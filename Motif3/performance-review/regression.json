@@ -1,0 +1,111 @@
+{
+  "styles": [
+    {
+      "id": "particle-form",
+      "engines": [
+        "gpu"
+      ],
+      "colors": 156
+    },
+    {
+      "id": "flow-field",
+      "engines": [
+        "gpu"
+      ],
+      "colors": 174
+    },
+    {
+      "id": "orbital-swarm",
+      "engines": [
+        "gpu"
+      ],
+      "colors": 227
+    },
+    {
+      "id": "metaballs",
+      "engines": [
+        "gpu"
+      ],
+      "colors": 240
+    },
+    {
+      "id": "kinetic-subdivision/kinetic-treemap",
+      "engines": [
+        "webgl"
+      ],
+      "colors": 152
+    },
+    {
+      "id": "kinetic-subdivision/mondrian-drift",
+      "engines": [
+        "webgl"
+      ],
+      "colors": 209
+    },
+    {
+      "id": "kinetic-subdivision/barcode-cathedral",
+      "engines": [
+        "webgl"
+      ],
+      "colors": 147
+    },
+    {
+      "id": "kinetic-subdivision/scanline-fault",
+      "engines": [
+        "webgl"
+      ],
+      "colors": 122
+    },
+    {
+      "id": "kinetic-subdivision/chromatic-register",
+      "engines": [
+        "webgl"
+      ],
+      "colors": 160
+    },
+    {
+      "id": "kinetic-subdivision/monolith-cut",
+      "engines": [
+        "webgl"
+      ],
+      "colors": 189
+    },
+    {
+      "id": "kinetic-subdivision/offset-press",
+      "engines": [
+        "webgl"
+      ],
+      "colors": 179
+    },
+    {
+      "id": "kinetic-subdivision/signal-cascade",
+      "engines": [
+        "webgl"
+      ],
+      "colors": 119
+    },
+    {
+      "id": "kinetic-subdivision/survey-grid",
+      "engines": [
+        "webgl"
+      ],
+      "colors": 152
+    },
+    {
+      "id": "kinetic-subdivision/afterimage-atlas",
+      "engines": [
+        "webgl"
+      ],
+      "colors": 159
+    }
+  ],
+  "media": {
+    "fallbackRevisions": 25,
+    "hiddenMattePlays": true,
+    "animatedMattePlays": true,
+    "unusedHiddenStops": true,
+    "removedStops": true
+  },
+  "errors": [],
+  "artifactRevision": "824d2fd4cb4ff1f7e0d4571aefc5c2ab10793569b055d2144fd34c66a469936a"
+}

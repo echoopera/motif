@@ -1,0 +1,30 @@
+{
+  "name": "engine-core",
+  "version": "1.0.0",
+  "entry": "src/index.js",
+  "dependsOn": [],
+  "exports": [
+    "TAU",
+    "clamp",
+    "lerp",
+    "fract",
+    "smooth",
+    "local",
+    "wrap",
+    "mulberry32",
+    "hash",
+    "gauss",
+    "createNoise",
+    "ease",
+    "spring",
+    "P",
+    "defaults",
+    "sanitize",
+    "mutate",
+    "randomize",
+    "memo",
+    "makeCanvas",
+    "fitFont",
+    "sampleText"
+  ]
+}

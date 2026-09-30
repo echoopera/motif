@@ -1,0 +1,20 @@
+{
+  "name": "renderer",
+  "version": "1.0.0",
+  "entry": "src/index.js",
+  "dependsOn": [
+    "engine-core",
+    "style-library",
+    "tokens"
+  ],
+  "exports": [
+    "renderFrame",
+    "exportSize",
+    "aspectRatio",
+    "frameCount",
+    "renderThumb",
+    "createStage",
+    "getStyle",
+    "TAU"
+  ]
+}

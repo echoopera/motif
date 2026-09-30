@@ -1,0 +1,21 @@
+{
+  "name": "style-library",
+  "version": "1.0.0",
+  "entry": "src/index.js",
+  "dependsOn": [
+    "engine-core",
+    "tokens"
+  ],
+  "exports": [
+    "CATEGORIES",
+    "SHARED_SCHEMA",
+    "STYLES",
+    "getStyle",
+    "defaultLook",
+    "sanitizeLook",
+    "mutateLook",
+    "randomizeLook",
+    "frameState",
+    "mulberry32"
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "name": "web-immersive-shell",
+  "version": "1.0.0",
+  "entry": "src/index.js",
+  "dependsOn": [
+    "exporter",
+    "renderer",
+    "style-library",
+    "tokens"
+  ],
+  "exports": [
+    "shellCss",
+    "shellHtml",
+    "boot"
+  ]
+}

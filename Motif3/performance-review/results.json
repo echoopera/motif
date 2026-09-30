@@ -1,0 +1,239 @@
+{
+  "artifactRevision": "824d2fd4cb4ff1f7e0d4571aefc5c2ab10793569b055d2144fd34c66a469936a",
+  "browser": "154.0.8037.58",
+  "date": "2026-09-29T06:51:58.832Z",
+  "fixture": "1920x1080 synthetic VP8 video, ~24 fps; 960x540 shader output; local headless hardware Chrome",
+  "runs": {
+    "before": {
+      "inactiveVideoStopped": null,
+      "stageCadence": {
+        "meanMs": 16.66583333333334,
+        "p95Ms": 16.700000000000728,
+        "scale": 1,
+        "fps": 60.00300015000748
+      },
+      "gpu": {
+        "ok": true,
+        "lost": false,
+        "resets": 0,
+        "budget": 4,
+        "scale": 1,
+        "timer": true,
+        "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5 Pro, Unspecified Version)",
+        "software": false
+      },
+      "webgpu": true,
+      "frameReuse": {
+        "bakes": 94,
+        "texImage": 0,
+        "texStorage": 0,
+        "texSubImage": 0,
+        "mipmaps": 0,
+        "resolves": 109,
+        "distinctTimes": 94,
+        "distinctBakes": 94
+      },
+      "uploadCounts": {
+        "bakes": 0,
+        "texImage": 20,
+        "texStorage": 0,
+        "texSubImage": 0,
+        "mipmaps": 10
+      },
+      "timings": {
+        "meanMs": 2.207999997138977,
+        "p50Ms": 2.0999999046325684,
+        "p95Ms": 3.700000047683716
+      },
+      "governor": {
+        "budgetBefore": 4,
+        "budgetAfter": 4,
+        "pausedScale": 1
+      },
+      "renderInfo": {
+        "u": 0.08333333333333333,
+        "engines": [
+          "cpu"
+        ],
+        "samples": 1,
+        "post": "gpu"
+      },
+      "kitErrors": [],
+      "pageErrors": []
+    },
+    "control": {
+      "inactiveVideoStopped": null,
+      "stageCadence": {
+        "meanMs": 16.66583333333334,
+        "p95Ms": 16.700000000000728,
+        "scale": 1,
+        "fps": 60.00300015000748
+      },
+      "gpu": {
+        "ok": true,
+        "lost": false,
+        "resets": 0,
+        "budget": 4,
+        "scale": 1,
+        "timer": true,
+        "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5 Pro, Unspecified Version)",
+        "software": false
+      },
+      "webgpu": true,
+      "frameReuse": {
+        "bakes": 94,
+        "texImage": 0,
+        "texStorage": 0,
+        "texSubImage": 0,
+        "mipmaps": 0,
+        "resolves": 109,
+        "distinctTimes": 94,
+        "distinctBakes": 94
+      },
+      "uploadCounts": {
+        "bakes": 0,
+        "texImage": 20,
+        "texStorage": 0,
+        "texSubImage": 0,
+        "mipmaps": 10
+      },
+      "timings": {
+        "meanMs": 2.3040000009536743,
+        "p50Ms": 2,
+        "p95Ms": 3.899999976158142
+      },
+      "governor": {
+        "budgetBefore": 4,
+        "budgetAfter": 4,
+        "pausedScale": 1
+      },
+      "renderInfo": {
+        "u": 0.08333333333333333,
+        "engines": [
+          "cpu"
+        ],
+        "samples": 1,
+        "post": "gpu"
+      },
+      "kitErrors": [],
+      "pageErrors": []
+    },
+    "after": {
+      "inactiveVideoStopped": true,
+      "stageCadence": {
+        "meanMs": 16.666666666666668,
+        "p95Ms": 16.799999999999272,
+        "scale": 1,
+        "fps": 59.99999999999999
+      },
+      "gpu": {
+        "ok": true,
+        "lost": false,
+        "resets": 0,
+        "budget": 1.3994484402240157,
+        "scale": 1,
+        "cadence": {
+          "meanMs": 29.722033333333354,
+          "p95Ms": 33.333,
+          "fps": 33.64507363224362
+        },
+        "timer": true,
+        "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5 Pro, Unspecified Version)",
+        "software": false
+      },
+      "webgpu": true,
+      "frameReuse": {
+        "bakes": 42,
+        "texImage": 0,
+        "texStorage": 0,
+        "texSubImage": 0,
+        "mipmaps": 0,
+        "resolves": 109,
+        "distinctTimes": 106,
+        "distinctBakes": 42
+      },
+      "uploadCounts": {
+        "bakes": 0,
+        "texImage": 10,
+        "texStorage": 0,
+        "texSubImage": 10,
+        "mipmaps": 10
+      },
+      "timings": {
+        "meanMs": 1.9640000009536742,
+        "p50Ms": 1.7000000476837158,
+        "p95Ms": 2.899999976158142
+      },
+      "governor": {
+        "budgetBefore": 1.936952858441544,
+        "budgetAfter": 1.3994484402240157,
+        "pausedScale": 1
+      },
+      "renderInfo": {
+        "u": 0.08333333333333333,
+        "engines": [
+          "webgl"
+        ],
+        "samples": 1,
+        "post": "gpu"
+      },
+      "kitErrors": [],
+      "fullHd": [
+        {
+          "layers": 1,
+          "shutter": 0,
+          "samples": 1,
+          "fullResolution": true,
+          "meanMs": 16.666666666666668,
+          "p95Ms": 16.700000000000728,
+          "fps": 59.99999999999999
+        },
+        {
+          "layers": 2,
+          "shutter": 180,
+          "samples": 4,
+          "fullResolution": true,
+          "meanMs": 16.66533333333333,
+          "p95Ms": 16.700000000000728,
+          "fps": 60.00480038403074
+        }
+      ],
+      "export": {
+        "size": 100007,
+        "type": "video/mp4",
+        "filename": "motif-kinetic-subdivision/kinetic-treemap-16x9-320x180-24fps.mp4",
+        "note": "",
+        "colorTag": "bt709/iec61966-2-1/bt709/full",
+        "encoderTag": "bt709/iec61966-2-1/bt709/full",
+        "audio": false
+      },
+      "pageErrors": []
+    }
+  },
+  "controlParity": {
+    "frame": {
+      "different": 14179,
+      "maxDelta": 1
+    },
+    "blur": {
+      "different": 24,
+      "maxDelta": 1
+    }
+  },
+  "controlMatchesAfter": {
+    "frame": true,
+    "blur": true
+  },
+  "parity": {
+    "frame": {
+      "bytes": 2073600,
+      "different": 14179,
+      "maxDelta": 1
+    },
+    "blur": {
+      "bytes": 230400,
+      "different": 24,
+      "maxDelta": 1
+    }
+  }
+}

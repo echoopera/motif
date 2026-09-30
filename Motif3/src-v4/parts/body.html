@@ -1,0 +1,119 @@
+<div class="app" id="app" data-tab="layer">
+  <header class="bar">
+    <div class="brand"><span class="mark"><i aria-hidden="true"></i>MOTIF<b>4</b></span></div>
+    <div class="proj"><span class="dot" aria-hidden="true"></span><b id="projName">Demo project</b><span id="projMeta">· 3 layers · 6.00 s loop</span></div>
+    <div class="bar-r">
+      <button class="chipbtn" id="bpmChip" hidden title="Audio tempo: open the Audio page"></button>
+      <button class="btn ghost" id="newBtn" title="New project (current one stays undoable)">New</button>
+      <button class="btn ghost icon" id="undoBtn" title="Undo (⌘Z)" aria-label="Undo"><svg class="i" viewBox="0 0 24 24"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg></button>
+      <button class="btn ghost icon" id="redoBtn" title="Redo (⇧⌘Z)" aria-label="Redo"><svg class="i" viewBox="0 0 24 24"><path d="m15 14 5-5-5-5"/><path d="M20 9H9.5a5.5 5.5 0 0 0 0 11H13"/></svg></button>
+      <span class="sep" aria-hidden="true"></span>
+      <button class="btn ghost icon" id="keysBtn" aria-label="Keyboard shortcuts" title="Shortcuts (?)"><svg class="i" viewBox="0 0 24 24"><rect x="2.5" y="6" width="19" height="12" rx="2"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M7 14h10"/></svg></button>
+      <button class="btn primary" id="exportBtn" title="Deliver (X)"><svg class="i" viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5M4 20h16"/></svg>Deliver</button>
+    </div>
+  </header>
+  <div class="actions" id="actions" role="toolbar" aria-label="Explore">
+    <span class="grp-l">Explore</span>
+    <button class="btn accent" id="mutateBtn" title="Nudge the selected layer's values (M)"><svg class="i" viewBox="0 0 24 24"><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/></svg>Mutate <kbd>M</kbd></button>
+    <button class="btn" id="evolveBtn" title="Breed six variations (E)"><svg class="i" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Evolve <kbd>E</kbd></button>
+    <button class="btn" id="randomBtn" title="Randomize the selected layer (R)"><svg class="i" viewBox="0 0 24 24"><path d="M16 3h5v5M4 20 21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg>Random <kbd>R</kbd></button>
+    <span class="sep" aria-hidden="true"></span>
+    <div class="strength" title="How far Mutate and Evolve move values"><label for="strength">Strength</label><input type="range" id="strength" min="0.05" max="1" step="0.05" value="0.35"><output class="val" id="strengthVal">0.35</output></div>
+    <span class="sep" aria-hidden="true"></span>
+    <button class="btn ghost icon" id="resetBtn" title="Reset this layer's style values" aria-label="Reset style values"><svg class="i" viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 0 2.6-5.9L4 8.5"/><path d="M4 3.5v5h5"/></svg></button>
+    <span class="spacer"></span>
+    <div class="ctx" id="ctxInfo"></div>
+  </div>
+  <aside class="lib" id="panel-library" aria-label="Style library" data-view="grid">
+    <div class="phead"><span class="t">Library</span><span class="readout" id="libCount"></span><span class="grow"></span>
+      <div class="seg" role="radiogroup" aria-label="Library view" id="libView"><button role="radio" data-v="grid" aria-checked="true" title="Thumbnails" aria-label="Thumbnails"><svg class="i" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg></button><button role="radio" data-v="list" aria-checked="false" title="List" aria-label="List"><svg class="i" viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg></button></div>
+    </div>
+    <div class="lib-head">
+      <input type="search" id="search" placeholder="Search styles" aria-label="Search styles" autocomplete="off">
+      <div class="chips" id="cats" role="group" aria-label="Filter by category"></div>
+    </div>
+    <p class="lib-note"></p>
+    <ul class="lib-list" id="libList" role="listbox" aria-label="Styles"></ul>
+  </aside>
+  <main class="stage" id="stageCol">
+    <div class="vhead">
+      <span class="t">Viewer</span><span class="clip" id="vClip"></span><span class="grow"></span>
+      <div class="seg" role="radiogroup" aria-label="Aspect ratio" id="aspects"></div>
+      <select id="aspectSel" class="aspect-sel" aria-label="Aspect ratio"></select>
+      <label class="mini"><span class="mlabel">Preview</span><select id="quality" aria-label="Preview quality"><option value="auto">Auto</option><option value="high">Full</option><option value="draft">Half</option></select></label>
+      <button class="btn ghost icon" id="guidesBtn" aria-pressed="false" aria-label="Safe-area guides" title="Safe-area guides (G)"><svg class="i" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="1"/><rect x="6" y="8" width="12" height="8" stroke-dasharray="2 2"/></svg></button>
+    </div>
+    <div class="stage-host" id="stageHost">
+      <div class="stage-box" id="stageBox">
+        <div class="guides" id="guides" hidden><i class="action"></i><i class="title"></i><i class="cross"></i></div>
+      </div>
+      <div class="coach" id="coach" hidden role="note">
+        <span>Pick a style</span><span><kbd>M</kbd> Mutate</span><span><kbd>Space</kbd> Play</span>
+        <button class="btn ghost icon" id="coachClose" aria-label="Dismiss"><svg class="i" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+      </div>
+      <div class="evolve" id="evolve" hidden role="dialog" aria-modal="false" aria-labelledby="evolveTitle">
+        <div class="evolve-head">
+          <h2 id="evolveTitle">Evolve</h2>
+          <label>Strength <input type="range" id="evoStrength" min="0.05" max="1" step="0.05" value="0.35" aria-label="Evolve strength"></label>
+          <label><input type="checkbox" class="switch" id="evoColour" role="switch"> Colour</label>
+          <button class="btn" id="evoAgain">Breed again</button>
+          <button class="btn" id="evoClose" aria-label="Close Evolve">Close</button>
+          <p class="hint" id="evoHint">Pick one · 1–6 · Esc</p>
+        </div>
+        <div class="evolve-grid" id="evoGrid"></div>
+      </div>
+    </div>
+    <p class="rm-hint" id="rmHint" hidden>Reduced motion is on · Space to play</p>
+    <div class="scrub">
+      <input type="range" id="scrub" min="0" max="1000" value="0" aria-label="Loop position">
+    </div>
+    <div class="transport">
+      <div class="tc" id="time" aria-live="off">00:00:00:00</div>
+      <div class="tbtns">
+        <button class="btn icon" id="toStart" aria-label="Go to start" title="Go to start (Home)"><svg class="i" viewBox="0 0 24 24"><path d="M6 5v14M18 6l-8 6 8 6z"/></svg></button>
+        <button class="btn icon" id="stepBack" aria-label="Previous frame" title="Previous frame (←)"><svg class="i" viewBox="0 0 24 24"><path d="m15 6-6 6 6 6"/></svg></button>
+        <button class="btn icon" id="play" aria-label="Pause" title="Play / pause (Space)"><svg viewBox="0 0 24 24"><path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z"/></svg></button>
+        <button class="btn icon" id="stepFwd" aria-label="Next frame" title="Next frame (→)"><svg class="i" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg></button>
+        <button class="btn icon" id="loopBtn" aria-label="Loop playback" title="Loops seamlessly" aria-pressed="true" disabled><svg class="i" viewBox="0 0 24 24"><path d="M17 2l3 3-3 3"/><path d="M4 11V9a4 4 0 0 1 4-4h12M7 22l-3-3 3-3"/><path d="M20 13v2a4 4 0 0 1-4 4H4"/></svg></button>
+      </div>
+      <div class="tread"><span class="readout" id="frameRead">f 000</span><span class="readout" id="perf" title="Render time per frame"></span></div>
+    </div>
+  </main>
+  <section class="lane" id="lane" aria-label="Timeline" data-collapsed="false">
+    <div class="lane-head" id="laneHead"></div>
+    <div class="lane-rows" id="laneRows"></div>
+  </section>
+  <nav class="tabs" role="tablist" aria-label="Inspector pages" id="tabs">
+    <button role="tab" class="mobile" data-tab="library" aria-selected="false" aria-controls="panel-library"><svg class="i" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg><span>Library</span></button>
+    <button role="tab" data-tab="layer" aria-selected="true" aria-controls="panel-layer"><svg class="i" viewBox="0 0 24 24"><path d="m12 3 9 5-9 5-9-5z"/><path d="m3 13 9 5 9-5"/></svg><span>Layers</span></button>
+    <button role="tab" data-tab="colour" aria-selected="false" aria-controls="panel-colour"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="8" r="2"/><circle cx="8" cy="14" r="2"/><circle cx="16" cy="14" r="2"/></svg><span>Colour</span></button>
+    <button role="tab" data-tab="finish" aria-selected="false" aria-controls="panel-finish"><svg class="i" viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 9 9"/><path d="M12 7a5 5 0 1 0 5 5"/><path d="M15 3h6v6M21 3l-7 7"/></svg><span>Finish</span></button>
+    <button role="tab" data-tab="audio" aria-selected="false" aria-controls="panel-audio"><svg class="i" viewBox="0 0 24 24"><path d="M3 12h2M7 8v8M11 5v14M15 9v6M19 7v10"/></svg><span>Audio</span></button>
+    <button role="tab" data-tab="looks" aria-selected="false" aria-controls="panel-looks"><svg class="i" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="1.5"/><path d="m3 16 5-5 4 4 3-3 6 6"/></svg><span>Looks</span></button>
+    <button role="tab" data-tab="kits" aria-selected="false" aria-controls="panel-kits"><svg class="i" viewBox="0 0 24 24"><path d="M21 8 12 3 3 8v8l9 5 9-5z"/><path d="m3 8 9 5 9-5M12 13v8"/></svg><span>Kits</span></button>
+  </nav>
+  <footer class="pagebar">
+    <div class="pb-l"><span class="ver">MOTIF 4.0</span><button class="chipbtn" id="engineChip" title="Render engine">CPU</button></div>
+    <div class="pb-r"><button class="chipbtn" id="gpuChip" title="Shader render scale">Shaders</button></div>
+  </footer>
+  <aside class="insp" id="insp" aria-label="Inspector">
+    <section role="tabpanel" id="panel-layer" data-panel="layer"></section>
+    <section role="tabpanel" id="panel-colour" data-panel="colour" hidden></section>
+    <section role="tabpanel" id="panel-finish" data-panel="finish" hidden></section>
+    <section role="tabpanel" id="panel-audio" data-panel="audio" hidden></section>
+    <section role="tabpanel" id="panel-kits" data-panel="kits" hidden></section>
+    <section role="tabpanel" id="panel-looks" data-panel="looks" hidden>
+      <div class="panel-head"><div class="lbl">Library</div><h1>Looks</h1></div>
+      <div class="looks">
+        <div class="btnrow">
+          <button class="btn primary" id="saveLook" title="Save the current look (S)">Save look</button>
+          <button class="btn" id="importBtn">Import</button>
+          <button class="btn" id="exportPresetBtn">Export JSON</button>
+          <input type="file" id="importFile" class="file" accept="application/json,.json" tabindex="-1" aria-hidden="true">
+        </div>
+        <div class="looks-grid" id="looks"></div>
+        <p class="empty" id="looksEmpty">No looks yet. Press S to save one.</p>
+      </div>
+    </section>
+  </aside>
+</div>

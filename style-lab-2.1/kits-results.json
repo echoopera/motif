@@ -1,0 +1,740 @@
+{
+ "when": "2026-09-29T01:20:45.926Z",
+ "seconds": 724.855,
+ "pass": 28,
+ "total": 28,
+ "results": [
+  {
+   "id": "K1",
+   "name": "Bundled kits register 54 shader styles alongside the 25 built-ins",
+   "pass": true,
+   "detail": "[{\"id\":\"cyberpunk\",\"n\":18,\"pal\":4},{\"id\":\"neuro\",\"n\":18,\"pal\":4},{\"id\":\"quantum\",\"n\":18,\"pal\":4}]"
+  },
+  {
+   "id": "K2",
+   "name": "All 54 kit styles compile (WebGL2, GLSL ES 3.0)",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "id": "K3",
+   "name": "All 54 kit styles render visible, finite frames",
+   "pass": true,
+   "detail": "mean luma 0.046–0.657"
+  },
+  {
+   "id": "K4a",
+   "name": "Frame at t = loop length is identical to frame 0 for every kit style",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "id": "K4b",
+   "name": "Loop seam is no bigger than the largest ordinary frame step (ratio ≤ 3)",
+   "pass": true,
+   "detail": "max 1.91"
+  },
+  {
+   "id": "K5",
+   "name": "A .motifkit package imports through the same path as a dropped file",
+   "pass": true,
+   "detail": "Updated Neuro 1.0.0 → 1.0.0: 18 styles, 4 palettes."
+  },
+  {
+   "id": "K6a",
+   "name": "The SDK starter kit installs cleanly",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "id": "K6b",
+   "name": "Kits without an id are rejected",
+   "pass": true,
+   "detail": "id must be 2–32 chars: lowercase letters, digits and hyphens, starting with a letter."
+  },
+  {
+   "id": "K6c",
+   "name": "Shader compile errors are rejected with the pass-local line number",
+   "pass": true,
+   "detail": "Shader: orbits: Pass 1: Error line 9: 'undefinedThing' : undeclared identifier\n\u0000"
+  },
+  {
+   "id": "K6d",
+   "name": "Duplicate style ids are rejected",
+   "pass": true,
+   "detail": "styles[2] (orbits): duplicate id."
+  },
+  {
+   "id": "K6e",
+   "name": "Shared parameter names (seed, zoom…) are rejected",
+   "pass": true,
+   "detail": "styles[0] (orbits).params.seed: \"seed\" is a shared parameter name."
+  },
+  {
+   "id": "K6f",
+   "name": "Defaults outside their range are rejected",
+   "pass": true,
+   "detail": "styles[0] (orbits).params.radius: def 9 is outside 0.1–0.45."
+  },
+  {
+   "id": "K6g",
+   "name": "Passes that define their own main() are rejected",
+   "pass": true,
+   "detail": "styles[0] (orbits): styles/orbits.glsl must not define main(); the runtime supplies it."
+  },
+  {
+   "id": "K6h",
+   "name": "Unknown kit formats are rejected",
+   "pass": true,
+   "detail": "format must be \"motif-kit@1\" (got \"motif-kit@9\")."
+  },
+  {
+   "id": "K7a",
+   "name": "Picking a kit style adopts the kit palette",
+   "pass": true,
+   "detail": "neuro/mitosis · neuro.confocal"
+  },
+  {
+   "id": "K7b",
+   "name": "Mutate works on kit parameters",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "id": "K7c",
+   "name": "Kit parameters keyframe like built-ins",
+   "pass": true,
+   "detail": "cleave @¼ = 0.5"
+  },
+  {
+   "id": "K7d",
+   "name": "Presets round-trip kit styles",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "id": "K7e",
+   "name": "Presets that need a missing kit are detected",
+   "pass": true,
+   "detail": "[\"ghost\"]"
+  },
+  {
+   "id": "K7f",
+   "name": "Kit styles export (PNG frame)",
+   "pass": true,
+   "detail": "image/png 255734"
+  },
+  {
+   "id": "K7g",
+   "name": "Removing a kit that a layer uses is blocked with a reason",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "id": "K8a",
+   "name": "Limiter on: every kit style stays at ≤ 3 flashes in any second, per screen tile, at 4× tempo (1.5 s effective loop)",
+   "pass": true,
+   "detail": "worst 3; limiter off at defaults: none above 3"
+  },
+  {
+   "id": "K8b",
+   "name": "Limiter on: still ≤ 3 flashes per second per tile at the extreme 0.25 s effective loop (temporal low-pass engages)",
+   "pass": true,
+   "detail": "worst 0"
+  },
+  {
+   "id": "K9",
+   "name": "Imported kits persist across reloads; a removed bundled kit stays removed and reinstallable",
+   "pass": true,
+   "detail": "{\"kits\":[\"quantum\",\"neuro\",\"my-kit\"],\"n\":63,\"cat\":[\"cyberpunk\"]}"
+  },
+  {
+   "id": "K9b",
+   "name": "A bundled kit reinstalls from the catalog",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "id": "K10",
+   "name": "Kit Manager lists kits, every control is labelled, the tab fits, kit chips filter the library",
+   "pass": true,
+   "detail": "{\"cards\":4,\"unlabeled\":0,\"btns\":0,\"tabVisible\":true,\"chips\":[\"All\",\"Kinetic type\",\"Geometry\",\"Particles & physics\",\"Generative\",\"Quantum\",\"Neuro\",\"My Kit\",\"Cyberpunk\"],\"drop\":true}"
+  },
+  {
+   "id": "K11",
+   "name": "Per-style frame time recorded (160×90, SwiftShader)",
+   "pass": true,
+   "detail": "median 135 ms · max 1149 ms (cyberpunk/neon-rain)"
+  },
+  {
+   "id": "K12",
+   "name": "No page errors",
+   "pass": true,
+   "detail": ""
+  }
+ ],
+ "flash": [
+  {
+   "id": "cyberpunk/neon-rain",
+   "safeWorst": 1,
+   "offDefault": 1
+  },
+  {
+   "id": "cyberpunk/datamosh",
+   "safeWorst": 0,
+   "offDefault": 0
+  },
+  {
+   "id": "cyberpunk/holo-decay",
+   "safeWorst": 2,
+   "offDefault": 1
+  },
+  {
+   "id": "cyberpunk/signal-loss",
+   "safeWorst": 1,
+   "offDefault": 0
+  },
+  {
+   "id": "cyberpunk/megastructure",
+   "safeWorst": 1,
+   "offDefault": 1
+  },
+  {
+   "id": "cyberpunk/cipher-fall",
+   "safeWorst": 0,
+   "offDefault": 0
+  },
+  {
+   "id": "cyberpunk/ice-breach",
+   "safeWorst": 2,
+   "offDefault": 3
+  },
+  {
+   "id": "cyberpunk/crt-burn",
+   "safeWorst": 0,
+   "offDefault": 0
+  },
+  {
+   "id": "cyberpunk/pixel-sort",
+   "safeWorst": 2,
+   "offDefault": 1
+  },
+  {
+   "id": "cyberpunk/circuit-growth",
+   "safeWorst": 1,
+   "offDefault": 0
+  },
+  {
+   "id": "cyberpunk/drone-swarm",
+   "safeWorst": 1,
+   "offDefault": 1
+  },
+  {
+   "id": "cyberpunk/thermal-scan",
+   "safeWorst": 1,
+   "offDefault": 0
+  },
+  {
+   "id": "cyberpunk/chrome-liquid",
+   "safeWorst": 1,
+   "offDefault": 0
+  },
+  {
+   "id": "cyberpunk/net-tunnel",
+   "safeWorst": 3,
+   "offDefault": 1
+  },
+  {
+   "id": "cyberpunk/smog-sprawl",
+   "safeWorst": 0,
+   "offDefault": 0
+  },
+  {
+   "id": "cyberpunk/bit-crush",
+   "safeWorst": 1,
+   "offDefault": 1
+  },
+  {
+   "id": "cyberpunk/emp",
+   "safeWorst": 2,
+   "offDefault": 1
+  },
+  {
+   "id": "cyberpunk/ar-overlay",
+   "safeWorst": 2,
+   "offDefault": 3
+  },
+  {
+   "id": "quantum/event-horizon",
+   "safeWorst": 0,
+   "offDefault": 0
+  },
+  {
+   "id": "quantum/quasar-jet",
+   "safeWorst": 0,
+   "offDefault": 0
+  },
+  {
+   "id": "quantum/supernova",
+   "safeWorst": 2,
+   "offDefault": 1
+  },
+  {
+   "id": "quantum/pulsar",
+   "safeWorst": 0,
+   "offDefault": 0
+  },
+  {
+   "id": "quantum/wormhole",
+   "safeWorst": 0,
+   "offDefault": 0
+  },
+  {
+   "id": "quantum/nebula-genesis",
+   "safeWorst": 1,
+   "offDefault": 0
+  },
+  {
+   "id": "quantum/gravitational-wave",
+   "safeWorst": 1,
+   "offDefault": 1
+  },
+  {
+   "id": "quantum/wavefunction",
+   "safeWorst": 0,
+   "offDefault": 0
+  },
+  {
+   "id": "quantum/double-slit",
+   "safeWorst": 1,
+   "offDefault": 0
+  },
+  {
+   "id": "quantum/orbitals",
+   "safeWorst": 0,
+   "offDefault": 0
+  },
+  {
+   "id": "quantum/quantum-foam",
+   "safeWorst": 1,
+   "offDefault": 0
+  },
+  {
+   "id": "quantum/entanglement",
+   "safeWorst": 0,
+   "offDefault": 0
+  },
+  {
+   "id": "quantum/feynman-paths",
+   "safeWorst": 1,
+   "offDefault": 0
+  },
+  {
+   "id": "quantum/bubble-chamber",
+   "safeWorst": 1,
+   "offDefault": 1
+  },
+  {
+   "id": "quantum/cosmic-web",
+   "safeWorst": 1,
+   "offDefault": 0
+  },
+  {
+   "id": "quantum/galaxy-collision",
+   "safeWorst": 0,
+   "offDefault": 0
+  },
+  {
+   "id": "quantum/solar-corona",
+   "safeWorst": 0,
+   "offDefault": 0
+  },
+  {
+   "id": "quantum/tokamak",
+   "safeWorst": 0,
+   "offDefault": 0
+  },
+  {
+   "id": "neuro/neural-arbor",
+   "safeWorst": 1,
+   "offDefault": 0
+  },
+  {
+   "id": "neuro/action-potential",
+   "safeWorst": 2,
+   "offDefault": 1
+  },
+  {
+   "id": "neuro/synaptic-cleft",
+   "safeWorst": 1,
+   "offDefault": 0
+  },
+  {
+   "id": "neuro/connectome",
+   "safeWorst": 2,
+   "offDefault": 1
+  },
+  {
+   "id": "neuro/cortical-fold",
+   "safeWorst": 0,
+   "offDefault": 0
+  },
+  {
+   "id": "neuro/mitosis",
+   "safeWorst": 0,
+   "offDefault": 0
+  },
+  {
+   "id": "neuro/physarum",
+   "safeWorst": 1,
+   "offDefault": 1
+  },
+  {
+   "id": "neuro/morphogen",
+   "safeWorst": 1,
+   "offDefault": 0
+  },
+  {
+   "id": "neuro/epithelium",
+   "safeWorst": 0,
+   "offDefault": 0
+  },
+  {
+   "id": "neuro/calcium-wave",
+   "safeWorst": 0,
+   "offDefault": 0
+  },
+  {
+   "id": "neuro/microtubule-transit",
+   "safeWorst": 2,
+   "offDefault": 1
+  },
+  {
+   "id": "neuro/protein-fold",
+   "safeWorst": 1,
+   "offDefault": 1
+  },
+  {
+   "id": "neuro/organoid",
+   "safeWorst": 1,
+   "offDefault": 0
+  },
+  {
+   "id": "neuro/eeg-cascade",
+   "safeWorst": 0,
+   "offDefault": 0
+  },
+  {
+   "id": "neuro/grid-cells",
+   "safeWorst": 0,
+   "offDefault": 0
+  },
+  {
+   "id": "neuro/neural-lace",
+   "safeWorst": 3,
+   "offDefault": 1
+  },
+  {
+   "id": "neuro/chromatin",
+   "safeWorst": 1,
+   "offDefault": 0
+  },
+  {
+   "id": "neuro/confocal",
+   "safeWorst": 2,
+   "offDefault": 1
+  },
+  {
+   "id": "my-kit/orbits",
+   "safeWorst": 0,
+   "offDefault": 0
+  },
+  {
+   "id": "my-kit/glitch-bars",
+   "safeWorst": 1,
+   "offDefault": 1
+  }
+ ],
+ "flashX": [
+  {
+   "id": "cyberpunk/neon-rain",
+   "safeWorst": 0,
+   "offDefault": null
+  },
+  {
+   "id": "cyberpunk/datamosh",
+   "safeWorst": 0,
+   "offDefault": null
+  },
+  {
+   "id": "cyberpunk/holo-decay",
+   "safeWorst": 0,
+   "offDefault": null
+  },
+  {
+   "id": "cyberpunk/signal-loss",
+   "safeWorst": 0,
+   "offDefault": null
+  },
+  {
+   "id": "cyberpunk/megastructure",
+   "safeWorst": 0,
+   "offDefault": null
+  },
+  {
+   "id": "cyberpunk/cipher-fall",
+   "safeWorst": 0,
+   "offDefault": null
+  },
+  {
+   "id": "cyberpunk/ice-breach",
+   "safeWorst": 0,
+   "offDefault": null
+  },
+  {
+   "id": "cyberpunk/crt-burn",
+   "safeWorst": 0,
+   "offDefault": null
+  },
+  {
+   "id": "cyberpunk/pixel-sort",
+   "safeWorst": 0,
+   "offDefault": null
+  },
+  {
+   "id": "cyberpunk/circuit-growth",
+   "safeWorst": 0,
+   "offDefault": null
+  },
+  {
+   "id": "cyberpunk/drone-swarm",
+   "safeWorst": 0,
+   "offDefault": null
+  },
+  {
+   "id": "cyberpunk/thermal-scan",
+   "safeWorst": 0,
+   "offDefault": null
+  },
+  {
+   "id": "cyberpunk/chrome-liquid",
+   "safeWorst": 0,
+   "offDefault": null
+  },
+  {
+   "id": "cyberpunk/net-tunnel",
+   "safeWorst": 0,
+   "offDefault": null
+  },
+  {
+   "id": "cyberpunk/smog-sprawl",
+   "safeWorst": 0,
+   "offDefault": null
+  },
+  {
+   "id": "cyberpunk/bit-crush",
+   "safeWorst": 0,
+   "offDefault": null
+  },
+  {
+   "id": "cyberpunk/emp",
+   "safeWorst": 0,
+   "offDefault": null
+  },
+  {
+   "id": "cyberpunk/ar-overlay",
+   "safeWorst": 0,
+   "offDefault": null
+  },
+  {
+   "id": "quantum/event-horizon",
+   "safeWorst": 0,
+   "offDefault": null
+  },
+  {
+   "id": "quantum/quasar-jet",
+   "safeWorst": 0,
+   "offDefault": null
+  },
+  {
+   "id": "quantum/supernova",
+   "safeWorst": 0,
+   "offDefault": null
+  },
+  {
+   "id": "quantum/pulsar",
+   "safeWorst": 0,
+   "offDefault": null
+  },
+  {
+   "id": "quantum/wormhole",
+   "safeWorst": 0,
+   "offDefault": null
+  },
+  {
+   "id": "quantum/nebula-genesis",
+   "safeWorst": 0,
+   "offDefault": null
+  },
+  {
+   "id": "quantum/gravitational-wave",
+   "safeWorst": 0,
+   "offDefault": null
+  },
+  {
+   "id": "quantum/wavefunction",
+   "safeWorst": 0,
+   "offDefault": null
+  },
+  {
+   "id": "quantum/double-slit",
+   "safeWorst": 0,
+   "offDefault": null
+  },
+  {
+   "id": "quantum/orbitals",
+   "safeWorst": 0,
+   "offDefault": null
+  },
+  {
+   "id": "quantum/quantum-foam",
+   "safeWorst": 0,
+   "offDefault": null
+  },
+  {
+   "id": "quantum/entanglement",
+   "safeWorst": 0,
+   "offDefault": null
+  },
+  {
+   "id": "quantum/feynman-paths",
+   "safeWorst": 0,
+   "offDefault": null
+  },
+  {
+   "id": "quantum/bubble-chamber",
+   "safeWorst": 0,
+   "offDefault": null
+  },
+  {
+   "id": "quantum/cosmic-web",
+   "safeWorst": 0,
+   "offDefault": null
+  },
+  {
+   "id": "quantum/galaxy-collision",
+   "safeWorst": 0,
+   "offDefault": null
+  },
+  {
+   "id": "quantum/solar-corona",
+   "safeWorst": 0,
+   "offDefault": null
+  },
+  {
+   "id": "quantum/tokamak",
+   "safeWorst": 0,
+   "offDefault": null
+  },
+  {
+   "id": "neuro/neural-arbor",
+   "safeWorst": 0,
+   "offDefault": null
+  },
+  {
+   "id": "neuro/action-potential",
+   "safeWorst": 0,
+   "offDefault": null
+  },
+  {
+   "id": "neuro/synaptic-cleft",
+   "safeWorst": 0,
+   "offDefault": null
+  },
+  {
+   "id": "neuro/connectome",
+   "safeWorst": 0,
+   "offDefault": null
+  },
+  {
+   "id": "neuro/cortical-fold",
+   "safeWorst": 0,
+   "offDefault": null
+  },
+  {
+   "id": "neuro/mitosis",
+   "safeWorst": 0,
+   "offDefault": null
+  },
+  {
+   "id": "neuro/physarum",
+   "safeWorst": 0,
+   "offDefault": null
+  },
+  {
+   "id": "neuro/morphogen",
+   "safeWorst": 0,
+   "offDefault": null
+  },
+  {
+   "id": "neuro/epithelium",
+   "safeWorst": 0,
+   "offDefault": null
+  },
+  {
+   "id": "neuro/calcium-wave",
+   "safeWorst": 0,
+   "offDefault": null
+  },
+  {
+   "id": "neuro/microtubule-transit",
+   "safeWorst": 0,
+   "offDefault": null
+  },
+  {
+   "id": "neuro/protein-fold",
+   "safeWorst": 0,
+   "offDefault": null
+  },
+  {
+   "id": "neuro/organoid",
+   "safeWorst": 0,
+   "offDefault": null
+  },
+  {
+   "id": "neuro/eeg-cascade",
+   "safeWorst": 0,
+   "offDefault": null
+  },
+  {
+   "id": "neuro/grid-cells",
+   "safeWorst": 0,
+   "offDefault": null
+  },
+  {
+   "id": "neuro/neural-lace",
+   "safeWorst": 0,
+   "offDefault": null
+  },
+  {
+   "id": "neuro/chromatin",
+   "safeWorst": 0,
+   "offDefault": null
+  },
+  {
+   "id": "neuro/confocal",
+   "safeWorst": 0,
+   "offDefault": null
+  },
+  {
+   "id": "my-kit/orbits",
+   "safeWorst": 0,
+   "offDefault": null
+  },
+  {
+   "id": "my-kit/glitch-bars",
+   "safeWorst": 0,
+   "offDefault": null
+  }
+ ]
+}

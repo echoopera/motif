@@ -1,0 +1,10 @@
+{
+  "order": [
+    "tokens",
+    "engine-core",
+    "style-library",
+    "renderer",
+    "exporter",
+    "web-immersive-shell"
+  ]
+}

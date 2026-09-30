@@ -1,0 +1,20 @@
+{
+  "name": "tokens",
+  "version": "1.0.0",
+  "entry": "src/index.js",
+  "dependsOn": [],
+  "exports": [
+    "TOKEN_VERSION",
+    "uiCss",
+    "PALETTES",
+    "FONTS",
+    "FONT_LINK",
+    "ASPECTS",
+    "rgbOf",
+    "alpha",
+    "mix",
+    "mixRgb",
+    "luminance",
+    "resolvePalette"
+  ]
+}

@@ -1,0 +1,43 @@
+<input type="file" id="kitFile" class="file" accept=".motifkit,.zip,application/zip,application/json,.json" multiple tabindex="-1" aria-hidden="true">
+<div class="dropzone" id="dropzone" hidden><div><b>Drop to add</b><span>.motifkit kits · images and video for MEDIA styles</span></div></div>
+<input type="file" id="mediaFile" class="file" accept="image/*,video/*" tabindex="-1" aria-hidden="true">
+<input type="file" id="imgFile" class="file" accept="image/*" tabindex="-1" aria-hidden="true">
+<input type="file" id="audioFile" class="file" accept="audio/*,.mp3,.wav,.m4a,.aac,.ogg,.flac" tabindex="-1" aria-hidden="true">
+<dialog id="exportDlg" aria-labelledby="exportTitle">
+  <div class="dlg-head"><h2 id="exportTitle">Export</h2><button class="btn icon" id="exportClose" aria-label="Close">✕</button></div>
+  <div class="dlg-body">
+    <div class="field"><span class="lbl">Format</span><div class="formats" id="formats" role="radiogroup" aria-label="Format"></div></div>
+    <div class="grid2">
+      <label class="field"><span class="lbl">Aspect</span><select id="exAspect"></select></label>
+      <label class="field"><span class="lbl">Size</span><select id="exTier"></select></label>
+      <label class="field"><span class="lbl">Frame rate</span><select id="exFps"></select></label>
+      <label class="field"><span class="lbl">Loops</span><select id="exLoops"><option>1</option><option>2</option><option>3</option><option>4</option><option>8</option></select></label>
+      <label class="field"><span class="lbl">Colour space</span><select id="exSpace"></select></label>
+      <div class="field"><span class="lbl">Motion blur</span><span class="summary" id="exBlur"></span></div>
+    </div>
+    <div class="toggles">
+      <label><span>Transparent background</span><input type="checkbox" class="switch" id="exAlpha" role="switch"></label>
+      <label><span>Broadcast-safe limiter</span><input type="checkbox" class="switch" id="exLegal" role="switch"></label>
+      <label id="exAudioRow"><span>Include audio</span><input type="checkbox" class="switch" id="exAudio" role="switch"></label>
+    </div>
+    <div class="summary" id="exSummary"></div>
+    <div class="gpuline" id="exGpu"></div>
+    <div class="speed"><button class="btn sm" id="exCheck">Check speed</button><div class="speedtable" id="exSpeed" aria-live="polite"></div></div>
+    <progress id="exProgress" max="1" value="0" hidden></progress>
+    <div class="status" id="exStatus" role="status" aria-live="polite"></div>
+  </div>
+  <div class="dlg-foot"><button class="btn" id="exCancel">Cancel</button><button class="btn" id="exSave" hidden>Save file</button><button class="btn primary" id="exRender">Render</button></div>
+</dialog>
+<dialog id="keysDlg" aria-labelledby="keysTitle">
+  <div class="dlg-head"><h2 id="keysTitle">Shortcuts</h2><button class="btn icon" id="keysClose" aria-label="Close">✕</button></div>
+  <div class="dlg-body"><dl class="keys-list">
+    <dt>Space</dt><dd>Play / pause</dd><dt>← →</dt><dd>Step a frame (Shift: ten)</dd><dt>Home</dt><dd>First frame</dd>
+    <dt>[ ]</dt><dd>Previous / next style</dd><dt>M · E · R</dt><dd>Mutate · Evolve · Random</dd>
+    <dt>1–6</dt><dd>Aspect ratio (Evolve: keep variation)</dd><dt>K</dt><dd>Show / hide timeline</dd>
+    <dt>Delete</dt><dd>Remove selected key</dd><dt>Alt + ← →</dt><dd>Nudge selected key a frame</dd>
+    <dt>⌘Z · ⇧⌘Z</dt><dd>Undo · Redo</dd><dt>S</dt><dd>Save look</dd><dt>G</dt><dd>Safe-area guides</dd><dt>X</dt><dd>Deliver</dd><dt>?</dt><dd>This list</dd>
+    <dt>◇</dt><dd>Key a value at the playhead</dd><dt>Double-click</dt><dd>Reset a slider</dd>
+  </dl></div>
+</dialog>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+

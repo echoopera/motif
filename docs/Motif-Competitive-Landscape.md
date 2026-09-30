@@ -1,0 +1,233 @@
+Competitive landscape 
+
+# Competitive landscape 
+
+As of Sep 26, 2026 
+
+## Verdict 
+
+No tool today combines all four of: browser-native, procedural depth, broadcast-grade output, and agent-driven authoring. That combination is Motif's opening. Motif cannot win on price or raw power alone: Cavalry went free for individuals in April 2026, and Blender and Unreal are free. 
+
+### **Where Motif wins** 
+
+1. **Agent-native, not agent-added.** Competitors bolt a chat box onto a desktop app (Jitter AI, Rive's coding agent), or rely on community MCP hacks. After Effects MCP servers relay commands through JSON files polled every 100 ms. Motif is built for agents from the first line: a structured document, typed tools, visual self-critique, 15 craft skills, and any MCP client. 
+
+2. **One engine from the timeline to the screen.** The same document plays in the editor, the web player, Lottie, video, and live. Nobody else spans broadcast renders and a sub80 KB interactive web runtime. 
+
+3. **Live audio-reactive visuals without a node graph.** TouchDesigner and Notch own live visuals but demand node-graph expertise and desktop GPUs. Reactors and states are a far simpler entry point. 
+
+4. **Pro results for amateurs.** Studio agents encode craft (timing, the 12 principles, composition) that beginners do not have yet, while pros keep full manual control. 
+
+### **Table stakes Motif is missing today** 
+
+- A GPU particle engine with real-time physics. Every serious competitor has one, including Rive since January 2026. 
+
+- A broadcast and VFX pipeline: color management, EXR output, broadcast-safe levels, and NTSC frame rates with drop-frame timecode. 
+
+Both are now specified in the main tab (sections 18 and 19). 
+
+Page 1 of 9 
+
+Competitive landscape 
+
+## Landscape 
+
+The main tools, grouped by what they are for. “Gap” is what each lacks against Motif's target of browser-native, procedural, broadcast-grade, and agent-driven. 
+
+|Tool|Group|Strengths|Gap against<br>Motif's target|Price (2026)|
+|---|---|---|---|---|
+|After Effects 26|Pro<br>compositing|Industry<br>standard; 3D<br>meshes, SVG<br>import, 8-axis<br>variable fonts;<br>huge plugin<br>ecosystem|Desktop only,<br>keyframe-first,<br>weak procedural<br>core, agents only<br>through<br>community<br>MCP<br>bridges|$34.49/mo|
+|Cinema 4D 2026|3D MoGraph|The MoGraph<br>reference:<br>cloners,<br>effectors, node<br>distributions,<br>GPU liquids and<br>Pyro|Desktop 3D,<br>heavy, no web<br>runtime, no<br>agent surface|$109/mo|
+|Cavalry|Procedural<br>2D|Closest rival: 3D-<br>style procedural<br>workflow for 2D,<br>rigging,<br>instancing|Desktop only; no<br>live audio mode;<br>no agent-native<br>authoring; now<br>tied to Canva<br>accounts|Free for<br>individuals;<br>studios need<br>Canva<br>Enterprise|
+|Houdini 21|Procedural<br>VFX|Deepest<br>procedural and<br>simulation stack;<br>Copernicus<br>fluids|Expert-only<br>learning curve;<br>overkill for 2D<br>motion|Free Apprentice<br>to $4,495+|
+|Blender 5.2|Open 3D|Free; geometry-<br>node physics<br>(XPBD), sound-<br>frequency node<br>for audio-driven<br>motion|3D-first; motion-<br>graphics UX is<br>secondary; no<br>web runtime|Free|
+
+
+
+Page 2 of 9 
+
+Competitive landscape 
+
+|Tool|Group|Strengths|Gap against<br>Motif's target|Price (2026)|
+|---|---|---|---|---|
+|Unreal Engine<br>Motion Design|Real-time<br>broadcast|Built for<br>broadcast<br>graphics; real-<br>time rendering<br>and lighting|Steep learning<br>curve, high GPU<br>demands, not a<br>2D or web tool|Free|
+|TouchDesigner<br>2025|Live visuals|GPU POPs for<br>millions of<br>points; live,<br>DMX, sensors|Node-graph<br>expertise<br>required;<br>desktop; not for<br>linear delivery|Free non-<br>commercial;<br>paid<br>commercial|
+|Notch|Live visuals|GPU particles at<br>hundreds of<br>millions of<br>points; FLIP, SPH,<br>MPM;<br>deterministic<br>sims|Desktop, event-<br>industry pricing<br>and learning<br>curve; no web<br>runtime|Paid licenses|
+|Trapcode<br>Particular|Particle<br>plugin|The After<br>Effects particle<br>standard|Plugin, not a<br>platform; lives<br>inside After<br>Effects|Red Giant<br>subscription|
+|Rive|Interactive<br>runtime|State machines,<br>small runtimes;<br>Luau scripting<br>with particles<br>and physics; AI<br>coding agent|Product-UI<br>focus; not a<br>broadcast or<br>VFX tool; agent<br>is in-app only|Plans from<br>$9/mo|
+|Lottie Creator|Web Lottie|Native Lottie<br>authoring; state<br>machines since<br>September 2025|Limited<br>procedural<br>depth; Lottie-<br>only output|Freemium|
+
+
+
+Page 3 of 9 
+
+Competitive landscape 
+
+|Tool|Group|Strengths|Gap against<br>Motif's target|Price (2026)|
+|---|---|---|---|---|
+|Jitter|Web motion|Fast browser<br>tool; “Animate<br>with AI”<br>generates<br>effects from<br>prompts (May<br>2026)|Shallow<br>procedural<br>model; no pro<br>output, no<br>particles, no<br>external agents|Free and paid<br>plans|
+|Remotion+<br>Claude Code<br>skills|Code video|React video<br>generated by<br>coding agents;<br>popular in 2026|Code-only, no<br>timeline or visual<br>tuning; agents<br>write raw code,<br>not a structured<br>document|Free for<br>individuals|
+|GSAP,<br>Theatre.js,<br>Motion Canvas|Code<br>libraries|Excellent web<br>animation<br>primitives; GSAP<br>free since 2025|Libraries, not<br>studios;<br>Theatre.js<br>development<br>moved private|Free|
+
+
+
+**Positioning.** Along one axis, tools run from accessible (Jitter, Lottie Creator) to expert (Houdini, TouchDesigner, Notch). Along the other, from web output (Rive, Lottie, GSAP) to broadcast output (After Effects, C4D, Unreal). Every tool sits in one corner. Motif aims for accessible authoring with expert depth underneath, and both web and broadcast output from one engine. 
+
+## What changed in 2025–2026 
+
+Eight shifts in the last 18 months reset the market. Particles, physics, and AI moved from differentiators to baseline, and prices collapsed. 
+
+|Date|Event|What it means for Motif|
+|---|---|---|
+|Jul 2026|Blender 5.2 LTS adds XPBD physics|Audio-driven procedural motion is|
+||and a sound-frequency node to<br>geometry nodes|free in a mainstream tool; Motif's live<br>mode must be easier, not just possible|
+
+
+
+Page 4 of 9 
+
+Competitive landscape 
+
+|Date|Event|What it means for Motif|
+|---|---|---|
+|May<br>2026|Jitter launches Animate with AI|Prompt-to-effect is expected in web<br>tools; Motif must beat it on depth and<br>craft|
+|Apr 2026|Canva makes Cavalry free for<br>individuals|Motif needs a generous free<br>individual tier; win on agents, web,<br>and live instead of price|
+|Jan 2026|Rive ships Luau scripting with<br>particles, physics, and an AI coding<br>agent|Interactive runtimes now include<br>particles and physics; Motif's must<br>too|
+|Jan 2026|After Effects 26 adds 3D meshes, SVG<br>import, 8-axis variable fonts|Variable-font animation and SVG<br>import are baseline; Motif already<br>specifies both|
+|Oct 2025|TouchDesigner POPs:GPU point<br>operators for millions of particles|Sets the bar for real-time particle<br>counts|
+|2025–<br>2026|WebGPU ships in Chrome, Edge,<br>Firefox, and Safari 26|Browser GPU compute for particles<br>and physics is viable; Linux support<br>still pending|
+|2025–<br>2026|MCP bridges for After Effects and<br>Remotion skills for Claude Code|Demand for agent-driven motion is<br>proven; current options are<br>workarounds, which is Motif's<br>opening|
+
+
+
+## Gaps to close 
+
+The PRD already beats the field on agents, web output, and live audio. These ten gaps separate it from best in class for TV, motion graphics, and VFX work. 
+
+|#|Gap|Who does it well|Motif today|Fix|
+|---|---|---|---|---|
+|1|GPU particles with<br>real-time physics|Notch, TouchDesigner,<br>Trapcode, C4D, Rive|Missing|New section 18,<br>PTX-01 to PTX-17<br>(core P0; fluids P1<br>and P2)|
+
+
+
+Page 5 of 9 
+
+Competitive landscape 
+
+|#|Gap|Who does it well|Motif today|Fix|
+|---|---|---|---|---|
+|2|Color management<br>and HDR|After Effects, C4D,<br>Unreal|sRGB and P3<br>only|OCIO-style pipeline<br>with ACEScg<br>working space; HDR<br>later (BVX-01, BVX-<br>02)|
+|3|EXR and<br>multichannel<br>output for VFX|After Effects, Houdini,<br>Blender|Missing|16- and 32-bit float<br>EXR with alpha and<br>ID mattes (BVX-03,<br>BVX-04)|
+|4|Broadcast delivery<br>specs|After Effects, Unreal|Partial (safe<br>areas,<br>ProRes)|Legal-range limiter,<br>23.976, 29.97, 59.94<br>with drop-frame<br>timecode, EBU and<br>SMPTE safe-area<br>presets, DNxHR<br>(BVX-05 to BVX-08)|
+|5|Footage plates,<br>tracking, camera<br>import|After Effects, Blender|Missing|Video and image-<br>sequence layers, 2D<br>point tracking,<br>camera import from<br>matchmove (BVX-<br>09 to BVX-11)|
+|6|Large-file<br>performance|All desktop apps|Browser<br>limits|Optional desktop<br>shell (same web<br>app) for fast disk IO,<br>native encoders,<br>and large<br>sequences (BVX-12)|
+|7|Graph view for<br>complex systems|Houdini,<br>TouchDesigner,<br>Cavalry|Deferred to<br>Later|Graph view over the<br>same document for<br>particles and<br>effectors in v1.x|
+|8|Extensibility:<br>custom effects and<br>modifiers|After Effects plugins,<br>TouchDesigner GLSL,<br>Notch|Modifier API<br>only|Plugin SDK with<br>WGSL shader<br>effects and custom<br>modifiers (v1.x)|
+
+
+
+Page 6 of 9 
+
+Competitive landscape 
+
+|#|Gap|Who does it well|Motif today|Fix|
+|---|---|---|---|---|
+|9|Beginner on-ramp|Jitter, Lottie Creator,<br>Canva|Skills only|Starter templates,<br>preset library, and a<br>Simple mode that<br>hides pro panels|
+|10|Free individual tier|Cavalry, Blender,<br>Unreal|Undefined|Free for individuals<br>with full features;<br>paid for teams,<br>cloud renders, and<br>live pro|
+
+
+
+## Recommendations 
+
+Ship particles and the broadcast pipeline in v1, lead the story with agents and live, and make individuals free. 
+
+### **Add to v1 (P0)** 
+
+1. **Particle engine with real-time physics** (main tab, section 18). WebGPU compute with a WebGL2 fallback. Emitters from shapes, paths, glyphs, and images; forces and fields; collisions with any layer; rigid and soft bodies; audio- and pointer-reactive particles; deterministic caching for renders. 
+
+2. **Broadcast and VFX pipeline** (section 19). ACEScg working space, EXR with alpha and ID mattes, legal-range limiter, NTSC rates with drop-frame timecode, safe-area presets, DNxHR and ProRes. 
+
+3. **Simple mode and starter library.** 40 templates (titles, lower thirds, loaders, social, live scenes) and a mode that shows only the canvas, timeline, and agent panel. This is how amateurs get professional results. 
+
+4. **Free individual tier.** Matches Cavalry, Blender, and Unreal and removes the main adoption barrier. 
+
+### **Position the product on three claims** 
+
+- “Direct your animation studio from Claude Code, Codex, or VS Code.” No competitor has an agent-native document, craft skills, and visual self-critique. 
+
+- “One scene, every screen.” Broadcast render, Lottie, web player, and live from the same engine. 
+
+Page 7 of 9 
+
+Competitive landscape 
+
+- “Visuals that listen.” Reactors and states give TouchDesigner-grade live reactivity without a node graph. 
+
+### **v1.x (next)** 
+
+- Graph view over modifier stacks, effectors, and particle systems. 
+
+- Plugin SDK: WGSL shader effects, custom modifiers, custom emitters and forces. Footage tracking and camera import from matchmove software. 
+
+- Optional desktop shell for large sequences and native encoders. HDR output (Rec.2100 PQ and HLG). 
+
+### **Later** 
+
+- Fluids (SPH, FLIP) and volumetrics. 
+
+- 3D meshes and extruded type. 
+
+- Multiplayer editing and a template marketplace. 
+
+### **Do not chase** 
+
+- Full 3D and physically based rendering (Unreal, C4D, and Blender own it). 
+
+- Node-graph-first authoring (Houdini and TouchDesigner own it). 
+
+- Pixel-based AI video generation. Motif stays vector, procedural, and editable. 
+
+## Sources 
+
+- <u>Canva makes Cavalry free — CG Channel</u> 
+
+- <u>After Effects 26.0 — CG Channel</u> 
+
+- <u>What's new in Cinema 4D 2026 — Super Renders Farm</u> 
+
+- <u>Houdini 21 key features — CG Channel</u> 
+
+- <u>Blender 5.2 LTS — CG Channel</u> 
+
+- <u>Unreal Engine for motion graphics — Puget Systems</u> 
+
+- <u>TouchDesigner 2025 release — Interactive & Immersive HQ</u> 
+
+- <u>Notch particles, simulations and volumetrics</u> 
+
+- <u>Maxon July 2026 release — Toolfarm</u> 
+
+- <u>Scripting is live in Rive</u> 
+
+- <u>Rive $9/mo plan</u> 
+
+- <u>State machines in Lottie Creator — LottieFiles</u> 
+
+- <u>Jitter AI changelog</u> 
+
+Page 8 of 9 
+
+Competitive landscape 
+
+### <u>Remotion Claude Code skill</u> 
+
+<u>GSAP is now free — CSS-Tricks</u> 
+
+<u>Theatre.js repository</u> 
+
+- <u>After Effects MCP server</u> 
+
+<u>WebGPU in major browsers — web.dev</u> 
+
+Page 9 of 9 
+

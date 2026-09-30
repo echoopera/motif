@@ -1,0 +1,36 @@
+{
+  "project": "Motif3",
+  "scope": "performance-v1",
+  "harness": "Echo Studio 1.2.0",
+  "owner": "Codex",
+  "review": "self-review",
+  "status": "complete",
+  "inputs": "baseline/",
+  "acceptance": "readiness.md",
+  "assignments": [
+    {
+      "id": "performance",
+      "scope": [
+        "src/parts/media.js",
+        "src/parts/glrt.js",
+        "src/parts/governor.js",
+        "src/parts/kitrender.js",
+        "src/build.py",
+        "Motif3.html",
+        "README.md",
+        "performance-review/",
+        "tools/performance-check.mjs",
+        "src/parts/performance_patch.py",
+        "tools/performance-regression.mjs"
+      ],
+      "state": "accepted"
+    }
+  ],
+  "artifactRevision": "824d2fd4cb4ff1f7e0d4571aefc5c2ab10793569b055d2144fd34c66a469936a",
+  "evidence": [
+    "REPORT.md",
+    "results.json",
+    "regression.json",
+    "build-sha256.txt"
+  ]
+}

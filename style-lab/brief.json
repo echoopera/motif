@@ -1,0 +1,30 @@
+{
+  "project": "Motif Style Lab",
+  "engagementMode": "build",
+  "client": { "name": "Echo Opera", "designLanguage": "fieldSYS v3", "references": ["Cavalry", "TouchDesigner", "Teenage Engineering"] },
+  "problem": "Designers exploring motion treatments for Motif have no fast way to audition a broad library of procedural animation styles, push their parameters, and export the result in the formats and aspect ratios a real deliverable needs. Hand-building each look in code or After Effects takes hours per variation.",
+  "users": [
+    { "persona": "Motion designer", "goal": "audition and evolve a treatment for a title, loop or social post", "context": "desktop browser, exploratory session, 10 to 60 minutes", "pain": "each variation is slow to build, compare and export" },
+    { "persona": "Creative technologist (Echo)", "goal": "stress-test Motif's style library and parameter model before the engine is built", "context": "desktop browser alongside Claude Code", "pain": "no shared vocabulary of styles and parameters to test against" }
+  ],
+  "platforms": ["web-immersive"],
+  "domain": "art",
+  "riskLanes": ["performance", "prototype"],
+  "journeys": [
+    { "name": "Audition", "steps": ["Open the lab", "Browse 25 styles by category", "Select a style", "Play, scrub and change aspect ratio"] },
+    { "name": "Evolve", "steps": ["Adjust parameters", "Mutate with a chosen strength and locked parameters", "Open Evolve to breed six variations", "Keep a child", "Undo or save the look"] },
+    { "name": "Export", "steps": ["Open export", "Choose format, size, fps and loops", "Render frame-accurately", "Save MP4, WebM, PNG sequence, PNG frame or preset JSON"] }
+  ],
+  "scenarios": ["Designer compares three treatments for a 9:16 social post in ten minutes", "Echo exports a seamless 1080p loop and its preset JSON for Motif"],
+  "constraints": ["Single self-contained web page, no build server", "Every style is a pure function of time so scrubbing, loops and exports are deterministic", "Styles loop seamlessly over the loop length", "60 fps preview on a mid-range laptop at stage size", "fieldSYS-style neutral chrome; the artwork carries the colour", "Downloads only through the page's downloads capability"],
+  "acceptance": [
+    { "id": "AC-1", "criterion": "25 distinct styles across type, geometry, particles/physics and generative categories, each with 4 to 7 style parameters plus shared colour, motion and finish controls" },
+    { "id": "AC-2", "criterion": "Mutate, Evolve (6 live children), Randomize, Reset, per-parameter lock, and unlimited undo/redo work on every style" },
+    { "id": "AC-3", "criterion": "Six aspect ratios (16:9, 9:16, 1:1, 4:5, 4:3, 21:9) re-lay out every style without cropping its subject" },
+    { "id": "AC-4", "criterion": "Frame-accurate export to MP4 and WebM (WebCodecs) with MediaRecorder fallback, PNG sequence ZIP, PNG frame and preset JSON" },
+    { "id": "AC-5", "criterion": "Every style loops seamlessly: frame 0 equals frame N" },
+    { "id": "AC-6", "criterion": "Keyboard-complete core journeys, visible focus, reduced-motion start paused, controls labelled" }
+  ],
+  "tone": "Instrument-like, quiet chrome, loud canvas",
+  "outOfScope": ["Timeline keyframing", "Agent bridge", "Lottie export", "Audio input"]
+}

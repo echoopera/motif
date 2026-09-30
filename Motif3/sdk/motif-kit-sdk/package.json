@@ -1,0 +1,17 @@
+{
+  "name": "motif-kit-sdk",
+  "version": "1.2.0",
+  "description": "Build, validate, preview and pack Motif kits (motif-kit@1). SDK 1.2 adds custom parameters (colour, XY pad, groups, conditional controls); 1.1 added media inputs.",
+  "type": "module",
+  "bin": {
+    "motif-kit": "bin/motif-kit.mjs"
+  },
+  "dependencies": {
+    "fflate": "^0.8.3"
+  },
+  "optionalDependencies": {
+    "playwright": "^1.47.0"
+  },
+  "license": "UNLICENSED",
+  "private": true
+}

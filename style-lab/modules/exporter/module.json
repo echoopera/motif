@@ -1,0 +1,20 @@
+{
+  "name": "exporter",
+  "version": "1.0.0",
+  "entry": "src/index.js",
+  "dependsOn": [
+    "engine-core",
+    "renderer",
+    "style-library"
+  ],
+  "exports": [
+    "PRESET_FORMAT",
+    "TIERS",
+    "FPS",
+    "probeCapabilities",
+    "fileName",
+    "presetJSON",
+    "parsePreset",
+    "runExport"
+  ]
+}
