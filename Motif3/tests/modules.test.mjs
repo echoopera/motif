@@ -5,7 +5,7 @@ const root = path.resolve(import.meta.dirname, '..');
 test('motif5.html is built from src-v5', () => { execFileSync('python3', [path.join(root, 'src-v5/build.py'), '--check']); });
 
 test('every module is wrapped and versioned', () => {
-  for (const f of fs.readdirSync(path.join(root, 'src-v5/modules')).filter(f => /^\d\d-/.test(f))) {
+  for (const f of fs.readdirSync(path.join(root, 'src-v5/modules')).filter(f => /^\d\d[a-z]?-/.test(f))) {
     const s = fs.readFileSync(path.join(root, 'src-v5/modules', f), 'utf8');
     assert.match(s, /^\/\/ ---- (module: [\w-]+|boot)/, f);
   }
