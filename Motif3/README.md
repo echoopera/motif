@@ -42,7 +42,11 @@ Open **Deliver** and press **Check speed**. It shows the GPU in use and what eac
 3. **Fit**: Fill (crop), Fit (letterbox), Stretch. Video **Timing**: *Fit to loop* retimes the clip to one Motif loop (seamless); *Real time* plays at 1×.
 4. **Media mix** in the Style group blends between your media and the procedural source, and can be keyframed.
 
-Files stay in this browser (IndexedDB, keyed by content hash) and are never uploaded. Projects, autosave and saved looks keep a reference; in another browser the slot shows **Relink**. Exports seek video frame by frame, so renders are deterministic.
+Files stay in this browser and are never uploaded. They live in the media pool: the Origin Private File System (keyed by content hash; large footage is read back lazily from disk, so it survives reloads without re-selecting and without sitting in memory), with IndexedDB as the fallback and as the read-through source for files stored by earlier versions (migrated the first time they are used). Projects, autosave and saved looks keep a reference; in another browser the slot shows **Relink**. The **Media** page (inspector tab) lists the pool with thumbnails, resolution, duration, codec, size and in-use badges, a storage meter, drag-and-drop import, relink for files a project references but this browser lacks, delete, and a "remove unused clips, oldest first" recovery when storage is full. Keyboard: arrows move, Enter uses the clip on the active layer, Delete removes it.
+
+MP4 and MOV clips are also decoded with WebCodecs (demuxed by the vendored mediabunny, see below) for paused scrubbing and export seeks: the exact frame for a time, from a bounded ring of decoded frames, hardware-accelerated where the browser allows. Playback still uses the `<video>` element. If WebCodecs, the container or the codec is unavailable, or the decoded frame does not match what `<video>` shows (typically an untagged BT.601 clip), Motif silently keeps the `<video>` path. WebM always uses `<video>`. Exports seek frame by frame either way, so renders are deterministic.
+
+Vendored: `src-v5/vendor/mediabunny-lite.js` (mediabunny 1.61.0, MPL-2.0, MP4/MOV demux and video decode only; about 190 KB, which is what it adds to `motif5.html`). Rebuild it with `sh src-v5/vendor/build-mediabunny.sh`. Media checks: `SOFTWARE_GL=1 node tests/browser/media-check.mjs` (needs Playwright, Chromium and ffmpeg).
 
 ## Building kits with media
 

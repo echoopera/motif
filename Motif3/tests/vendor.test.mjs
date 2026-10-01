@@ -11,7 +11,7 @@ test('built file has no external script dependency (fonts only)', () => {
   assert.doesNotMatch(html, /<!--vendor:/, 'unreplaced vendor marker');
   // Every absolute URL left in the file is a font host, a namespace/doc link in a comment, or the one documented optional dynamic import.
   const urls = [...new Set([...html.matchAll(/https?:\/\/[A-Za-z0-9.\-]+/g)].map(m => m[0]))];
-  const allowed = [/fonts\.googleapis\.com$/, /fonts\.gstatic\.com$/, /www\.w3\.org$/, /wiki\.multimedia\.cx$/, /stackoverflow\.com$/, /github\.com$/];
+  const allowed = [/fonts\.googleapis\.com$/, /fonts\.gstatic\.com$/, /www\.w3\.org$/, /wiki\.multimedia\.cx$/, /stackoverflow\.com$/, /github\.com$/, /^mozilla\.org$/];
   const extra = urls.filter(u => !allowed.some(a => a.test(u.replace(/^https?:\/\//, ''))));
   assert.deepEqual(extra, ['https://cdn.jsdelivr.net'], 'only the optional FDK-AAC dynamic import may reference a CDN: ' + extra.join(', '));
   const imports = [...html.matchAll(/import\(\s*['"](https?:[^'"]+)['"]/g)].map(m => m[1]);

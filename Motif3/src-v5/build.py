@@ -2,6 +2,7 @@
 """Motif 5 build: python3 src-v5/build.py  ->  ../motif5.html (single self-contained file).
 Modules in src-v5/modules/NN-name.js are concatenated in filename order between head.html and tail.html.
 Third-party libraries in vendor/ (pinned, see vendor/VENDOR.md) are inlined where head.html has a <!--vendor:name--> marker, so the build never needs a CDN.
+src-v5/vendor/*.js (bundled libs for the main script) are appended before the modules.
 `--check` rebuilds in memory and fails if motif5.html differs (CI guard)."""
 import os, sys, glob
 ROOT = os.path.dirname(os.path.abspath(__file__))
@@ -17,6 +18,7 @@ def build():
         assert f'<!--vendor:{n}-->\n' in head, f'head.html is missing the vendor marker for {n}'
         head = head.replace(f'<!--vendor:{n}-->\n', vendor_tag(n))
     parts = [head]
+    for f in sorted(glob.glob(f'{ROOT}/vendor/*.js')): parts.append(open(f).read().rstrip('\n') + '\n')  # vendored libs first, licence headers intact
     for f in sorted(glob.glob(f'{ROOT}/modules/*.js')): parts.append(open(f).read())
     parts.append(open(f'{ROOT}/tail.html').read())
     return ''.join(parts)
