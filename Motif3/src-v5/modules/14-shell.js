@@ -1682,6 +1682,14 @@ function boot() {
 
   // ---------- kits ----------
   let kitMsg = null; // { kind: 'ok' | 'error' | 'info', text }
+  // motif-kit@2 install review: kitReview = a kit waiting for capability approval; kitDiags = line-numbered diagnostics
+  // of the last failed install. Installs go through kit-host (validate → background compile → canary).
+  let kitReview = null, kitDiags = [];
+  const H = __m_kit_host;
+  const plural = (n, w) => `${n} ${w}${n === 1 ? '' : 's'}`;
+  const kindsText = k => [k.styles && plural(k.styles, 'style'), k.effects && plural(k.effects, 'effect'), k.transitions && plural(k.transitions, 'transition'), k.exporters && plural(k.exporters, 'export preset')].filter(Boolean).join(' · ') || 'no entries';
+  const diagList = ds => (ds && ds.length ? `<ul class="kit-diags" aria-label="Diagnostics">${ds.slice(0, 24).map(d => `<li data-sev="${d.severity === 'warning' ? 'warning' : 'error'}"><code>${esc((d.file || 'manifest.json') + (d.line ? ':' + d.line : ''))}</code> ${esc(d.message)}${d.entry ? ` <small class="info">(${esc(d.entry)})</small>` : ''}</li>`).join('')}${ds.length > 24 ? `<li data-sev="warning">…and ${ds.length - 24} more</li>` : ''}</ul>` : '');
+  function focusKit(sel) { requestAnimationFrame(() => { const el = $('panel-kits').querySelector(sel); if (el) el.focus(); }); }
   const kitUsers = id => project.layers.map((l, i) => ({ l, i })).filter(({ l }) => K.kitOfStyle(l.styleId) === id);
   function kitStatus(kind, text) { kitMsg = { kind, text }; if (tab === 'kits') renderKitsPanel(); else toast(text.split('\n')[0]); }
   async function saveFile(filename, blob) {
@@ -1689,12 +1697,18 @@ function boot() {
     if (dl) { try { await dl.save({ filename, data: blob }); return true; } catch (e) { if (e && e.code === 'declined') return false; } }
     const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = filename; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 60000); return true;
   }
-  function installRaw(raw, source, label) {
-    const r = K.install(raw, { source });
-    if (!r.ok) { kitStatus('error', `Couldn’t install ${label}.\n${r.errors.slice(0, 12).join('\n')}${r.errors.length > 12 ? `\n…and ${r.errors.length - 12} more` : ''}`); return false; }
-    const n = r.kit.styles.length;
-    kitStatus('ok', `${r.replaced ? `Updated ${r.kit.name} ${r.replaced} → ${r.kit.version}` : `Installed ${r.kit.name} ${r.kit.version}`}: ${n} style${n === 1 ? '' : 's'}, ${r.kit.palettes.length} palette${r.kit.palettes.length === 1 ? '' : 's'}.${r.warnings.length ? `\nNotes:\n${r.warnings.slice(0, 6).join('\n')}` : ''}${r.skippedCompile ? '\nWebGL2 is unavailable here, so shaders were not test-compiled.' : ''}`);
-    catFilter = 'kit:' + r.kit.id; renderChips(); renderLibrary();
+  async function installRaw(raw, source, label, approved) {
+    kitReview = null; kitDiags = [];
+    // Lightweight status while checking: update the live region only (a full panel render redraws every kit thumbnail).
+    const live = tab === 'kits' && $('kitStatus'), checking = `Checking ${label}: validating, compiling in the background and test-rendering small frames…`;
+    if (live) { kitMsg = { kind: 'info', text: checking }; live.hidden = false; live.className = 'kit-status'; live.dataset.kind = 'info'; live.textContent = checking; } else kitStatus('info', checking);
+    let r;
+    try { r = await H.install(raw, { source, approved }); } catch (err) { kitStatus('error', `Couldn’t install ${label}. ${err.message || err}`); return false; }
+    if (r.needsApproval) { kitReview = { raw, source, label, r }; kitMsg = null; if (tab === 'kits') renderKitsPanel(); else setTab('kits'); focusKit('#kitReview'); return false; }
+    if (!r.ok) { kitDiags = r.diagnostics || []; kitStatus('error', `Couldn’t install ${label}.\n${r.errors.slice(0, 12).join('\n')}${r.errors.length > 12 ? `\n…and ${r.errors.length - 12} more` : ''}`); return false; }
+    const n = r.kit.styles.length, q = r.quarantined || [];
+    kitStatus(q.length ? 'error' : 'ok', `${r.replaced ? `Updated ${r.kit.name} ${r.replaced} → ${r.kit.version}` : `Installed ${r.kit.name} ${r.kit.version}`}: ${kindsText({ styles: n, effects: r.kit.effects.length, transitions: r.kit.transitions.length, exporters: r.kit.exporters.length })}, ${plural(r.kit.palettes.length, 'palette')}.${r.kit.migration ? `\nRead as ${r.kit.format} (migrated from ${r.kit.sourceFormat}).` : ''}${q.length ? `\nQuarantined ${q.length}: ${q.map(id => id.split('/')[1]).join(', ')}. ${q.length === 1 ? 'It draws' : 'They draw'} a placeholder; see the kit card to retry.` : ''}${r.warnings.length ? `\nNotes:\n${r.warnings.slice(0, 6).join('\n')}` : ''}${r.skippedCompile ? '\nWebGL2 is unavailable here, so shaders were not test-compiled.' : ''}`);
+    if (n) { catFilter = 'kit:' + r.kit.id; renderChips(); renderLibrary(); }
     return true;
   }
   async function importFiles(files) {
@@ -1710,6 +1724,47 @@ function boot() {
       renderThumb(pipeline, c, { styleId: st.id, params: base.params, shared: { ...base.shared, palette: st.palette || 'signal', loop: project.finish.loop } }, 0.3, project.palettes);
     });
   }
+  function kitBadges(k) {
+    const fmt = k.sourceFormat && k.sourceFormat !== k.format ? `${k.sourceFormat} → ${k.format}` : k.format;
+    const b = [`<span title="${esc(k.migration ? 'Migrated on load: ' + k.migration.steps.join('; ') : 'Kit format')}">${esc(fmt || '')}</span>`];
+    for (const [n, w] of [[k.styles.length, 'style'], [k.effects.length, 'effect'], [k.transitions.length, 'transition'], [k.exporters.length, 'export preset']]) if (n) b.push(`<span>${plural(n, w)}</span>`);
+    for (const c of k.capabilities) b.push(`<span data-cap title="${esc(c.text)}">${k.approved.includes(c.id) ? '✓ ' : ''}${esc(c.id)}</span>`);
+    if (!k.capabilities.length) b.push('<span title="Pixels from its own parameters only">no extra access</span>');
+    return `<div class="kit-badges" aria-label="Format, contents and capabilities">${b.join('')}</div>`;
+  }
+  function kitQuarantine(k) {
+    const all = [...k.styles, ...k.effects, ...k.transitions];
+    return all.filter(s => s.quarantine || s.checking).map(s => s.checking
+      ? `<div class="kit-q" data-checking role="status"><span>Checking <b>${esc(s.name)}</b>…</span></div>`
+      : `<div class="kit-q" role="alert"><span><b>${esc(s.name)}</b> is quarantined: ${esc(s.quarantine.reason)}.<br><small>${esc(s.quarantine.detail || '')}</small></span><button class="btn sm" data-retry="${esc(s.id)}">Retry</button></div>`).join('');
+  }
+  function kitReport(k) {
+    const r = k.report; if (!r) return '';
+    const rows = (r.entries || []).map(e => `<tr><td>${esc(e.localId)}</td><td>${esc(e.kind)}</td><td class="n">${e.executions}</td><td class="n">${r.analyzed ? Math.round(e.iterations) : '–'}</td><td class="n">${r.analyzed ? Math.round(e.fetches) : '–'}</td><td class="n">${r.canary && r.canary[e.id] ? r.canary[e.id].ms64 + ' ms' : '–'}</td></tr>`).join('');
+    const mig = k.migration ? `<p class="info">Migrated ${esc(k.migration.from)} → ${esc(k.migration.to)}:</p><ol>${k.migration.steps.map(x => `<li>${esc(x)}</li>`).join('')}</ol>` : '';
+    const legacy = k.legacyApproval ? '<p class="info">Installed before capability approval existed; its access was kept.</p>' : '';
+    return `<details class="kit-report"><summary>Validation report · ${k.warnings.length ? plural(k.warnings.length, 'note') : 'no notes'}</summary>
+      ${mig}${legacy}${rows ? `<table><thead><tr><th>Entry</th><th>Kind</th><th class="n">Passes run</th><th class="n">Loop iters / px</th><th class="n">Fetches / px</th><th class="n">64² canary</th></tr></thead><tbody>${rows}</tbody></table>` : ''}
+      ${r.analyzed ? '' : '<p class="info">Bundled with this build: audited by the test suite, not re-analysed at load.</p>'}
+      ${k.warnings.length ? `<ul>${k.warnings.slice(0, 12).map(w => `<li>${esc(w)}</li>`).join('')}</ul>` : ''}
+      ${k.exporters.length ? `<p class="info">Export presets: ${k.exporters.map(x => `${esc(x.name)} (${esc(Object.entries(x.preset).map(([a, b]) => a + ' ' + b).join(', '))})`).join('; ')}</p>` : ''}
+    </details>`;
+  }
+  function kitReviewCard() {
+    if (!kitReview) return '';
+    const { r, label } = kitReview, k = r.kit;
+    return `<section class="kit-card kit-review" id="kitReview" tabindex="-1" aria-labelledby="kitReviewTitle"><div class="kit-body">
+      <div class="lbl">Review before installing</div>
+      <h2 id="kitReviewTitle">${esc(k.name)} ${esc(k.version)}</h2>
+      <p class="info">${esc(label)} · ${esc(k.sourceFormat && k.sourceFormat !== k.format ? `${k.sourceFormat} → ${k.format}` : k.format)} · ${kindsText(k.kinds)}${k.author ? ` · by ${esc(k.author)}` : ''}</p>
+      <p class="info">${esc(k.description || '')}</p>
+      <p style="margin:0">This kit asks to:</p>
+      <ul class="kit-caps">${r.capabilities.map(c => `<li><b>${esc(c.id)}</b>: ${esc(c.text)}</li>`).join('')}</ul>
+      <p class="info">Kits are data and GLSL only: they cannot run scripts, reach the network or read the page. Shaders were checked for unbounded loops and will be test-rendered on one small frame before they draw.</p>
+      ${diagList((r.diagnostics || []).filter(d => d.severity === 'warning'))}
+      <div class="btnrow"><button class="btn primary sm" data-approve>Install and allow</button><button class="btn sm" data-cancel>Cancel</button></div>
+    </div></section>`;
+  }
   function renderKitsPanel() {
     const kits = K.list(), cat = K.catalog().filter(c => !c.installed);
     const pal = p => `<i title="${esc(p.name)}"><s style="background:${p.bg}"></s><s style="background:${p.ink}"></s>${p.a.map(c => `<s style="background:${c}"></s>`).join('')}</i>`;
@@ -1718,9 +1773,12 @@ function boot() {
         <div class="kit-body">
           <div class="kit-top"><span class="kd" style="--kd:${k.accent || 'var(--accent)'}" aria-hidden="true"></span><b>${esc(k.name)}</b><input type="checkbox" class="switch" role="switch" data-toggle="${k.id}" aria-label="${esc(k.name)} kit enabled"${k.enabled ? ' checked' : ''}></div>
           <div class="kit-meta">v${esc(k.version)} · ${k.styles.length} styles · ${k.styles.filter(s => s.passes > 1).length} multi-pass · ${esc(k.author || 'Unknown author')} · ${k.source === 'catalog' ? 'bundled' : k.source === 'url' ? 'from URL' : 'imported'} · ${(k.bytes / 1024).toFixed(0)} KB</div>
+          ${kitBadges(k)}
           <p class="info">${esc(k.description)}</p>
+          ${kitQuarantine(k)}
           <div class="kit-pals" aria-label="Kit palettes">${k.palettes.map(pal).join('')}</div>
-          <div class="btnrow"><button class="btn sm" data-show="${k.id}"${k.enabled ? '' : ' disabled'}>Show in library</button><button class="btn sm" data-export="${k.id}">Export .motifkit</button><button class="btn sm" data-remove="${k.id}">Remove</button></div>
+          ${kitReport(k)}
+          <div class="btnrow"><button class="btn sm" data-show="${k.id}"${k.enabled && k.styles.length ? '' : ' disabled'}>Show in library</button><button class="btn sm" data-export="${k.id}">Export .motifkit</button>${k.canRollback ? `<button class="btn sm" data-rollback="${k.id}">Roll back to v${esc(k.previousVersion)}</button>` : ''}<button class="btn sm" data-remove="${k.id}">Remove</button></div>
         </div></article>`;
     $('panel-kits').innerHTML = `
       <div class="panel-head"><div class="lbl">Library · ${STYLES.length} styles · ${kits.filter(k => k.enabled).length} of ${kits.length} kits on</div><h1>Kits</h1><p>Add shader styles and palettes to the library.</p></div>
@@ -1731,16 +1789,22 @@ function boot() {
           <form class="btnrow" id="kitUrlForm" style="width:100%"><input type="url" id="kitUrl" placeholder="https://…/my-kit.motifkit" aria-label="Kit URL" style="flex:1 1 12em;min-height:var(--target);padding:0 var(--space-2);border:var(--hairline) solid var(--line);border-radius:var(--radius-m);background:var(--surface-1)"><button class="btn sm" type="submit">Load from URL</button></form>
         </div>
         ${kitMsg ? `<div class="kit-status" id="kitStatus" role="status" data-kind="${kitMsg.kind}">${esc(kitMsg.text)}</div>` : '<div id="kitStatus" role="status" hidden></div>'}
+        ${kitMsg && kitMsg.kind === 'error' ? diagList(kitDiags) : ''}
+        ${kitReviewCard()}
         <label class="kit-row"><span>Photosensitive-safe limiter<br><small class="info">Caps flashes at 3 per second (WCAG 2.3.1)</small></span><input type="checkbox" class="switch" role="switch" id="kitSafe"${K.safe ? ' checked' : ''}></label>
-        ${kits.length ? kits.map(card).join('') : '<p class="info">No kits installed.</p>'}
+        ${kits.length ? kits.map(card).join('') : '<p class="kit-empty">No kits installed yet. Import a <b>.motifkit</b> above, or install a bundled kit below. Kits add shader styles, effects, transitions and export presets.</p>'}
         ${cat.length ? `<div class="lbl">Bundled, not installed</div>${cat.map(c => `<div class="kit-row"><span><b>${esc(c.name)}</b> · ${c.styles} styles<br><small class="info">${esc(c.description)}</small></span><button class="btn sm" data-install="${c.id}">Install</button></div>`).join('')}` : ''}
-        <p class="info">Format <b>${K.KIT_FORMAT}</b> · see the SDK for the spec</p>
+        <p class="info">Format <b>${K.KIT_FORMAT}</b> (reads ${K.KIT_FORMATS.join(', ')}) · see the SDK for the spec</p>
       </div>`;
     kitThumbs($('panel-kits'));
   }
   $('panel-kits').addEventListener('click', async e => {
     const b = e.target.closest('button'); if (!b) return;
     if (b.id === 'kitImport') { $('kitFile').click(); return; }
+    if (b.hasAttribute('data-approve') && kitReview) { const { raw, source, label, r } = kitReview; kitReview = null; installRaw(raw, source, label, r.capabilities.map(c => c.id)); return; }
+    if (b.hasAttribute('data-cancel') && kitReview) { kitStatus('info', `Didn’t install ${kitReview.r.kit.name}.`); kitReview = null; renderKitsPanel(); focusKit('#kitImport'); return; }
+    if (b.dataset.retry) { const id = b.dataset.retry; b.disabled = true; const r = await H.retry(id); kitStatus(r.ok ? 'ok' : 'error', r.ok ? `${id.split('/')[1]} passed its test frame and is back.` : `${id.split('/')[1]} is still quarantined: ${r.quarantine.reason}.`); stage.invalidate(); drawThumbs(); return; }
+    if (b.dataset.rollback) { const id = b.dataset.rollback, k = K.list().find(x => x.id === id); kitStatus('info', `Rolling ${k.name} back to v${k.previousVersion}…`); const r = await H.rollback(id); if (r.ok) kitStatus('ok', `Rolled ${r.kit.name} back to v${r.kit.version}. Roll forward from the same button.`); else { kitDiags = r.diagnostics || []; kitStatus('error', `Couldn’t roll back.\n${(r.errors || []).join('\n')}`); } return; }
     if (b.id === 'kitStarter') {
       const raw = K.starterKit();
       if (typeof fflate === 'undefined') { kitStatus('error', 'The ZIP library did not load, so the starter kit cannot be packaged here.'); return; }
@@ -1765,6 +1829,7 @@ function boot() {
     }
     if (b.dataset.install) { const r = K.installCatalog(id); if (!r.ok) kitStatus('error', r.errors.join('\n')); else { kitStatus('ok', `Installed ${r.kit.name} ${r.kit.version}: ${r.kit.styles.length} styles.`); catFilter = 'kit:' + id; renderChips(); renderLibrary(); } }
   });
+  $('panel-kits').addEventListener('keydown', e => { if (e.key === 'Escape' && kitReview) { e.stopPropagation(); kitStatus('info', `Didn’t install ${kitReview.r.kit.name}.`); kitReview = null; renderKitsPanel(); focusKit('#kitImport'); } });
   $('panel-kits').addEventListener('change', e => {
     if (e.target.id === 'kitSafe') { K.setSafe(e.target.checked); stage.invalidate(); drawThumbs(); toast(K.safe ? 'Photosensitive limiter on' : 'Photosensitive limiter off: flashing styles run at full rate'); return; }
     const id = e.target.dataset.toggle; if (!id) return;
@@ -1817,7 +1882,7 @@ function boot() {
     loadAudio, get analysis() { return analysis ? { bpm: analysis.bpm, offset: analysis.beatOffset, confidence: analysis.confidence, duration: analysis.duration } : null },
     parsePreset: X.parsePreset, presetJSON: () => X.presetJSON(project, aspect),
     api: { timeline: T, colour: C, audio: A, kits: K },
-    kits: K, importKitBytes(bytes, name) { return installRaw(K.parseBytes(new Uint8Array(bytes), name), 'file', name || 'kit'); }, get kitMsg() { return kitMsg; }, renderKitsPanel,
+    kits: K, kitHost: H, importKitBytes(bytes, name, opts = {}) { return installRaw(K.parseBytes(new Uint8Array(bytes), name), 'file', name || 'kit', opts.approve ? 'all' : undefined); }, get kitMsg() { return kitMsg; }, get kitReview() { return kitReview ? { name: kitReview.r.kit.name, capabilities: kitReview.r.capabilities.map(c => c.id) } : null; }, get kitDiags() { return kitDiags.slice(); }, renderKitsPanel,
     get env() { return envFn; }, get laneCollapsed() { return laneCollapsed; }, get tab() { return tab; },
   };
 }

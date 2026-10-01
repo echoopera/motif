@@ -19,7 +19,7 @@ test('engine-core is deterministic', () => {
 });
 
 test('timeline sanitizes and round-trips a new project', () => {
-  const m = load('tokens', 'engine-core', 'style-library', 'kit-gl', 'kits', 'colour', 'timeline');
+  const m = load('tokens', 'engine-core', 'style-library', 'kit-gl', 'kit-sandbox', 'kits', 'colour', 'timeline');
   assert.ok(m.__m_timeline.newProject);
 });
 

@@ -1,12 +1,14 @@
 #!/usr/bin/env node
-// motif-kit — validate, pack, inspect and preview Motif kits (motif-kit@1, SDK 1.2: media inputs, custom params).
-//   motif-kit validate <kit-folder | file.motifkit>   schema + static checks (+ shader compile with --gl)
-//   motif-kit pack <kit-folder> [--out dir]            validate, then write <id>-<version>.motifkit
-//   motif-kit new <folder> [--id my-kit]               copy the starter template
-//   motif-kit preview <kit-folder> [style ...]         contact sheet PNG + compile/loop/timing report (needs playwright)
-//        [--media photo.jpg]                           image fed to styles with media inputs (default: a test card)
-//   motif-kit prelude                                  print the GLSL prelude every pass is compiled with
-import fs from 'node:fs'; import path from 'node:path'; import { fileURLToPath } from 'node:url'; import { createRequire } from 'node:module';
+// motif-kit — validate, pack, migrate, bench and preview Motif kits (motif-kit@2; reads motif-kit@1 unchanged).
+//   motif-kit validate <kit-folder | file.motifkit> [--json]   schema, static GLSL analysis, capability checks
+//   motif-kit pack <kit-folder> [--out dir]                     validate, then write <id>-<version>.motifkit
+//   motif-kit migrate <kit-folder>                              rewrite a motif-kit@1 manifest as motif-kit@2
+//   motif-kit bench <kit-folder | file.motifkit> [--app motif5.html] [--size 1280x720] [--frames 60]
+//                                                               headless benchmark (tools/bench.mjs) vs. declared cost
+//   motif-kit new <folder> [--id my-kit]                        copy the starter template
+//   motif-kit preview <kit-folder> [entry ...] [--media a.jpg]  contact sheet + compile/loop/timing report (playwright)
+//   motif-kit prelude                                           print the GLSL prelude and runtime declarations
+import fs from 'node:fs'; import path from 'node:path'; import os from 'node:os'; import { fileURLToPath } from 'node:url'; import { createRequire } from 'node:module'; import { spawnSync } from 'node:child_process';
 const here = path.dirname(fileURLToPath(import.meta.url));
 const KG = new Function(fs.readFileSync(path.join(here, '../lib/kit-gl.js'), 'utf8'))();
 const require = createRequire(import.meta.url);
@@ -16,7 +18,7 @@ for (let i = 0; i < rest.length; i++) {
   const a = rest[i];
   if (!a.startsWith('--')) { args.push(a); continue; }
   const [k, v] = a.slice(2).split('=');
-  if (v !== undefined) flags[k] = v; else if (rest[i + 1] && !rest[i + 1].startsWith('--') && ['out', 'id', 'name', 'w', 'h', 'chromium', 'media'].includes(k)) flags[k] = rest[++i]; else flags[k] = true;
+  if (v !== undefined) flags[k] = v; else if (rest[i + 1] && !rest[i + 1].startsWith('--') && ['out', 'id', 'name', 'w', 'h', 'chromium', 'media', 'app', 'size', 'frames', 'harness'].includes(k)) flags[k] = rest[++i]; else flags[k] = true;
 }
 const die = m => { console.error(m); process.exit(1); };
 function fflate() { try { return require('fflate'); } catch (e) { die('This command needs fflate: npm i fflate'); } }
@@ -25,25 +27,41 @@ function readDir(dir) {
   const walk = d => { for (const f of fs.readdirSync(d)) { const p = path.join(d, f); if (fs.statSync(p).isDirectory()) walk(p); else if (!f.startsWith('.') && /\.(glsl|json|md|txt)$/i.test(f)) files[path.relative(dir, p).split(path.sep).join('/')] = fs.readFileSync(p, 'utf8'); } };
   walk(dir);
   if (!files['manifest.json']) die(`No manifest.json in ${dir}`);
-  const manifest = JSON.parse(files['manifest.json']); delete files['manifest.json'];
+  let manifest; try { manifest = JSON.parse(files['manifest.json']); } catch (e) { die(`manifest.json is not valid JSON: ${e.message}`); }
+  delete files['manifest.json'];
   return { manifest, files };
 }
 function readKit(p) {
+  if (!fs.existsSync(p)) die(`${p} does not exist`);
   if (fs.statSync(p).isDirectory()) return readDir(p);
-  const { unzipSync, strFromU8 } = fflate(); const un = unzipSync(new Uint8Array(fs.readFileSync(p)));
+  const buf = new Uint8Array(fs.readFileSync(p));
+  if (buf[0] !== 0x50 || buf[1] !== 0x4B) { const j = JSON.parse(Buffer.from(buf).toString('utf8')); if (j && j.manifest && j.files) return { manifest: j.manifest, files: j.files }; die(`${p} is not a .motifkit package or kit bundle`); }
+  const { unzipSync, strFromU8 } = fflate(); const un = unzipSync(buf);
   const files = {}; let manifest = null;
-  for (const [n, b] of Object.entries(un)) { if (n.endsWith('/')) continue; if (n === 'manifest.json') manifest = JSON.parse(strFromU8(b)); else files[n] = strFromU8(b); }
+  for (const [n, b] of Object.entries(un)) { if (n.endsWith('/')) continue; if (n === 'manifest.json') manifest = JSON.parse(strFromU8(b)); else if (/\.(glsl|json|md|txt)$/i.test(n)) files[n] = strFromU8(b); }
   return { manifest, files };
 }
+const loc = d => `${d.file || 'manifest.json'}${d.line ? `:${d.line}` : ''}`;
 function report(v) {
-  v.warnings.forEach(w => console.log(`  warn  ${w}`));
-  v.errors.forEach(e => console.log(`  error ${e}`));
-  if (v.ok) { const mi = v.kit.styles.filter(x => x.inputs && x.inputs.length).length; console.log(`  ok    ${v.kit.name} ${v.kit.version}: ${v.kit.styles.length} styles, ${v.kit.palettes.length} palettes, ${v.kit.styles.reduce((s, x) => s + Object.keys(x.params).length, 0)} params${mi ? `, ${mi} with media input` : ''}`); }
+  const diags = v.diagnostics || [];
+  for (const d of diags) console.log(`  ${d.severity === 'error' ? 'error' : 'warn '} ${loc(d)}  ${d.message}${d.entry ? `  (${d.entry})` : ''}`);
+  // Messages without a structured diagnostic (older shapes) still print.
+  for (const e of v.errors) if (!diags.some(d => e.endsWith(d.message))) console.log(`  error ${e}`);
+  if (v.ok) {
+    const k = v.kit, r = v.report;
+    const kinds = [['styles', k.styles.length], ['effects', k.effects.length], ['transitions', k.transitions.length], ['exporters', k.exporters.length]].filter(x => x[1]).map(([n, c]) => `${c} ${n}`).join(', ');
+    console.log(`  ok    ${k.name} ${k.version} (${k.sourceFormat}${k.migration ? ` → ${k.format}` : ''}): ${kinds}, ${k.palettes.length} palettes`);
+    if (k.migration) console.log(`  migr  ${k.migration.steps.join(' · ')}`);
+    console.log(`  caps  ${k.capabilities.length ? k.capabilities.map(c => `${c} (${KG.CAPABILITIES[c]})`).join('; ') : 'none: pixels from its own params only'}`);
+    for (const e of r.entries) console.log(`        ${(e.kind + ' ' + e.localId).padEnd(32)} passes run ${String(e.executions).padStart(2)} · ≤ ${Math.round(e.iterations)} loop iterations/px · ≤ ${Math.round(e.fetches)} fetches/px · declared cost ${e.cost}`);
+  }
   return v.ok;
 }
 if (cmd === 'validate') {
-  if (!args[0]) die('usage: motif-kit validate <kit-folder | file.motifkit>');
-  const raw = readKit(args[0]); const ok = report(KG.validateKit(raw.manifest, raw.files)); process.exit(ok ? 0 : 1);
+  if (!args[0]) die('usage: motif-kit validate <kit-folder | file.motifkit> [--json]');
+  const raw = readKit(args[0]); const v = KG.validateKit(raw.manifest, raw.files);
+  if (flags.json) { console.log(JSON.stringify({ ok: v.ok, errors: v.errors, warnings: v.warnings, diagnostics: v.diagnostics, report: v.report }, null, 2)); process.exit(v.ok ? 0 : 1); }
+  process.exit(report(v) ? 0 : 1);
 } else if (cmd === 'pack') {
   if (!args[0]) die('usage: motif-kit pack <kit-folder> [--out dir]');
   const raw = readDir(args[0]); const v = KG.validateKit(raw.manifest, raw.files); if (!report(v)) process.exit(1);
@@ -51,15 +69,41 @@ if (cmd === 'validate') {
   const zin = { 'manifest.json': strToU8(JSON.stringify(raw.manifest, null, 2)) }; for (const [k, t] of Object.entries(raw.files)) zin[k] = strToU8(t);
   const out = path.join(flags.out || '.', `${raw.manifest.id}-${raw.manifest.version}.motifkit`);
   fs.mkdirSync(path.dirname(out), { recursive: true }); fs.writeFileSync(out, zipSync(zin, { level: 9 })); console.log(`  wrote ${out}`);
+} else if (cmd === 'migrate') {
+  if (!args[0]) die('usage: motif-kit migrate <kit-folder>');
+  const raw = readDir(args[0]);
+  if (raw.manifest.format === KG.KIT_FORMAT_2) { console.log(`  ${raw.manifest.id} is already ${KG.KIT_FORMAT_2}`); process.exit(0); }
+  const v = KG.validateKit(raw.manifest, raw.files); if (!report(v)) process.exit(1);
+  // Same result the app records on load: format bump + capabilities inferred; styles, params and shaders unchanged.
+  const m = { ...raw.manifest, format: KG.KIT_FORMAT_2 };
+  if (v.kit.capabilities.length) m.capabilities = v.kit.capabilities.slice();
+  const keys = Object.keys(m), at = keys.indexOf('format');
+  const ordered = Object.fromEntries([...keys.slice(0, at + 1).map(k => [k, m[k]]), ...(m.capabilities ? [['capabilities', m.capabilities]] : []), ...keys.slice(at + 1).filter(k => k !== 'capabilities').map(k => [k, m[k]])]);
+  const v2 = KG.validateKit(ordered, raw.files); if (!v2.ok) { report(v2); die('  migrated manifest does not validate; nothing written'); }
+  fs.writeFileSync(path.join(args[0], 'manifest.json'), JSON.stringify(ordered, null, 2) + '\n');
+  console.log(`  wrote ${path.join(args[0], 'manifest.json')} as ${KG.KIT_FORMAT_2}\n  ${v.kit.migration.steps.join('\n  ')}`);
+} else if (cmd === 'bench') {
+  if (!args[0]) die('usage: motif-kit bench <kit-folder | file.motifkit> [--app motif5.html] [--size 1280x720] [--frames 60]');
+  const raw = readKit(args[0]); const v = KG.validateKit(raw.manifest, raw.files); if (!report(v)) process.exit(1);
+  // The headless harness lives with the app (Motif3/tools/bench.mjs); the SDK ships inside Motif3/sdk/motif-kit-sdk.
+  const harness = path.resolve(flags.harness || path.join(here, '../../../tools/bench.mjs'));
+  if (!fs.existsSync(harness)) die(`bench needs the app's benchmark harness: pass --harness <Motif3/tools/bench.mjs> (looked at ${harness})`);
+  const app = flags.app ? path.resolve(flags.app) : path.join(path.dirname(harness), '..', 'motif5.html');
+  const tmp = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'motif-kit-')), `${raw.manifest.id}.json`);
+  fs.writeFileSync(tmp, JSON.stringify(raw));
+  const a = ['--kit', tmp, '--file', app, '--size', String(flags.size || '1280x720'), '--frames', String(flags.frames || 60)];
+  const r = spawnSync(process.execPath, [harness, ...a], { stdio: 'inherit', env: process.env });
+  process.exit(r.status == null ? 1 : r.status);
 } else if (cmd === 'new') {
   const dest = args[0] || 'my-kit'; if (fs.existsSync(dest)) die(`${dest} already exists`);
   fs.cpSync(path.join(here, '../template'), dest, { recursive: true });
   if (flags.id) { const mp = path.join(dest, 'manifest.json'); const m = JSON.parse(fs.readFileSync(mp, 'utf8')); m.id = String(flags.id); m.name = String(flags.name || flags.id); fs.writeFileSync(mp, JSON.stringify(m, null, 2) + '\n'); }
   console.log(`  created ${dest}. Edit manifest.json and styles/*.glsl, then: motif-kit preview ${dest}`);
 } else if (cmd === 'prelude') {
-  process.stdout.write(KG.PRELUDE + '\n// ---- your params become: uniform <float|int|bool> p_<key>; select options also #define KEY_OPTION <index>\n' + KG.MAIN_FINAL);
+  process.stdout.write(KG.PRELUDE + '\n// ---- your params become: uniform <float|int|bool> p_<key>; select options also #define KEY_OPTION <index>\n'
+    + '// ---- motif-kit@2 runtime declarations (added per pass when they apply):\n' + KG.runtimeDecls('transition', ['audio'], ['input']).replace(/^/gm, '//   ') + '\n' + KG.MAIN_FINAL);
 } else if (cmd === 'preview') {
   const { runPreview } = await import('../lib/preview.mjs'); await runPreview(KG, readDir(args[0]), args.slice(1), flags);
 } else {
-  console.log(fs.readFileSync(fileURLToPath(import.meta.url), 'utf8').split('\n').slice(1, 8).map(l => l.replace(/^\/\/ ?/, '')).join('\n'));
+  console.log(fs.readFileSync(fileURLToPath(import.meta.url), 'utf8').split('\n').slice(1, 11).map(l => l.replace(/^\/\/ ?/, '')).join('\n'));
 }

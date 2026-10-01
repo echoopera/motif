@@ -13,7 +13,7 @@ await page.waitForTimeout(1500);
 await page.evaluate(() => { document.body.innerHTML = ''; });
 const res = await page.evaluate(async (RAW) => {
   const K = __m_kits, KG = __m_kit_gl, E = __m_engine_core, SL = __m_style_library;
-  const inst = K.install(RAW, { source: 'file', silent: true });
+  const inst = K.install(RAW, { source: 'file', silent: true, approved: 'all' }); // audit tool: the kit's capabilities (media) are approved
   const head = { installOk: inst.ok, errors: inst.errors || [], warnings: inst.warnings || [], skipped: !!inst.skippedCompile };
   if (!inst.ok) return { head, out: [] };
   const W = 192, H = 108;
