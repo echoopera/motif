@@ -3,7 +3,7 @@
 import fs from 'node:fs'; import path from 'node:path'; import vm from 'node:vm';
 const dir = path.resolve(import.meta.dirname, '../src-v5/modules');
 export function load(...names) {
-  const ctx = vm.createContext({ console, setTimeout, clearTimeout, performance, structuredClone, TextEncoder, TextDecoder, localStorage: { getItem: () => null, setItem() {} }, document: undefined, OffscreenCanvas: undefined });
+  const ctx = vm.createContext({ console, setTimeout, clearTimeout, performance, structuredClone, AbortController, TextEncoder, TextDecoder, localStorage: { getItem: () => null, setItem() {} }, document: undefined, OffscreenCanvas: undefined });
   const files = fs.readdirSync(dir).filter(f => f.endsWith('.js')).sort();
   const want = new Set(names);
   const code = files.filter(f => want.has(f.replace(/^\d+[a-z]?-|\.js$/g, ''))).map(f => fs.readFileSync(path.join(dir, f), 'utf8')).join('\n');

@@ -21,6 +21,16 @@ Motif3/
   tools/kit-audit.mjs                    headless audit of every kit style
 ```
 
+## Deliver page and render queue (Motif 5)
+
+Open the **Deliver** tab in the inspector. Pick a preset (YouTube 1080p, 4K HEVC, Social vertical, Transparent WebM, PNG sequence, Master; all editable, plus your own), press **Add to queue**, and keep working. Jobs render one at a time in the background, with progress, frames per second and an ETA; Pause / Resume, Cancel, Retry and Remove are available per job. Jobs and finished files live in IndexedDB (OPFS when the browser allows), so they survive a reload: a job that was rendering becomes **Interrupted** (Retry starts it again from frame 0) and the queue waits paused until you press Resume. The tab title shows progress and a badge counts finished renders; **Notify me** asks for system notifications (only when you press it). The viewer pauses while a job renders so the render pipeline is never shared. The quick export dialog (X) is unchanged and gained **Add to queue** and a **Codec** choice.
+
+**Codecs.** H.264, HEVC, VP9 and AV1 go through WebCodecs where the browser reports `isConfigSupported`; hardware is requested first (`prefer-hardware`) and the exporter retries without the preference if the encoder rejects it. The Deliver page's *Encoder capabilities* table shows codec × size (720p to 4K) × alpha for this browser; the browser does not say which encoder will actually run, so *HW* means the hardware preference was accepted. Results report frames per second for the whole render + encode loop. On hardware-backed WebGL, opaque sRGB / Rec.709 frames go straight from the canvas to the encoder (`VideoFrame(canvas)`, no JS RGB to I420 loop); on software GL, with alpha, or in Display P3 the tagged I420 path is used (`frameSource: 'canvas' | 'i420'` forces one).
+
+**Offline.** fflate, mp4-muxer and webm-muxer are vendored in `vendor/` (see `vendor/VENDOR.md`) and inlined into the single HTML by `src-v5/build.py`, so exports and ZIP need no network. Only the Google Fonts stylesheet and the optional FDK-AAC fallback for MP4 audio in browsers without an AAC encoder are external.
+
+Tests: `npm test` (unit, including vendor and queue logic) and `npm run test:export` (browser: offline MP4/WebM/ZIP, queue order, reload recovery, Deliver page).
+
 ## Slow exports
 
 Open **Deliver** and press **Check speed**. It shows the GPU in use and what each layer costs per frame at the export size. If it says *Software rendering*, the browser is drawing WebGL on the CPU; turn on hardware acceleration (Chrome: Settings › System › Use graphics acceleration) and reload. Frame cost depends on the style, resolution, layer count and motion-blur samples; use the measured result for your scene.
