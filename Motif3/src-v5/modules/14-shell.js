@@ -351,7 +351,7 @@ function boot() {
   // Renders each scene at a fixed size and time sweep, forcing a GPU readback per frame so the wall time covers
   // submission plus execution. Output is JSON with p50/p95/max frame times for CI budgets and cross-machine comparison.
   const pctile = (a, q) => { const b = [...a].sort((x, y) => x - y); return b[Math.min(b.length - 1, Math.ceil(b.length * q) - 1)]; };
-  async function benchScene(pr, { w, h, frames, warm }) {
+  async function benchScene(pr, { w, h, frames, warm, id }) {
     const cv = document.createElement('canvas'); cv.width = w; cv.height = h; const x = cv.getContext('2d', { willReadFrequently: false });
     const fps = pr.output.fps || 30, N = frames, L = pr.finish.loop, ms = [], errs = [];
     __m_kits.setPreview(false);
@@ -362,7 +362,21 @@ function boot() {
       if (i % 8 === 7) await new Promise(r => setTimeout(r, 0)); // keep the page responsive
     }
     const mean = ms.reduce((a, b) => a + b, 0) / ms.length;
-    return { p50: +pctile(ms, 0.5).toFixed(2), p95: +pctile(ms, 0.95).toFixed(2), max: +Math.max(...ms).toFixed(2), mean: +mean.toFixed(2), fps60: pctile(ms, 0.95) <= 16.7, errors: [...new Set(errs)].slice(0, 3) };
+    // Look check: one more frame at mid-loop, reduced to 96×54, so the report also says whether the picture is blank,
+    // flat or a quarantine placeholder on this GPU, and carries a small thumbnail to eyeball.
+    let look = null;
+    try {
+      pipeline.renderFrame(x, w, h, pr, L * 0.37, { env: null });
+      const sm = document.createElement('canvas'); sm.width = 96; sm.height = 54; const sx = sm.getContext('2d', { willReadFrequently: true }); sx.drawImage(cv, 0, 0, 96, 54);
+      const d = sx.getImageData(0, 0, 96, 54).data, n = 96 * 54; let sum = 0, sq = 0, dark = 0, clear = 0;
+      for (let i = 0; i < n; i++) { const o = i * 4, l = (d[o] * 0.2126 + d[o + 1] * 0.7152 + d[o + 2] * 0.0722) / 255; sum += l; sq += l * l; if (l < 0.02) dark++; if (d[o + 3] < 8) clear++; }
+      const m = sum / n, sd = Math.sqrt(Math.max(0, sq / n - m * m));
+      const th = document.createElement('canvas'); th.width = 160; th.height = 90; th.getContext('2d').drawImage(cv, 0, 0, 160, 90);
+      look = { mean: +m.toFixed(3), sd: +sd.toFixed(3), dark: +(dark / n).toFixed(3), clear: +(clear / n).toFixed(3), thumb: th.toDataURL('image/jpeg', 0.6) };
+    } catch (e) { errs.push('look: ' + String(e && e.message || e)); }
+    const q = id && __m_kits.quarantine ? __m_kits.quarantine.get(id) : null, kerr = id && __m_kits.errors ? __m_kits.errors.get(id) : null;
+    const flags = []; if (look && (look.dark > 0.97 || look.sd < 0.01)) flags.push('blank'); if (q) flags.push('quarantined'); if (kerr) flags.push('shader error');
+    return { p50: +pctile(ms, 0.5).toFixed(2), p95: +pctile(ms, 0.95).toFixed(2), max: +Math.max(...ms).toFixed(2), mean: +mean.toFixed(2), fps60: pctile(ms, 0.95) <= 16.7, errors: [...new Set(errs)].slice(0, 3), look, flags, quarantine: q ? q.reason : null, shaderError: kerr ? String(kerr.message || kerr).slice(0, 160) : null };
   }
   async function runBench(opt = {}) {
     const w = opt.w || 1280, h = opt.h || 720, frames = opt.frames || 60, warm = opt.warm == null ? 6 : opt.warm;
@@ -375,15 +389,15 @@ function boot() {
         toast(`Benchmark ${++n}/${list.length} · ${sc.id}`);
         pipeline.renderFrame(document.createElement('canvas').getContext('2d'), 8, 8, sc.pr, 0, {}); // starts shader compiles before timing
         if (K.runtime.pendingCompiles) { const t0 = performance.now(); while (K.runtime.pendingCompiles && performance.now() - t0 < 8000) await new Promise(r => setTimeout(r, 30)); }
-        report.scenes.push({ id: sc.id, ...(await benchScene(sc.pr, { w, h, frames, warm })) });
+        report.scenes.push({ id: sc.id, ...(await benchScene(sc.pr, { w, h, frames, warm, id: sc.id })) });
       }
     } finally { stage.setCache(wasCache); if (wasPlaying) stage.play(); else stage.invalidate(); }
     const worst = report.scenes.reduce((a, b) => (b.p95 > a.p95 ? b : a), report.scenes[0]);
-    report.summary = { scenes: report.scenes.length, over60fpsBudget: report.scenes.filter(x => !x.fps60).map(x => x.id), worst: worst && { id: worst.id, p95: worst.p95 } };
+    report.summary = { scenes: report.scenes.length, over60fpsBudget: report.scenes.filter(x => !x.fps60).map(x => x.id), flagged: report.scenes.filter(x => x.flags && x.flags.length).map(x => `${x.id}: ${x.flags.join(', ')}`), worst: worst && { id: worst.id, p95: worst.p95 } };
     if (!opt.silent) {
       const blob = new Blob([JSON.stringify(report, null, 2)], { type: 'application/json' }), a = document.createElement('a');
       a.href = URL.createObjectURL(blob); a.download = `motif-bench-${new Date().toISOString().slice(0, 16).replace(/[:T]/g, '-')}.json`; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 4000);
-      toast(`Benchmark done · worst p95 ${report.summary.worst.p95} ms · ${report.summary.over60fpsBudget.length} over 16.7 ms`);
+      toast(`Benchmark done · worst p95 ${report.summary.worst.p95} ms · ${report.summary.over60fpsBudget.length} over 16.7 ms${report.summary.flagged.length ? ` · ${report.summary.flagged.length} blank or quarantined` : ''}`);
     }
     return report;
   }
@@ -1755,6 +1769,7 @@ function boot() {
     out.push(c('cache-toggle', stage.cacheOn ? 'Render cache: turn off' : 'Render cache: turn on', '', () => toggleCache(), 'performance scrub loop'));
     out.push(c('cache-clear', 'Render cache: clear', '', () => { stage.cacheClear(); stage.invalidate(); toast('Render cache cleared'); }, 'performance'));
     out.push(c('bench', 'Benchmark this scene (download frame-time JSON)', '', () => runBench(), 'performance speed fps gpu'));
+    out.push(c('health', 'Check every style on this GPU (blank, black or quarantined; downloads report with thumbnails)', '', () => runBench({ all: true, w: 640, h: 360, frames: 12, warm: 3 }), 'health audit black blank broken kit quarantine smear'));
     out.push(c('bench-all', 'Benchmark every style (download frame-time JSON)', '', () => runBench({ all: true }), 'performance speed fps gpu budget'));
     out.push(c('keys', 'Keyboard shortcuts', '?', () => $('keysDlg').showModal()));
     const pals = [...PALETTES, ...project.palettes];

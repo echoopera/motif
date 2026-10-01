@@ -191,6 +191,8 @@ vec4 buf(sampler2D b, vec2 fc) { return texture(b, fc / u_res); }
 // out-of-range values, normalize of a zero vector). GPUs differ: Apple, AMD and NVIDIA return zeros, NaN or garbage,
 // which shows up as black blocks and hard bands. These overloads give every case one meaning on every GPU:
 // smoothstep with reversed edges eases downwards, equal edges step, the rest clamp to the nearest defined value.
+// pow() is deliberately left alone: its undefined inputs (negative base) are read by many shaders as sign-less, and zeroing
+// them changes the picture.
 // Results for well-defined inputs are unchanged.
 float M_ss(float a, float b, float x) { float d = b - a; float t = d == 0.0 ? step(a, x) : clamp((x - a) / d, 0.0, 1.0); return t * t * (3.0 - 2.0 * t); }
 vec2 M_ss(float a, float b, vec2 x) { return vec2(M_ss(a, b, x.x), M_ss(a, b, x.y)); }
@@ -199,10 +201,6 @@ vec4 M_ss(float a, float b, vec4 x) { return vec4(M_ss(a, b, x.x), M_ss(a, b, x.
 vec2 M_ss(vec2 a, vec2 b, vec2 x) { return vec2(M_ss(a.x, b.x, x.x), M_ss(a.y, b.y, x.y)); }
 vec3 M_ss(vec3 a, vec3 b, vec3 x) { return vec3(M_ss(a.x, b.x, x.x), M_ss(a.y, b.y, x.y), M_ss(a.z, b.z, x.z)); }
 vec4 M_ss(vec4 a, vec4 b, vec4 x) { return vec4(M_ss(a.x, b.x, x.x), M_ss(a.y, b.y, x.y), M_ss(a.z, b.z, x.z), M_ss(a.w, b.w, x.w)); }
-float M_pow(float x, float y) { return x > 0.0 ? pow(x, y) : 0.0; }
-vec2 M_pow(vec2 x, vec2 y) { return vec2(M_pow(x.x, y.x), M_pow(x.y, y.y)); }
-vec3 M_pow(vec3 x, vec3 y) { return vec3(M_pow(x.x, y.x), M_pow(x.y, y.y), M_pow(x.z, y.z)); }
-vec4 M_pow(vec4 x, vec4 y) { return vec4(M_pow(x.x, y.x), M_pow(x.y, y.y), M_pow(x.z, y.z), M_pow(x.w, y.w)); }
 float M_sqrt(float x) { return sqrt(max(x, 0.0)); }
 vec2 M_sqrt(vec2 x) { return sqrt(max(x, 0.0)); }
 vec3 M_sqrt(vec3 x) { return sqrt(max(x, 0.0)); }
@@ -221,7 +219,6 @@ vec2 M_norm(vec2 v) { float l = length(v); return l > 1e-20 ? v / l : vec2(0.0);
 vec3 M_norm(vec3 v) { float l = length(v); return l > 1e-20 ? v / l : vec3(0.0); }
 vec4 M_norm(vec4 v) { float l = length(v); return l > 1e-20 ? v / l : vec4(0.0); }
 #define smoothstep M_ss
-#define pow M_pow
 #define sqrt M_sqrt
 #define log M_log
 #define inversesqrt M_rsqrt
