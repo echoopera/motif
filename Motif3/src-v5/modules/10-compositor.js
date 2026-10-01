@@ -26,7 +26,7 @@ function createCompositor({ gpu } = {}) {
     ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over'; ctx.filter = 'none';
     if (opts.clear !== false) ctx.clearRect(0, 0, w, h);
     if (opts.bg) { ctx.fillStyle = pal.bg; ctx.fillRect(0, 0, w, h); }
-    ctx.translate(w / 2, h / 2); ctx.rotate((sh.rotate * Math.PI) / 180); ctx.scale(sh.zoom, sh.zoom); ctx.translate(-w / 2, -h / 2);
+    ctx.translate(w * (sh.posX || 0), h * (sh.posY || 0)); ctx.translate(w / 2, h / 2); ctx.rotate((sh.rotate * Math.PI) / 180); ctx.scale(sh.zoom, sh.zoom); ctx.translate(-w / 2, -h / 2);
     let engine = 'cpu';
     try {
       if (gpu && style.gpu && gpu.ready && !opts.cpu) {

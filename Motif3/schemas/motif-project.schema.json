@@ -240,6 +240,92 @@
         }
       ]
     },
+    "arrange": {
+      "type": "object",
+      "description": "Arrange view sequence (Motif 6): clips on three tracks plus transition regions. Sanitised by sanitizeArrange(): up to 256 items and 256 fx; unknown fields dropped.",
+      "additionalProperties": false,
+      "properties": {
+        "items": {
+          "type": "array",
+          "maxItems": 256,
+          "items": {
+            "type": "object",
+            "additionalProperties": true,
+            "required": [
+              "id",
+              "clip",
+              "track",
+              "start",
+              "dur"
+            ],
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "clip": {
+                "type": "string"
+              },
+              "track": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 2
+              },
+              "start": {
+                "type": "number",
+                "minimum": 0
+              },
+              "dur": {
+                "type": "number",
+                "minimum": 0.1
+              },
+              "off": {
+                "type": "number",
+                "minimum": 0
+              },
+              "opacity": {
+                "type": "number"
+              }
+            }
+          }
+        },
+        "fx": {
+          "type": "array",
+          "maxItems": 256,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "style",
+              "track",
+              "a",
+              "b"
+            ],
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "style": {
+                "type": "string"
+              },
+              "track": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 2
+              },
+              "a": {
+                "type": "number",
+                "minimum": 0
+              },
+              "b": {
+                "type": "number",
+                "minimum": 0
+              }
+            }
+          }
+        }
+      }
+    },
     "output": {
       "type": "object",
       "additionalProperties": true,
@@ -313,7 +399,9 @@
             "phase",
             "seed",
             "zoom",
-            "rotate"
+            "rotate",
+            "posX",
+            "posY"
           ],
           "properties": {
             "palette": {
@@ -361,6 +449,20 @@
               "maximum": 180,
               "default": 0,
               "description": "Rotate (°)"
+            },
+            "posX": {
+              "type": "number",
+              "minimum": -1,
+              "maximum": 1,
+              "default": 0,
+              "description": "Position X"
+            },
+            "posY": {
+              "type": "number",
+              "minimum": -1,
+              "maximum": 1,
+              "default": 0,
+              "description": "Position Y"
             }
           }
         },

@@ -54,6 +54,31 @@ const BANDS = [
 const EASES = [{ v: 'linear', l: 'Linear' }, { v: 'smooth', l: 'Smooth' }, { v: 'in', l: 'Ease in' }, { v: 'out', l: 'Ease out' }, { v: 'hold', l: 'Hold' }];
 const easeFn = { linear: ease.linear, smooth: ease.inOutCubic, in: ease.inCubic, out: ease.outCubic, hold: () => 0 };
 
+// ---------- arrangement (Arrange view): clips laid out on three tracks, with transition regions ----------
+const ARR_TRACKS = 3;
+const TRANSITIONS = [
+  { v: 'dissolve', l: 'Dissolve' }, { v: 'wipe', l: 'Wipe' }, { v: 'slide', l: 'Push' }, { v: 'zoom', l: 'Zoom' }, { v: 'iris', l: 'Iris' },
+  { v: 'clock', l: 'Clock wipe' }, { v: 'blur', l: 'Blur dissolve' }, { v: 'pixel', l: 'Pixelate' }, { v: 'glitch', l: 'Glitch' }, { v: 'noise', l: 'Noise dissolve' }, { v: 'whip', l: 'Whip pan' },
+];
+function sanitizeArrange(a) {
+  const out = { items: [], fx: [] };
+  if (!a || typeof a !== 'object') return out;
+  const num = (v, d, lo, hi) => clamp(Number.isFinite(Number(v)) ? Number(v) : d, lo, hi);
+  const ids = new Set();
+  const uid = (id, pre) => { id = typeof id === 'string' && id ? id.slice(0, 24) : pre + Math.random().toString(36).slice(2, 8); while (ids.has(id)) id = pre + Math.random().toString(36).slice(2, 8); ids.add(id); return id; };
+  for (const it of (Array.isArray(a.items) ? a.items : []).slice(0, 256)) {
+    if (!it || typeof it.clip !== 'string' || !it.clip) continue;
+    out.items.push({ id: uid(it.id, 'i'), clip: it.clip.slice(0, 40), track: Math.round(num(it.track, 0, 0, ARR_TRACKS - 1)), start: num(it.start, 0, 0, 36000), dur: num(it.dur, 1, 0.1, 36000), off: num(it.off, 0, 0, 36000), opacity: num(it.opacity, 1, 0, 1) });
+  }
+  const tids = TRANSITIONS.map(t => t.v);
+  for (const f of (Array.isArray(a.fx) ? a.fx : []).slice(0, 256)) {
+    if (!f || !tids.includes(f.style)) continue;
+    const A = num(f.a, 0, 0, 36000), B = num(f.b, A + 0.5, 0, 36000); if (B - A < 0.05) continue;
+    out.fx.push({ id: uid(f.id, 'x'), style: f.style, track: Math.round(num(f.track, 0, 0, ARR_TRACKS - 1)), a: A, b: B });
+  }
+  return out;
+}
+
 let lid = 0;
 const newLayerId = () => `l${Date.now().toString(36).slice(-4)}${(lid++).toString(36)}`;
 const clone = o => JSON.parse(JSON.stringify(o));
@@ -66,7 +91,7 @@ function newLayer(styleId, shared, comp) {
 }
 function newProject(styleId = 'particle-form') {
   const l = newLayer(styleId);
-  return { format: FORMAT, layers: [l], active: l.id, finish: defaults(FINISH_SCHEMA), palettes: [], keys: {}, audio: null, output: { ...OUTPUT_DEFAULT } };
+  return { format: FORMAT, layers: [l], active: l.id, finish: defaults(FINISH_SCHEMA), palettes: [], keys: {}, audio: null, output: { ...OUTPUT_DEFAULT }, arrange: { items: [], fx: [] } };
 }
 // Media attached to a kit style's inputs: { <inputId>: { asset, name, kind, w, h, dur, fit, timing } }.
 function sanitizeMedia(m) {
@@ -93,7 +118,7 @@ function sanitizeProject(pr, sanitizeCustom) {
     format: FORMAT, layers, active: layers.some(l => l.id === pr.active) ? pr.active : layers[0].id,
     finish: sanitize(pr.finish, FINISH_SCHEMA),
     palettes: (Array.isArray(pr.palettes) ? pr.palettes : []).map(p => (sanitizeCustom ? sanitizeCustom(p) : p)).filter(Boolean).slice(0, 24),
-    keys: {}, audio: null, output: { ...OUTPUT_DEFAULT, ...(pr.output || {}) },
+    keys: {}, audio: null, output: { ...OUTPUT_DEFAULT, ...(pr.output || {}) }, arrange: sanitizeArrange(pr.arrange),
   };
   if (pr.grade && GR()) { const g = GR().sanitizeGrade(pr.grade); if (g) out.grade = g; }
   out.output.space = ['srgb', 'p3', 'rec709'].includes(out.output.space) ? out.output.space : 'srgb';
@@ -262,7 +287,7 @@ function randomizeProject(pr, layerId, locks, rng) {
   return { project: next, changed: a.changed };
 }
 
-return { FORMAT, MAX_LAYERS, BLENDS, COMP_SCHEMA, FINISH_SCHEMA, OUTPUT_DEFAULT, BANDS, EASES, newLayer, newProject, sanitizeProject, fromV1, layerById, parsePath, schemaAt, isNumericPath, getBase, setBase, pathLabel, allPaths, keyIndexAt, setKey, removeKey, moveKey, clearKeys, valueAt, evaluate, mutateProject, randomizeProject, lockedFor, clone, mulberry32 };
+return { FORMAT, ARR_TRACKS, TRANSITIONS, sanitizeArrange, MAX_LAYERS, BLENDS, COMP_SCHEMA, FINISH_SCHEMA, OUTPUT_DEFAULT, BANDS, EASES, newLayer, newProject, sanitizeProject, fromV1, layerById, parsePath, schemaAt, isNumericPath, getBase, setBase, pathLabel, allPaths, keyIndexAt, setKey, removeKey, moveKey, clearKeys, valueAt, evaluate, mutateProject, randomizeProject, lockedFor, clone, mulberry32 };
 
 })();
 

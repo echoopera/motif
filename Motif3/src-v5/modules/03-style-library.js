@@ -25,6 +25,8 @@ const SHARED_SCHEMA = {
   seed: P.int('Seed', 1, 9999, 417, { group: 'motion', mutate: 0 }),
   zoom: P.range('Zoom', 0.5, 2, 1, 0.01, { group: 'motion', unit: '×', mutate: 0.3 }),
   rotate: P.range('Rotate', -180, 180, 0, 1, { group: 'motion', unit: '°', mutate: 0.15 }),
+  posX: P.range('Position X', -1, 1, 0, 0.005, { group: 'motion', mutate: 0 }),
+  posY: P.range('Position Y', -1, 1, 0, 0.005, { group: 'motion', mutate: 0 }),
 };
 // Loop length lives on the project (finish block); styles read it from S.L.
 

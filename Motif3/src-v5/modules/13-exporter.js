@@ -105,6 +105,11 @@ let mediaPrep = null;
 // Optional ctx.gate(): awaited once per frame; a pending promise pauses the render (render queue Pause) without losing progress.
 let gate = null;
 // One frame, rendered in short slices so Cancel is honoured within ~100 ms even for very heavy frames.
+const arrN = (project, s) => (s.arrange ? Math.max(1, Math.round(s.arrange.duration * s.fps)) : frameCount(project, s.fps, s.loops));
+async function frameAt(s, pipeline, ctx, w, h, project, i, t0, ropts, job, signal) {
+  if (s.arrange) { if (signal && signal.aborted) throw abortErr(); return s.arrange.draw(ctx, w, h, t0 != null ? t0 : i / s.fps, ropts); }
+  return frameCoop(pipeline, ctx, w, h, project, t0 != null ? t0 : frameTime(project, s.fps, i), ropts, job, signal);
+}
 async function frameCoop(pipeline, ctx, w, h, project, t, ropts, job, signal) {
   if (mediaPrep) { await mediaPrep(project, t); if (signal && signal.aborted) throw abortErr(); }
   if (!job) { if (signal && signal.aborted) throw abortErr(); return pipeline.renderFrame(ctx, w, h, project, t, ropts); }
@@ -201,7 +206,7 @@ async function encodeVideo(pipeline, project, s, caps, env, audio, onProgress, s
   throw first || new Error('The video encoder could not start.');
 }
 async function encodeVideoOnce(pipeline, project, s, caps, env, audio, onProgress, signal, job, { id, cd, pick, alpha, bitrate }) {
-  const { w, h } = exportSize(s.aspect, s.tier); const N = frameCount(project, s.fps, s.loops);
+  const { w, h } = exportSize(s.aspect, s.tier); const N = arrN(project, s);
   const isMp4 = s.format === 'mp4';
   const space = spaceById(project.output.space);
   // Direct path: VideoFrame(canvas) lets the browser convert RGB to YUV (GPU where it can) instead of a JS getImageData + I420 loop.
@@ -225,14 +230,14 @@ async function encodeVideoOnce(pipeline, project, s, caps, env, audio, onProgres
   try { enc.configure({ ...pick.cfg, latencyMode: /^((?!chrome|android).)*safari/i.test(navigator.userAgent) ? 'realtime' : 'quality' }); } catch (e) { throw earlyFail(e); }
   const ropts = { transparent: !isMp4 && s.transparent, env, space: space.id };
   g.__exportTiming = null; let framePathNote = '';
-  await frameCoop(pipeline, ctx, w, h, project, 0, ropts, job, signal); // warm-up: scratch canvases settle before frame 0
+  await frameAt(s, pipeline, ctx, w, h, project, 0, 0, ropts, job, signal); // warm-up: scratch canvases settle before frame 0
   const tStart = performance.now(); let tEnd = tStart;
   for (let i = 0; i < N; i++) {
     if (gate) await gate();
     if (signal && signal.aborted) { try { enc.close(); } catch (e) { /* closed */ } throw abortErr(); }
     if (failure) throw failure;
     const T0 = performance.now();
-    await frameCoop(pipeline, ctx, w, h, project, frameTime(project, s.fps, i), ropts, job, signal);
+    await frameAt(s, pipeline, ctx, w, h, project, i, null, ropts, job, signal);
     const T1 = performance.now();
     const ts = Math.round((i * 1e6) / s.fps), dur = Math.round(1e6 / s.fps);
     let frame = null, T2 = T1, T3 = T1;
@@ -315,14 +320,14 @@ async function encodeVideoOnce(pipeline, project, s, caps, env, audio, onProgres
 
 async function canvasPng(canvas) { return new Promise(r => canvas.toBlob(r, 'image/png')); }
 async function pngSequence(pipeline, project, s, env, onProgress, signal, job) {
-  const { w, h } = exportSize(s.aspect, s.tier); const N = frameCount(project, s.fps, s.loops);
+  const { w, h } = exportSize(s.aspect, s.tier); const N = arrN(project, s);
   const { c: canvas, ctx } = makeExportCanvas(w, h, project.output.space); const files = {};
   const pad = Math.max(4, String(N).length); const base = slug(project).replace(/\+/g, '_');
-  await frameCoop(pipeline, ctx, w, h, project, 0, { transparent: s.transparent, env }, job, signal);
+  await frameAt(s, pipeline, ctx, w, h, project, 0, 0, { transparent: s.transparent, env }, job, signal);
   for (let i = 0; i < N; i++) {
     if (gate) await gate();
     if (signal && signal.aborted) throw abortErr();
-    await frameCoop(pipeline, ctx, w, h, project, frameTime(project, s.fps, i), { transparent: s.transparent, env }, job, signal);
+    await frameAt(s, pipeline, ctx, w, h, project, i, null, { transparent: s.transparent, env }, job, signal);
     files[`${base}_${String(i).padStart(pad, '0')}.png`] = [new Uint8Array(await (await canvasPng(canvas)).arrayBuffer()), { level: 0 }];
     onProgress && onProgress((i + 1) / N, `Rendering frame ${i + 1} of ${N}`);
   }
@@ -343,7 +348,7 @@ async function runExportInner(project, s, { pipeline, env, audio, onProgress, si
   if (s.format === 'json') return { blob: new Blob([presetJSON(project, s.aspect)], { type: 'application/json' }), filename: `motif-${slug(project)}-preset.json` };
   if (s.format === 'png') {
     const { w, h } = exportSize(s.aspect, s.tier); const { c, ctx } = makeExportCanvas(w, h, project.output.space);
-    await frameCoop(pipeline, ctx, w, h, project, s.time || 0, { transparent: s.transparent, env }, job, signal);
+    await frameAt(s, pipeline, ctx, w, h, project, 0, s.time || 0, { transparent: s.transparent, env }, job, signal);
     return { blob: await canvasPng(c), filename: fileName(project, s, 'png') };
   }
   if (s.format === 'png-seq') {

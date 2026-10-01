@@ -145,7 +145,8 @@ function createPlayer() {
     for (const b of BAND_IDS) { const pk = liveVals.peak; pk[b] = Math.max(out[b], pk[b] * 0.995, 1e-4); out[b] = Math.min(1, out[b] / pk[b]); }
     cached = out; return out;
   }
-  return { decode, setRegion, start, stop, time, setVolume, startLive, stopLive, liveBands, get playing() { return playing; }, get live() { return !!analyser; }, get buffer() { return buffer; }, get context() { return ctx; } };
+  function clear() { stop(); buffer = null; }
+  return { decode, setRegion, start, stop, clear, time, setVolume, startLive, stopLive, liveBands, get playing() { return playing; }, get live() { return !!analyser; }, get buffer() { return buffer; }, get context() { return ctx; } };
 }
 
 // Slice [start, start+dur) of an AudioBuffer as planar Float32 channels (for export muxing).

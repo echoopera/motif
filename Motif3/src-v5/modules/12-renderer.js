@@ -169,7 +169,7 @@ function createFrameCache(pipeline) {
 // OffscreenCanvas or worker WebGL2/WebGPU is missing, after a worker failure, with ?worker=0, and for scenes whose
 // inputs live on the page (image/video layers, live audio input).
 function createStage({ host, box, pipeline, getProject, onTick, onError, clock, env, extras }) {
-  let canvas = null, ctx = null, space = 'srgb';
+  let canvas = null, ctx = null, space = 'srgb', ovr = null; // ovr: Arrange plays its sequence through the stage (main thread)
   let aspect = '16x9', quality = 'auto', playing = true, t = 0, last = 0, raf = 0, cssW = 0, cssH = 0, pxW = 2, pxH = 2, dirty = true, held = false;
   const timings = []; let lastInfo = null, drawn = 0;
   const fc = createFrameCache(pipeline);
@@ -192,7 +192,7 @@ function createStage({ host, box, pipeline, getProject, onTick, onError, clock, 
     dropPending();
     const c = newEl(); c.id = 'stage';
     if (canvas) canvas.replaceWith(c); else box.prepend(c);
-    canvas = c; ctx = c.getContext('2d', { colorSpace: space === 'p3' ? 'display-p3' : 'srgb' }); layout();
+    canvas = c; ctx = c.getContext('2d', { colorSpace: space === 'p3' ? 'display-p3' : 'srgb' }); cssW = cssH = 0; layout(true);
   }
   // Worker canvas: transferred, then kept hidden under the current one until the worker's first frame lands (no blank flash).
   function toWorker() {
@@ -220,6 +220,7 @@ function createStage({ host, box, pipeline, getProject, onTick, onError, clock, 
   // Why the preview must stay on the main thread right now ('' = the worker can take it).
   function mainReason() {
     if (forced) return 'switched to the main thread';
+    if (ovr) return 'Arrange plays on the main thread';
     if (!wk) return why;
     if (!wk.caps) return 'render worker starting';
     if (wk.caps.webgl2 === false && __m_kits.gpuStatus().ok) return 'WebGL2 is unavailable in workers';
@@ -247,20 +248,38 @@ function createStage({ host, box, pipeline, getProject, onTick, onError, clock, 
   if (!RW) why = 'render worker unavailable';
   else { const r = RW.connect(onMessage, fail); if (r.ok) wk = r.client; else why = r.reason; }
   const dprFor = () => { const d = window.devicePixelRatio || 1; return quality === 'quarter' ? 0.25 : quality === 'draft' ? 0.5 : quality === 'high' ? Math.min(d, 2) : Math.min(d, 1.5); };
-  function layout() {
+  // Layout is split in two so resizing stays cheap: the CSS size follows the host every frame (the browser just
+  // scales the canvas) and the backing store is reallocated once the size has settled.
+  let settleTimer = 0, layoutRaf = 0;
+  function measure() {
     const r = host.getBoundingClientRect(), cs = getComputedStyle(host); const ar = aspectRatio(aspect);
     const aw = Math.max(1, r.width - (parseFloat(cs.paddingLeft) || 0) - (parseFloat(cs.paddingRight) || 0)), ah = Math.max(1, r.height - (parseFloat(cs.paddingTop) || 0) - (parseFloat(cs.paddingBottom) || 0));
     let w = aw, h = w / ar; if (h > ah) { h = ah; w = h * ar; }
-    cssW = Math.max(1, Math.floor(w)); cssH = Math.max(1, Math.floor(h));
-    for (const c of [canvas, pend && pend.el]) if (c) { c.style.width = cssW + 'px'; c.style.height = cssH + 'px'; }
-    box.style.width = cssW + 'px'; box.style.height = cssH + 'px';
-    const d = dprFor(); pxW = Math.max(2, Math.round(cssW * d)); pxH = Math.max(2, Math.round(cssH * d));
-    if (mode === 'main') { canvas.width = pxW; canvas.height = pxH; } // the worker resizes its canvas from each frame request
-    dirty = true;
+    return { w: Math.max(1, Math.floor(w)), h: Math.max(1, Math.floor(h)) };
   }
-  const ro = new ResizeObserver(() => layout());
+  function applyBacking() {
+    const d = dprFor(), bw = Math.max(2, Math.round(cssW * d)), bh = Math.max(2, Math.round(cssH * d));
+    if (pxW !== bw || pxH !== bh) { pxW = bw; pxH = bh; if (mode === 'main') { canvas.width = bw; canvas.height = bh; } dirty = true; } // the worker resizes its canvas from each frame request
+  }
+  function layout(now) {
+    const m = measure();
+    if (m.w !== cssW || m.h !== cssH) {
+      cssW = m.w; cssH = m.h;
+      for (const c of [canvas, pend && pend.el]) if (c) { c.style.width = cssW + 'px'; c.style.height = cssH + 'px'; }
+      box.style.width = cssW + 'px'; box.style.height = cssH + 'px';
+    }
+    if (now || pxW <= 2 || Math.abs(pxW / dprFor() - cssW) > 96) { clearTimeout(settleTimer); applyBacking(); return; }
+    clearTimeout(settleTimer); settleTimer = setTimeout(() => { const s = measure(); cssW = s.w; cssH = s.h; applyBacking(); }, 120);
+  }
+  const layoutSoon = () => { if (layoutRaf) return; layoutRaf = requestAnimationFrame(() => { layoutRaf = 0; layout(); }); };
+  const ro = new ResizeObserver(layoutSoon);
   function draw() {
     const t0 = performance.now();
+    if (ovr) {
+      __m_kits.setPreview(true, playing);
+      try { lastInfo = ovr.draw(ctx, canvas.width, canvas.height, t, { preview: playing }); } catch (e) { if (onError) onError(e); } finally { __m_kits.setPreview(false); }
+      drawn++; timing(performance.now() - t0); dirty = false; if (onTick) onTick(t, lastInfo); return;
+    }
     const r = fc.draw(ctx, canvas, getProject(), t, { playing, quality, space, zebra: zebraOn(), env: env && env(), live: liveOn(), onError });
     if (!r.failed) { lastInfo = r.info; drawn++; }
     timing(performance.now() - t0); dirty = false; if (onTick) onTick(t, lastInfo);
@@ -280,11 +299,11 @@ function createStage({ host, box, pipeline, getProject, onTick, onError, clock, 
   function frame(now) {
     raf = requestAnimationFrame(frame);
     if (pend && pend.ready) adopt();
-    const L = getProject().finish.loop;
+    const L = loopLen();
     const dt = last ? Math.min(0.1, (now - last) / 1000) : 0;
     if (last && playing && mode === 'main' && !document.hidden && !__m_kits.job.on && !__m_kits.runtime.pendingCompiles) __m_kits.reportFrame(now - last);
     last = now;
-    if (playing) { const ct = clock ? clock() : null; t = ct != null ? ct % L : (t + dt) % L; dirty = true; }
+    if (playing) { const ct = !ovr && clock ? clock() : null; t = ct != null ? ct % L : (t + dt) % L; dirty = true; }
     else if (liveOn()) dirty = true;
     const reason = mainReason();
     if (reason && mode === 'worker') toMain(reason); else if (!reason && mode === 'main') toWorker(); else if (reason) why = reason;
@@ -293,10 +312,11 @@ function createStage({ host, box, pipeline, getProject, onTick, onError, clock, 
     settled();
   }
   makeCanvasEl(); ro.observe(host); raf = requestAnimationFrame(frame);
-  const loopLen = () => getProject().finish.loop;
+  const loopLen = () => (ovr ? Math.max(0.1, ovr.duration()) : getProject().finish.loop);
   return {
-    setAspect(a) { aspect = a; layout(); }, get aspect() { return aspect; },
-    setQuality(q) { quality = q; layout(); },
+    setOverride(o) { ovr = o || null; t = Math.min(t, Math.max(0, loopLen() - 1e-3)); last = 0; dirty = true; }, get overridden() { return !!ovr; },
+    setAspect(a) { aspect = a; layout(true); dirty = true; }, get aspect() { return aspect; },
+    setQuality(q) { quality = q; layout(true); dirty = true; },
     setSpace(s) { if (s === space) return; space = s; if (mode === 'worker') toWorker(); else makeCanvasEl(); },
     get canvas() { return canvas; },
     hold(on) { held = !!on; if (!held) dirty = true; }, get held() { return held; }, // background renders (render queue) own the pipeline: the viewer stops drawing until released

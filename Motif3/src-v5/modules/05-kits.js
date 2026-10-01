@@ -114,6 +114,15 @@ const JOB = {
   end() { this.on = false; this.clear(); },
 };
 
+// Imported kits are kept in two places: localStorage (read synchronously at start-up) and IndexedDB (no 5 MB cap).
+// A large kit that will not fit in localStorage still survives a reload through IndexedDB, so it is only ever loaded once.
+const idb = (() => {
+  let dbp = null;
+  const open = () => dbp || (dbp = new Promise((res, rej) => { try { const r = indexedDB.open('motif-kits', 1); r.onupgradeneeded = () => r.result.createObjectStore('kits', { keyPath: 'id' }); r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); } catch (e) { rej(e); } }));
+  const tx = (mode, fn) => open().then(db => new Promise((res, rej) => { const t = db.transaction('kits', mode); const out = fn(t.objectStore('kits')); t.oncomplete = () => res(out && out.result); t.onerror = t.onabort = () => rej(t.error); }));
+  return { all: () => tx('readonly', st => st.getAll()), replace: rows => tx('readwrite', st => { st.clear(); rows.forEach(r => st.put(r)); }) };
+})();
+try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch (e) { /* best effort */ }
 function persist() {
   const kits = [...installed.values()].map(k => {
     const q = {}; for (const [id, r] of quarantine) if (id.startsWith(k.kit.id + '/')) q[id] = r;
@@ -121,7 +130,9 @@ function persist() {
     return { id: k.kit.id, version: k.kit.version, enabled: k.enabled, source: k.source, raw: k.source === 'catalog' ? null : k.raw, approved: k.approved || [], quarantine: q, previous: prev };
   });
   for (const id of removedCatalog) if (!installed.has(id)) kits.push({ id, source: 'catalog', removed: true });
-  return store.set({ v: 1, safe, kits });
+  idb.replace(kits.filter(k => k.raw)).catch(e => console.warn('Kits could not be written to IndexedDB', e));
+  if (store.set({ v: 1, safe, kits })) return true;
+  return store.set({ v: 1, safe, kits: kits.map(k => (k.raw ? { ...k, raw: null, idb: true } : k)) }); // too big for localStorage: keep the list, the kit itself is in IndexedDB
 }
 function emit(ev) { listeners.forEach(fn => { try { fn(ev); } catch (e) { console.error(e); } }); }
 
@@ -359,6 +370,26 @@ function list() {
       report: e.report || null, warnings: (e.warnings || []).slice(0, 24), canRollback: !!(e.previous && (e.previous.raw || e.previous.source === 'catalog')), previousVersion: e.previous ? e.previous.version : null };
   });
 }
+
+// Kits kept in IndexedDB (or missing from a full localStorage) come back a moment after start-up.
+const ready = idb.all().then(rows => {
+  let n = 0;
+  for (const r of rows || []) {
+    if (!r || !r.raw || !r.raw.manifest || r.source === 'catalog') continue;
+    const cur = installed.get(r.id); if (cur && cur.source !== 'catalog') continue;
+    const v = SB.validate(r.raw.manifest, r.raw.files, { analyze: false }); if (!v.ok) continue; // already analysed at install
+    const approved = Array.isArray(r.approved) ? r.approved : v.kit.capabilities.slice();
+    if (v.kit.capabilities.some(c => !approved.includes(c))) continue; // needs approval again
+    const entry = { kit: v.kit, raw: r.raw, enabled: r.enabled !== false, source: r.source || 'file', approved, report: v.report, warnings: v.warnings, previous: r.previous || null, legacyApproval: !Array.isArray(r.approved) };
+    restoreQuarantine(r, v.kit);
+    if (cur) unregister(r.id);
+    installed.set(v.kit.id, entry); removedCatalog.delete(v.kit.id); register(entry); n++;
+  }
+  if (n) emit({ type: 'restore', count: n });
+  if ([...installed.values()].some(k => k.source !== 'catalog')) persist(); // mirror kits installed before IndexedDB was used
+  return n;
+}).catch(() => 0);
+
 function catalog() { return (typeof KIT_CATALOG !== 'undefined' ? KIT_CATALOG : []).map(r => ({ id: r.manifest.id, name: r.manifest.name, version: r.manifest.version, description: r.manifest.description, accent: r.manifest.accent, styles: r.manifest.styles.length, installed: installed.has(r.manifest.id) })); }
 function installCatalog(id) { const raw = (typeof KIT_CATALOG !== 'undefined' ? KIT_CATALOG : []).find(r => r.manifest.id === id); return raw ? install(raw, { source: 'catalog' }) : { ok: false, errors: ['Not in the bundled catalog.'] }; }
 function kitOfStyle(styleId) { const i = styleId.indexOf('/'); return i > 0 ? styleId.slice(0, i) : null; }
@@ -393,7 +424,7 @@ function byKind(kind) { const out = []; for (const e of installed.values()) if (
 
 return {
   KIT_FORMAT: SB.KIT_FORMAT_2, APP_KIT_API, LOWPASS_BELOW, runtime: rt, setPreview, reportFrame, gpuStatus, job: JOB, setMediaResolver, install, remove, setEnabled, setSafe, get safe() { return safe; }, list, catalog, installCatalog,
-  readFile, parseBytes, exportBytes, starterKit, validate: SB.validate, validateV1: KG.validateKit, kitOfStyle, missingKits, on, errors: errorsByStyle, persist,
+  readFile, parseBytes, exportBytes, starterKit, validate: SB.validate, validateV1: KG.validateKit, kitOfStyle, missingKits, on, errors: errorsByStyle, persist, ready,
   KIT_FORMATS: SB.FORMATS, MS_PER_MPX, paramsOf, defOf, entry, quarantine, setQuarantine, setChecking, isChecking: id => checking.has(id), previousRaw,
   effects: () => byKind('effect'), transitions: () => byKind('transition'), exporters: () => byKind('exporter'),
   snapshot, applySnapshot, get revision() { return revision; },

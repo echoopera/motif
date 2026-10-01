@@ -219,9 +219,15 @@ function boot() {
   // ---------- state ----------
   const AUTOSAVE = 'motif3-autosave-v1';
   let project = demoProject(), restored = false, audition = null;
+  // Motif 6 state: project file identity, Arrange, viewer tools, clip library.
+  let projectName = 'Demo project', dirty = false, fileHandle = null, dirHandle = null, projectId = 'p-' + Date.now().toString(36), pendingSv = null;
+  let arrMode = false, moveTool = false, gridOn = false, gridN = 8;
+  let clips = [], groups = [];
+  const arrUi = { pps: 72, sel: new Set(), fx: null, region: null, tool: 'select', snap: true };
   try {
     const sv = JSON.parse(localStorage.getItem(AUTOSAVE) || 'null');
-    if (sv && sv.project && K.missingKits(sv.project).length === 0) { project = T.sanitizeProject(sv.project, C.sanitizeCustom); restored = true; }
+    if (sv && sv.project && K.missingKits(sv.project).length === 0) { project = T.sanitizeProject(sv.project, C.sanitizeCustom); restored = true; if (typeof sv.name === 'string' && sv.name) projectName = sv.name.slice(0, 60); if (typeof sv.id === 'string' && sv.id) projectId = sv.id.slice(0, 40); }
+    else if (sv && sv.project) pendingSv = sv; // needs a kit that is still loading from IndexedDB
   } catch (e) { /* no usable autosave */ }
   let aspect = '16x9', strength = 0.35, catFilter = 'all', query = '', tab = 'layer', zebra = false;
   let selKey = null; // { path, idx }
@@ -230,19 +236,19 @@ function boot() {
   const history = [JSON.stringify(project)]; let cursor = 0;
   // Autosave: the project is written shortly after every change and when the page is hidden or closed.
   let asTimer = 0;
-  function saveNow() { try { localStorage.setItem(AUTOSAVE, JSON.stringify({ v: 1, at: Date.now(), aspect, project })); } catch (e) { /* storage full or unavailable */ } }
+  function saveNow() { try { localStorage.setItem(AUTOSAVE, JSON.stringify({ v: 1, at: Date.now(), aspect, project, name: projectName, id: projectId })); } catch (e) { /* storage full or unavailable */ } }
   function autosave() { clearTimeout(asTimer); asTimer = setTimeout(saveNow, 600); }
   addEventListener('pagehide', saveNow); document.addEventListener('visibilitychange', () => { if (document.hidden) saveNow(); });
   const clone = T.clone;
   function commit(next, msg) {
-    project = T.sanitizeProject(next, C.sanitizeCustom);
+    dirty = true; project = T.sanitizeProject(next, C.sanitizeCustom);
     const snap = JSON.stringify(project);
     if (snap !== history[cursor]) { history.splice(cursor + 1); history.push(snap); if (history.length > 300) history.shift(); cursor = history.length - 1; }
     syncAudioRegion(); refresh(); if (msg) toast(msg);
   }
-  function live(next) { project = next; autosave(); stage.invalidate(); }
-  function undo() { if (cursor > 0) { cursor--; project = JSON.parse(history[cursor]); syncAudioRegion(); refresh(); toast('Undo'); } }
-  function redo() { if (cursor < history.length - 1) { cursor++; project = JSON.parse(history[cursor]); syncAudioRegion(); refresh(); toast('Redo'); } }
+  function live(next) { project = next; if (!dirty) { dirty = true; updateNameUi(); } autosave(); stage.invalidate(); }
+  function undo() { if (cursor > 0) { cursor--; dirty = true; project = JSON.parse(history[cursor]); syncAudioRegion(); refresh(); toast('Undo'); } }
+  function redo() { if (cursor < history.length - 1) { cursor++; dirty = true; project = JSON.parse(history[cursor]); syncAudioRegion(); refresh(); toast('Redo'); } }
   const active = () => T.layerById(project, project.active) || project.layers[0];
   const lpath = (scope, key, id = project.active) => `L:${id}:${scope}:${key}`;
 
@@ -306,9 +312,10 @@ function boot() {
   $('gpuChip').addEventListener('click', () => setTab('kits'));
   let lastUi = 0, lastEvo = 0;
   function onTick(t, info) {
+    if (arrMode) updateArrPlayhead(t);
     const now = performance.now(); if (now - lastUi < 60 && stage.playing) return; lastUi = now;
-    media.syncPlayback(project);
-    const L = project.finish.loop, u = t / L;
+    if (!arrMode) media.syncPlayback(project);
+    const L = loopSec(), u = t / L;
     $('time').innerHTML = timecode(t) + `<small>/ ${timecode(L)}</small>`; $('lcd').style.setProperty('--u', u.toFixed(4));
     if (document.activeElement !== $('scrub')) $('scrub').value = Math.round(u * 1000);
     $('frameRead').textContent = `f ${String(Math.floor(t * project.output.fps + 1e-6)).padStart(3, '0')} / ${Math.round(L * project.output.fps)}`;
@@ -322,7 +329,7 @@ function boot() {
     $('lane').style.setProperty('--ph', u.toFixed(4));
     for (const x of extensions) if (x.tick) { try { x.tick(t, extApi, info); } catch (e) { console.error(e); } }
     if (evolveOpen && now - lastEvo > 90) { lastEvo = now; drawChildren(t); }
-    updateAnimatedRows(t);
+    if (!arrMode) updateAnimatedRows(t);
     if (tab === 'audio') updateMeters(t);
   }
 
@@ -399,7 +406,7 @@ function boot() {
   function setPlayUi(on) { $('play').innerHTML = on ? '<svg viewBox="0 0 24 24"><path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z"/></svg>' : '<svg viewBox="0 0 24 24"><path d="M7 4.5v15l12.5-7.5z"/></svg>'; $('play').setAttribute('aria-label', on ? 'Pause' : 'Play'); }
   function togglePlay() {
     const on = stage.toggle(); setPlayUi(on); if (on) $('rmHint').hidden = true;
-    if (player.buffer && audioSync) { if (on) player.start(stage.time); else player.stop(); }
+    if (player.buffer && audioSync && !arrMode) { if (on) player.start(stage.time); else player.stop(); }
   }
   $('play').addEventListener('click', togglePlay);
   if (reduce) setPlayUi(false);
@@ -408,7 +415,6 @@ function boot() {
   function toggleGuides() { const on = $('guides').hidden; $('guides').hidden = !on; $('guidesBtn').setAttribute('aria-pressed', on); }
   function seekFrac(f) { stage.seek(f); if (player.playing) player.start(stage.time); }
   $('scrub').addEventListener('input', e => seekFrac(e.target.value / 1000));
-  $('bpmChip').addEventListener('click', () => setTab('audio'));
   (() => {
     const coach = $('coach'); if (!coach) return;
     let seen = false; try { seen = localStorage.getItem('motif5-coach') === '1'; } catch (e) { /* storage unavailable */ }
@@ -422,8 +428,8 @@ function boot() {
   })();
   function stepFrames(n) { if (stage.playing) togglePlay(); stage.step(n, project.output.fps); refreshRowsOnly(); }
   $('toStart').addEventListener('click', () => { seekFrac(0); if (!stage.playing) refreshRowsOnly(); });
-  $('stepBack').addEventListener('click', () => stepFrames(-1));
-  $('stepFwd').addEventListener('click', () => stepFrames(1));
+  $('stepBack').addEventListener('click', () => jumpKey(-1));
+  $('stepFwd').addEventListener('click', () => jumpKey(1));
 
   // ---------- tabs ----------
   const mqDesktop = matchMedia('(min-width: 64em)');
@@ -541,6 +547,7 @@ function boot() {
       const mn = s.log ? 0 : s.min, mx = s.log ? 1000 : s.max, st = s.log ? 1 : s.step;
       return `<div class="${cls}" data-row="${path}"><label for="${id}">${s.label}</label>${lock}${key}<output class="val${ks !== 'none' ? ' anim' : ''}" id="${id}-v">${fmt(v, s)}</output><input type="range" id="${id}" data-path="${path}" min="${mn}" max="${mx}" step="${st}" value="${toSlider(v, s)}">${note}</div>`;
     }
+    if (s.type === 'select' && /:c:blend$/.test(path)) { const cur = s.options.find(o => o.v === v) || s.options[0]; return `<div class="${cls}" data-row="${path}"><label for="${id}">${s.label}</label>${lock}${key}<span></span><button type="button" class="selbtn" id="${id}" data-blend="${path}" aria-haspopup="listbox" aria-expanded="false"><span>${cur.l}</span><svg class="i" viewBox="0 0 24 24"><path d="m7 10 5 5 5-5"/></svg></button></div>`; }
     if (s.type === 'select') return `<div class="${cls}" data-row="${path}"><label for="${id}">${s.label}</label>${lock}${key}<span></span><select id="${id}" data-path="${path}">${s.options.map(o => `<option value="${o.v}"${o.v === v ? ' selected' : ''}>${o.l}</option>`).join('')}</select></div>`;
     if (s.type === 'toggle') return `<div class="${cls}" data-row="${path}"><label for="${id}">${s.label}</label>${lock}${key}<input type="checkbox" class="switch" role="switch" id="${id}" data-path="${path}"${v ? ' checked' : ''}></div>`;
     return `<div class="${cls}" data-row="${path}"><label for="${id}">${s.label}</label><span></span>${key}<span></span><input type="text" id="${id}" data-path="${path}" maxlength="${s.max}" value="${esc(v)}" spellcheck="false"></div>`;
@@ -582,6 +589,7 @@ function boot() {
     root.addEventListener('change', e => { const el = e.target; if (el.dataset && el.dataset.comp === 'color') { commit(setComp(el, compVals(el))); return; } if (!el.dataset || !el.dataset.path) return; const v = readInput(el); if (v === undefined) return; commit(applyValue(el.dataset.path, v)); });
     root.addEventListener('dblclick', e => { const el = e.target; if (el.type !== 'range' || !el.dataset.path) return; const s = T.schemaAt(project, el.dataset.path); commit(applyValue(el.dataset.path, s.def), `${s.label} reset`); });
     root.addEventListener('click', e => {
+      const bb = e.target.closest('[data-blend]'); if (bb) { openBlendMenu(bb); return; }
       const lk = e.target.closest('[data-lock]');
       if (lk) { const p = lk.dataset.lock; locks.has(p) ? locks.delete(p) : locks.add(p); lk.setAttribute('aria-pressed', locks.has(p)); lk.closest('.row').classList.toggle('locked', locks.has(p)); return; }
       const lc = e.target.closest('[data-lockc]');
@@ -601,7 +609,7 @@ function boot() {
     else { const v = shownValue(path); const next = T.setKey(project, path, u, v); commit(next, 'Key added'); selKey = { path, idx: T.keyIndexAt(project.keys[path], u) }; }
   }
   function updateAnimatedRows(t) {
-    const root = $('panel-' + tab); if (!root || tab === 'looks') return;
+    const root = $('panel-' + tab); if (!root || tab === 'clips') return;
     const paths = [...Object.keys(project.keys), ...(project.audio ? project.audio.maps.map(m => m.path) : [])]; if (!paths.length) return;
     const ev = T.evaluate(project, t, currentEnv());
     root.querySelectorAll('[data-comp]').forEach(el => { if (el === document.activeElement || el._drag) return; const ps = el.dataset.paths.split(','); const vs = ps.map(p => valueFromEval(ev, p)); if (vs.every(v => v !== undefined)) paintComp(el, vs); const kb = el.closest('.row').querySelector('.kb'); if (kb) { const ks = ps.map(keyState); kb.dataset.state = ks.every(x => x === 'on') ? 'on' : ks.some(x => x !== 'none') ? 'anim' : 'none'; } });
@@ -609,7 +617,7 @@ function boot() {
     for (const path of new Set(paths)) {
       const el = $(rid(path)); if (!el || el === document.activeElement) continue;
       const s = T.schemaAt(project, path); const v = valueFromEval(ev, path); if (v === undefined) continue;
-      if (s.type === 'range' || s.type === 'int') el.value = toSlider(v, s); else if (s.type === 'toggle') el.checked = !!v; else if (el.tagName === 'SELECT') el.value = v;
+      if (s.type === 'range' || s.type === 'int') el.value = toSlider(v, s); else if (s.type === 'toggle') el.checked = !!v; else if (el.tagName === 'SELECT') el.value = v; else if (el.dataset && el.dataset.blend) { const o = s.options.find(q => q.v === v); if (o && el.firstElementChild) el.firstElementChild.textContent = o.l; }
       const out = $(el.id + '-v'); if (out) out.textContent = fmt(v, s);
       const kb = el.closest('.row') && el.closest('.row').querySelector('.kb'); if (kb) kb.dataset.state = keyState(path);
     }
@@ -618,6 +626,7 @@ function boot() {
   }
 
   // ---------- panels ----------
+  ['wheel', 'touchmove'].forEach(t => $('insp').addEventListener(t, () => { $('insp').dataset.userScroll = '1'; setTimeout(() => { delete $('insp').dataset.userScroll; }, 160); }, { passive: true }));
   ['layer', 'colour', 'finish', 'audio'].forEach(p => bindRows($('panel-' + p)));
   $('insp').addEventListener('pointerover', e => { const l = e.target.closest && e.target.closest('.row label, .row .rl'); if (l && !l.title && l.scrollWidth > l.clientWidth) l.title = l.textContent; });
   $('insp').addEventListener('toggle', e => { const d = e.target; if (d.dataset && d.dataset.g) openGroups[d.dataset.g] = d.open; }, true);
@@ -637,7 +646,17 @@ function boot() {
     const sec = document.createElement('section'); sec.setAttribute('role', 'tabpanel'); sec.id = 'panel-' + ext.id; sec.dataset.panel = ext.id; sec.hidden = true; $('insp').appendChild(sec);
     bindRows(sec); if (ext.init) { try { ext.init(sec, extApi); } catch (e) { console.error(e); } }
   });
-  function renderPanel() { const ext = extensions.find(e => e.id === tab); if (ext) { try { ext.panel($('panel-' + ext.id), extApi); } catch (e) { console.error(e); $('panel-' + ext.id).textContent = 'This page failed to load.'; } paintRanges($('insp')); return; } if (tab === 'layer') renderLayerPanel(); else if (tab === 'colour') renderColourPanel(); else if (tab === 'finish') renderFinishPanel(); else if (tab === 'audio') renderAudioPanel(); else if (tab === 'looks') renderLooks(); else if (tab === 'kits') renderKitsPanel(); paintRanges($('insp')); }
+  let scrollHold = 0;
+  function renderPanel() {
+    const insp = $('insp'), sc = insp.scrollTop, ae = document.activeElement;
+    const fid = ae && ae !== document.body && ae.id && insp.contains(ae) ? ae.id : null;
+    renderPanel0();
+    insp.scrollTop = sc;
+    if (fid) { const n = document.getElementById(fid); if (n && n !== document.activeElement) n.focus({ preventScroll: true }); }
+    // some browsers settle the scroll offset after layout: hold the position one frame later too (unless the user has scrolled since)
+    const tk = ++scrollHold; requestAnimationFrame(() => { if (tk === scrollHold && Math.abs(insp.scrollTop - sc) > 1 && !insp.dataset.userScroll) insp.scrollTop = sc; });
+  }
+  function renderPanel0() { const ext = extensions.find(e => e.id === tab); if (ext) { try { ext.panel($('panel-' + ext.id), extApi); } catch (e) { console.error(e); $('panel-' + ext.id).textContent = 'This page failed to load.'; } paintRanges($('insp')); return; } if (arrMode && ['layer', 'colour', 'finish', 'audio'].includes(tab)) { renderArrangeNotice(); return; } if (tab === 'layer') renderLayerPanel(); else if (tab === 'colour') renderColourPanel(); else if (tab === 'finish') renderFinishPanel(); else if (tab === 'audio') renderAudioPanel(); else if (tab === 'clips') renderClips(); else if (tab === 'kits') renderKitsPanel(); paintRanges($('insp')); }
 
   // Layers
   // ---- style parameters: grouped sections, colour / point compounds, show conditions ----
@@ -743,7 +762,7 @@ function boot() {
       ${styleGroups(st)}
       ${group('comp', 'Composite', compKeys.map(k => rowHtml(lpath('c', k))).join('') + (bottom ? '<p class="info">The base layer always fills its background.</p>' : ''))}
       ${l.comp.mask !== 'none' ? group('mask', 'Mask', maskKeys.map(k => rowHtml(lpath('c', k))).join('') + matteNote) : ''}
-      ${group('motion', 'Motion and transform', ['tempo', 'phase', 'seed', 'zoom', 'rotate'].map(k => rowHtml(lpath('s', k))).join(''))}`;
+      ${group('motion', 'Motion and transform', ['tempo', 'phase', 'seed', 'zoom', 'rotate', 'posX', 'posY'].map(k => rowHtml(lpath('s', k))).join(''))}`;
     paintMediaThumbs();
     $('panel-layer').querySelectorAll('#layerList canvas').forEach(c => { const x = T.layerById(project, c.closest('.layer').dataset.layer); renderThumb(pipeline, c, { ...x, shared: { ...x.shared, loop: project.finish.loop } }, 0.3, project.palettes); });
   }
@@ -948,7 +967,7 @@ function boot() {
       <div class="full"><span>Amount</span><input type="range" min="-1" max="1" step="0.01" value="${m.amount}" data-mapf="amount" data-map="${m.id}" aria-label="Amount"><output class="readout">${m.amount.toFixed(2)}</output></div>
       <div class="full"><span>Smooth</span><input type="range" min="0" max="1" step="0.01" value="${m.smooth}" data-mapf="smooth" data-map="${m.id}" aria-label="Smoothing"><output class="readout">${Math.round(m.smooth * 600)} ms</output></div></div>`).join('');
     $('panel-audio').innerHTML = `
-      <div class="panel-head"><div class="lbl">Sync</div><h1>Audio</h1><p>Load a track to sync the loop and drive values.</p></div>
+      <div class="panel-head"><div class="lbl">Sync</div><h1>Audio</h1><p>Load a track to sync the loop and drive values.</p>${audioMetaHtml()}</div>
       ${group('track', 'Track', `<div class="btnrow"><button class="btn sm${has ? '' : ' primary'}" id="loadAudio">${has ? 'Replace track…' : 'Load track…'}</button>${has ? `<button class="btn sm" id="audioPlay">${player.playing ? 'Stop' : 'Play from loop start'}</button>` : ''}</div>
         <p class="info" id="audioStatus">${has ? `<b>${esc(trackName)}</b> · ${player.buffer.duration.toFixed(1)} s${analysis ? ` · detected ${analysis.bpm} BPM (confidence ${(analysis.confidence * 100).toFixed(0)}%)` : ''}` : au && au.name ? `Built with <b>${esc(au.name)}</b>. Load it again to hear it.` : 'MP3, WAV, AAC, OGG or FLAC · stays in your browser'}</p>
         ${has ? `<canvas class="wave" id="wave" width="600" height="64" aria-label="Waveform: drag to set where the loop starts"></canvas><div class="row"><span class="rl">Loop starts at</span><span></span><span></span><output class="val">${(au ? au.offset : 0).toFixed(2)} s</output></div>
@@ -978,7 +997,15 @@ function boot() {
     for (let b = au.offset; b < au.offset + L; b += beat) x.fillRect((b / dur) * W, H - 6, 1, 6);
   }
   function syncAudioRegion() { if (player.buffer && project.audio) player.setRegion(project.audio.offset, project.finish.loop); updateBpmChip(); }
-  function updateBpmChip() { const c = $('bpmChip'); if (project.audio) { c.hidden = false; c.dataset.state = 'bpm'; c.textContent = `${project.audio.bpm} BPM · ${project.audio.bars} bar${project.audio.bars > 1 ? 's' : ''}`; } else c.hidden = true; }
+  // Tempo, bars and loop length live in the Audio tab (they used to sit in the header).
+  function audioMetaHtml() {
+    const au = project.audio; if (!au) return '<dl class="ameta" id="audMeta" hidden></dl>';
+    const items = [[au.bpm, 'BPM', 1], [au.bars, au.bars > 1 ? 'bars' : 'bar'], [project.finish.loop.toFixed(2) + ' s', 'loop']];
+    if (player.buffer) items.push([player.buffer.duration.toFixed(1) + ' s', 'track']);
+    if (analysis) items.push([Math.round(analysis.confidence * 100) + '%', 'confidence']);
+    return `<dl class="ameta" id="audMeta">${items.map(([v, l, hot]) => `<div${hot ? ' class="hot"' : ''}><dd>${esc(String(v))}</dd><dt>${l}</dt></div>`).join('')}</dl>`;
+  }
+  function updateBpmChip() { const m = $('audMeta'); if (m) m.outerHTML = audioMetaHtml(); }
   function updateMeters(t) {
     const m = $('meters'); if (!m) return; const env = currentEnv(); const at = (project.audio ? project.audio.offset : 0) + t;
     m.querySelectorAll('i').forEach((el, i) => { const v = env ? env(A.BAND_IDS[i], at, 0) : 0; el.style.setProperty('--v', (v || 0).toFixed(3)); });
@@ -1043,6 +1070,14 @@ function boot() {
     return { keyed, mapped };
   }
   function renderLane() { renderLaneHead(); renderLaneRows(); }
+  // Timeline | Arrange: one switch, centred in the strip above whichever surface is showing.
+  const surfSeg = () => `<div class="seg surf-seg" role="radiogroup" aria-label="Timeline or Arrange"><button role="radio" data-surf="timeline" aria-checked="${!arrMode}" data-tip="Timeline" data-kbd="K">Timeline</button><button role="radio" data-surf="arrange" aria-checked="${arrMode}" data-tip="Arrange" data-kbd="Alt A">Arrange</button></div>`;
+  function setSurface(name) {
+    if (name === 'arrange') { if (!arrMode) { focusSaved = null; setArrange(true); } return; }
+    if (arrMode) { setArrange(false); laneCollapsed = false; focusSaved = null; layoutChanged(); return; }
+    if (laneCollapsed) { laneCollapsed = false; focusSaved = null; layoutChanged(); }
+  }
+  document.addEventListener('click', e => { const b = e.target.closest && e.target.closest('[data-surf]'); if (b) setSurface(b.dataset.surf); });
   function renderLaneHead() {
     const { keyed } = laneRows(); const n = keyed.reduce((a, p) => a + project.keys[p].length, 0);
     if (selKey && (!project.keys[selKey.path] || !project.keys[selKey.path][selKey.idx])) selKey = null;
@@ -1053,19 +1088,19 @@ function boot() {
       const easeCtl = (s.type === 'range' || s.type === 'int' || s.dynamic) ? `<select id="kEase" aria-label="Ease to next key">${T.EASES.map(o => `<option value="${o.v}"${o.v === k.e ? ' selected' : ''}>${o.l}</option>`).join('')}</select>` : '<span class="readout">Hold</span>';
       editor = `<span class="readout">${esc(T.pathLabel(project, selKey.path))} @ ${(k.u * project.finish.loop).toFixed(2)} s</span>${valueCtl}${easeCtl}<button class="btn sm" id="kDel">Delete key</button>`;
     }
-    $('laneHead').innerHTML = `<button class="btn sm" id="laneToggle" aria-expanded="${!laneCollapsed}" aria-controls="laneRows">${laneCollapsed ? '▸' : '▾'} Timeline</button><span class="readout">${n ? `${n} key${n > 1 ? 's' : ''}` : 'No keys'}</span><span class="grow"></span>${editor || '<span class="readout lane-extra">Key any value with ◇</span>'}`;
+    $('laneHead').innerHTML = `<div class="sh-l"><button class="btn ghost icon" id="laneToggle" aria-expanded="${!laneCollapsed}" aria-controls="laneRows" aria-label="${laneCollapsed ? 'Expand' : 'Collapse'} timeline" data-tip="${laneCollapsed ? 'Expand' : 'Collapse'} timeline" data-kbd="K"><svg class="i" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></button><span class="readout">${n ? `${n} key${n > 1 ? 's' : ''}` : 'No keys'}</span></div>${surfSeg()}<div class="sh-r">${editor || '<span class="readout lane-extra">Key any value with ◇</span>'}</div>`;
     $('lane').dataset.collapsed = laneCollapsed; applyLayout(); saveLayout();
   }
   function renderLaneRows() {
     const { keyed, mapped } = laneRows();
     const bandsFor = p => project.audio ? project.audio.maps.filter(x => x.path === p).map(x => x.band).join(', ') : '';
-    const rows = keyed.map(p => { const ks = project.keys[p]; const lab = T.pathLabel(project, p); const bands = bandsFor(p); return `<div class="lrow" data-lpath="${p}"><span class="nm" title="${esc(lab)}${bands ? ' + audio ' + bands : ''}">${esc(lab)}${bands ? ` <small>∿ ${bands}</small>` : ''}</span><div class="track" data-track="${p}">${ks.map((k, i) => `<button class="kf" style="left:${(k.u * 100).toFixed(3)}%" data-kp="${p}" data-ki="${i}" data-ease="${k.e}" aria-pressed="${!!(selKey && selKey.path === p && selKey.idx === i)}" aria-label="${esc(lab)} key ${i + 1} at ${(k.u * project.finish.loop).toFixed(2)} seconds"></button>`).join('')}</div><button class="ib" data-clear="${p}" aria-label="Remove all keys for ${esc(lab)}" title="Remove all keys">✕</button></div>`; }).join('');
+    const rows = keyed.map(p => { const ks = project.keys[p]; const lab = T.pathLabel(project, p); const bands = bandsFor(p); return `<div class="lrow" data-lpath="${p}"><span class="nm" role="button" tabindex="0" title="${esc(lab)}${bands ? ' + audio ' + bands : ''}">${esc(lab)}${bands ? ` <small>∿ ${bands}</small>` : ''}</span><div class="track" data-track="${p}">${ks.map((k, i) => `<button class="kf" style="left:${(k.u * 100).toFixed(3)}%" data-kp="${p}" data-ki="${i}" data-ease="${k.e}" aria-pressed="${!!(selKey && selKey.path === p && selKey.idx === i)}" aria-label="${esc(lab)} key ${i + 1} at ${(k.u * project.finish.loop).toFixed(2)} seconds"></button>`).join('')}</div><button class="ib" data-clear="${p}" aria-label="Remove all keys for ${esc(lab)}" title="Remove all keys">✕</button></div>`; }).join('');
     const maps = mapped.map(p => { const lab = T.pathLabel(project, p); const m = project.audio.maps.filter(x => x.path === p).map(x => x.band).join(', '); return `<div class="lrow"><span class="nm" title="${esc(lab)}">${esc(lab)} <small>∿ ${m}</small></span><div class="track" data-track="${p}" data-env="${p}"><canvas width="300" height="20"></canvas></div><span></span></div>`; }).join('');
     const L = project.finish.loop, stepS = L <= 4 ? 0.5 : L <= 12 ? 1 : L <= 30 ? 2 : 5;
     let ticks = ''; for (let s = 0; s < L - 1e-6; s += stepS) ticks += `<span style="left:${(s / L * 100).toFixed(3)}%">${timecode(s).slice(3)}</span>`;
     const ruler = `<div class="lrow ruler"><span class="nm">${timecode(0).slice(0, 8)}</span><div class="track" data-ruler="1">${ticks}<i class="ph"></i></div><span></span></div>`;
     const clipCols = ['var(--clip-1)', 'var(--clip-2)', 'var(--clip-3)', 'var(--clip-4)'];
-    const vts = project.layers.map((l, i) => ({ l, i })).reverse().map(({ l, i }) => { const st = getStyle(l.styleId); return `<div class="lrow vt" style="--cb:${clipCols[i % 4]}" data-active="${l.id === project.active}" data-hidden="${l.visible === false}"><span class="nm"><span class="vid">V${i + 1}</span>${esc(st.name)}</span><div class="track" data-vlayer="${l.id}"><span class="clipbar" style="--cb:${clipCols[i % 4]}">${esc(st.name)}<small>${st.kit ? esc(st.kitName) + ' · GLSL' : esc(l.comp.blend === 'source-over' ? 'Normal' : l.comp.blend)} · ${Math.round(l.comp.opacity * 100)}%</small></span></div><span></span></div>`; }).join('');
+    const vts = project.layers.map((l, i) => ({ l, i })).reverse().map(({ l, i }) => { const st = getStyle(l.styleId); return `<div class="lrow vt" data-layer="${l.id}" style="--cb:${clipCols[i % 4]}" data-active="${l.id === project.active}" data-hidden="${l.visible === false}"><span class="nm" tabindex="0" role="button" aria-label="Select layer V${i + 1}, ${esc(st.name)}" title="Select layer V${i + 1}"><span class="vid">V${i + 1}</span>${esc(st.name)}</span><div class="track" data-vlayer="${l.id}"><span class="clipbar" style="--cb:${clipCols[i % 4]}">${esc(st.name)}<small>${st.kit ? esc(st.kitName) + ' · GLSL' : esc(l.comp.blend === 'source-over' ? 'Normal' : l.comp.blend)} · ${Math.round(l.comp.opacity * 100)}%</small></span></div><span></span></div>`; }).join('');
     const keysPart = rows + maps || '<p class="lane-empty">Key a value with ◇ to animate it. The last key eases back to the first.</p>';
     $('laneRows').innerHTML = ruler + vts + keysPart;
     drawEnvRows();
@@ -1081,9 +1116,21 @@ function boot() {
   $('lane').addEventListener('pointerdown', e => {
     const kf = e.target.closest('.kf');
     if (kf) { e.preventDefault(); selKey = { path: kf.dataset.kp, idx: Number(kf.dataset.ki) }; drag = { el: kf, track: kf.parentElement, moved: false, id: e.pointerId }; kf.setPointerCapture(e.pointerId); renderLaneHead(); markSelected(); return; }
-    const tr = e.target.closest('.track'); if (tr) { const r = tr.getBoundingClientRect(); seekFrac(clamp((e.clientX - r.left) / r.width, 0, 0.9999)); if (tr.dataset.vlayer) selectLayer(tr.dataset.vlayer); if (!stage.playing) refreshRowsOnly(); }
+    const ph = e.target.closest('.ph'), tr = ph ? ph.closest('.track') : e.target.closest('.track');
+    if (tr) {
+      const r = tr.getBoundingClientRect(); laneScrub = { left: r.left, width: r.width, id: e.pointerId };
+      seekFrac(clamp((e.clientX - r.left) / r.width, 0, 0.9999));
+      try { $('lane').setPointerCapture(e.pointerId); } catch (err) { /* capture is a nicety */ }
+      document.body.classList.add('scrubbing');
+      if (tr.dataset.vlayer) selectLayer(tr.dataset.vlayer);
+      if (!stage.playing) refreshRowsOnly();
+    }
   });
+  let laneScrub = null;
+  const laneScrubEnd = e => { if (!laneScrub || (e && e.pointerId !== laneScrub.id)) return; laneScrub = null; document.body.classList.remove('scrubbing'); };
+  $('lane').addEventListener('pointerup', laneScrubEnd); $('lane').addEventListener('pointercancel', laneScrubEnd);
   $('lane').addEventListener('pointermove', e => {
+    if (laneScrub) { seekFrac(clamp((e.clientX - laneScrub.left) / laneScrub.width, 0, 0.9999)); if (!stage.playing) refreshRowsOnly(); return; }
     if (!drag) return; const r = drag.track.getBoundingClientRect(); let u = clamp((e.clientX - r.left) / r.width, 0, 0.99999);
     const fr = 1 / (project.finish.loop * project.output.fps); if (!e.shiftKey) u = Math.round(u / fr) * fr;
     const res = T.moveKey(project, selKey.path, selKey.idx, u); if (!res.project) return;
@@ -1096,8 +1143,9 @@ function boot() {
     const ev = T.evaluate(project, u * project.finish.loop, null); commit(T.setKey(project, p, u, valueFromEval(ev, p)), 'Key added');
   });
   $('lane').addEventListener('click', e => {
+    const nm = e.target.closest('.lrow .nm'); if (nm && !nm.closest('.ruler')) { pickLaneLayer(nm.closest('.lrow')); }
     const id = e.target.id;
-    if (id === 'laneToggle') { laneCollapsed = !laneCollapsed; renderLane(); return; }
+    if (e.target.closest('#laneToggle')) { laneCollapsed = !laneCollapsed; focusSaved = null; layoutChanged(); return; }
     if (id === 'kDel' && selKey) { commit(T.removeKey(project, selKey.path, selKey.idx), 'Key removed'); selKey = null; renderLane(); return; }
     const cl = e.target.closest('[data-clear]'); if (cl) { commit(T.clearKeys(project, cl.dataset.clear), `${T.pathLabel(project, cl.dataset.clear)} is no longer animated`); }
   });
@@ -1107,6 +1155,8 @@ function boot() {
     if (e.target.id === 'kVal') { let v = e.target.value; if (s.type === 'range' || s.type === 'int') v = Number(v); if (s.type === 'toggle') v = v === '1'; commit(T.setKey(project, selKey.path, k.u, v, k.e), 'Key value set'); }
   });
   $('lane').addEventListener('keydown', e => {
+    const nmk = e.target.closest('.lrow .nm');
+    if (nmk && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); pickLaneLayer(nmk.closest('.lrow')); return; }
     const kf = e.target.closest('.kf'); if (!kf) return;
     const path = kf.dataset.kp, idx = Number(kf.dataset.ki);
     if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selKey = { path, idx }; renderLane(); focusKey(); }
@@ -1125,7 +1175,6 @@ function boot() {
   function doRandom() { const r = T.randomizeProject(project, project.active, lockKeys(), nextRng()); commit(r.project, 'Randomized'); if (tab === 'layer') flash(r.changed); }
   function doReset() { const next = clone(project); const l = T.layerById(next, next.active); l.params = T.newLayer(l.styleId).params; for (const p of Object.keys(next.keys)) if (p.startsWith(`L:${l.id}:p:`)) delete next.keys[p]; commit(next, 'Style parameters reset'); }
   $('mutateBtn').addEventListener('click', doMutate); $('randomBtn').addEventListener('click', doRandom); $('resetBtn').addEventListener('click', doReset);
-  $('newBtn').addEventListener('click', () => { commit(demoProject(), 'New project'); stage.setSpace(project.output.space); });
   $('undoBtn').addEventListener('click', undo); $('redoBtn').addEventListener('click', redo);
   $('strength').addEventListener('input', e => { strength = Number(e.target.value); $('strengthVal').textContent = strength.toFixed(2); $('evoStrength').value = strength; });
 
@@ -1160,34 +1209,6 @@ function boot() {
   $('evoStrength').addEventListener('input', e => { strength = Number(e.target.value); $('strength').value = strength; $('strengthVal').textContent = strength.toFixed(2); });
   evoGrid.addEventListener('click', e => { const b = e.target.closest('.child'); if (b) keep(Number(b.dataset.i)); });
 
-  // ---------- saved looks ----------
-  let saved = store.get('motif-style-lab-2-looks') || [];
-  function renderLooks() {
-    $('looks').innerHTML = saved.map((s, i) => `<div class="look" role="button" tabindex="0" data-i="${i}" aria-label="Load ${esc(s.name)}" title="${esc(s.name)}"><img alt="" src="${s.thumb}"><small>${esc(s.name)}</small><button class="x" data-del="${i}" aria-label="Delete ${esc(s.name)}">✕</button></div>`).join('');
-    $('looksEmpty').hidden = saved.length > 0;
-  }
-  function saveLook() {
-    const c = document.createElement('canvas'); const sz = exportSize(aspect, 108); c.width = sz.w; c.height = sz.h;
-    renderProjectThumb(pipeline, c, project, stage.time);
-    const name = project.layers.map(l => getStyle(l.styleId).name.split(' ')[0]).join(' + ');
-    saved.unshift({ name: `${name} ${saved.length + 1}`, project: clone(project), aspect, thumb: c.toDataURL('image/jpeg', 0.8) });
-    saved = saved.slice(0, 24); store.set('motif-style-lab-2-looks', saved); renderLooks(); toast('Look saved');
-  }
-  $('saveLook').addEventListener('click', saveLook);
-  $('looks').addEventListener('click', e => {
-    const del = e.target.closest('[data-del]'); if (del) { saved.splice(Number(del.dataset.del), 1); store.set('motif-style-lab-2-looks', saved); renderLooks(); toast('Look deleted'); return; }
-    const it = e.target.closest('.look'); if (it) { const s = saved[Number(it.dataset.i)]; const miss = K.missingKits(s.project); if (miss.length) { toast(`This look needs the ${miss.join(', ')} kit. Install it in the Kits tab first.`); return; } setAspect(s.aspect || aspect); commit(s.project, `Loaded ${s.name}`); stage.setSpace(project.output.space); }
-  });
-  $('looks').addEventListener('keydown', e => { if ((e.key === 'Enter' || e.key === ' ') && e.target.classList.contains('look')) { e.preventDefault(); e.target.click(); } });
-  $('importBtn').addEventListener('click', () => $('importFile').click());
-  $('exportPresetBtn').addEventListener('click', () => { openExport(); ex.format = 'json'; renderFormats(); exSummary(); });
-  $('importFile').addEventListener('change', async e => {
-    const f = e.target.files && e.target.files[0]; if (!f) return;
-    try { const txt = await f.text(); const miss = K.missingKits((JSON.parse(txt).project) || JSON.parse(txt)); if (miss.length) { toast(`This preset needs the ${miss.join(', ')} kit${miss.length > 1 ? 's' : ''}. Install ${miss.length > 1 ? 'them' : 'it'} in the Kits tab first.`); setTab('kits'); e.target.value = ''; return; } const r = X.parsePreset(txt); setAspect(r.aspect); commit(r.project, 'Preset loaded'); stage.setSpace(project.output.space); }
-    catch (err) { toast(`That file isn’t a Motif preset: ${err.message}.`); }
-    e.target.value = '';
-  });
-
   // ---------- export ----------
   const FORMATS = [
     { id: 'mp4', name: 'MP4', note: 'H.264 · colour tagged' }, { id: 'webm', name: 'WebM', note: 'VP9 · alpha capable' },
@@ -1207,7 +1228,7 @@ function boot() {
     }).join('');
   }
   function exSummary() {
-    const { w, h } = exportSize(aspect, ex.tier), fps = project.output.fps, n = frameCount(project, fps, ex.loops);
+    const { w, h } = exportSize(aspect, ex.tier), fps = project.output.fps, n = arrMode ? Math.max(1, Math.round(arrDuration() * fps)) : frameCount(project, fps, ex.loops);
     const still = ex.format === 'png' || ex.format === 'json', video = ex.format === 'mp4' || ex.format === 'webm';
     const alphaOk = ['webm', 'png', 'png-seq'].includes(ex.format);
     $('exAlpha').disabled = !alphaOk; if (!alphaOk) $('exAlpha').checked = false;
@@ -1219,7 +1240,8 @@ function boot() {
     const f = project.finish; $('exBlur').textContent = f.shutter > 0 ? `${f.shutter}° · ${f.samples} samples` : 'Off';
     const sp = C.spaceById(project.output.space);
     const gpuStyles = project.layers.filter(l => GPU_STYLES.has(l.styleId)).length;
-    $('exSummary').textContent = ex.format === 'json' ? `preset@2 · ${project.layers.length} layer${project.layers.length > 1 ? 's' : ''}, ${Object.keys(project.keys).length} keyed parameters, palettes, finish${project.audio ? ', audio maps' : ''}` :
+    if (arrMode) { $('exAudioRow').hidden = true; $('exLoops').disabled = true; }
+    $('exSummary').textContent = arrMode && ex.format !== 'json' ? `Arrange sequence · ${w} × ${h} px · ${fps} fps · ${n} frames · ${(n / fps).toFixed(2)} s · ${T.ARR_TRACKS} tracks` : ex.format === 'json' ? `preset@2 · ${project.layers.length} layer${project.layers.length > 1 ? 's' : ''}, ${Object.keys(project.keys).length} keyed parameters, palettes, finish${project.audio ? ', audio maps' : ''}` :
       ex.format === 'png' ? `${w} × ${h} px · ${sp.label} · frame at ${stage.time.toFixed(2)} s` :
       `${w} × ${h} px · ${fps} fps · ${n} frames · ${(n / fps).toFixed(2)} s · ${sp.label}${project.output.broadcastSafe ? ' · legal' : ''}${f.shutter > 0 ? ` · ${n * f.samples * project.layers.length} layer renders` : ''}${gpuStyles && gpu.ready ? ' · WebGPU' : ''}${ex.loops === 1 && !(project.audio && project.audio.maps.length && envFn) ? ' · seamless loop' : ''}`;
   }
@@ -1332,7 +1354,7 @@ function boot() {
     exStop = () => { if (!exAbort || stopping) return; stopping = true; exAbort.abort(); $('exCancel').disabled = true; $('exCancel').textContent = 'Stopping…'; status('Stopping…'); };
     const wasPlaying = stage.playing; stage.pause(); media.pauseAll(); if (player.playing) player.stop();
     try {
-      lastFile = await X.runExport(clone(project), { ...ex, withAudio: ex.withAudio && !!player.buffer, aspect, fps: project.output.fps, time: stage.time }, { ...exportCtx(), signal: exAbort.signal, onProgress: (f, m) => { frac = f; msg = m; $('exProgress').value = f; paint(); } });
+      lastFile = await X.runExport(clone(project), { ...ex, withAudio: !arrMode && ex.withAudio && !!player.buffer, loops: arrMode ? 1 : ex.loops, arrange: arrMode ? arrangeSource() : null, aspect, fps: project.output.fps, time: stage.time }, { ...exportCtx(), signal: exAbort.signal, onProgress: (f, m) => { frac = f; msg = m; $('exProgress').value = f; paint(); } });
       $('exProgress').value = 1; status(`Rendered ${lastFile.filename} (${(lastFile.blob.size / 1048576).toFixed(1)} MB${lastFile.stats ? ` · ${lastFile.stats.fps} frames/s render + encode` : ''})`);
       await offer();
     } catch (e) { if (e && e.name === 'AbortError') status('Export cancelled.'); else { console.error(e); status(e && e.message ? e.message : 'Export failed.', true); } }
@@ -1353,12 +1375,13 @@ function boot() {
   document.addEventListener('keydown', e => {
     const tg = e.target, tag = tg.tagName;
     const typing = (tag === 'INPUT' && ['text', 'search', 'number'].includes(tg.type)) || tag === 'TEXTAREA' || tag === 'SELECT';
-    if ($('exportDlg').open || $('keysDlg').open) return;
+    if (document.querySelector('dialog[open]')) return;
     const mod = e.metaKey || e.ctrlKey;
     if (mod && e.key.toLowerCase() === 'z' && !typing) { e.preventDefault(); e.shiftKey ? redo() : undo(); return; }
     if (typing || mod || e.altKey) return;
     if (evolveOpen) { if (e.key === 'Escape') { e.preventDefault(); closeEvolve(); return; } if (/^[1-6]$/.test(e.key)) { e.preventDefault(); keep(Number(e.key) - 1); return; } }
     if (tg.closest && tg.closest('.kf')) return;
+    if (arrMode && arrKey(e)) return;
     const onRange = tag === 'INPUT' && tg.type === 'range';
     switch (e.key) {
       case ' ': if (tag === 'BUTTON' || tag === 'INPUT' || tag === 'LI' || (tg.getAttribute && tg.getAttribute('role') === 'button')) return; e.preventDefault(); togglePlay(); break;
@@ -1370,8 +1393,11 @@ function boot() {
       case 'e': case 'E': evolveOpen ? closeEvolve() : openEvolve(); break;
       case 'r': case 'R': doRandom(); break;
       case 's': case 'S': saveLook(); break;
-      case 'g': case 'G': toggleGuides(); break;
+      case 'g': case 'G': if (e.shiftKey) setGrid(!gridOn); else toggleGuides(); break;
       case 'k': case 'K': togLane(); break;
+      case ',': jumpKey(-1); break;
+      case '.': jumpKey(1); break;
+      case 'v': case 'V': setMoveTool(!moveTool); break;
       case 'x': case 'X': openExport(); break;
       case 'Delete': case 'Backspace': if (selKey) { e.preventDefault(); commit(T.removeKey(project, selKey.path, selKey.idx), 'Key removed'); selKey = null; } break;
       case 'l': case 'L': togLib(); break;
@@ -1395,7 +1421,8 @@ function boot() {
   // =====================================================================
   const mqTablet = matchMedia('(min-width: 48em)');
   const IS_MAC = /Mac|iPhone|iPad/i.test(navigator.platform || navigator.userAgent || '');
-  $('cmdKbd').textContent = IS_MAC ? '⌘K' : 'Ctrl K'; $('coachK').textContent = IS_MAC ? '⌘K' : 'Ctrl K';
+  $('cmdBtn').dataset.kbd = IS_MAC ? '⌘K' : 'Ctrl K'; $('coachK').textContent = IS_MAC ? '⌘K' : 'Ctrl K';
+  if (!IS_MAC) { $('saveBtn').dataset.kbd = 'Ctrl S'; $('loadBtn').dataset.kbd = 'Ctrl O'; $('undoBtn').dataset.kbd = 'Ctrl Z'; $('redoBtn').dataset.kbd = 'Ctrl ⇧Z'; $('newBtn').dataset.kbd = 'Alt N'; }
 
   // ---- layout manager: sizes, collapse, presets, focus ----
   const LAYOUT_KEY = 'motif5-layout';
@@ -1404,6 +1431,7 @@ function boot() {
   if (typeof savedLay.laneCollapsed === 'boolean' && mqTablet.matches) laneCollapsed = savedLay.laneCollapsed;
   if (LAY.libOff && LAY.inspOff && savedLay.laneCollapsed === true) { LAY.libOff = false; LAY.inspOff = false; laneCollapsed = false; } // Focus never persists across reloads
   let lastLayoutJson = '', focusSaved = null;
+  const ARR_MIN = 280, LANE_MIN = 112;
   const PRESETS = {
     explore: { libOff: false, inspOff: true, lane: false },
     build: { libOff: false, inspOff: false, lane: true },
@@ -1411,6 +1439,7 @@ function boot() {
     focus: { libOff: true, inspOff: true, lane: false },
   };
   function layoutName() {
+    if (arrMode) return '';
     for (const [n, p] of Object.entries(PRESETS)) if (p.libOff === LAY.libOff && p.inspOff === LAY.inspOff && p.lane === !laneCollapsed) return n;
     return '';
   }
@@ -1422,9 +1451,9 @@ function boot() {
       set('--lib-w', LAY.libOff ? '0px' : LAY.lib ? LAY.lib + 'px' : null);
       set('--insp-w', LAY.inspOff ? '0px' : LAY.insp ? LAY.insp + 'px' : null);
       const foc = layoutName() === 'focus'; app.dataset.focus = foc ? '1' : '';
-      set('--lane-h', foc ? '0px' : laneCollapsed ? '40px' : LAY.tall ? Math.max(LAY.lane || 0, 336) + 'px' : LAY.lane ? LAY.lane + 'px' : null);
+      set('--lane-h', foc ? '0px' : arrMode ? (LAY.lane ? Math.max(LAY.lane, ARR_MIN) + 'px' : 'clamp(320px, 42vh, 480px)') : laneCollapsed ? '40px' : LAY.tall ? Math.max(LAY.lane || 0, 336) + 'px' : LAY.lane ? LAY.lane + 'px' : null);
     } else { set('--lib-w'); set('--insp-w'); set('--lane-h'); }
-    $('togLib').setAttribute('aria-pressed', !LAY.libOff); $('togInsp').setAttribute('aria-pressed', !LAY.inspOff); $('togLane').setAttribute('aria-pressed', !laneCollapsed);
+    $('togLib').setAttribute('aria-pressed', !LAY.libOff); $('togInsp').setAttribute('aria-pressed', !LAY.inspOff); $('togLane').setAttribute('aria-pressed', !laneCollapsed || arrMode);
     const cur = layoutName();
     $('layouts').querySelectorAll('button').forEach(b => b.setAttribute('aria-checked', b.dataset.l === cur));
   }
@@ -1432,16 +1461,20 @@ function boot() {
     const j = JSON.stringify({ lib: LAY.lib, insp: LAY.insp, lane: LAY.lane, libOff: LAY.libOff, inspOff: LAY.inspOff, tall: LAY.tall, laneCollapsed });
     if (j !== lastLayoutJson) { lastLayoutJson = j; store.set(LAYOUT_KEY, JSON.parse(j)); }
   }
-  function layoutChanged() { renderLane(); } // renderLaneHead applies + saves
+  // Layout changes only touch the strip and the grid; the rows underneath are already current.
+  let layoutRaf = 0;
+  function layoutChanged() { $('lane').dataset.collapsed = laneCollapsed; applyLayout(); if (layoutRaf) return; layoutRaf = requestAnimationFrame(() => { layoutRaf = 0; renderLaneHead(); }); } // renderLaneHead applies + saves
   function togLib() { if (!mqDesktop.matches) { setTab('library'); return; } LAY.libOff = !LAY.libOff; focusSaved = null; applyLayout(); saveLayout(); }
   function togInsp() { if (!mqDesktop.matches) return; LAY.inspOff = !LAY.inspOff; focusSaved = null; applyLayout(); saveLayout(); }
-  function togLane() { laneCollapsed = !laneCollapsed; focusSaved = null; layoutChanged(); }
+  function togLane() { if (arrMode) { setArrange(false); laneCollapsed = false; focusSaved = null; layoutChanged(); return; } laneCollapsed = !laneCollapsed; focusSaved = null; layoutChanged(); }
   function setLayout(name) {
     const p = PRESETS[name]; if (!p || !mqDesktop.matches) return;
+    if (arrMode) setArrange(false);
     LAY.libOff = p.libOff; LAY.inspOff = p.inspOff; laneCollapsed = !p.lane; LAY.tall = !!p.tall; focusSaved = null; layoutChanged();
   }
   function toggleFocus() {
     if (!mqDesktop.matches) return;
+    if (arrMode) setArrange(false);
     if (layoutName() === 'focus') {
       const s = focusSaved || PRESETS.build; LAY.libOff = s.libOff; LAY.inspOff = s.inspOff; laneCollapsed = focusSaved ? focusSaved.laneCollapsed : !PRESETS.build.lane; focusSaved = null;
     } else { focusSaved = { libOff: LAY.libOff, inspOff: LAY.inspOff, laneCollapsed }; LAY.libOff = true; LAY.inspOff = true; laneCollapsed = true; }
@@ -1455,20 +1488,32 @@ function boot() {
   $('layouts').addEventListener('click', e => { const b = e.target.closest('button'); if (b) setLayout(b.dataset.l); });
   mqDesktop.addEventListener('change', applyLayout); mqTablet.addEventListener('change', applyLayout);
 
-  // splitters: drag, arrow keys, double-click to reset, drag past the minimum to collapse
+  // splitters: drag, arrow keys, double-click to reset, drag well past the minimum to collapse.
+  // Sizes come from the pointer's distance since press (never from the live layout), so the handle cannot drift,
+  // and updates are batched to one per frame.
   document.querySelectorAll('.split').forEach(h => {
-    const kind = h.dataset.split; let d = null;
-    const size = () => kind === 'lib' ? $('panel-library').getBoundingClientRect().width : kind === 'insp' ? $('insp').getBoundingClientRect().width : $('lane').getBoundingClientRect().height;
+    const kind = h.dataset.split; let d = null, raf = 0, pending = null;
+    const size = () => kind === 'lib' ? $('panel-library').getBoundingClientRect().width : kind === 'insp' ? $('insp').getBoundingClientRect().width : (arrMode ? $('arrange') : $('lane')).getBoundingClientRect().height;
+    const laneMin = () => (arrMode ? ARR_MIN : LANE_MIN);
     const put = raw => {
-      if (kind === 'lib') { LAY.libOff = raw < 160; if (!LAY.libOff) LAY.lib = Math.round(clamp(raw, 216, 520)); }
-      else if (kind === 'insp') { LAY.inspOff = raw < 200; if (!LAY.inspOff) LAY.insp = Math.round(clamp(raw, 296, 600)); }
-      else { LAY.lane = Math.round(clamp(raw, 112, Math.max(160, innerHeight * 0.62))); LAY.tall = false; }
+      if (kind === 'lib') { LAY.libOff = raw < 120; if (!LAY.libOff) LAY.lib = Math.round(clamp(raw, 216, 520)); }
+      else if (kind === 'insp') { LAY.inspOff = raw < 160; if (!LAY.inspOff) LAY.insp = Math.round(clamp(raw, 296, 600)); }
+      else { LAY.lane = Math.round(clamp(raw, laneMin(), Math.max(laneMin() + 48, innerHeight * 0.62))); LAY.tall = false; }
       focusSaved = null; applyLayout();
     };
-    h.addEventListener('pointerdown', e => { e.preventDefault(); h.setPointerCapture(e.pointerId); d = { x: e.clientX, y: e.clientY, s: size() }; h.classList.add('on'); app.dataset.drag = '1'; });
-    h.addEventListener('pointermove', e => { if (!d) return; put(kind === 'lib' ? d.s + e.clientX - d.x : kind === 'insp' ? d.s - (e.clientX - d.x) : d.s - (e.clientY - d.y)); });
-    const end = () => { if (!d) return; d = null; h.classList.remove('on'); delete app.dataset.drag; saveLayout(); stage.invalidate(); };
-    h.addEventListener('pointerup', end); h.addEventListener('pointercancel', end);
+    const flush = () => { raf = 0; if (pending != null) { const v = pending; pending = null; put(v); } };
+    const want = e => (kind === 'lib' ? d.s + e.clientX - d.x : kind === 'insp' ? d.s - (e.clientX - d.x) : d.s - (e.clientY - d.y));
+    h.addEventListener('pointerdown', e => {
+      if (e.button !== 0 && e.pointerType === 'mouse') return; e.preventDefault();
+      try { h.setPointerCapture(e.pointerId); } catch (err) { /* capture is a nicety */ }
+      d = { id: e.pointerId, x: e.clientX, y: e.clientY, s: size() }; h.classList.add('on'); app.dataset.drag = kind === 'lane' ? 'row' : 'col';
+    });
+    h.addEventListener('pointermove', e => { if (!d || e.pointerId !== d.id) return; pending = want(e); if (!raf) raf = requestAnimationFrame(flush); });
+    const end = e => {
+      if (!d || (e && e.pointerId !== d.id)) return; if (raf) { cancelAnimationFrame(raf); flush(); }
+      d = null; h.classList.remove('on'); delete app.dataset.drag; saveLayout(); stage.invalidate();
+    };
+    h.addEventListener('pointerup', end); h.addEventListener('pointercancel', end); h.addEventListener('lostpointercapture', end);
     h.addEventListener('dblclick', () => { if (kind === 'lib') { LAY.lib = null; LAY.libOff = false; } else if (kind === 'insp') { LAY.insp = null; LAY.inspOff = false; } else { LAY.lane = null; LAY.tall = false; } applyLayout(); saveLayout(); });
     h.addEventListener('keydown', e => {
       const k = e.key; if (!/^Arrow/.test(k)) return;
@@ -1505,7 +1550,7 @@ function boot() {
   function updateHud() {
     const a = ASPECTS.find(x => x.id === aspect) || ASPECTS[0], sz = exportSize(aspect, 720);
     $('hudTag').textContent = `${a.label} · ${sz.w}×${sz.h} · ${project.output.fps} fps`;
-    $('lcdRate').textContent = `${project.finish.loop.toFixed(2)} s · ${project.output.fps} fps`;
+    $('lcdRate').textContent = `${(arrMode ? arrDuration() : project.finish.loop).toFixed(2)} s · ${project.output.fps} fps`;
   }
 
   // ---- sliders: fill + "modified" state ----
@@ -1547,10 +1592,10 @@ function boot() {
   const pal = $('pal'), palIn = $('palIn'), palList = $('palList');
   let palOpen = false, palRows = [], palItems = [], palSel = 0, palPrevFocus = null, palTimer = 0;
   const RECENT_KEY = 'motif5-recent'; let recents = store.get(RECENT_KEY) || [];
-  const PAGE_NAMES = [['layer', 'Layers'], ['colour', 'Colour'], ['finish', 'Finish'], ['audio', 'Audio'], ['looks', 'Looks'], ['kits', 'Kits']];
+  const PAGE_NAMES = [['layer', 'Layers'], ['colour', 'Colour'], ['finish', 'Finish'], ['audio', 'Audio'], ['clips', 'Clips'], ['kits', 'Kits']];
   function showInsp() { if (mqDesktop.matches && LAY.inspOff) { LAY.inspOff = false; applyLayout(); saveLayout(); } }
   function palAll() {
-    const CORE = new Set(['play', 'mutate', 'evolve', 'random', 'add', 'undo', 'redo', 'look', 'deliver', 'lay-explore', 'lay-build', 'lay-time', 'lay-focus']);
+    const CORE = new Set(['play', 'mutate', 'evolve', 'random', 'add', 'undo', 'redo', 'look', 'deliver', 'save', 'open', 'arrange', 'lay-explore', 'lay-build', 'lay-time', 'lay-focus']);
     const c = (id, label, kbd, run, kw = '') => ({ key: 'cmd:' + id, label, kind: 'Command', kbd, run, kw, core: CORE.has(id) });
     const out = [];
     out.push(c('play', stage.playing ? 'Pause' : 'Play', 'Space', togglePlay, 'transport start stop'));
@@ -1562,8 +1607,9 @@ function boot() {
     if (project.layers.length > 1) { out.push(c('del', 'Delete layer', '', delLayer)); out.push(c('up', 'Move layer up', '', () => moveLayer(1))); out.push(c('down', 'Move layer down', '', () => moveLayer(-1))); }
     if (cursor > 0) out.push(c('undo', 'Undo', IS_MAC ? '⌘Z' : 'Ctrl Z', undo));
     if (cursor < history.length - 1) out.push(c('redo', 'Redo', IS_MAC ? '⇧⌘Z' : 'Ctrl ⇧Z', redo));
-    out.push(c('look', 'Save look', 'S', saveLook)); out.push(c('deliver', 'Deliver: render and export', 'X', openExport, 'export render mp4 gif lottie'));
-    out.push(c('new', 'New project', '', () => { commit(demoProject(), 'New project'); stage.setSpace(project.output.space); }));
+    out.push(c('look', 'Save clip', 'S', saveLook)); out.push(c('save', 'Save project', IS_MAC ? '⌘S' : 'Ctrl S', () => saveProject(), 'file disk write')); out.push(c('open', 'Open project…', IS_MAC ? '⌘O' : 'Ctrl O', openProjectDialog, 'load file')); out.push(c('arrange', 'Arrange: sequence clips', 'Alt A', () => setArrange(!arrMode), 'nle edit sequence clips timeline')); out.push(c('deliver', 'Render and export', 'X', openExport, 'export deliver render mp4 gif lottie'));
+    out.push(c('new', 'New project', IS_MAC ? '⌥N' : 'Alt N', newProject, 'blank slate empty start'));
+    out.push(c('import-clips', 'Import clips…', '', openImportDialog, 'clips from project finder files'));
     [['explore', 'Explore', 'Alt 1'], ['build', 'Build', 'Alt 2'], ['time', 'Time', 'Alt 3'], ['focus', 'Focus', 'F']].forEach(([n, l, k]) => out.push(c('lay-' + n, `Workspace: ${l}`, k, () => setLayout(n), 'layout panels')));
     out.push(c('t-lib', 'Toggle library', 'L', togLib, 'panel')); out.push(c('t-insp', 'Toggle inspector', 'I', togInsp, 'panel')); out.push(c('t-lane', 'Toggle timeline', 'K', togLane, 'panel keys'));
     out.push(c('guides', 'Toggle safe-area guides', 'G', toggleGuides));
@@ -1680,7 +1726,7 @@ function boot() {
   addEventListener('keydown', e => {
     const k = e.key.toLowerCase();
     if ((e.metaKey || e.ctrlKey) && !e.altKey && k === 'k') { e.preventDefault(); e.stopPropagation(); palOpen ? closePal() : openPal(); return; }
-    if (palOpen || $('exportDlg').open || $('keysDlg').open) return;
+    if (palOpen || $('exportDlg').open || $('keysDlg').open || $('projDlg').open || $('askDlg').open) return;
     const tg = e.target, tag = tg.tagName; const typing = (tag === 'INPUT' && ['text', 'search', 'number'].includes(tg.type)) || tag === 'TEXTAREA' || tag === 'SELECT';
     if (typing || e.metaKey || e.ctrlKey || !e.altKey) return;
     const m = /^Digit([1-4])$/.exec(e.code);
@@ -1691,11 +1737,1072 @@ function boot() {
     }
   }, true);
 
+
+  // =====================================================================
+  // Motif 6: tooltips, page-zoom lock, menus, clips + groups, project files,
+  // viewer tools (Move, Grid) and the Arrange sequencer. UI state lives here;
+  // every project change still goes through commit() / live().
+  // =====================================================================
+  const newId = p => p + Date.now().toString(36).slice(-4) + Math.random().toString(36).slice(2, 6);
+  const wrapPos = (x, n) => ((x % n) + n) % n;
+  function loopSec() { return arrMode ? arrDuration() : project.finish.loop; }
+
+  // ---- tooltips: name + shortcut on hover or keyboard focus, for icon-only controls ----
+  (() => {
+    const tip = $('tip'); let timer = 0, cur = null;
+    const hide = () => { clearTimeout(timer); cur = null; tip.hidden = true; };
+    const show = el => {
+      const name = el.dataset.tip; if (!name) return; cur = el;
+      const k = el.dataset.kbd;
+      const meta = el.dataset.tipMeta;
+      tip.classList.toggle('rich', !!meta);
+      tip.innerHTML = `<span>${esc(name)}</span>${k ? `<kbd>${esc(k)}</kbd>` : ''}${meta ? `<small>${esc(meta)}</small>` : ''}`;
+      tip.hidden = false;
+      const r = el.getBoundingClientRect(), tw = tip.offsetWidth, th = tip.offsetHeight;
+      const x = clamp(r.left + r.width / 2 - tw / 2, 6, Math.max(6, innerWidth - tw - 6));
+      let y = r.bottom + 8; if (y + th > innerHeight - 6) y = r.top - th - 8;
+      tip.style.left = x + 'px'; tip.style.top = y + 'px';
+    };
+    document.addEventListener('pointerover', e => {
+      if (e.pointerType === 'touch') return;
+      const el = e.target.closest && e.target.closest('[data-tip]'); if (!el || el === cur) return;
+      hide(); timer = setTimeout(() => show(el), 300);
+    });
+    document.addEventListener('pointerout', e => { const el = e.target.closest && e.target.closest('[data-tip]'); if (el && !el.contains(e.relatedTarget)) hide(); });
+    document.addEventListener('pointerdown', hide, true); document.addEventListener('keydown', hide, true);
+    addEventListener('scroll', hide, true); addEventListener('blur', hide);
+    document.addEventListener('focusin', e => { const el = e.target.closest && e.target.closest('[data-tip]'); if (el && el.matches(':focus-visible')) { hide(); show(el); } });
+    document.addEventListener('focusout', hide);
+  })();
+
+  // ---- page zoom lock: pinch and ctrl+wheel never resize the page ----
+  (() => {
+    const stop = e => e.preventDefault();
+    ['gesturestart', 'gesturechange', 'gestureend'].forEach(t => document.addEventListener(t, stop, { passive: false })); // Safari pinch
+    document.addEventListener('wheel', e => { if (e.ctrlKey) e.preventDefault(); }, { passive: false });                  // trackpad pinch arrives as ctrl+wheel
+    document.addEventListener('touchmove', e => { if (e.touches.length > 1 || (e.scale && e.scale !== 1)) e.preventDefault(); }, { passive: false });
+  })();
+
+  // ---- popup menus: blend picker (hover previews on the stage), clip and group menus ----
+  let menu = null;
+  function closeMenu() {
+    if (!menu) return; const m = menu; menu = null; const el = $('popmenu'); el.hidden = true; el.innerHTML = '';
+    if (m.anchor && m.anchor.setAttribute) m.anchor.setAttribute('aria-expanded', 'false');
+    if (m.o.onClose) m.o.onClose();
+    if (m.restore !== false && m.prev && m.prev.focus && document.contains(m.prev)) m.prev.focus({ preventScroll: true });
+  }
+  function openMenu(anchor, items, o = {}) {
+    closeMenu();
+    const el = $('popmenu'); el.setAttribute('aria-label', o.label || 'Menu');
+    el.innerHTML = items.map((it, i) => it.sep ? '<hr>' : `<button type="button" role="${o.radio ? 'option' : 'menuitem'}" data-i="${i}"${it.disabled ? ' disabled' : ''}${it.danger ? ' class="danger"' : ''} aria-selected="${!!it.checked}"><span class="ck">${it.checked ? '✓' : ''}</span><span class="tx">${esc(it.label)}</span>${it.kbd ? `<kbd>${esc(it.kbd)}</kbd>` : ''}</button>`).join('');
+    el.hidden = false;
+    const ar = anchor && anchor.getBoundingClientRect ? anchor.getBoundingClientRect() : null;
+    el.style.minWidth = Math.max(o.minWidth || 168, ar ? Math.min(ar.width, 260) : 0) + 'px';
+    const mw = el.offsetWidth, mh = el.offsetHeight;
+    let x, y;
+    if (o.at) { x = o.at.x; y = o.at.y; } else { x = ar.left; y = ar.bottom + 4; if (y + mh > innerHeight - 8 && ar.top - mh - 4 > 8) y = ar.top - mh - 4; }
+    x = clamp(x, 8, Math.max(8, innerWidth - mw - 8)); y = clamp(y, 8, Math.max(8, innerHeight - mh - 8));
+    el.style.left = x + 'px'; el.style.top = y + 'px';
+    if (anchor && anchor.setAttribute) anchor.setAttribute('aria-expanded', 'true');
+    menu = { items, anchor, o, prev: document.activeElement };
+    const first = (o.radio && el.querySelector('[aria-selected="true"]')) || el.querySelector('button:not([disabled])');
+    if (first) first.focus({ preventScroll: true });
+  }
+  (() => {
+    const el = $('popmenu');
+    const hoverBtn = b => { if (!menu || !b || b.disabled || !menu.o.onHover) return; menu.o.onHover(menu.items[+b.dataset.i]); };
+    el.addEventListener('pointerover', e => { const b = e.target.closest('button'); if (b && !b.disabled) { if (document.activeElement !== b) b.focus({ preventScroll: true }); hoverBtn(b); } });
+    el.addEventListener('pointerleave', () => { if (menu && menu.o.onLeave) menu.o.onLeave(); });
+    el.addEventListener('click', e => {
+      const b = e.target.closest('button'); if (!b || b.disabled || !menu) return;
+      const it = menu.items[+b.dataset.i]; menu.restore = it.restoreFocus; const run = it.run; closeMenu(); if (run) run();
+    });
+    el.addEventListener('keydown', e => {
+      if (!menu) return; const bs = [...el.querySelectorAll('button:not([disabled])')]; if (!bs.length) return; const i = bs.indexOf(document.activeElement);
+      const go = n => { n.focus({ preventScroll: true }); hoverBtn(n); };
+      if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); go(bs[(i + (e.key === 'ArrowDown' ? 1 : -1) + bs.length) % bs.length]); }
+      else if (e.key === 'Home') { e.preventDefault(); go(bs[0]); } else if (e.key === 'End') { e.preventDefault(); go(bs[bs.length - 1]); }
+      else if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); closeMenu(); } else if (e.key === 'Tab') closeMenu();
+    });
+    document.addEventListener('pointerdown', e => { if (menu && !el.contains(e.target) && !(menu.anchor && menu.anchor.contains && menu.anchor.contains(e.target))) closeMenu(); }, true);
+    addEventListener('blur', closeMenu); addEventListener('resize', closeMenu);
+    document.addEventListener('scroll', e => { if (menu && !el.contains(e.target)) closeMenu(); }, true);
+  })();
+  // Blend modes: hovering (or arrowing through) a mode previews it on the stage; choosing one applies it. The panel stays where it is.
+  function openBlendMenu(btn) {
+    if (menu && menu.anchor === btn) { closeMenu(); return; }
+    const path = btn.dataset.blend, s = T.schemaAt(project, path), id = btn.id, cur = shownValue(path);
+    const stop = () => { if (audition) setAudition(null); };
+    const items = s.options.map(o => ({ label: o.l, v: o.v, checked: o.v === cur, restoreFocus: false, run: () => { commit(applyValue(path, o.v), `Blend: ${o.l}`); const n = document.getElementById(id); if (n) n.focus({ preventScroll: true }); } }));
+    openMenu(btn, items, { radio: true, label: 'Blend mode', minWidth: 176, onHover: it => { if (it.v === cur) stop(); else setAudition(applyValue(path, it.v), `Blend · ${it.label}`, 'Click to apply'); }, onLeave: stop, onClose: stop });
+  }
+
+  // ---- small text prompt (rename, new group, save as) ----
+  function askText(title, label, value, ok = 'Save') {
+    return new Promise(resolve => {
+      const d = $('askDlg'), inp = $('askIn'); let out = null;
+      $('askTitle').textContent = title; $('askLabel').textContent = label; $('askOk').textContent = ok; inp.value = value || '';
+      const done = () => { d.removeEventListener('close', done); resolve(out); };
+      d.addEventListener('close', done);
+      $('askForm').onsubmit = () => { out = inp.value.trim() || null; };
+      $('askCancel').onclick = $('askClose').onclick = () => { out = null; d.close(); };
+      d.showModal(); inp.focus(); inp.select();
+    });
+  }
+
+  // ---- project name + unsaved marker ----
+  function updateNameUi() {
+    const b = $('projName'); if (!b) return;
+    if (b.textContent !== projectName) b.textContent = projectName;
+    b.parentElement.dataset.dirty = dirty ? '1' : ''; $('saveBtn').dataset.dirty = dirty ? '1' : '';
+    b.title = `${dirty ? 'Unsaved changes · ' : ''}${fileHandle ? `File: ${fileHandle.name} · ` : ''}Click to rename`;
+    document.title = `${projectName}${dirty ? ' •' : ''} · Motif 6`;
+  }
+  async function renameProject() { const n = await askText('Rename project', 'Project name', projectName, 'Rename'); if (n) { projectName = n.slice(0, 60); dirty = true; updateNameUi(); autosave(); } }
+  $('projName').addEventListener('click', renameProject);
+  $('projName').addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); renameProject(); } });
+
+  // ---- previous / next keyframe (Arrange: previous / next cut) ----
+  function keyTimes() {
+    if (arrMode) { const set = new Set([0]); for (const it of project.arrange.items) { set.add(+it.start.toFixed(4)); set.add(+(it.start + it.dur).toFixed(4)); } return [...set].sort((a, b) => a - b); }
+    const L = project.finish.loop, set = new Set();
+    for (const ks of Object.values(project.keys)) for (const k of ks) set.add(+(k.u * L).toFixed(4));
+    return [...set].sort((a, b) => a - b);
+  }
+  function jumpKey(dir) {
+    const ts = keyTimes(), t = stage.time, eps = 0.5 / project.output.fps;
+    const to = dir < 0 ? [...ts].reverse().find(x => x < t - eps) : ts.find(x => x > t + eps);
+    if (to === undefined) { toast(arrMode ? (dir < 0 ? 'Start of the sequence' : 'End of the sequence') : ts.length ? (dir < 0 ? 'No earlier keyframe' : 'No later keyframe') : 'No keyframes yet · key a value with ◇'); return; }
+    stage.seekTime(arrMode ? Math.min(to, arrDuration() - 1e-3) : to);
+    if (player.playing) player.start(stage.time);
+    if (!arrMode) {
+      const u = to / project.finish.loop;
+      for (const [p, ks] of Object.entries(project.keys)) { const i = T.keyIndexAt(ks, u); if (i >= 0) { selKey = { path: p, idx: i }; renderLaneHead(); markSelected(); break; } }
+      if (!stage.playing) refreshRowsOnly();
+    }
+  }
+  function pickLaneLayer(row) {
+    if (!row) return; let id = row.dataset.layer;
+    if (!id && row.dataset.lpath) { const p = T.parsePath(row.dataset.lpath); if (p && p.kind !== 'F') id = p.layer; }
+    if (id) selectLayer(id);
+  }
+
+  // ---------- clips: saved looks, organised in groups. Arrange lays them out on tracks ----------
+  const CLIPS_KEY = 'motif6-clips', GROUPS_KEY = 'motif6-groups', OLD_LOOKS_KEY = 'motif-style-lab-2-looks';
+  clips = store.get(CLIPS_KEY);
+  if (!Array.isArray(clips)) clips = (store.get(OLD_LOOKS_KEY) || []).map(l => ({ ...l, group: null })); // looks from earlier versions become clips
+  groups = store.get(GROUPS_KEY); if (!Array.isArray(groups)) groups = [];
+  clips = clips.filter(c => c && c.project && c.project.layers);
+  clips.forEach(c => { if (!c.id) c.id = newId('c'); if (!('group' in c)) c.group = null; });
+  groups.forEach(g => { if (!g.id) g.id = newId('g'); });
+  const clipById = id => clips.find(c => c.id === id) || null;
+  const clipLoop = c => (c && c.project && c.project.finish && Number(c.project.finish.loop)) || 6;
+  const clipProjCache = new WeakMap();
+  function clipProject(c) { let p = clipProjCache.get(c); if (!p) { p = T.sanitizeProject(c.project, C.sanitizeCustom); clipProjCache.set(c, p); } return p; }
+  function saveClips() {
+    try { localStorage.setItem(CLIPS_KEY, JSON.stringify(clips)); localStorage.setItem(GROUPS_KEY, JSON.stringify(groups)); return true; }
+    catch (e) { toast('Browser storage is full. Delete some clips, or save the project to a file.'); return false; }
+  }
+  const groupName = id => { const g = groups.find(x => x.id === id); return g ? g.name : ''; };
+  function clipCard(c) {
+    const inArr = arrMode;
+    return `<div class="look clipcard" role="button" tabindex="0" draggable="true" data-clip="${c.id}" aria-label="${inArr ? 'Add' : 'Load'} ${esc(c.name)}" title="${inArr ? 'Click to add to Arrange · drag onto a track' : 'Click to load · drag onto a group or an Arrange track'}"><img alt="" src="${esc(c.thumb || '')}" draggable="false"><span class="dur">${clipLoop(c).toFixed(1)} s</span><small>${esc(c.name)}</small><span class="acts"><button class="x" data-cadd aria-label="Add ${esc(c.name)} to Arrange" data-tip="Add to Arrange"><svg class="i" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button><button class="x" data-cmore aria-label="Options for ${esc(c.name)}" aria-haspopup="menu" data-tip="Options"><svg class="i" viewBox="0 0 24 24"><path d="M5 12h.01M12 12h.01M19 12h.01" stroke-width="2.6"/></svg></button></span></div>`;
+  }
+  function groupSection(g, list) {
+    const open = g ? g.open !== false : true;
+    const head = g ? `<header class="cg-head" data-group-head="${g.id}"><button class="cg-tog" aria-expanded="${open}" aria-label="${open ? 'Collapse' : 'Expand'} ${esc(g.name)}"><svg class="i" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg></button><span class="cg-name" title="Double-click to rename">${esc(g.name)}</span><span class="cg-n">${list.length}</span><button class="x" data-gmore aria-label="Group options" aria-haspopup="menu" data-tip="Group options"><svg class="i" viewBox="0 0 24 24"><path d="M5 12h.01M12 12h.01M19 12h.01" stroke-width="2.6"/></svg></button></header>`
+      : `<header class="cg-head loose"><span class="cg-name">Ungrouped</span><span class="cg-n">${list.length}</span></header>`;
+    return `<section class="cgroup" data-group="${g ? g.id : ''}" data-open="${open}">${head}<div class="looks-grid">${open ? list.map(clipCard).join('') : ''}${open && !list.length ? `<p class="cg-empty">${g ? 'Drag clips here' : 'Nothing here'}</p>` : ''}</div></section>`;
+  }
+  function renderClips() {
+    const root = $('looks'); if (!root) return;
+    const by = new Map(groups.map(g => [g.id, []])), loose = [];
+    for (const c of clips) (by.get(c.group) || loose).push(c);
+    root.innerHTML = groups.map(g => groupSection(g, by.get(g.id))).join('') + (groups.length ? (loose.length || !clips.length ? groupSection(null, loose) : '') : (loose.length ? `<div class="looks-grid">${loose.map(clipCard).join('')}</div>` : ''));
+    $('looksEmpty').hidden = clips.length > 0 || groups.length > 0;
+    $('newGroup').title = `Create a group (${groups.length} so far)`;
+  }
+  // Save the working project as a clip. The arrangement belongs to the project, not the clip, so it is left out.
+  function saveLook() {
+    const c = document.createElement('canvas'); const sz = exportSize(aspect, 108); c.width = sz.w; c.height = sz.h;
+    renderProjectThumb(pipeline, c, project, arrMode ? 0 : stage.time);
+    const name = project.layers.map(l => getStyle(l.styleId).name.split(' ')[0]).join(' + ');
+    const snap = clone(project); snap.arrange = { items: [], fx: [] };
+    const clip = { id: newId('c'), name: `${name} ${clips.length + 1}`, group: null, project: snap, aspect, thumb: c.toDataURL('image/jpeg', 0.8), at: Date.now() };
+    clips.unshift(clip); clips = clips.slice(0, 200); saveClips(); renderClips(); toast('Clip saved'); return clip;
+  }
+  $('saveLook').addEventListener('click', saveLook);
+  function loadClip(c) {
+    const miss = K.missingKits(c.project); if (miss.length) { toast(`This clip needs the ${miss.join(', ')} kit. Install it in the Kits tab first.`); return; }
+    if (arrMode) setArrange(false);
+    setAspect(c.aspect || aspect);
+    const next = clone(c.project); next.arrange = clone(project.arrange);
+    commit(next, `Loaded ${c.name}`); stage.setSpace(project.output.space);
+  }
+  async function newGroupPrompt() {
+    const n = await askText('New group', 'Group name', `Group ${groups.length + 1}`, 'Create'); if (!n) return null;
+    const g = { id: newId('g'), name: n.slice(0, 40), open: true }; groups.push(g); saveClips(); renderClips(); toast(`Group “${g.name}” created`); return g;
+  }
+  function moveClipToGroup(id, gid) {
+    const c = clipById(id); if (!c || (c.group || null) === (gid || null)) return;
+    c.group = gid || null; saveClips(); renderClips(); toast(gid ? `Moved to ${groupName(gid)}` : 'Removed from its group');
+  }
+  async function renameClip(c) { const n = await askText('Rename clip', 'Clip name', c.name, 'Rename'); if (n) { c.name = n.slice(0, 60); saveClips(); renderClips(); renderArrange(); } }
+  async function renameGroup(g) { const n = await askText('Rename group', 'Group name', g.name, 'Rename'); if (n) { g.name = n.slice(0, 40); saveClips(); renderClips(); } }
+  function deleteClip(c) {
+    const used = project.arrange.items.filter(i => i.clip === c.id).length;
+    if (used && !confirm(`“${c.name}” is used ${used} time${used > 1 ? 's' : ''} in Arrange. Delete it anyway? Those clips will show as missing.`)) return;
+    clips = clips.filter(x => x !== c); saveClips(); renderClips(); renderArrange(); toast('Clip deleted');
+  }
+  function clipMenu(c, anchor, at) {
+    const items = [
+      { label: arrMode ? 'Load into Timeline' : 'Load', kbd: '↵', run: () => loadClip(c) },
+      { label: 'Add to Arrange', run: () => addClipToArrange(c.id) }, { sep: true },
+      { label: 'Rename…', run: () => renameClip(c) },
+      { label: 'Duplicate', run: () => { const i = clips.indexOf(c); clips.splice(i, 0, { ...clone(c), id: newId('c'), name: `${c.name} copy` }); saveClips(); renderClips(); } }, { sep: true },
+      ...groups.map(g => ({ label: `Move to ${g.name}`, checked: c.group === g.id, run: () => moveClipToGroup(c.id, g.id) })),
+      { label: 'New group…', run: async () => { const g = await newGroupPrompt(); if (g) moveClipToGroup(c.id, g.id); } },
+      ...(c.group ? [{ label: 'Remove from group', run: () => moveClipToGroup(c.id, null) }] : []), { sep: true },
+      { label: 'Delete', danger: true, run: () => deleteClip(c) },
+    ];
+    openMenu(anchor, items, { at, label: 'Clip options', restore: false });
+  }
+  function groupMenu(g, anchor, at) {
+    const members = clips.filter(c => c.group === g.id);
+    openMenu(anchor, [
+      { label: 'Rename…', run: () => renameGroup(g) },
+      { label: `Add all to Arrange (${members.length})`, disabled: !members.length, run: () => { members.slice().reverse().forEach(c => addClipToArrange(c.id, { quiet: true })); toast(`Added ${members.length} clip${members.length > 1 ? 's' : ''} to V1`); } }, { sep: true },
+      { label: 'Ungroup (keep clips)', run: () => { members.forEach(c => { c.group = null; }); groups = groups.filter(x => x !== g); saveClips(); renderClips(); } },
+      { label: 'Delete group and clips', danger: true, disabled: !members.length && false, run: () => { if (members.length && !confirm(`Delete “${g.name}” and its ${members.length} clip${members.length > 1 ? 's' : ''}?`)) return; clips = clips.filter(c => c.group !== g.id); groups = groups.filter(x => x !== g); saveClips(); renderClips(); renderArrange(); } },
+    ], { at, label: 'Group options', restore: false });
+  }
+  const clipsEl = $('looks');
+  clipsEl.addEventListener('click', e => {
+    const card = e.target.closest('.clipcard');
+    if (card) {
+      const c = clipById(card.dataset.clip); if (!c) return;
+      if (e.target.closest('[data-cadd]')) { addClipToArrange(c.id); return; }
+      if (e.target.closest('[data-cmore]')) { clipMenu(c, e.target.closest('[data-cmore]')); return; }
+      if (arrMode) addClipToArrange(c.id); else loadClip(c);
+      return;
+    }
+    const head = e.target.closest('[data-group-head]'); if (!head) return;
+    const g = groups.find(x => x.id === head.dataset.groupHead); if (!g) return;
+    if (e.target.closest('[data-gmore]')) { groupMenu(g, e.target.closest('[data-gmore]')); return; }
+    g.open = g.open === false; saveClips(); renderClips();
+  });
+  clipsEl.addEventListener('dblclick', e => { const n = e.target.closest('.cg-name'); if (!n) return; const head = n.closest('[data-group-head]'); const g = head && groups.find(x => x.id === head.dataset.groupHead); if (g) renameGroup(g); });
+  clipsEl.addEventListener('contextmenu', e => {
+    const card = e.target.closest('.clipcard'), head = e.target.closest('[data-group-head]');
+    if (card) { e.preventDefault(); const c = clipById(card.dataset.clip); if (c) clipMenu(c, null, { x: e.clientX, y: e.clientY }); }
+    else if (head) { e.preventDefault(); const g = groups.find(x => x.id === head.dataset.groupHead); if (g) groupMenu(g, null, { x: e.clientX, y: e.clientY }); }
+  });
+  clipsEl.addEventListener('keydown', e => { if ((e.key === 'Enter' || e.key === ' ') && e.target.classList.contains('clipcard')) { e.preventDefault(); e.target.click(); } });
+  // drag a clip onto a group to file it, or onto an Arrange track to place it
+  const dnd = { id: null };
+  clipsEl.addEventListener('dragstart', e => {
+    const card = e.target.closest('.clipcard'); if (!card) return; dnd.id = card.dataset.clip;
+    e.dataTransfer.effectAllowed = 'copyMove'; e.dataTransfer.setData('application/x-motif-clip', dnd.id); e.dataTransfer.setData('text/plain', (clipById(dnd.id) || {}).name || 'clip');
+    card.classList.add('dragging');
+  });
+  clipsEl.addEventListener('dragend', () => { dnd.id = null; clipsEl.querySelectorAll('.dragging,.over').forEach(x => x.classList.remove('dragging', 'over')); });
+  clipsEl.addEventListener('dragover', e => { if (!dnd.id) return; const g = e.target.closest('.cgroup'); if (!g) return; e.preventDefault(); e.dataTransfer.dropEffect = 'move'; clipsEl.querySelectorAll('.over').forEach(x => { if (x !== g) x.classList.remove('over'); }); g.classList.add('over'); });
+  clipsEl.addEventListener('dragleave', e => { const g = e.target.closest('.cgroup'); if (g && !g.contains(e.relatedTarget)) g.classList.remove('over'); });
+  clipsEl.addEventListener('drop', e => { const g = e.target.closest('.cgroup'); if (!g || !dnd.id) return; e.preventDefault(); const id = dnd.id; dnd.id = null; moveClipToGroup(id, g.dataset.group || null); });
+  $('newGroup').addEventListener('click', newGroupPrompt);
+  // ---- Import: bring clips into THIS project from another Motif project (saved here, or in the project folder) or from a file ----
+  const imp = { src: null, sel: new Set() };
+  const FINDER = /Mac/i.test(navigator.platform || '') ? 'Finder' : 'Files';
+  $('importBtn').innerHTML = 'Import…'; $('importBtn').title = `Import clips from another Motif project or from ${FINDER}`;
+  $('importFile').accept = '.motif,.json,application/json';
+  function impThumb(pr, asp) {
+    try { const c = document.createElement('canvas'), sz = exportSize(asp || aspect, 108); c.width = sz.w; c.height = sz.h; renderProjectThumb(pipeline, c, T.sanitizeProject(pr, C.sanitizeCustom), 0); return c.toDataURL('image/jpeg', 0.8); }
+    catch (err) { return ''; }
+  }
+  // A source is a project file's contents: its saved clips, plus the project's own composition as one more clip.
+  function impSource(data, name) {
+    const pr = data && (data.project || (data.layers ? data : null));
+    if (!pr || !Array.isArray(pr.layers)) throw new Error('there is no Motif project in it');
+    const gs = (Array.isArray(data.groups) ? data.groups : []).map(cleanGroup).filter(Boolean);
+    const items = (Array.isArray(data.clips) ? data.clips : []).map(cleanClip).filter(Boolean).map(c => ({ clip: c, group: gs.find(g => g.id === c.group) || null }));
+    const main = clone(pr); main.arrange = { items: [], fx: [] };
+    const asp = data.aspect && ASPECTS.some(a => a.id === data.aspect) ? data.aspect : aspect;
+    items.unshift({ clip: { id: 'main', name: `${name} · composition`, group: null, project: main, aspect: asp, thumb: '', at: 0 }, group: null, main: true });
+    return { name, items };
+  }
+  function renderImport() {
+    const body = $('impBody'), foot = $('impFoot'), src = imp.src;
+    if (!src) {
+      const local = localProjects(), names = Object.keys(local).filter(n => local[n].id !== projectId || n !== projectName).sort((a, b) => String(local[b].savedAt).localeCompare(String(local[a].savedAt)));
+      body.innerHTML = `<section class="pd-sec"><h3>Motif projects</h3>${names.length ? `<ul class="pd-list">${names.map(n => `<li><span class="pd-n">${esc(n)}</span><span class="pd-d">${(local[n].clips || []).length} clips · ${when(Date.parse(local[n].savedAt))}</span><button class="btn sm" data-imp-local="${esc(n)}">Choose</button></li>`).join('')}</ul>` : '<p class="pd-note">No other projects are saved in this browser yet.</p>'}</section>
+        <section class="pd-sec"><h3>${FINDER}</h3><div class="btnrow"><button class="btn primary" id="impFinder">Choose from ${FINDER}…</button>${FS_FILE ? '<button class="btn" id="impPick">Choose from a project folder…</button>' : ''}</div><p class="pd-note">A <b>.motif</b> project, or a Motif preset (<b>.json</b>). Clips are copied into this project; the original is not touched.</p></section>`;
+      foot.innerHTML = '<button class="btn primary" id="impDone">Done</button>'; return;
+    }
+    body.innerHTML = `<div class="imp-bar"><b>${esc(src.name)}</b><span class="grow"></span><button class="btn sm ghost" id="impAll">${imp.sel.size === src.items.length ? 'Select none' : 'Select all'}</button></div>
+      <div class="imp-grid">${src.items.map((it, i) => `<button class="imp-clip" data-imp-i="${i}" aria-pressed="${imp.sel.has(i)}" title="${esc(it.clip.name)}${it.group ? ' · ' + esc(it.group.name) : ''}"><img alt="" src="${esc(it.clip.thumb || '')}"><small>${esc(it.clip.name)}</small></button>`).join('')}</div>`;
+    foot.innerHTML = `<button class="btn" id="impBack">Back</button><button class="btn primary" id="impGo"${imp.sel.size ? '' : ' disabled'}>Import ${imp.sel.size || ''} clip${imp.sel.size === 1 ? '' : 's'}</button>`;
+  }
+  function openImportDialog() { imp.src = null; imp.sel.clear(); renderImport(); const d = $('impDlg'); if (!d.open) d.showModal(); }
+  function chooseSource(data, name) {
+    try { imp.src = impSource(data, name); } catch (err) { toast(`That isn’t a Motif project: ${err.message}`); return; }
+    const main = imp.src.items[0]; if (!main.clip.thumb) main.clip.thumb = impThumb(main.clip.project, main.clip.aspect);
+    imp.sel = new Set(imp.src.items.length > 1 ? [] : [0]); renderImport();
+  }
+  function doImport() {
+    const src = imp.src; if (!src || !imp.sel.size) return; let n = 0;
+    for (const i of imp.sel) {
+      const it = src.items[i]; let gid = null;
+      if (it.group) { let g = groups.find(x => x.name === it.group.name); if (!g) { g = { id: newId('g'), name: it.group.name, open: true }; groups.push(g); } gid = g.id; }
+      clips.unshift({ ...clone(it.clip), id: newId('c'), group: gid, name: it.clip.name.slice(0, 60), at: Date.now() }); n++;
+    }
+    clips = clips.slice(0, 200); saveClips(); renderClips(); $('impDlg').close(); setTab('clips'); toast(`Imported ${n} clip${n === 1 ? '' : 's'} from ${src.name}`);
+  }
+  $('importBtn').addEventListener('click', openImportDialog);
+  $('impClose').addEventListener('click', () => $('impDlg').close());
+  $('impDlg').addEventListener('click', async e => {
+    const t = e.target.closest('button'); if (!t) return;
+    try {
+      if (t.dataset.impLocal) { const d = localProjects()[t.dataset.impLocal]; if (d) chooseSource(d, t.dataset.impLocal); }
+      else if (t.id === 'impFinder') $('importFile').click();
+      else if (t.id === 'impPick') { const [h] = await window.showOpenFilePicker({ types: FILE_TYPES, multiple: false }); const f = await h.getFile(); chooseSource(JSON.parse(await f.text()), h.name.replace(FILE_EXT, '')); }
+      else if (t.dataset.impI != null) { const i = +t.dataset.impI; if (imp.sel.has(i)) imp.sel.delete(i); else imp.sel.add(i); renderImport(); }
+      else if (t.id === 'impAll') { if (imp.sel.size === imp.src.items.length) imp.sel.clear(); else imp.src.items.forEach((_, i) => imp.sel.add(i)); renderImport(); }
+      else if (t.id === 'impBack') { imp.src = null; renderImport(); }
+      else if (t.id === 'impGo') doImport();
+      else if (t.id === 'impDone') $('impDlg').close();
+    } catch (err) { if (err && err.name === 'AbortError') return; toast(`Couldn’t import: ${err && err.message ? err.message : err}`); }
+  });
+  $('importFile').addEventListener('change', async e => {
+    const f = e.target.files && e.target.files[0]; e.target.value = ''; if (!f) return;
+    try { chooseSource(JSON.parse(await f.text()), f.name.replace(FILE_EXT, '')); if (!$('impDlg').open) $('impDlg').showModal(); }
+    catch (err) { toast(`That file isn’t a Motif project or preset: ${err.message}.`); }
+  });
+
+  // ---------- project files ----------
+  // Chrome and Edge can write real files to disk (File System Access API). Safari and Firefox cannot open folders,
+  // so there Save keeps the project in this site's browser storage and Open lists what is stored there.
+  const FS_FILE = typeof window.showSaveFilePicker === 'function' && typeof window.showOpenFilePicker === 'function';
+  const FS_DIR = typeof window.showDirectoryPicker === 'function';
+  $('saveBtn').dataset.tip = FS_FILE ? 'Save project to a file' : 'Save project in this browser'; $('loadBtn').dataset.tip = FS_FILE ? 'Open project from a file' : 'Open a saved project';
+  const PROJ_KEY = 'motif6-projects', FILE_EXT = /\.(motif|json)$/i;
+  const FILE_TYPES = [{ description: 'Motif project', accept: { 'application/json': ['.motif', '.json'] } }];
+  const safeName = n => String(n || 'Untitled').replace(/[\\/:*?"<>|\u0000-\u001f]+/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 80) || 'Untitled';
+  const projectPayload = () => ({ format: 'motif6/project@1', app: 'Motif 6', id: projectId, name: projectName, savedAt: new Date().toISOString(), aspect, project: clone(project), clips: clone(clips), groups: clone(groups) });
+  const fsdb = (() => {
+    let dbp = null;
+    const open = () => dbp || (dbp = new Promise((res, rej) => { try { const r = indexedDB.open('motif6-fs', 1); r.onupgradeneeded = () => r.result.createObjectStore('kv'); r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); } catch (e) { rej(e); } }));
+    const tx = (mode, fn) => open().then(db => new Promise((res, rej) => { const t = db.transaction('kv', mode); const r = fn(t.objectStore('kv')); t.oncomplete = () => res(r && r.result); t.onerror = () => rej(t.error); }));
+    return { get: k => tx('readonly', s => s.get(k)), set: (k, v) => tx('readwrite', s => s.put(v, k)), del: k => tx('readwrite', s => s.delete(k)) };
+  })();
+  if (FS_DIR) fsdb.get('dir').then(h => { if (h && h.kind === 'directory') { dirHandle = h; if ($('projDlg').open) renderProjDialog(); } }).catch(() => { /* no remembered folder */ });
+  async function ensurePerm(h, mode = 'readwrite') {
+    if (!h || !h.queryPermission) return true;
+    if ((await h.queryPermission({ mode })) === 'granted') return true;
+    return (await h.requestPermission({ mode })) === 'granted';
+  }
+  async function writeFile(handle, text) { const w = await handle.createWritable(); await w.write(text); await w.close(); }
+  function localProjects() { const all = store.get(PROJ_KEY); return all && typeof all === 'object' ? all : {}; }
+  async function saveProject(o = {}) {
+    try {
+      if (FS_FILE) {
+        let h = !o.as && fileHandle ? fileHandle : null, picked = false;
+        if (!h && !o.as && dirHandle && await ensurePerm(dirHandle)) h = await dirHandle.getFileHandle(safeName(projectName) + '.motif', { create: true });
+        if (!h) {
+          const opts = { suggestedName: safeName(projectName) + '.motif', types: FILE_TYPES };
+          if (dirHandle) opts.startIn = dirHandle;
+          h = await window.showSaveFilePicker(opts); picked = true;
+        }
+        if (!(await ensurePerm(h))) { toast('Motif needs permission to write that file'); return false; }
+        if (picked) projectName = h.name.replace(FILE_EXT, '').slice(0, 60);
+        await writeFile(h, JSON.stringify(projectPayload()));
+        fileHandle = h; dirty = false; updateNameUi(); autosave(); toast(`Saved ${h.name}`); return true;
+      }
+      const all = localProjects();
+      const unnamed = /^(Demo project|Untitled( \d+)?)$/.test(projectName);
+      if (o.as || (unnamed && !all[projectName])) { const n = await askText(o.as ? 'Save project as' : 'Name this project', 'Project name', unnamed ? 'My project' : projectName, 'Save'); if (!n) return false; projectName = n.slice(0, 60); }
+      all[projectName] = projectPayload();
+      try { localStorage.setItem(PROJ_KEY, JSON.stringify(all)); } catch (e) { toast('Browser storage is full. Delete an older project in Open, or use Export file.'); return false; }
+      dirty = false; updateNameUi(); autosave(); toast(`Saved “${projectName}” in this browser`); return true;
+    } catch (e) {
+      if (e && e.name === 'AbortError') return false;
+      console.error(e); toast(`Couldn’t save: ${e && e.message ? e.message : e}`); return false;
+    }
+  }
+  // A project owns its clips and groups. Opening or starting a project swaps them out with it; nothing is shared.
+  const cleanClip = c => (c && c.id && c.project && Array.isArray(c.project.layers) ? { id: String(c.id).slice(0, 40), name: String(c.name || 'Clip').slice(0, 60), group: c.group ? String(c.group).slice(0, 40) : null, project: c.project, aspect: c.aspect, thumb: typeof c.thumb === 'string' && /^data:image\/(jpeg|png|webp);base64,/.test(c.thumb) ? c.thumb : '', at: Number(c.at) || 0 } : null);
+  const cleanGroup = g => (g && g.id ? { id: String(g.id).slice(0, 40), name: String(g.name || 'Group').slice(0, 40), open: g.open !== false } : null);
+  // Start over from a given project: fresh undo history, its own clips, no audio or selection left over from the last one.
+  function resetSession(pr, { name, id, handle = null, clipList = [], groupList = [], aspectId = null }) {
+    if (evolveOpen) closeEvolve();
+    if (arrMode) setArrange(false);
+    if (audition) setAudition(null);
+    player.clear(); analysis = null; envFn = null; trackName = ''; liveOn = false;
+    locks.clear(); selKey = null; arrUi.sel.clear(); arrUi.fx = null; arrUi.region = null;
+    groups = groupList.map(cleanGroup).filter(Boolean); clips = clipList.map(cleanClip).filter(Boolean); saveClips(); renderClips();
+    if (aspectId && ASPECTS.some(a => a.id === aspectId)) setAspect(aspectId);
+    projectName = String(name || 'Untitled').slice(0, 60); projectId = id || newId('p'); fileHandle = handle;
+    project = T.sanitizeProject(pr, C.sanitizeCustom); history.length = 0; history.push(JSON.stringify(project)); cursor = 0; dirty = false;
+    stage.setSpace(project.output.space); stage.seek(0); syncAudioRegion(); refresh(); updateNameUi(); saveNow();
+  }
+  function loadProjectData(data, { handle = null, name = null } = {}) {
+    const pr = data && (data.project || (data.layers ? data : null));
+    if (!pr || !Array.isArray(pr.layers)) throw new Error('this file has no Motif project in it');
+    const miss = K.missingKits(pr);
+    if (miss.length) { toast(`This project needs the ${miss.join(', ')} kit${miss.length > 1 ? 's' : ''}. Install ${miss.length > 1 ? 'them' : 'it'} in the Kits tab first.`); setTab('kits'); return false; }
+    resetSession(pr, { name: name || data.name, id: data.id ? String(data.id).slice(0, 40) : null, handle, clipList: Array.isArray(data.clips) ? data.clips : [], groupList: Array.isArray(data.groups) ? data.groups : [], aspectId: data.aspect });
+    toast(`Opened ${projectName}`);
+    return true;
+  }
+  // ---- unsaved changes, and New: a blank project with none of the previous project's clips ----
+  function confirmChoice(title, body, buttons) {
+    return new Promise(resolve => {
+      const d = $('confirmDlg'); let out = 'cancel';
+      $('confirmTitle').textContent = title; $('confirmBody').textContent = body;
+      $('confirmBtns').innerHTML = buttons.map(b => `<button class="btn${b.primary ? ' primary' : ''}" data-choice="${b.id}">${esc(b.label)}</button>`).join('');
+      const done = () => { d.removeEventListener('close', done); resolve(out); };
+      d.addEventListener('close', done);
+      $('confirmBtns').onclick = e => { const b = e.target.closest('[data-choice]'); if (!b) return; out = b.dataset.choice; d.close(); };
+      $('confirmClose').onclick = () => { out = 'cancel'; d.close(); };
+      d.showModal();
+    });
+  }
+  async function guardUnsaved(action) {
+    if (!dirty) return true;
+    const c = await confirmChoice('Unsaved changes', `“${projectName}” has changes that aren’t saved. Save them before you ${action}?`, [{ id: 'cancel', label: 'Cancel' }, { id: 'discard', label: 'Don’t save' }, { id: 'save', label: 'Save', primary: true }]);
+    if (c === 'cancel') return false;
+    if (c === 'save') return saveProject();
+    return true;
+  }
+  const uniqueName = base => { const taken = new Set(Object.keys(localProjects())); let n = base, i = 1; while (taken.has(n)) n = `${base} ${++i}`; return n; };
+  async function newProject() {
+    if (!(await guardUnsaved('start a new project'))) return;
+    resetSession(T.newProject(), { name: uniqueName('Untitled'), id: newId('p') });
+    setTab('layer'); toast('New project · a blank slate');
+  }
+  $('newBtn').addEventListener('click', newProject);
+  async function openFileHandle(h) {
+    const f = await h.getFile(), data = JSON.parse(await f.text());
+    if (!(await guardUnsaved('open another project'))) return;
+    if (loadProjectData(data, { handle: h, name: h.name.replace(FILE_EXT, '') })) $('projDlg').close();
+  }
+  async function projList() {
+    const rows = [];
+    if (dirHandle) {
+      let ok = false; try { ok = (await dirHandle.queryPermission({ mode: 'readwrite' })) === 'granted'; } catch (e) { /* stale handle */ }
+      if (!ok) return { needPerm: true, rows };
+      for await (const [n, h] of dirHandle.entries()) if (h.kind === 'file' && FILE_EXT.test(n)) { let at = 0; try { at = (await h.getFile()).lastModified; } catch (e) { /* unreadable */ } rows.push({ name: n, at }); }
+      rows.sort((a, b) => b.at - a.at);
+    }
+    return { rows };
+  }
+  const when = at => { if (!at) return ''; const d = new Date(at); return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) + ' · ' + d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' }); };
+  async function renderProjDialog() {
+    const body = $('projBody'), local = localProjects(), names = Object.keys(local).sort((a, b) => String(local[b].savedAt).localeCompare(String(local[a].savedAt)));
+    let disk = '';
+    if (FS_FILE) {
+      const pl = FS_DIR && dirHandle ? await projList().catch(() => ({ rows: [] })) : { rows: [] };
+      disk = `<section class="pd-sec"><h3>On this computer</h3>
+        <div class="btnrow"><button class="btn primary" id="pdOpenFile">Open file…</button>${FS_DIR ? `<button class="btn" id="pdPickDir">${dirHandle ? 'Change project folder…' : 'Choose project folder…'}</button>` : ''}</div>
+        ${FS_DIR && dirHandle ? `<p class="pd-note">Project folder <b>${esc(dirHandle.name)}</b> · Save writes here <button class="btn sm ghost" id="pdForget">Forget</button></p>${pl.needPerm ? '<div class="btnrow"><button class="btn sm" id="pdAllow">Allow access to this folder</button></div>' : pl.rows.length ? `<ul class="pd-list">${pl.rows.map(r => `<li><span class="pd-n">${esc(r.name.replace(FILE_EXT, ''))}</span><span class="pd-d">${when(r.at)}</span><button class="btn sm" data-pd-file="${esc(r.name)}">Open</button></li>`).join('')}</ul>` : '<p class="pd-note">No Motif projects in this folder yet.</p>'}` : FS_DIR ? '<p class="pd-note">Pick a folder once and Save writes there. Open lists what is in it.</p>' : ''}
+      </section>`;
+    } else {
+      disk = `<section class="pd-sec"><h3>Files</h3><p class="pd-note">${/^((?!chrome|android).)*safari/i.test(navigator.userAgent) ? 'Safari' : 'This browser'} can’t open folders on your computer, so Save keeps projects in this browser. You can still move a project as a file.</p>
+        <div class="btnrow"><button class="btn" id="pdImport">Import file…</button><button class="btn" id="pdExport">Export file</button></div></section>`;
+    }
+    const inBrowser = `<section class="pd-sec"><h3>In this browser</h3>${names.length ? `<ul class="pd-list">${names.map(n => `<li><span class="pd-n">${esc(n)}</span><span class="pd-d">${when(Date.parse(local[n].savedAt))}</span><button class="btn sm" data-pd-local="${esc(n)}">Open</button><button class="btn sm ghost" data-pd-del="${esc(n)}" aria-label="Delete ${esc(n)}">Delete</button></li>`).join('')}</ul>` : `<p class="pd-note">${FS_FILE ? 'Nothing stored in this browser.' : 'No saved projects yet. Press Save (⌘S) to keep this one here.'}</p>`}</section>`;
+    body.innerHTML = (FS_FILE ? disk + inBrowser : inBrowser + disk);
+  }
+  function openProjectDialog() { const d = $('projDlg'); if (!d.open) d.showModal(); renderProjDialog(); }
+  $('saveBtn').addEventListener('click', e => saveProject({ as: e.shiftKey }));
+  $('loadBtn').addEventListener('click', openProjectDialog);
+  $('projClose').addEventListener('click', () => $('projDlg').close()); $('projDone').addEventListener('click', () => $('projDlg').close());
+  $('projSaveAs').addEventListener('click', async () => { if (await saveProject({ as: true })) renderProjDialog(); });
+  const pdFile = Object.assign(document.createElement('input'), { type: 'file', accept: '.motif,.json,application/json', hidden: true }); document.body.appendChild(pdFile);
+  pdFile.addEventListener('change', async () => {
+    const f = pdFile.files && pdFile.files[0]; pdFile.value = ''; if (!f) return;
+    try { const data = JSON.parse(await f.text()); if (!(await guardUnsaved('open another project'))) return; if (loadProjectData(data, { name: f.name.replace(FILE_EXT, '') })) $('projDlg').close(); } catch (err) { toast(`That file isn’t a Motif project: ${err.message}`); }
+  });
+  $('projBody').addEventListener('click', async e => {
+    const t = e.target.closest('button'); if (!t) return;
+    try {
+      if (t.id === 'pdOpenFile') { const [h] = await window.showOpenFilePicker({ types: FILE_TYPES, multiple: false }); await openFileHandle(h); }
+      else if (t.id === 'pdPickDir') { const h = await window.showDirectoryPicker({ mode: 'readwrite', id: 'motif6' }); dirHandle = h; await fsdb.set('dir', h).catch(() => { /* not remembered */ }); renderProjDialog(); }
+      else if (t.id === 'pdForget') { dirHandle = null; await fsdb.del('dir').catch(() => { /* nothing stored */ }); renderProjDialog(); }
+      else if (t.id === 'pdAllow') { if (await ensurePerm(dirHandle)) renderProjDialog(); }
+      else if (t.dataset.pdFile) { if (!(await ensurePerm(dirHandle))) return; await openFileHandle(await dirHandle.getFileHandle(t.dataset.pdFile)); }
+      else if (t.dataset.pdLocal) { const d = localProjects()[t.dataset.pdLocal]; if (d && (await guardUnsaved('open another project')) && loadProjectData(d, { name: t.dataset.pdLocal })) $('projDlg').close(); }
+      else if (t.dataset.pdDel) { const n = t.dataset.pdDel; if (!confirm(`Delete “${n}” from this browser?`)) return; const all = localProjects(); delete all[n]; store.set(PROJ_KEY, all); renderProjDialog(); }
+      else if (t.id === 'pdImport') pdFile.click();
+      else if (t.id === 'pdExport') { await saveFile(`${safeName(projectName)}.motif`, new Blob([JSON.stringify(projectPayload())], { type: 'application/json' })); toast('Exported a copy'); }
+    } catch (err) { if (err && err.name === 'AbortError') return; console.error(err); toast(`Couldn’t do that: ${err && err.message ? err.message : err}`); }
+  });
+  addEventListener('keydown', e => {
+    const mod = e.metaKey || e.ctrlKey, k = e.key.toLowerCase();
+    if (mod && !e.altKey && (k === 's' || k === 'o')) { e.preventDefault(); e.stopPropagation(); if (document.querySelector('dialog[open]')) return; if (k === 's') saveProject({ as: e.shiftKey }); else openProjectDialog(); return; }
+    if (e.altKey && !mod && e.code === 'KeyA') { const tg = e.target, tag = tg.tagName; if ((tag === 'INPUT' && ['text', 'search', 'number'].includes(tg.type)) || tag === 'TEXTAREA') return; if (document.querySelector('dialog[open]')) return; e.preventDefault(); setArrange(!arrMode); }
+    if (e.altKey && !mod && e.code === 'KeyN') { const tg = e.target, tag = tg.tagName; if ((tag === 'INPUT' && ['text', 'search', 'number'].includes(tg.type)) || tag === 'TEXTAREA') return; if (document.querySelector('dialog[open]')) return; e.preventDefault(); newProject(); }
+  }, true);
+
+  // ---------- viewer tools: Move picks and drags layers, Grid draws guides and snaps ----------
+  const posPaths = id => [lpath('s', 'posX', id), lpath('s', 'posY', id)];
+  const setAt = (pr, path, v) => (pr.keys[path] ? T.setKey(pr, path, uNow(), v) : T.setBase(pr, path, v));
+  function setMoveTool(on) {
+    if (on && arrMode) { toast('Leave Arrange to move layers'); on = false; }
+    moveTool = !!on; $('toolMove').setAttribute('aria-pressed', moveTool); $('moveLayer').hidden = !moveTool; app.dataset.tool = moveTool ? 'move' : '';
+    updateReticle();
+  }
+  function setGrid(on) { gridOn = !!on; $('toolGrid').setAttribute('aria-pressed', gridOn); $('gridN').hidden = !gridOn; $('gridOv').hidden = !gridOn; if (gridOn) drawGrid(); }
+  function drawGrid() {
+    const ov = $('gridOv'); if (ov.hidden) return;
+    const W = $('stageBox').clientWidth, H = $('stageBox').clientHeight; if (!W || !H) return;
+    const cell = W / gridN, cx = W / 2, cy = H / 2; let d = '', c = '';
+    const sv = $('gridSvg'); sv.setAttribute('viewBox', `0 0 ${W} ${H}`);
+    for (let k = -Math.ceil(cx / cell); k <= Math.ceil(cx / cell); k++) { const x = cx + k * cell; if (x < 0.5 || x > W - 0.5) continue; if (k === 0) c += `M${x.toFixed(1)} 0V${H}`; else d += `M${x.toFixed(1)} 0V${H}`; }
+    for (let k = -Math.ceil(cy / cell); k <= Math.ceil(cy / cell); k++) { const y = cy + k * cell; if (y < 0.5 || y > H - 0.5) continue; if (k === 0) c += `M0 ${y.toFixed(1)}H${W}`; else d += `M0 ${y.toFixed(1)}H${W}`; }
+    sv.innerHTML = `<path class="gl" d="${d}"/><path class="gc" d="${c}"/>`;
+  }
+  new ResizeObserver(() => { drawGrid(); updateReticle(); }).observe($('stageBox'));
+  $('toolMove').addEventListener('click', () => setMoveTool(!moveTool));
+  $('toolGrid').addEventListener('click', () => setGrid(!gridOn));
+  $('gridN').value = String(gridN); $('gridN').addEventListener('change', e => { gridN = Number(e.target.value) || 8; drawGrid(); });
+  function updateReticle() {
+    const r = $('reticle'); if (!r) return;
+    if (!moveTool || arrMode) { r.hidden = true; return; }
+    const W = $('stageBox').clientWidth, H = $('stageBox').clientHeight, l = active(), li = project.layers.indexOf(l);
+    const px = shownValue(lpath('s', 'posX')) || 0, py = shownValue(lpath('s', 'posY')) || 0;
+    r.hidden = false; r.style.left = (W / 2 + px * W) + 'px'; r.style.top = (H / 2 + py * H) + 'px';
+    $('reticleTag').textContent = `V${li + 1} · ${getStyle(l.styleId).name}`;
+  }
+  // Which layer is under the pointer: render each layer alone (small, transparent) and look for ink near the point, top layer first.
+  const pickCv = document.createElement('canvas');
+  function pickLayerAt(px, py, w, h) {
+    const W = 360, H = Math.max(2, Math.round(W * h / w)); pickCv.width = W; pickCv.height = H;
+    const x = pickCv.getContext('2d', { willReadFrequently: true }), gx = Math.round(px / w * W), gy = Math.round(py / h * H), R = 7;
+    const ev = T.evaluate(project, stage.time, currentEnv());
+    for (let i = ev.layers.length - 1; i >= 0; i--) {
+      const l = ev.layers[i]; if (!l.visible) continue;
+      x.clearRect(0, 0, W, H);
+      try {
+        const pal = C.resolvePalette(l.shared.palette, l.shared.invert, project.palettes, l.pmix && l.pmix.to, l.pmix && l.pmix.t);
+        pipeline.compositor.renderLook(x, W, H, l, stage.time, pal, { bg: false, cpu: true });
+        const x0 = clamp(gx - R, 0, W - 1), y0 = clamp(gy - R, 0, H - 1), d = x.getImageData(x0, y0, Math.min(2 * R + 1, W - x0), Math.min(2 * R + 1, H - y0)).data;
+        for (let k = 3; k < d.length; k += 4) if (d[k] > 24) return l.id;
+      } catch (err) { /* a layer that cannot draw here is skipped */ }
+    }
+    return null;
+  }
+  (() => {
+    const ml = $('moveLayer'), hud = $('moveHud'); let mv = null;
+    ml.addEventListener('pointerdown', e => {
+      if (e.button !== 0) return;
+      const r = ml.getBoundingClientRect(), hit = pickLayerAt(e.clientX - r.left, e.clientY - r.top, r.width, r.height);
+      if (hit && hit !== project.active) selectLayer(hit);
+      const id = project.active; if (T.layerById(project, id) == null) return;
+      mv = { id: e.pointerId, x0: e.clientX, y0: e.clientY, w: r.width, h: r.height, layer: id, fx0: shownValue(lpath('s', 'posX', id)) || 0, fy0: shownValue(lpath('s', 'posY', id)) || 0, moved: false };
+      try { ml.setPointerCapture(e.pointerId); } catch (err) { /* capture is a nicety */ }
+      ml.classList.add('grab'); if (!hit) toast('Nothing under the pointer · moving the selected layer');
+    });
+    ml.addEventListener('pointermove', e => {
+      if (!mv || e.pointerId !== mv.id) return;
+      const dx = e.clientX - mv.x0, dy = e.clientY - mv.y0; if (!mv.moved && Math.hypot(dx, dy) < 3) return; mv.moved = true;
+      let fx = mv.fx0 + dx / mv.w, fy = mv.fy0 + dy / mv.h;
+      if (e.shiftKey) { if (Math.abs(dx) > Math.abs(dy)) fy = mv.fy0; else fx = mv.fx0; }
+      if (!e.altKey) {
+        if (gridOn) { const cell = mv.w / gridN; fx = Math.round(fx * mv.w / cell) * cell / mv.w; fy = Math.round(fy * mv.h / cell) * cell / mv.h; }
+        else { if (Math.abs(fx * mv.w) < 6) fx = 0; if (Math.abs(fy * mv.h) < 6) fy = 0; } // magnetic centre
+      }
+      fx = clamp(+fx.toFixed(4), -1, 1); fy = clamp(+fy.toFixed(4), -1, 1);
+      const [px, py] = posPaths(mv.layer); live(setAt(setAt(project, px, fx), py, fy));
+      hud.hidden = false; hud.textContent = `X ${fx.toFixed(3)}   Y ${fy.toFixed(3)}${gridOn && !e.altKey ? '   · snapped' : ''}`;
+      hud.style.left = clamp(e.clientX - ml.getBoundingClientRect().left + 14, 4, mv.w - 150) + 'px'; hud.style.top = clamp(e.clientY - ml.getBoundingClientRect().top + 14, 4, mv.h - 26) + 'px';
+      updateReticle();
+    });
+    const end = e => { if (!mv || (e && e.pointerId !== mv.id)) return; const m = mv; mv = null; ml.classList.remove('grab'); hud.hidden = true; if (m.moved) commit(project, 'Layer moved'); };
+    ml.addEventListener('pointerup', end); ml.addEventListener('pointercancel', end);
+    ml.addEventListener('dblclick', e => { const [px, py] = posPaths(project.active); let pr = setAt(project, px, 0); pr = setAt(pr, py, 0); commit(pr, 'Layer centred'); e.preventDefault(); });
+  })();
+
+  // ---------- Arrange: three tracks of clips, with trim, loop, opacity and transition regions ----------
+  const LBL_W = 92, ROW_H = 60;
+  const itemEnd = it => it.start + it.dur;
+  function arrDuration() { const e = Math.max(0, ...project.arrange.items.map(itemEnd)); return e > 0 ? Math.max(1, e) : 6; }
+  const fmtT = s => { const m = Math.floor(s / 60), r = s - m * 60; return `${m}:${r < 9.95 ? '0' : ''}${r.toFixed(1)}`; };
+  const arrColor = id => { let h = 0; for (const ch of String(id)) h = (h * 31 + ch.charCodeAt(0)) | 0; return `var(--clip-${Math.abs(h) % 6 + 1})`; };
+  const trName = tr => `V${tr + 1}`;
+  const itemAt = (track, time) => { let best = null; for (const it of project.arrange.items) if (it.track === track && it.start <= time + 1e-6 && time < itemEnd(it) - 1e-6 && (!best || it.start > best.start)) best = it; return best; };
+
+  // -- transition shaders (WebGL2): A is the outgoing clip, B the incoming one, p runs 0 → 1 across the region --
+  const trans = (() => {
+    const STYLE_IX = Object.fromEntries(T.TRANSITIONS.map((t, i) => [t.v, i]));
+    const VS = '#version 300 es\nin vec2 p; out vec2 v; void main(){ v = p * .5 + .5; gl_Position = vec4(p, 0., 1.); }';
+    const FS = `#version 300 es
+precision highp float;
+in vec2 v; out vec4 o;
+uniform sampler2D uA, uB; uniform float uP, uOpA, uOpB, uHasA, uHasB, uAsp; uniform int uS;
+vec4 A(vec2 q){ if(q.x<0.||q.x>1.||q.y<0.||q.y>1.) return vec4(0.); return texture(uA,q)*uOpA*uHasA; }
+vec4 B(vec2 q){ if(q.x<0.||q.x>1.||q.y<0.||q.y>1.) return vec4(0.); return texture(uB,q)*uOpB*uHasB; }
+float h21(vec2 p){ p = fract(p*vec2(123.34,456.21)); p += dot(p,p+45.32); return fract(p.x*p.y); }
+float vn(vec2 p){ vec2 i=floor(p), f=fract(p); f=f*f*(3.-2.*f); return mix(mix(h21(i),h21(i+vec2(1.,0.)),f.x),mix(h21(i+vec2(0.,1.)),h21(i+vec2(1.,1.)),f.x),f.y); }
+float fbm(vec2 p){ return .5*vn(p)+.25*vn(p*2.03)+.125*vn(p*4.1)+.0625*vn(p*8.3); }
+void main(){
+  vec2 q = v; float p = uP; float e = p*p*(3.-2.*p); vec4 c; vec2 ct = vec2(.5); vec2 d = (q-ct)*vec2(uAsp,1.);
+  if(uS==0){ c = mix(A(q),B(q),e); }
+  else if(uS==1){ float m = 1.-smoothstep(e*1.08-.08, e*1.08, q.x); c = mix(A(q),B(q),m); }
+  else if(uS==2){ float x=e; c = q.x < 1.-x ? A(q+vec2(x,0.)) : B(q-vec2(1.-x,0.)); }
+  else if(uS==3){ float s1=1.+e*.5, s2=1.5-e*.5; vec4 a=A(ct+(q-ct)/s1), b=B(ct+(q-ct)/s2); c = mix(a,b,smoothstep(.15,.85,p)); }
+  else if(uS==4){ float r = e*1.05*length(vec2(uAsp,1.))*.5; float m = 1.-smoothstep(r-.03,r,length(d)); c = mix(A(q),B(q),m); }
+  else if(uS==5){ float ang = atan(q.x-.5, .5-q.y)/6.2831853 + .5; float m = 1.-smoothstep(e*1.02-.02, e*1.02, ang); c = mix(A(q),B(q),m); }
+  else if(uS==6){ float bl = sin(p*3.14159)*.035; vec4 a=vec4(0.), b=vec4(0.); for(int i=0;i<12;i++){ float ang=float(i)*.5236; vec2 o2=vec2(cos(ang),sin(ang))*bl*(.35+.65*fract(float(i)*.618)); a+=A(q+o2); b+=B(q+o2);} a/=12.; b/=12.; c = mix(a,b,e); }
+  else if(uS==7){ float cells = mix(480.,14.,sin(p*3.14159)); vec2 g = vec2(cells*uAsp, cells); vec2 qq=(floor(q*g)+.5)/g; c = mix(A(qq),B(qq),smoothstep(.3,.7,p)); }
+  else if(uS==8){ float row=floor(q.y*28.); float rs=h21(vec2(row,floor(p*14.))); float amt=sin(p*3.14159); float sh=(rs-.5)*.28*amt*step(.55,rs); vec2 qa=vec2(q.x+sh,q.y); float pick = step(h21(vec2(row,7.7)), e); vec2 sp=vec2(.012*amt,0.); c = mix(A(qa),B(qa),pick); c.r = mix(A(qa+sp).r, B(qa+sp).r, pick); c.b = mix(A(qa-sp).b, B(qa-sp).b, pick); }
+  else if(uS==9){ float n = fbm(q*vec2(uAsp,1.)*5.); float m = smoothstep(n-.06,n+.06, p*1.12-.06); c = mix(A(q),B(q),m); }
+  else { float x=e; vec4 a=vec4(0.), b=vec4(0.); float bl=sin(p*3.14159)*.12; for(int i=0;i<10;i++){ float k=float(i)/9.-.5; a+=A(q+vec2(x+k*bl,0.)); b+=B(q-vec2(1.-x,0.)+vec2(k*bl,0.)); } a/=10.; b/=10.; c = q.x < 1.-x ? a : b; }
+  o = c;
+}`;
+    let gl = null, cv = null, failed = false, texA = null, texB = null; const U = {};
+    const mkTex = () => { const t = gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D, t); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE); gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array(4)); return t; };
+    function init() {
+      try {
+        cv = document.createElement('canvas'); cv.width = cv.height = 2;
+        gl = cv.getContext('webgl2', { alpha: true, premultipliedAlpha: true, antialias: false, preserveDrawingBuffer: true }); if (!gl) throw new Error('no WebGL2');
+        const sh = (type, src) => { const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s); if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(s)); return s; };
+        const pg = gl.createProgram(); gl.attachShader(pg, sh(gl.VERTEX_SHADER, VS)); gl.attachShader(pg, sh(gl.FRAGMENT_SHADER, FS)); gl.linkProgram(pg);
+        if (!gl.getProgramParameter(pg, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(pg));
+        gl.useProgram(pg); const buf = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, buf); gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
+        const loc = gl.getAttribLocation(pg, 'p'); gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+        for (const n of ['uA', 'uB', 'uP', 'uOpA', 'uOpB', 'uHasA', 'uHasB', 'uAsp', 'uS']) U[n] = gl.getUniformLocation(pg, n);
+        texA = mkTex(); texB = mkTex();
+      } catch (err) { failed = true; gl = null; console.warn('Arrange transitions fall back to cross-fades:', err); }
+    }
+    function run(style, ca, cb, opA, opB, p, w, h) {
+      if (failed) return null; if (!gl) init(); if (!gl) return null;
+      if (cv.width !== w || cv.height !== h) { cv.width = w; cv.height = h; }
+      gl.viewport(0, 0, w, h); gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true); gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true);
+      const up = (unit, tex, src) => { gl.activeTexture(gl.TEXTURE0 + unit); gl.bindTexture(gl.TEXTURE_2D, tex); if (src) gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, src); };
+      up(0, texA, ca); up(1, texB, cb);
+      gl.uniform1i(U.uA, 0); gl.uniform1i(U.uB, 1); gl.uniform1f(U.uP, p); gl.uniform1f(U.uOpA, opA); gl.uniform1f(U.uOpB, opB);
+      gl.uniform1f(U.uHasA, ca ? 1 : 0); gl.uniform1f(U.uHasB, cb ? 1 : 0); gl.uniform1f(U.uAsp, w / h); gl.uniform1i(U.uS, STYLE_IX[style] || 0);
+      gl.clearColor(0, 0, 0, 0); gl.clear(gl.COLOR_BUFFER_BIT); gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+      return cv;
+    }
+    return { run };
+  })();
+
+  // -- rendering the sequence --
+  const arrPool = new Map();
+  function arrCanvas(slot, w, h) { let c = arrPool.get(slot); if (!c) { c = document.createElement('canvas'); arrPool.set(slot, c); } if (c.width !== w || c.height !== h) { c.width = w; c.height = h; } return c; }
+  // One clip's frame at sequence time t. Clips are procedural loops, so a clip looks the same before its start and after its end:
+  // transitions read past the edges of a clip with no handles to render.
+  function drawClipFrame(item, t, w, h, slot, opts) {
+    const clip = clipById(item.clip); if (!clip) return null;
+    const c = arrCanvas(slot, w, h), L = clipLoop(clip), lt = wrapPos(t - item.start + item.off, L);
+    try { pipeline.renderFrame(c.getContext('2d'), w, h, clipProject(clip), lt, { preview: !!opts.preview, previewSamples: 4, onError: e => console.error(e) }); } catch (err) { console.error(err); return null; }
+    return c;
+  }
+  function runTrans(ctx, style, A, B, p, t, w, h, opts) {
+    const ca = A ? drawClipFrame(A, t, w, h, 'A', opts) : null, cb = B ? drawClipFrame(B, t, w, h, 'B', opts) : null;
+    if (!ca && !cb) return false;
+    const out = trans.run(style, ca, cb, A ? A.opacity : 0, B ? B.opacity : 0, p, w, h);
+    if (out) { ctx.drawImage(out, 0, 0, w, h); return true; }
+    if (ca) { ctx.globalAlpha = A.opacity * (1 - p); ctx.drawImage(ca, 0, 0); }
+    if (cb) { ctx.globalAlpha = B.opacity * p; ctx.drawImage(cb, 0, 0); }
+    ctx.globalAlpha = 1; return true;
+  }
+  function arrDraw(ctx, w, h, t, opts = {}) {
+    ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = 1; ctx.filter = 'none';
+    ctx.fillStyle = '#000'; ctx.fillRect(0, 0, w, h);
+    const arr = project.arrange;
+    for (let tr = 0; tr < T.ARR_TRACKS; tr++) {
+      const fx = arr.fx.find(f => f.track === tr && t >= f.a - 1e-6 && t <= f.b + 1e-6);
+      let done = false;
+      if (fx) {
+        // A = the clip playing when the region opens, B = the clip playing when it closes. Same clip: dip out and back in.
+        const p = clamp((t - fx.a) / (fx.b - fx.a), 0, 1), A = itemAt(tr, fx.a), B = itemAt(tr, fx.b - 1e-4);
+        if (A && B && A.id === B.id) done = p < 0.5 ? runTrans(ctx, fx.style, A, null, p * 2, t, w, h, opts) : runTrans(ctx, fx.style, null, B, (p - 0.5) * 2, t, w, h, opts);
+        else if (A || B) done = runTrans(ctx, fx.style, A, B, p, t, w, h, opts);
+      }
+      if (!done) { const it = itemAt(tr, t); const c = it && drawClipFrame(it, t, w, h, 'A', opts); if (c) { ctx.globalAlpha = it.opacity; ctx.drawImage(c, 0, 0); ctx.globalAlpha = 1; } }
+    }
+    if (!arr.items.length && opts.preview !== false) { ctx.fillStyle = '#ffffff55'; ctx.font = `500 ${Math.max(12, Math.round(h / 22))}px "IBM Plex Sans",system-ui,sans-serif`; ctx.textAlign = 'center'; ctx.fillText('Arrange · drag clips from the Clips tab onto a track', w / 2, h / 2); }
+    ctx.restore();
+    return { engines: [], samples: 1, post: 'arrange' };
+  }
+  const arrSource = { duration: arrDuration, draw: (ctx, w, h, t, o) => arrDraw(ctx, w, h, t, { preview: !!(o && o.preview) }) };
+  const arrangeSource = () => ({ duration: arrDuration(), draw: (ctx, w, h, t) => arrDraw(ctx, w, h, t, { preview: false }) });
+
+  // -- editing --
+  function fitStart(list, track, start, dur) {
+    const on = list.filter(i => i.track === track);
+    const free = s => on.every(i => s + dur <= i.start + 1e-6 || s >= itemEnd(i) - 1e-6);
+    start = Math.max(0, start); if (free(start)) return start;
+    const cands = [0]; for (const i of on) { cands.push(itemEnd(i)); cands.push(i.start - dur); }
+    let best = null; for (const c of cands) { const cc = Math.max(0, c); if (!free(cc)) continue; if (best === null || Math.abs(cc - start) < Math.abs(best - start)) best = cc; }
+    return best === null ? start : best;
+  }
+  const trackEnd = track => Math.max(0, ...project.arrange.items.filter(i => i.track === track).map(itemEnd));
+  function addClipToArrange(clipId, o = {}) {
+    const c = clipById(clipId); if (!c) return null;
+    const track = o.track != null ? o.track : 0, dur = clipLoop(c);
+    const start = fitStart(project.arrange.items, track, o.start != null ? o.start : trackEnd(track), dur);
+    const it = { id: newId('i'), clip: c.id, track, start, dur, off: 0, opacity: 1 };
+    const next = clone(project); next.arrange.items.push(it);
+    arrUi.sel = new Set([it.id]); arrUi.fx = null;
+    if (!arrMode && !o.quiet) setArrange(true);
+    commit(next, o.quiet ? '' : `Added ${c.name} to ${trName(track)}`);
+    return it;
+  }
+  function addCurrentToArrange() { const c = saveLook(); addClipToArrange(c.id); }
+  const selItems = () => [...arrUi.sel].map(id => project.arrange.items.find(i => i.id === id)).filter(Boolean);
+  function splitAtPlayhead() {
+    const t = stage.time; let targets = selItems().filter(i => t > i.start + 0.1 && t < itemEnd(i) - 0.1);
+    if (!targets.length) { for (let tr = T.ARR_TRACKS - 1; tr >= 0 && !targets.length; tr--) { const it = itemAt(tr, t); if (it && t > it.start + 0.1 && t < itemEnd(it) - 0.1) targets = [it]; } }
+    if (!targets.length) { toast('Move the playhead inside a clip to split it'); return; }
+    const next = clone(project), made = [];
+    for (const it of targets) {
+      const n = next.arrange.items.find(i => i.id === it.id), c = clipById(n.clip), L = c ? clipLoop(c) : n.dur, cut = t - n.start;
+      const right = { ...n, id: newId('i'), start: t, dur: n.dur - cut, off: wrapPos(n.off + cut, L) }; n.dur = cut; next.arrange.items.push(right); made.push(right.id);
+    }
+    arrUi.sel = new Set(made); commit(next, `Split ${targets.length > 1 ? targets.length + ' clips' : 'clip'}`);
+  }
+  function duplicateSelected() {
+    const items = selItems(); if (!items.length) { toast('Select a clip first'); return; }
+    const next = clone(project), made = [];
+    for (const it of items) { const start = fitStart(next.arrange.items, it.track, itemEnd(it), it.dur); const copy = { ...it, id: newId('i'), start }; next.arrange.items.push(copy); made.push(copy.id); }
+    arrUi.sel = new Set(made); commit(next, 'Duplicated');
+  }
+  function deleteSelected() {
+    if (arrUi.fx) { const next = clone(project); next.arrange.fx = next.arrange.fx.filter(f => f.id !== arrUi.fx); arrUi.fx = null; commit(next, 'Transition removed'); return; }
+    if (!arrUi.sel.size) return;
+    const next = clone(project); const n = arrUi.sel.size; next.arrange.items = next.arrange.items.filter(i => !arrUi.sel.has(i.id)); arrUi.sel.clear(); commit(next, `Removed ${n} clip${n > 1 ? 's' : ''}`);
+  }
+  function applyTransition(style) {
+    const r = arrUi.region, label = (T.TRANSITIONS.find(t => t.v === style) || {}).l || style;
+    if (arrUi.fx) { const next = clone(project); const f = next.arrange.fx.find(x => x.id === arrUi.fx); if (f) { f.style = style; commit(next, `Transition: ${label}`); } return; }
+    if (!r) return;
+    const next = clone(project); let first = null;
+    for (let tr = r.t0; tr <= r.t1; tr++) {
+      if (!itemAt(tr, r.a) && !itemAt(tr, r.b - 1e-4)) continue;
+      next.arrange.fx = next.arrange.fx.filter(f => !(f.track === tr && f.a < r.b - 1e-6 && f.b > r.a + 1e-6));
+      const f = { id: newId('x'), style, track: tr, a: r.a, b: r.b }; next.arrange.fx.push(f); first = first || f;
+    }
+    if (!first) { toast('No clips inside that region · drag across a clip or a cut'); return; }
+    arrUi.region = null; arrUi.fx = first.id; arrUi.sel.clear(); commit(next, `${label} applied`);
+  }
+  // quick regions from the selected clip: its head, its tail, or the cut that follows it
+  function quickRegion(kind) {
+    const it = selItems()[0]; if (!it) return; const span = Math.min(1, it.dur / 2), end = itemEnd(it);
+    let a, b;
+    if (kind === 'head') { a = it.start; b = it.start + span; }
+    else if (kind === 'tail') { a = end - span; b = end; }
+    else { const nx = project.arrange.items.filter(i => i.track === it.track && i.start >= end - 1e-6).sort((x, y) => x.start - y.start)[0]; if (!nx) { toast('No clip after this one on the track'); return; } const cut = (end + nx.start) / 2, half = Math.min(0.5, it.dur / 2, nx.dur / 2); a = cut - half; b = cut + half; }
+    arrUi.region = { a: Math.max(0, a), b, t0: it.track, t1: it.track }; arrUi.fx = null; renderArrHead(); renderArrBody();
+  }
+
+  // -- view --
+  const tick = pps => { const want = 80 / pps; return [0.1, 0.25, 0.5, 1, 2, 5, 10, 15, 30, 60, 120, 300].find(s => s >= want) || 300; };
+  const SVG = {
+    select: '<path d="M5 3.5 18.5 11l-6 1.8-2.3 5.7z"/>',
+    region: '<rect x="3.5" y="6.5" width="17" height="11" rx="1" stroke-dasharray="3 2.4"/><path d="M8 10v4M16 10v4"/>',
+    split: '<path d="M12 3v18"/><path d="M7 8l5-5 5 5M7 16l5 5 5-5" opacity=".55"/>',
+    dup: '<rect x="8" y="8" width="12" height="12" rx="1.5"/><path d="M16 8V5.5A1.5 1.5 0 0 0 14.5 4h-9A1.5 1.5 0 0 0 4 5.5v9A1.5 1.5 0 0 0 5.5 16H8"/>',
+    del: '<path d="M4 7h16M9 7V4.5h6V7M6.5 7l1 13h9l1-13M10 11v6M14 11v6"/>',
+    snap: '<path d="M6 3v7a6 6 0 0 0 12 0V3h-4v7a2 2 0 0 1-4 0V3z"/><path d="M6 6.5h4M14 6.5h4"/>',
+    plus: '<path d="M12 5v14M5 12h14"/>', minus: '<path d="M5 12h14"/>', fit: '<path d="M4 12h5M15 12h5M6.5 9.5 4 12l2.5 2.5M17.5 9.5 20 12l-2.5 2.5"/>',
+    cur: '<circle cx="12" cy="12" r="8.5"/><path d="M12 8v8M8 12h8"/>',
+  };
+  const ab = (act, icon, tip, kbd, on) => `<button class="btn ghost icon" data-a="${act}" aria-label="${tip}"${on != null ? ` aria-pressed="${on}"` : ''} data-tip="${tip}"${kbd ? ` data-kbd="${kbd}"` : ''}><svg class="i" viewBox="0 0 24 24">${SVG[icon]}</svg></button>`;
+  function arrHeadHtml() {
+    const items = selItems(), one = items.length === 1 ? items[0] : null;
+    const fx = arrUi.fx && project.arrange.fx.find(f => f.id === arrUi.fx), r = arrUi.region;
+    const can = !!(fx || r), dur = arrDuration();
+    const opv = items.length ? Math.round(items[0].opacity * 100) : 100;
+    const c1 = one && clipById(one.clip), L1 = c1 ? clipLoop(c1) : 0;
+    const regTxt = fx ? `${trName(fx.track)} · ${fmtT(fx.a)}–${fmtT(fx.b)}` : r ? `${r.t0 === r.t1 ? trName(r.t0) : trName(r.t0) + '–' + trName(r.t1)} · ${fmtT(r.a)}–${fmtT(r.b)}` : '';
+    return `<div class="arr-strip"><div class="sh-l"><span class="readout">${fmtT(dur)} · ${T.ARR_TRACKS} tracks</span></div>${surfSeg()}<div class="sh-r"><span class="arr-right">
+      ${ab('snap', 'snap', 'Snap to clip edges and playhead', '', arrUi.snap)}
+      ${ab('zoomout', 'minus', 'Zoom out', 'Pinch')}${ab('zoomin', 'plus', 'Zoom in', 'Pinch')}${ab('fit', 'fit', 'Fit sequence')}
+      <button class="btn sm" data-a="addcur" data-tip="Save the working project as a clip and add it to V1">${`<svg class="i" viewBox="0 0 24 24">${SVG.cur}</svg>`} Add current</button></span></div></div>
+      <div class="arr-tools"><div class="seg" role="group" aria-label="Arrange tool"><button data-a="tool-select" aria-pressed="${arrUi.tool === 'select'}" aria-label="Select tool" data-tip="Select · move, trim, loop" data-kbd="V"><svg class="i" viewBox="0 0 24 24">${SVG.select}</svg></button><button data-a="tool-region" aria-pressed="${arrUi.tool === 'region'}" aria-label="Region tool" data-tip="Region · drag across clips to choose where a transition goes" data-kbd="Shift-drag"><svg class="i" viewBox="0 0 24 24">${SVG.region}</svg></button></div>
+      ${ab('split', 'split', 'Split at playhead', 'B')}${ab('dup', 'dup', 'Duplicate', 'D')}${ab('del', 'del', 'Remove', '⌫')}
+      <span class="sep" aria-hidden="true"></span>
+      ${items.length ? `<label class="arr-op" title="Opacity of the selected clip${items.length > 1 ? 's' : ''}"><span>Opacity</span><input type="range" id="arrOp" min="0" max="100" step="1" value="${opv}" aria-label="Clip opacity"><output id="arrOpV">${opv}%</output></label>
+        <span class="readout">${one ? `${esc(c1 ? c1.name : 'Missing clip')} · ${one.dur.toFixed(1)} s${L1 ? ` · ×${(one.dur / L1).toFixed(2)} loop` : ''}${one.off > 0.01 ? ' · cropped' : ''}` : `${items.length} clips`}</span>
+        ${one ? `<span class="quick"><button class="btn sm ghost" data-a="q-head" data-tip="Region over the start of this clip">Head</button><button class="btn sm ghost" data-a="q-tail" data-tip="Region over the end of this clip">Tail</button><button class="btn sm ghost" data-a="q-cut" data-tip="Region across the cut to the next clip">Cut</button></span>` : ''}` : '<span class="readout dim">Select a clip · drag edges to crop or loop</span>'}
+      <span class="sep" aria-hidden="true"></span>
+      <label class="arr-tr"><span>Transition</span><select id="arrStyle" aria-label="Transition style"${can ? '' : ' disabled'}>${fx ? '' : '<option value="" selected disabled>Choose…</option>'}${T.TRANSITIONS.map(t => `<option value="${t.v}"${fx && fx.style === t.v ? ' selected' : ''}>${t.l}</option>`).join('')}</select></label>
+      ${can ? `<span class="readout">${regTxt}</span>${fx ? '<button class="btn sm" data-a="fx-remove">Remove</button>' : '<button class="btn sm ghost" data-a="region-clear">Clear</button>'}` : '<span class="readout dim">Region tool: drag across clips</span>'}
+      </div>`;
+  }
+  function itemHtml(it, pps) {
+    const c = clipById(it.clip), L = c ? clipLoop(c) : it.dur, sel = arrUi.sel.has(it.id);
+    let seams = ''; for (let k = 1; k * L - it.off < it.dur - 0.02; k++) { const sx = (k * L - it.off) * pps; if (sx > 3) seams += `<i class="seam" style="left:${sx.toFixed(1)}px"></i>`; }
+    const loops = it.dur / L;
+    const meta = `${it.dur.toFixed(1)} s${loops > 1.02 ? ` · ×${loops.toFixed(1)}` : ''}${it.off > 0.01 ? ' · crop' : ''}${it.opacity < 0.995 ? ` · ${Math.round(it.opacity * 100)}%` : ''}`;
+    return `<div class="arr-item${c ? '' : ' missing'}" data-item="${it.id}" data-sel="${sel}" role="button" tabindex="0" aria-label="${esc(c ? c.name : 'Missing clip')}, ${meta}" aria-pressed="${sel}" style="left:${(it.start * pps).toFixed(1)}px;width:${Math.max(6, it.dur * pps).toFixed(1)}px;--c:${arrColor(it.clip)}"><i class="hd l" data-h="l"></i>${seams}<span class="an"><b>${esc(c ? c.name : 'Missing clip')}</b><small>${meta}</small></span><span class="opl" style="--o:${it.opacity}"></span><i class="hd r" data-h="r"></i></div>`;
+  }
+  function arrBodyHtml() {
+    const pps = arrUi.pps, dur = arrDuration(), sc = $('arrScroll'), avail = sc ? sc.clientWidth - LBL_W : 0;
+    const laneW = Math.ceil(Math.max((dur + 8) * pps, avail));
+    const step = tick(pps); let ticks = '';
+    for (let s = 0; s * pps < laneW; s += step) { ticks += `<span class="tk" style="left:${(s * pps).toFixed(1)}px">${fmtT(s)}</span>`; for (let m = 1; m < 5; m++) { const x = (s + step * m / 5) * pps; if (x < laneW) ticks += `<i class="mt" style="left:${x.toFixed(1)}px"></i>`; } }
+    const r = arrUi.region;
+    const rows = [];
+    for (let tr = T.ARR_TRACKS - 1; tr >= 0; tr--) {
+      const its = project.arrange.items.filter(i => i.track === tr).map(i => itemHtml(i, pps)).join('');
+      const fxs = project.arrange.fx.filter(f => f.track === tr).map(f => `<div class="arr-fxspan" style="left:${(f.a * pps).toFixed(1)}px;width:${((f.b - f.a) * pps).toFixed(1)}px"></div><div class="arr-fx" data-fx="${f.id}" data-sel="${arrUi.fx === f.id}" role="button" tabindex="0" aria-label="${esc((T.TRANSITIONS.find(t => t.v === f.style) || {}).l)} transition" style="left:${(f.a * pps).toFixed(1)}px;width:${Math.max(8, (f.b - f.a) * pps).toFixed(1)}px"><i class="hd l" data-h="fl"></i><span>${esc((T.TRANSITIONS.find(t => t.v === f.style) || {}).l)}</span><i class="hd r" data-h="fr"></i></div>`).join('');
+      const reg = r && tr >= r.t0 && tr <= r.t1 ? `<div class="arr-reg" style="left:${(r.a * pps).toFixed(1)}px;width:${((r.b - r.a) * pps).toFixed(1)}px"></div>` : '';
+      rows.push(`<div class="arr-row" data-track="${tr}"><div class="arr-lbl"><span class="vid">${trName(tr)}</span><small>${tr === 0 ? 'base' : tr === 1 ? 'mid' : 'top'}</small></div><div class="arr-lane" data-track="${tr}" style="width:${laneW}px">${its}${fxs}${reg}</div></div>`);
+    }
+    const empty = project.arrange.items.length ? '' : `<div class="arr-empty" style="left:${LBL_W}px"><span>Drag clips here from the <b>Clips</b> tab, or press <b>+</b> on a clip.<br>Drag a clip’s edges to crop or loop it. Use the Region tool to add transitions.</span></div>`;
+    return `<div class="arr-inner" style="--pps:${pps}px;width:${LBL_W + laneW}px;height:${ROW_H * T.ARR_TRACKS + 26}px">
+      <div class="arr-row arr-ruler"><div class="arr-lbl"><span class="readout">${timecode(0).slice(0, 8)}</span></div><div class="arr-lane" data-ruler="1" style="width:${laneW}px">${ticks}</div></div>
+      ${rows.join('')}${empty}<i class="arr-line" id="arrLine"></i></div>`;
+  }
+  let arrBound = false;
+  function ensureArrShell() {
+    if (arrBound) return; arrBound = true;
+    $('arrange').innerHTML = '<div class="arr-head" id="arrHead"></div><div class="arr-scroll" id="arrScroll" tabindex="-1"></div>';
+    bindArrange();
+  }
+  function renderArrHead() {
+    const h = $('arrHead'); if (!h) return;
+    const ae = document.activeElement, fid = ae && h.contains(ae) && ae.id ? ae.id : null;
+    h.innerHTML = arrHeadHtml();
+    if (fid) { const n = document.getElementById(fid); if (n && n !== document.activeElement) n.focus({ preventScroll: true }); }
+  }
+  function renderArrBody() {
+    const sc = $('arrScroll'); if (!sc) return;
+    const l = sc.scrollLeft, tp = sc.scrollTop, ae = document.activeElement, key = ae && sc.contains(ae) ? (ae.dataset.item ? `[data-item="${ae.dataset.item}"]` : ae.dataset.fx ? `[data-fx="${ae.dataset.fx}"]` : null) : null;
+    sc.innerHTML = arrBodyHtml(); sc.scrollLeft = l; sc.scrollTop = tp;
+    if (key) { const n = sc.querySelector(key); if (n) n.focus({ preventScroll: true }); }
+    updateArrPlayhead(stage.time);
+  }
+  function renderArrange() {
+    if (!arrMode) return; ensureArrShell();
+    const ids = new Set(project.arrange.items.map(i => i.id)); arrUi.sel = new Set([...arrUi.sel].filter(id => ids.has(id)));
+    if (arrUi.fx && !project.arrange.fx.some(f => f.id === arrUi.fx)) arrUi.fx = null;
+    renderArrHead(); renderArrBody();
+  }
+  function updateArrPlayhead(t) {
+    const ln = $('arrLine'); if (!ln) return; const x = LBL_W + t * arrUi.pps; ln.style.transform = `translateX(${x.toFixed(1)}px)`;
+    const sc = $('arrScroll');
+    if (sc && stage.playing && !arrDrag && (x < sc.scrollLeft + LBL_W || x > sc.scrollLeft + sc.clientWidth - 48)) sc.scrollLeft = Math.max(0, x - LBL_W - 48);
+  }
+  function renderArrangeNotice() {
+    const id = { layer: 'panel-layer', colour: 'panel-colour', finish: 'panel-finish', audio: 'panel-audio' }[tab]; if (!id) return;
+    $(id).innerHTML = `<div class="panel-head"><div class="lbl">Arrange</div><h1>Sequence view</h1></div><div class="arr-note"><p>The viewer is playing your arrangement, so this page, which edits the working project, is paused.</p><p>Drag clips from <b>Clips</b> onto the tracks, crop and loop them by their edges, then choose a transition for a region. To change a clip itself, double-click it on a track: it opens in the Timeline.</p><div class="btnrow"><button class="btn primary" data-arr-act="exit">Back to Timeline</button><button class="btn" data-arr-act="clips">Open Clips</button></div></div>`;
+  }
+  document.addEventListener('click', e => { const b = e.target.closest && e.target.closest('[data-arr-act]'); if (!b) return; if (b.dataset.arrAct === 'exit') { setArrange(false); laneCollapsed = false; layoutChanged(); } else setTab('clips'); });
+  function setArrange(on) {
+    on = !!on; if (on === arrMode) return;
+    if (on && evolveOpen) closeEvolve();
+    if (on && moveTool) setMoveTool(false);
+    arrMode = on; app.dataset.arrange = on ? 'on' : 'off'; $('arrange').hidden = !on;
+    if (on) {
+      if (player.playing) player.stop();
+      ensureArrShell(); stage.setOverride(arrSource);
+      if (['layer', 'colour', 'finish', 'audio'].includes(tab)) tab = 'clips';
+    } else { closeMenu(); stage.setOverride(null); }
+    applyLayout(); setTab(tab); renderArrange(); renderClips(); updateHud(); stage.invalidate();
+    if (on) toast('Arrange · drag clips onto the tracks');
+  }
+
+  // -- interaction --
+  let arrDrag = null, lastTap = { id: null, t: 0, x: 0, y: 0 };
+  const arrLaneLeft = () => { const l = $('arrScroll').querySelector('.arr-lane'); return l ? l.getBoundingClientRect().left : 0; };
+  const arrTimeAt = x => Math.max(0, (x - arrLaneLeft()) / arrUi.pps);
+  function arrTrackAt(y) {
+    const rows = [...$('arrScroll').querySelectorAll('.arr-row[data-track]')]; if (!rows.length) return 0;
+    for (const r of rows) { const b = r.getBoundingClientRect(); if (y >= b.top && y < b.bottom) return +r.dataset.track; }
+    return y < rows[0].getBoundingClientRect().top ? T.ARR_TRACKS - 1 : 0;
+  }
+  function snapPts(skip) {
+    const pts = [0, stage.time]; for (const i of project.arrange.items) if (!skip.includes(i.id)) { pts.push(i.start, itemEnd(i)); }
+    for (const f of project.arrange.fx) pts.push(f.a, f.b); return pts;
+  }
+  const nearest = (v, pts, tol) => { let b = v, bd = tol; for (const p of pts) { const d = Math.abs(p - v); if (d <= bd) { b = p; bd = d; } } return b; };
+  // Snap a clip's start or its end to the nearest edge / playhead, whichever is closer.
+  function snapSpan(ns, dur, pts, tol) {
+    let best = ns, bd = tol + 1e-9;
+    for (const p of pts) { let d = Math.abs(p - ns); if (d <= bd) { best = p; bd = d; } d = Math.abs(p - (ns + dur)); if (d <= bd) { best = p - dur; bd = d; } }
+    return best;
+  }
+  const liveArr = arr => { live({ ...project, arrange: arr }); stage.invalidate(); renderArrBody(); };
+  function bindArrange() {
+    const sc = $('arrScroll'), head = $('arrHead');
+    const seekTo = e => { stage.seekTime(Math.min(arrTimeAt(e.clientX), arrDuration() - 1e-3)); };
+    sc.addEventListener('pointerdown', e => {
+      if (e.button !== 0) return;
+      const hd = e.target.closest('.hd'), itEl = e.target.closest('.arr-item'), fxEl = e.target.closest('.arr-fx'), lane = e.target.closest('.arr-lane[data-track]'), ruler = e.target.closest('.arr-lane[data-ruler]');
+      const cap = () => { try { sc.setPointerCapture(e.pointerId); } catch (err) { /* capture is a nicety */ } };
+      const base = clone(project.arrange);
+      if (ruler) { arrDrag = { kind: 'scrub', id: e.pointerId }; seekTo(e); cap(); document.body.classList.add('scrubbing'); return; }
+      if (fxEl && hd) { arrUi.fx = fxEl.dataset.fx; arrUi.sel.clear(); arrDrag = { kind: hd.dataset.h, id: e.pointerId, fx: fxEl.dataset.fx, base, moved: false }; cap(); renderArrHead(); return; }
+      if (fxEl) { arrUi.fx = fxEl.dataset.fx; arrUi.sel.clear(); arrUi.region = null; renderArrHead(); renderArrBody(); const n = sc.querySelector(`[data-fx="${arrUi.fx}"]`); if (n) n.focus({ preventScroll: true }); return; }
+      const regionMode = (arrUi.tool === 'region' || e.shiftKey) && lane;
+      if (regionMode) { const tr = arrTrackAt(e.clientY); let a = arrTimeAt(e.clientX); if (arrUi.snap) a = nearest(a, snapPts([]), 8 / arrUi.pps); arrDrag = { kind: 'region', id: e.pointerId, a0: a, tr0: tr, moved: false }; arrUi.fx = null; cap(); return; }
+      if (itEl && hd) {
+        const it = base.items.find(i => i.id === itEl.dataset.item); if (!it) return;
+        arrUi.sel = new Set([it.id]); arrUi.fx = null; arrDrag = { kind: hd.dataset.h, id: e.pointerId, item: it.id, x0: e.clientX, base, moved: false }; cap(); renderArrHead(); return;
+      }
+      if (itEl) {
+        const id = itEl.dataset.item, now = performance.now();
+        // double-click opens the clip in the Timeline (tracked here because the body re-renders on pointer-down, which swallows native click events)
+        if (lastTap.id === id && now - lastTap.t < 420 && Math.hypot(e.clientX - lastTap.x, e.clientY - lastTap.y) < 8) {
+          lastTap = { id: null, t: 0, x: 0, y: 0 }; const its = project.arrange.items.find(i => i.id === id), c = its && clipById(its.clip); if (c) { loadClip(c); return; }
+        }
+        lastTap = { id, t: now, x: e.clientX, y: e.clientY };
+        if (e.shiftKey || e.metaKey || e.ctrlKey) { if (arrUi.sel.has(id)) arrUi.sel.delete(id); else arrUi.sel.add(id); } else if (!arrUi.sel.has(id)) arrUi.sel = new Set([id]);
+        arrUi.fx = null; arrUi.region = null;
+        arrDrag = { kind: 'move', id: e.pointerId, primary: id, ids: [...arrUi.sel], x0: e.clientX, base, moved: false }; cap(); renderArrHead(); renderArrBody();
+        const n = sc.querySelector(`[data-item="${id}"]`); if (n) n.focus({ preventScroll: true }); return;
+      }
+      if (lane) { arrUi.sel.clear(); arrUi.fx = null; arrUi.region = null; arrDrag = { kind: 'scrub', id: e.pointerId }; seekTo(e); cap(); renderArrHead(); renderArrBody(); }
+    });
+    sc.addEventListener('pointermove', e => {
+      const d = arrDrag; if (!d || e.pointerId !== d.id) return; const pps = arrUi.pps;
+      if (d.kind === 'scrub') { seekTo(e); return; }
+      if (d.kind === 'region') {
+        let b = arrTimeAt(e.clientX); if (arrUi.snap && !e.altKey) b = nearest(b, snapPts([]), 8 / pps); const tr = arrTrackAt(e.clientY);
+        if (Math.abs(b - d.a0) * pps > 3 || tr !== d.tr0) d.moved = true;
+        arrUi.region = d.moved ? { a: Math.min(d.a0, b), b: Math.max(d.a0, b) + (Math.abs(b - d.a0) < 0.05 ? 0.05 : 0), t0: Math.min(d.tr0, tr), t1: Math.max(d.tr0, tr) } : null; renderArrBody(); return;
+      }
+      const dt = d.x0 !== undefined ? (e.clientX - d.x0) / pps : 0;
+      if (d.kind === 'move') {
+        d.moved = d.moved || Math.abs(e.clientX - d.x0) > 3 || d.trackMoved; const ids = d.ids, prim = d.base.items.find(i => i.id === d.primary), others = d.base.items.filter(i => !ids.includes(i.id));
+        let ns = Math.max(0, prim.start + dt);
+        if (arrUi.snap && !e.shiftKey) ns = Math.max(0, snapSpan(ns, prim.dur, snapPts(ids), 8 / pps));
+        const items = d.base.items.map(i => ({ ...i }));
+        if (ids.length === 1) {
+          const tr = arrTrackAt(e.clientY); if (tr !== prim.track) d.trackMoved = true; d.moved = d.moved || !!d.trackMoved;
+          if (!d.moved) return;
+          const it = items.find(i => i.id === prim.id); it.track = tr; it.start = fitStart(others, tr, ns, prim.dur);
+        } else {
+          if (!d.moved) return; const delta = ns - prim.start;
+          for (const it of items) if (ids.includes(it.id)) it.start = Math.max(0, it.start + delta);
+          const moved = items.filter(i => ids.includes(i.id)), rest = items.filter(i => !ids.includes(i.id));
+          if (moved.some(m => rest.some(o => o.track === m.track && m.start < itemEnd(o) - 1e-6 && itemEnd(m) > o.start + 1e-6))) return;
+        }
+        liveArr({ ...d.base, items }); return;
+      }
+      if (d.kind === 'l' || d.kind === 'r') {
+        d.moved = true; const it0 = d.base.items.find(i => i.id === d.item), same = d.base.items.filter(i => i.id !== it0.id && i.track === it0.track), c = clipById(it0.clip), L = c ? clipLoop(c) : it0.dur;
+        const pts = snapPts([it0.id]), tol = e.shiftKey || !arrUi.snap ? 0 : 8 / pps;
+        const items = d.base.items.map(i => ({ ...i })), it = items.find(i => i.id === it0.id);
+        if (d.kind === 'r') {
+          const room = Math.min(Infinity, ...same.filter(o => o.start >= itemEnd(it0) - 1e-6).map(o => o.start));
+          const ne = clamp(nearest(itemEnd(it0) + dt, pts, tol), it0.start + 0.2, room); it.dur = ne - it0.start;
+        } else {
+          const prevEnd = Math.max(0, ...same.filter(o => itemEnd(o) <= it0.start + 1e-6).map(itemEnd));
+          const ns = clamp(nearest(it0.start + dt, pts, tol), prevEnd, itemEnd(it0) - 0.2), dl = ns - it0.start;
+          it.start = ns; it.dur = it0.dur - dl; it.off = wrapPos(it0.off + dl, L);
+        }
+        liveArr({ ...d.base, items }); return;
+      }
+      if (d.kind === 'fl' || d.kind === 'fr') {
+        d.moved = true; let tt = arrTimeAt(e.clientX); if (arrUi.snap && !e.shiftKey) tt = nearest(tt, snapPts([]), 8 / pps);
+        const fx = d.base.fx.map(f => ({ ...f })), f = fx.find(x => x.id === d.fx);
+        if (d.kind === 'fl') f.a = clamp(tt, 0, f.b - 0.1); else f.b = Math.max(f.a + 0.1, tt);
+        liveArr({ ...d.base, fx }); return;
+      }
+    });
+    const end = e => {
+      const d = arrDrag; if (!d || (e && e.pointerId !== d.id)) return; arrDrag = null; document.body.classList.remove('scrubbing');
+      if (d.kind === 'region') { if (!d.moved) arrUi.region = null; renderArrHead(); renderArrBody(); return; }
+      if (d.moved && d.kind !== 'scrub') { commit(project); return; }
+      if (d.kind !== 'scrub') { renderArrHead(); renderArrBody(); }
+    };
+    sc.addEventListener('pointerup', end); sc.addEventListener('pointercancel', end);
+    sc.addEventListener('keydown', e => {
+      const el = e.target.closest('.arr-item, .arr-fx'); if (!el) return;
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); if (el.dataset.item) { arrUi.sel = new Set([el.dataset.item]); arrUi.fx = null; } else { arrUi.fx = el.dataset.fx; arrUi.sel.clear(); } renderArrHead(); renderArrBody(); }
+      if ((e.key === 'ArrowLeft' || e.key === 'ArrowRight') && e.altKey && el.dataset.item) {
+        e.preventDefault(); e.stopPropagation(); const next = clone(project), it = next.arrange.items.find(i => i.id === el.dataset.item); const dt = (e.key === 'ArrowRight' ? 1 : -1) * (e.shiftKey ? 1 : 0.1); it.start = fitStart(next.arrange.items.filter(i => i.id !== it.id), it.track, Math.max(0, it.start + dt), it.dur); commit(next);
+      }
+    });
+    // drop clips from the Clips tab
+    const laneAt = e => e.target.closest && e.target.closest('.arr-lane[data-track]');
+    sc.addEventListener('dragover', e => { if (!e.dataTransfer || ![...e.dataTransfer.types].includes('application/x-motif-clip')) return; e.preventDefault(); e.dataTransfer.dropEffect = 'copy'; sc.querySelectorAll('.arr-lane.drop').forEach(x => x.classList.remove('drop')); const l = laneAt(e); if (l) l.classList.add('drop'); });
+    sc.addEventListener('dragleave', e => { if (!sc.contains(e.relatedTarget)) sc.querySelectorAll('.arr-lane.drop').forEach(x => x.classList.remove('drop')); });
+    sc.addEventListener('drop', e => {
+      sc.querySelectorAll('.arr-lane.drop').forEach(x => x.classList.remove('drop'));
+      const id = e.dataTransfer && e.dataTransfer.getData('application/x-motif-clip'); if (!id) return; e.preventDefault();
+      let start = arrTimeAt(e.clientX); const c = clipById(id); if (arrUi.snap && c) start = snapSpan(start, clipLoop(c), snapPts([]), 8 / arrUi.pps);
+      addClipToArrange(id, { track: arrTrackAt(e.clientY), start: Math.max(0, start) });
+    });
+    // Zoom: trackpad pinch (arrives as ctrl + wheel), Safari gestures and two-finger touch all zoom the sequence, and only here.
+    // Page zoom stays locked everywhere else. Requests are folded into one re-render per frame, anchored on the pointer.
+    let zoomRaf = 0, zoomPps = null, zoomX = 0;
+    const zoomTo = (pps, clientX) => {
+      zoomPps = clamp(pps, 12, 480); zoomX = clientX;
+      if (zoomRaf) return;
+      zoomRaf = requestAnimationFrame(() => {
+        zoomRaf = 0; if (zoomPps == null) return; const next = zoomPps; zoomPps = null; if (Math.abs(next - arrUi.pps) < 0.01) return;
+        const r = sc.getBoundingClientRect(), tAt = (sc.scrollLeft + zoomX - r.left - LBL_W) / arrUi.pps;
+        arrUi.pps = next; renderArrBody(); sc.scrollLeft = Math.max(0, tAt * arrUi.pps - (zoomX - r.left - LBL_W));
+      });
+    };
+    const zoomFactor = (f, clientX) => zoomTo((zoomPps == null ? arrUi.pps : zoomPps) * f, clientX);
+    sc.addEventListener('wheel', e => {
+      if (!(e.ctrlKey || e.metaKey)) return; e.preventDefault();
+      zoomFactor(Math.exp(-e.deltaY * (e.deltaMode === 1 ? 0.06 : e.ctrlKey ? 0.02 : 0.01)), e.clientX);
+    }, { passive: false });
+    let gs = null;
+    sc.addEventListener('gesturestart', e => { e.preventDefault(); gs = { pps: arrUi.pps }; });
+    sc.addEventListener('gesturechange', e => { e.preventDefault(); if (gs) zoomTo(gs.pps * e.scale, e.clientX); });
+    sc.addEventListener('gestureend', e => { e.preventDefault(); gs = null; });
+    let pinch = null;
+    const tdist = t => Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY);
+    sc.addEventListener('touchstart', e => {
+      if (e.touches.length !== 2) return;
+      if (arrDrag) { if (arrDrag.base) live({ ...project, arrange: arrDrag.base }); arrDrag = null; document.body.classList.remove('scrubbing'); renderArrBody(); } // the first finger was a drag; the second makes it a pinch
+      pinch = { d: Math.max(1, tdist(e.touches)), pps: arrUi.pps }; sc.classList.add('pinching');
+    }, { passive: true });
+    sc.addEventListener('touchmove', e => {
+      if (!pinch || e.touches.length !== 2) return; e.preventDefault();
+      zoomTo(pinch.pps * tdist(e.touches) / pinch.d, (e.touches[0].clientX + e.touches[1].clientX) / 2);
+    }, { passive: false });
+    const pinchEnd = e => { if (e.touches.length < 2 && pinch) { pinch = null; sc.classList.remove('pinching'); } };
+    sc.addEventListener('touchend', pinchEnd); sc.addEventListener('touchcancel', pinchEnd);
+    // header controls
+    const zoomBy = f => { const r = sc.getBoundingClientRect(); zoomFactor(f, r.left + LBL_W + (r.width - LBL_W) / 2); };
+    head.addEventListener('click', e => {
+      const b = e.target.closest('[data-a]'); if (!b) return; const a = b.dataset.a;
+      if (a === 'tool-select' || a === 'tool-region') { arrUi.tool = a === 'tool-select' ? 'select' : 'region'; renderArrHead(); }
+      else if (a === 'split') splitAtPlayhead(); else if (a === 'dup') duplicateSelected(); else if (a === 'del') { if (!arrUi.sel.size && !arrUi.fx) toast('Select a clip or a transition first'); deleteSelected(); }
+      else if (a === 'snap') { arrUi.snap = !arrUi.snap; renderArrHead(); toast(arrUi.snap ? 'Snap on' : 'Snap off'); }
+      else if (a === 'zoomin') zoomBy(1.4); else if (a === 'zoomout') zoomBy(1 / 1.4);
+      else if (a === 'fit') { arrUi.pps = clamp((sc.clientWidth - LBL_W - 48) / arrDuration(), 12, 480); renderArrBody(); sc.scrollLeft = 0; }
+      else if (a === 'addcur') addCurrentToArrange();
+      else if (a === 'q-head' || a === 'q-tail' || a === 'q-cut') quickRegion(a.slice(2));
+      else if (a === 'region-clear') { arrUi.region = null; renderArrHead(); renderArrBody(); }
+      else if (a === 'fx-remove') deleteSelected();
+    });
+    head.addEventListener('input', e => {
+      if (e.target.id !== 'arrOp') return; const v = Number(e.target.value) / 100; $('arrOpV').textContent = Math.round(v * 100) + '%';
+      const ids = [...arrUi.sel]; const items = project.arrange.items.map(i => (ids.includes(i.id) ? { ...i, opacity: v } : i)); liveArr({ ...project.arrange, items });
+    });
+    head.addEventListener('change', e => { if (e.target.id === 'arrOp') commit(project); else if (e.target.id === 'arrStyle' && e.target.value) applyTransition(e.target.value); });
+    addEventListener('resize', () => { if (arrMode) renderArrBody(); });
+  }
+  // keys while Arrange is open: B split, D duplicate, Delete remove, V select tool, Esc clear; layer-editing keys are held back
+  function arrKey(e) {
+    const k = e.key;
+    if (k === 'b' || k === 'B') { e.preventDefault(); splitAtPlayhead(); return true; }
+    if (k === 'd' || k === 'D') { e.preventDefault(); duplicateSelected(); return true; }
+    if (k === 'Delete' || k === 'Backspace') { e.preventDefault(); if (arrUi.sel.size || arrUi.fx) deleteSelected(); return true; }
+    if (k === 'v' || k === 'V') { arrUi.tool = 'select'; renderArrHead(); return true; }
+    if (k === 'Escape' && (arrUi.region || arrUi.sel.size || arrUi.fx)) { arrUi.region = null; arrUi.sel.clear(); arrUi.fx = null; renderArrHead(); renderArrBody(); return true; }
+    if (/^[maerAMER]$/.test(k)) { toast('Mutate, Evolve, Random and Add work on layers · press Alt A to leave Arrange'); return true; }
+    if (k === '[' || k === ']') return true;
+    return false;
+  }
+
   // ---------- refresh ----------
   let lastStyle = null, lastPalKey = '';
   function refresh() {
     if (audition) setAudition(null);
-    autosave(); updateHud(); renderPanel(); renderLane(); stage.invalidate();
+    autosave(); updateHud(); renderPanel(); renderLane(); renderArrange(); updateNameUi(); updateReticle(); stage.invalidate();
     $('undoBtn').disabled = cursor <= 0; $('redoBtn').disabled = cursor >= history.length - 1;
     const st = getStyle(active().styleId); if (stage.canvas) stage.canvas.setAttribute('aria-label', `${project.layers.map(l => getStyle(l.styleId).name).join(' + ')} animation preview`);
     const palKey = active().shared.palette + project.palettes.length;
@@ -1707,12 +2814,19 @@ function boot() {
     if (dot && !wantDot) dot.remove(); else if (!dot && wantDot) at.insertAdjacentHTML('beforeend', '<span class="dot" aria-hidden="true"></span>');
     const li = project.layers.indexOf(active());
     $('vClip').textContent = `· V${li + 1}  ${st.name}${st.kit ? `  ·  ${st.kitName} kit` : ''}`;
-    $('projMeta').textContent = `· ${project.layers.length} layer${project.layers.length > 1 ? 's' : ''} · ${project.finish.loop.toFixed(2)} s loop · ${project.output.fps} fps`;
     $('ctxInfo').innerHTML = `<span>Selected</span><b>V${li + 1} · ${esc(st.name)}</b>${st.engine === 'glsl' ? '<span class="tag">GLSL</span>' : st.gpu ? '<span class="tag">GPU</span>' : ''}`;
     updateGpuChip();
     updateBpmChip();
   }
-  renderLibrary(); refresh(); renderLooks();
+  renderLibrary(); refresh(); renderClips();
+  // A saved session that uses an imported kit is picked up once the kit has come back from IndexedDB.
+  K.ready.then(() => {
+    const sv = pendingSv; pendingSv = null;
+    if (!sv || dirty || cursor > 0 || K.missingKits(sv.project).length) return;
+    project = T.sanitizeProject(sv.project, C.sanitizeCustom); if (typeof sv.name === 'string' && sv.name) projectName = sv.name.slice(0, 60); if (typeof sv.id === 'string' && sv.id) projectId = sv.id.slice(0, 40);
+    if (ASPECTS.some(a => a.id === sv.aspect)) setAspect(sv.aspect);
+    history.length = 0; history.push(JSON.stringify(project)); cursor = 0; stage.setSpace(project.output.space); syncAudioRegion(); refresh(); toast('Restored your last session');
+  });
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { stage.invalidate(); drawThumbs(); });
 
   // ---------- kits ----------
@@ -1800,14 +2914,16 @@ function boot() {
       <div class="btnrow"><button class="btn primary sm" data-approve>Install and allow</button><button class="btn sm" data-cancel>Cancel</button></div>
     </div></section>`;
   }
+  // Version and provenance show on hover of the kit name, so the card itself stays quiet.
+  const kitMeta = k => `v${k.version} · ${esc0(k.author || 'Unknown author')}\n${k.styles.length} styles · ${k.styles.filter(s => s.passes > 1).length} multi-pass\n${k.source === 'catalog' ? 'Bundled' : k.source === 'url' ? 'From URL' : 'Imported'} · ${(k.bytes / 1024).toFixed(0)} KB`;
+  const esc0 = v => String(v);
   function renderKitsPanel() {
     const kits = K.list(), cat = K.catalog().filter(c => !c.installed);
     const pal = p => `<i title="${esc(p.name)}"><s style="background:${p.bg}"></s><s style="background:${p.ink}"></s>${p.a.map(c => `<s style="background:${c}"></s>`).join('')}</i>`;
     const card = k => `<article class="kit-card" data-kit="${k.id}" data-off="${!k.enabled}">
         <div class="kit-strip" aria-hidden="true">${k.styles.slice(0, 6).map(s => `<canvas width="96" height="60" data-style="${s.id}"></canvas>`).join('')}</div>
         <div class="kit-body">
-          <div class="kit-top"><span class="kd" style="--kd:${k.accent || 'var(--accent)'}" aria-hidden="true"></span><b>${esc(k.name)}</b><input type="checkbox" class="switch" role="switch" data-toggle="${k.id}" aria-label="${esc(k.name)} kit enabled"${k.enabled ? ' checked' : ''}></div>
-          <div class="kit-meta">v${esc(k.version)} · ${k.styles.length} styles · ${k.styles.filter(s => s.passes > 1).length} multi-pass · ${esc(k.author || 'Unknown author')} · ${k.source === 'catalog' ? 'bundled' : k.source === 'url' ? 'from URL' : 'imported'} · ${(k.bytes / 1024).toFixed(0)} KB</div>
+          <div class="kit-top"><span class="kd" style="--kd:${k.accent || 'var(--accent)'}" aria-hidden="true"></span><b tabindex="0" data-tip="${esc(k.name)}" data-tip-meta="${esc(kitMeta(k))}">${esc(k.name)}</b><input type="checkbox" class="switch" role="switch" data-toggle="${k.id}" aria-label="${esc(k.name)} kit enabled"${k.enabled ? ' checked' : ''}></div>
           ${kitBadges(k)}
           <p class="info">${esc(k.description)}</p>
           ${kitQuarantine(k)}
@@ -1902,7 +3018,7 @@ function boot() {
     }
     renderChips(); renderLibrary(); stage.invalidate();
     if (ev.type !== 'safe' && tab === 'kits') renderKitsPanel();
-    if (tab === 'layer') renderLayerPanel();
+    if (tab === 'layer') renderPanel();
   });
 
   // ---------- accessibility: roving tabindex + arrow keys (tablists, radiogroups) and splitter values ----------
@@ -1944,6 +3060,9 @@ function boot() {
     api: { timeline: T, colour: C, audio: A, kits: K },
     kits: K, kitHost: H, importKitBytes(bytes, name, opts = {}) { return installRaw(K.parseBytes(new Uint8Array(bytes), name), 'file', name || 'kit', opts.approve ? 'all' : undefined); }, get kitMsg() { return kitMsg; }, get kitReview() { return kitReview ? { name: kitReview.r.kit.name, capabilities: kitReview.r.capabilities.map(c => c.id) } : null; }, get kitDiags() { return kitDiags.slice(); }, renderKitsPanel,
     get env() { return envFn; }, get laneCollapsed() { return laneCollapsed; }, get tab() { return tab; },
+    // Motif 6
+    get clips() { return clips; }, get groups() { return groups; }, saveLook, addClipToArrange, setArrange, get arrMode() { return arrMode; }, arrUi, arrDraw, arrDuration, splitAtPlayhead, applyTransition, jumpKey, keyTimes,
+    setMoveTool, setGrid, pickLayerAt, saveProject, loadProjectData, projectPayload, get dirty() { return dirty; }, get projectName() { return projectName; }, renderClips, newGroupPrompt, moveClipToGroup, FS_FILE,
   };
 }
 
