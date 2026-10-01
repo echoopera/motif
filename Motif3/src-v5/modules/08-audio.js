@@ -95,11 +95,13 @@ function makeEnv(an) {
     cache.set(key, s); if (cache.size > 40) cache.delete(cache.keys().next().value);
     return s;
   }
-  return function env(band, seconds, smooth = 0) {
+  function env(band, seconds, smooth = 0) {
     const s = series(band, smooth || 0); if (!s) return null;
     const f = seconds * an.fps; if (f < 0 || f >= s.length - 1) return f < 0 ? s[0] : s[s.length - 1];
     const i = Math.floor(f), t = f - i; return s[i] * (1 - t) + s[i + 1] * t;
-  };
+  }
+  env.source = { bands: an.bands, fps: an.fps }; // plain arrays: the render worker rebuilds the same envelope from these
+  return env;
 }
 
 // Loop length that fits `bars` of 4/4 at `bpm`.

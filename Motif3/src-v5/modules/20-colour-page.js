@@ -374,10 +374,17 @@ function syncScopeUi() {
   els.wrap.querySelectorAll('[data-gr=space]').forEach(b => { b.setAttribute('aria-checked', b.dataset.v === st.space); b.tabIndex = b.dataset.v === st.space ? 0 : -1; });
 }
 const pct = v => `${Math.round(v * 100)}%`;
+const wk = { frame: null, busy: false, again: false };
 function runScope(exact) {
   if (!scopes || !scopes.ok || !api) return null;
   if (scopes.lost) { els.msg.hidden = false; els.msg.textContent = 'The GPU reset the scopes. They come back when you reopen this page.'; return null; }
-  const c = api.stage.canvas; if (!c || !c.width) return null;
+  let c = api.stage.canvas; if (!c || !c.width) return null;
+  // In worker mode the stage canvas is transferred and unreadable here: scope the last frame read back from the worker (one frame behind), then refresh.
+  if (api.stage.engineMode === 'worker') {
+    if (!wk.busy) { wk.busy = true; api.stage.readPixels().then(f => { wk.frame = new ImageData(new Uint8ClampedArray(f.data), f.w, f.h); wk.busy = false; if (els && wk.again) { wk.again = false; runScope(exact); } }).catch(() => { wk.busy = false; }); }
+    if (!wk.frame) { wk.again = true; return null; }
+    wk.again = true; c = wk.frame;
+  }
   sizeScope();
   let r; try { r = scopes.update(c, { mode: st.mode, space: st.space, exact }); } catch (e) { console.error(e); els.msg.hidden = false; els.msg.textContent = 'Scopes could not read this frame.'; return null; }
   if (!r) { els.msg.hidden = false; els.msg.textContent = 'Waiting for the first frame.'; return null; }
