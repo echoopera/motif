@@ -1,23 +1,33 @@
-# Motif Kit SDK 1.2 (`motif-kit@1`)
+# Motif Kit SDK 2.0 (`motif-kit@2`, reads `motif-kit@1`)
 
-A kit is a set of shader styles packaged as a single `.motifkit` file. When you drop one on Motif 3.2, its styles show up in the library alongside the 25 built-ins and work the same way: layers, blend modes and masks, keyframes on any parameter, Mutate, Evolve, Randomize, audio-band mapping, the finishing stack, and every export format.
+A kit adds shader **styles**, **effects**, **transitions** and **export presets** to Motif, packaged as a single `.motifkit` file. When you drop one on Motif, its styles show up in the library alongside the built-ins and work the same way: layers, blend modes and masks, keyframes on any parameter, Mutate, Evolve, Randomize, audio-band mapping, the finishing stack, and every export format.
 
-The app is one build. A kit is data (a manifest plus GLSL) that is checked, test-compiled and registered when it is loaded.
+The app is one build. A kit is **data and GLSL only**: a manifest plus shaders that are checked statically, compiled in the background and test-rendered before they draw. Nothing in a kit is ever run as JavaScript.
 
 ```
 motif-kit new my-kit --id my-kit       # copy the starter template (3 example styles, one with a media input)
 motif-kit preview my-kit               # contact sheet + compile errors, loop seam, blank-frame check, timing
 motif-kit preview my-kit --media a.jpg # feed an image to styles with media inputs
-motif-kit validate my-kit              # schema and static checks
+motif-kit validate my-kit [--json]     # schema, static GLSL analysis (file:line diagnostics), capabilities
 motif-kit pack my-kit --out dist       # writes dist/my-kit-0.1.0.motifkit
-motif-kit prelude                      # prints the GLSL prelude every pass is compiled with
+motif-kit migrate my-kit               # rewrite a motif-kit@1 manifest as motif-kit@2 (same result as the app)
+motif-kit bench my-kit                 # headless benchmark through the app (tools/bench.mjs), vs. declared cost
+motif-kit prelude                      # prints the GLSL prelude and runtime declarations
 ```
 
-Setup: `npm i` in this folder. For `preview`, also run `npm i -D playwright && npx playwright install chromium`, or point `MOTIF_CHROMIUM` at an existing Chromium.
+Setup: `npm i` in this folder. For `preview` and `bench`, also run `npm i -D playwright && npx playwright install chromium`, or point `MOTIF_CHROMIUM` at an existing Chromium. `bench` runs the app's harness (`Motif3/tools/bench.mjs`, or `--harness <path>`) against `motif5.html` (or `--app <path>`). On software GL it reports numbers but does not judge them.
 
-**New in 1.2:** custom parameters. Up to 32 per style, colour pickers, XY pads, grouped sections, hints, controls that show only when another control has a given value, and log sliders. See [Parameters](#parameters). Existing kits are unchanged.
+**New in 2.0** ([Kit format 2](docs/kit-format-2.md)):
 
-**New in 1.1:** media inputs. A style can declare an image or video input; the user attaches a file to the layer in Motif and the shader samples it. See [Media inputs](#media-inputs). Kits without `inputs` are unchanged.
+- Effects ([docs](docs/effects.md)) and transitions ([docs](docs/transitions.md))
+- Pass graphs with named buffers and bounded ping-pong feedback
+- Declarative export presets
+- A capability manifest (`media`, `audio`, `feedback`) that users approve at install
+- The [sandbox](docs/sandbox.md): static GLSL analysis, a background compile budget, a first-frame canary and quarantine
+
+`motif-kit@1` kits keep working unchanged ([versioning, compatibility and deprecation](docs/versioning.md)). The reference kit is `examples/lumen-fx`. JSON Schemas: `schemas/motif-kit-2.schema.json` and `schemas/motif-project.schema.json`.
+
+**1.2:** custom parameters ([Parameters](docs/parameters.md)). **1.1:** media inputs.
 
 ## Package layout
 
@@ -35,14 +45,14 @@ A `.motifkit` file is a zip of this folder with `manifest.json` at the root. The
 
 | Field | Rules |
 | --- | --- |
-| `format` | `"motif-kit@1"` |
+| `format` | `"motif-kit@2"` (or `"motif-kit@1"`, read unchanged). `capabilities`, `effects`, `transitions`, `exporters` and `graph` are @2 only: see [Kit format 2](docs/kit-format-2.md). |
 | `id` | 2–32 characters: lowercase letters, digits and hyphens, starting with a letter. Unique per install. `core`, `motif`, `builtin` and `all` are reserved. Installing a kit with an id that is already installed updates it. |
 | `name`, `version` | Display name (up to 32 characters) and a semver version such as `1.2.0` |
 | `author`, `description`, `license`, `accent` | Optional. `accent` is a `#RRGGBB` colour used for the kit's chip and badges. |
 | `common` | Optional path to shared GLSL |
 | `inputs[]` | Optional, SDK 1.1. Media inputs every style inherits unless it declares its own. See [Media inputs](#media-inputs). |
 | `palettes[]` | Up to 8 palettes: `{ id, name, bg, ink, a: [3 accents] }`, all `#RRGGBB`. They become `<kit>.<id>` in the palette picker. |
-| `styles[]` | 1–40 styles (see below) |
+| `styles[]` | Up to 40 styles (see below). A @2 kit may have none if it ships effects, transitions or exporters. |
 
 ### Styles
 
@@ -198,20 +208,13 @@ Route every glitch, flicker, strobe and flash through these helpers, and set `"f
 
 ## Validation
 
-Before a kit installs, the app and `motif-kit validate` check the following:
+Before a kit installs, the app and `motif-kit validate` check the manifest (format, ids, semver, colours, limits, parameter types and ranges, `show` conditions, media inputs, capabilities, pass graphs, exporter presets). They also run static analysis on every pass: unbounded loops, iteration and texture-fetch budgets per pixel, recursion, huge arrays, macro bombs, and extension and pragma allowlists. Problems come back as `file:line` diagnostics. See [Sandbox](docs/sandbox.md) for every rule, every limit and the limits of the approach.
 
-- Format, ids, semver, colours
-- Unique style ids and the limits: 40 styles, 32 params (48 uniforms after colour/point expansion), 4 passes, 96 KB per GLSL file, 3 MB per kit
-- Parameter types, ranges and defaults, and reserved names
-- `show` conditions (SDK 1.2): the controlling param must exist in the same style and be a range, int, toggle or select
-- Each pass defines `vec4 motif(vec2, vec2)` and does not define `main()`
-- Media inputs (SDK 1.1): at most 2 per style, valid ids, type `image`/`video`/`media`, fit `fill`/`fit`/`stretch`
-
-The app then compiles every pass. Any error rejects the kit and reports the style, the pass and the line number within that pass file. A kit that fails leaves any installed version untouched.
+The app then compiles every pass in the background and renders small test frames. A compile error rejects the kit and reports the entry, the file and the line within that file. An entry that is valid but pathologically slow installs **quarantined**: it draws a placeholder until the user retries. A kit that fails leaves any installed version untouched. Every install keeps the previous version for one-step **rollback** from the Kits panel.
 
 ## Performance notes
 
-- Keep loops bounded by constants (`for (int i = 0; i < 12; i++) { if (i >= p_n) break; … }`).
+- Keep loops bounded by constants (`for (int i = 0; i < 12; i++) { if (i >= p_n) break; … }`) or by an int param with a sensible `max`. The sandbox rejects loops it cannot bound.
 - Cull early: skip work when the pixel is far from an object (see `neuro/neural-arbor`).
 - Put expensive scenes in a pass with `"scale": 0.5` and add a cheap full-resolution post pass for bloom and grain (see `quantum/event-horizon` and `neuro/organoid`).
 - Raymarchers: expose a quality parameter that sets the step count.

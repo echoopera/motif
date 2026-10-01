@@ -1,4 +1,4 @@
-// ---- module: kit-gl v1.2.0 (media inputs, custom params)
+// ---- module: kit-gl v1.3.0 (media inputs, custom params, motif-kit@2 pass graphs, canary probe)
 const __m_kit_gl = (() => {
 // kit-gl/prelude — the Motif Kit GLSL prelude (API motif-kit@1). Every kit pass is compiled as:
 //   PRELUDE + generated param uniforms + kit common.glsl + pass source + MAIN.
@@ -302,8 +302,20 @@ function validateKit(manifest, files) {
       if (!(scale >= 0.125 && scale <= 1)) err(`${where}: pass ${j + 1} scale must be 0.125–1.`);
       passes.push({ file: ps.src, src, scale });
     });
+    const params = normParams(s.params, where, err, warn);
+    const inputs = resolveInputs(s, where, kitInputs, [common || '', ...passes.map(x => x.src || '')].join('\n'), styles, params, err, warn);
+    const pal = s.palette ? `${m.id}.${s.palette}` : null;
+    if (pal && !palettes.some(p => p.id === pal)) warn(`${where}: palette "${s.palette}" is not defined by the kit.`);
+    const cost = Math.max(0.25, Math.min(24, Number(s.cost) || 1));
+    styles.push({ id: `${m.id}/${s.id}`, localId: s.id, cost, name: String(s.name || s.id).slice(0, 32), blurb: String(s.blurb || '').slice(0, 160), group: String(s.group || '').slice(0, 24), tags: (Array.isArray(s.tags) ? s.tags : []).map(String).slice(0, 8), palette: pal && palettes.some(p => p.id === pal) ? pal : null, flash: !!s.flash, passes, params, inputs });
+  });
+  const ok = errors.length === 0;
+  return { ok, errors, warnings, kit: ok ? { format: KIT_FORMAT, id: m.id, name: String(m.name), version: m.version, author: String(m.author || '').slice(0, 48), description: String(m.description || '').slice(0, 280), accent: m.accent || null, license: String(m.license || '').slice(0, 32), palettes, styles, common: common || '' } : null };
+}
+// Params of one entry (style, effect or transition): normalized specs keyed by uniform name. Shared by motif-kit@1 and @2.
+function normParams(raw0, where, err, warn) {
     const params = {};
-    const raw = s.params || {};
+    const raw = raw0 || {};
     if (typeof raw !== 'object' || Array.isArray(raw)) err(`${where}: params must be an object.`);
     const keys = Object.keys(raw);
     if (keys.length > KIT_LIMITS.params) err(`${where}: at most ${KIT_LIMITS.params} params (a colour counts as one, a point as one).`);
@@ -352,23 +364,21 @@ function validateKit(manifest, files) {
     }
     if (Object.keys(params).length > KIT_LIMITS.expanded) err(`${where}: colour and point params count as 3 and 2 uniforms; at most ${KIT_LIMITS.expanded} in total.`);
     if (keys.length < 4) warn(`${where}: fewer than 4 params gives Mutate and Evolve little to work with.`);
-    // Media inputs: the style's own list wins, else the kit-level list. Kits written before SDK 1.1 that declare
-    // \`uniform sampler2D u_<name>;\` themselves get an implicit input so they work unchanged.
+    return params;
+}
+// Media inputs: the entry's own list wins, else the kit-level list. Kits written before SDK 1.1 that declare
+// `uniform sampler2D u_<name>;` themselves get an implicit input so they work unchanged.
+// text: the entry's GLSL (common + passes); prior: entries already normalized (one implicit-input warning per kit).
+function resolveInputs(s, where, kitInputs, text, prior, params, err, warn) {
     let inputs = normInputs(s.inputs, `${where}.`, err);
     if (inputs == null) inputs = kitInputs;
     if (inputs == null) {
-      inputs = []; const text = [common || '', ...passes.map(x => x.src || '')].join('\n'); const re = /\buniform\s+sampler2D\s+u_([A-Za-z][A-Za-z0-9]{0,15})\s*;/g; let mm;
+      inputs = []; const re = /\buniform\s+sampler2D\s+u_([A-Za-z][A-Za-z0-9]{0,15})\s*;/g; let mm;
       while ((mm = re.exec(text)) && inputs.length < KIT_LIMITS.inputs) { const id = mm[1]; if (INPUT_RESERVED.has(id.toLowerCase()) || inputs.some(q => q.id === id)) continue; inputs.push({ id, type: 'media', label: id[0].toUpperCase() + id.slice(1), fit: 'fill', required: false, hint: '', implicit: true }); }
-      if (inputs.length && !styles.some(x => x.inputs.some(q => q.implicit))) warn(`Declares ${inputs.map(q => 'u_' + q.id).join(', ')} without "inputs"; treated as media input${inputs.length > 1 ? 's' : ''}. Add "inputs": [{ "id": "${inputs[0].id}", "type": "media" }] to the manifest.`);
+      if (inputs.length && !prior.some(x => x.inputs.some(q => q.implicit))) warn(`Declares ${inputs.map(q => 'u_' + q.id).join(', ')} without "inputs"; treated as media input${inputs.length > 1 ? 's' : ''}. Add "inputs": [{ "id": "${inputs[0].id}", "type": "media" }] to the manifest.`);
     }
     for (const q of inputs) if (params[q.id + 'On'] || params[q.id]) warn(`${where}: param "${q.id}" shares a name with media input "${q.id}".`);
-    const pal = s.palette ? `${m.id}.${s.palette}` : null;
-    if (pal && !palettes.some(p => p.id === pal)) warn(`${where}: palette "${s.palette}" is not defined by the kit.`);
-    const cost = Math.max(0.25, Math.min(24, Number(s.cost) || 1));
-    styles.push({ id: `${m.id}/${s.id}`, localId: s.id, cost, name: String(s.name || s.id).slice(0, 32), blurb: String(s.blurb || '').slice(0, 160), group: String(s.group || '').slice(0, 24), tags: (Array.isArray(s.tags) ? s.tags : []).map(String).slice(0, 8), palette: pal && palettes.some(p => p.id === pal) ? pal : null, flash: !!s.flash, passes, params, inputs });
-  });
-  const ok = errors.length === 0;
-  return { ok, errors, warnings, kit: ok ? { format: KIT_FORMAT, id: m.id, name: String(m.name), version: m.version, author: String(m.author || '').slice(0, 48), description: String(m.description || '').slice(0, 280), accent: m.accent || null, license: String(m.license || '').slice(0, 32), palettes, styles, common: common || '' } : null };
+    return inputs;
 }
 
 // kit-gl v2 (Motif 3) — WebGL2 runtime for Motif Kit shader styles (motif-kit@1): adaptive internal
@@ -428,10 +438,13 @@ function stripInputDecls(text, inputs) {
   for (const q of inputs) text = text.replace(new RegExp(`\\buniform\\s+\\w+\\s+u_${q.id}(On|Size|Time)?\\s*;`, 'g'), '');
   return text;
 }
-function buildSource(passSrc, common, params, final, inputs) {
+// extra (motif-kit@2): runtime declarations for graph buffers, transition progress and audio bands (see kit-sandbox).
+function buildSource(passSrc, common, params, final, inputs, extra) {
   passSrc = stripInputDecls(passSrc, inputs); common = stripInputDecls(common, inputs);
-  const head = PRELUDE + '\n// ---- params ----\n' + paramUniforms(params) + (inputs && inputs.length ? '\n// ---- media inputs ----\n' + inputSource(inputs) : '') + '\n// ---- kit common ----\n' + (common || '') + '\n// ---- pass ----\n#line 1 1\n';
-  return { src: head + passSrc + (final ? MAIN_FINAL : MAIN_PASS), headLines: head.split('\n').length - 1 };
+  const pre = PRELUDE + '\n// ---- params ----\n' + paramUniforms(params) + (inputs && inputs.length ? '\n// ---- media inputs ----\n' + inputSource(inputs) : '') + (extra ? '\n// ---- runtime (motif-kit@2) ----\n' + extra : '') + '\n// ---- kit common ----\n';
+  const head = pre + (common || '') + '\n// ---- pass ----\n#line 1 1\n';
+  // commonLine: first line of the kit common file in the compiled source (driver logs report it as 0:<line>).
+  return { src: head + passSrc + (final ? MAIN_FINAL : MAIN_PASS), headLines: head.split('\n').length - 1, commonLine: pre.split('\n').length, commonLines: common ? common.split('\n').length : 0 };
 }
 
 function createGlRuntime() {
@@ -505,18 +518,19 @@ function createGlRuntime() {
   const VS = '#version 300 es\nin vec2 a_pos;\nvoid main(){ gl_Position = vec4(a_pos, 0.0, 1.0); }\n';
   function shader(type, src) { const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s); return s; }
   // Maps driver log lines back to pass-local line numbers (the pass source starts at #line 1 1).
-  function cleanLog(log) {
-    return String(log || '').split('\n').filter(Boolean).map(l => l.replace(/^(ERROR|WARNING): 1:(\d+):/, (m, k, n) => `${k === 'ERROR' ? 'Error' : 'Warning'} line ${n}:`).replace(/^(ERROR|WARNING): 0:(\d+):/, (m, k, n) => `${k === 'ERROR' ? 'Error' : 'Warning'} in prelude/common (line ${n}):`)).slice(0, 12).join('\n');
+  // Lines inside the kit's common file are reported as "in common line N".
+  function cleanLog(log, cs, cn) {
+    return String(log || '').split('\n').filter(Boolean).map(l => l.replace(/^(ERROR|WARNING): 1:(\d+):/, (m, k, n) => `${k === 'ERROR' ? 'Error' : 'Warning'} line ${n}:`).replace(/^(ERROR|WARNING): 0:(\d+):/, (m, k, n) => (cn && +n >= cs && +n < cs + cn ? `${k === 'ERROR' ? 'Error' : 'Warning'} in common line ${n - cs + 1}:` : `${k === 'ERROR' ? 'Error' : 'Warning'} in prelude/common (line ${n}):`))).slice(0, 12).join('\n');
   }
-  function startPass(src, final, common, params, inputs) {
-    const { src: fs } = buildSource(src, common, params, final, inputs);
+  function startPass(src, final, common, params, inputs, extra) {
+    const { src: fs, commonLine, commonLines } = buildSource(src, common, params, final, inputs, extra);
     const v = shader(gl.VERTEX_SHADER, VS), f = shader(gl.FRAGMENT_SHADER, fs);
     const p = gl.createProgram(); gl.attachShader(p, v); gl.attachShader(p, f); gl.bindAttribLocation(p, 0, 'a_pos'); gl.linkProgram(p);
-    return { p, v, f };
+    return { p, v, f, cs: commonLine, cn: commonLines };
   }
-  function finishPass({ p, v, f }) {
+  function finishPass({ p, v, f, cs, cn }) {
     if (!gl.getProgramParameter(p, gl.LINK_STATUS)) {
-      const log = cleanLog(gl.getShaderInfoLog(f)) || gl.getProgramInfoLog(p);
+      const log = cleanLog(gl.getShaderInfoLog(f), cs, cn) || gl.getProgramInfoLog(p);
       gl.deleteProgram(p); gl.deleteShader(v); gl.deleteShader(f);
       if (gl.isContextLost()) return { error: 'lost' };
       return { error: log || 'Shader failed to compile.' };
@@ -537,7 +551,7 @@ function createGlRuntime() {
       }
       passes.push({ ...r, scale: started[i].scale });
     }
-    programs.set(key, { passes, inputs: started.inputs || [] }); return { ok: true };
+    programs.set(key, started.graph ? { passes, inputs: started.inputs || [], graph: started.graph } : { passes, inputs: started.inputs || [] }); return { ok: true };
   }
   // def: { passes:[{src, scale}], common, params }. Returns { ok, error } or { ok:false, pending:true } while
   // the driver compiles in the background (KHR_parallel_shader_compile), so the UI never freezes on a big shader.
@@ -548,7 +562,11 @@ function createGlRuntime() {
     if (programs.has(key)) { const e = programs.get(key); return { ok: !e.error, error: e.error }; }
     let job = compiling.get(key);
     if (!job) {
-      job = def.passes.map((ps, i) => ({ ...startPass(ps.src, i === def.passes.length - 1, def.common, def.params, def.inputs), scale: Math.min(1, Math.max(0.125, ps.scale || 1)) }));
+      if (def.graph) {
+        // motif-kit@2 pass graph: each pass gets declarations for the buffers it reads (see kit-sandbox graphDecls).
+        job = def.graph.passes.map(ps => ({ ...startPass(ps.src, ps.writes === 'output', def.common, def.params, def.inputs, ps.extra || ''), scale: 1 }));
+        job.graph = def.graph;
+      } else job = def.passes.map((ps, i) => ({ ...startPass(ps.src, i === def.passes.length - 1, def.common, def.params, def.inputs, def.extra), scale: Math.min(1, Math.max(0.125, ps.scale || 1)) }));
       job.inputs = def.inputs || []; compiling.set(key, job);
     }
     if (!sync && parExt && !job.every(x => gl.getProgramParameter(x.p, parExt.COMPLETION_STATUS_KHR))) return { ok: false, pending: true };
@@ -566,6 +584,8 @@ function createGlRuntime() {
     if (!gl) return;
     for (const [k, v] of programs) if (k.startsWith(prefix)) { (v.passes || []).forEach(x => gl.deleteProgram(x.prog)); programs.delete(k); }
     for (const [k, v] of targets) if (k.startsWith(prefix)) { gl.deleteTexture(v.tex); gl.deleteFramebuffer(v.fbo); targets.delete(k); }
+    // In-flight background compiles too (a cancelled or timed-out kit check must not finish later).
+    for (const [k, job] of compiling) if (k.startsWith(prefix)) { job.forEach(x => { gl.deleteProgram(x.p); gl.deleteShader(x.v); gl.deleteShader(x.f); }); compiling.delete(k); }
   }
   function target(key, i, w, h) {
     const k = `${key}|${i}`; let t = targets.get(k);
@@ -615,11 +635,12 @@ function createGlRuntime() {
     gl.disable(gl.BLEND); gl.disable(gl.DEPTH_TEST);
     pollTimers();
     let query = null;
-    if (timerExt && pending.length < 4) { query = gl.createQuery(); gl.beginQuery(timerExt.TIME_ELAPSED_EXT, query); }
+    if (timerExt && pending.length < 4 && !opt.noTimer) { query = gl.createQuery(); gl.beginQuery(timerExt.TIME_ELAPSED_EXT, query); }
+    if (entry.graph) runGraph(key, entry, w, h, u, pal, bands);
     // DOM uploads can flush the graphics pipeline. Finish them before submitting any shader passes.
-    const inputs = entry.inputs.map(q => u.media && u.media[q.id] ? mediaTexture(u.media[q.id]) : blankTex);
+    const inputs = entry.graph ? [] : entry.inputs.map(q => u.media && u.media[q.id] ? mediaTexture(u.media[q.id]) : blankTex);
     const texs = [];
-    entry.passes.forEach((ps, i) => {
+    (entry.graph ? [] : entry.passes).forEach((ps, i) => {
       const lastPass = i === entry.passes.length - 1;
       const pw = lastPass ? w : Math.max(1, Math.round(w * ps.scale)), ph = lastPass ? h : Math.max(1, Math.round(h * ps.scale));
       if (lastPass) { gl.bindFramebuffer(gl.FRAMEBUFFER, null); gl.viewport(0, 0, pw, ph); }
@@ -665,6 +686,113 @@ function createGlRuntime() {
     last = { w, h };
     return canvas;
   }
+  // ---- motif-kit@2 pass graph ----
+  // Buffers are named render targets (scale × output size). A pass that reads the buffer it writes ping-pongs
+  // between two targets, `iterate` times (bounded by validation). External inputs (an effect's `input`, a
+  // transition's `from`/`to`) arrive as host canvases ({ canvas, rev }) and upload like media. Feedback lives
+  // within one frame only: nothing carries over between frames, so exports stay deterministic and loops close.
+  const GRAPH_UNIT = 8, ZERO8 = new Float32Array(8);
+  function stdUniforms(U, pw, ph, u, pal, entry, media) {
+    if (U.u_res) gl.uniform2f(U.u_res, pw, ph);
+    if (U.u_p) gl.uniform1f(U.u_p, u.p);
+    if (U.u_L) gl.uniform1f(U.u_L, u.L);
+    if (U.u_seed) gl.uniform1f(U.u_seed, u.seed);
+    if (U.u_safe) gl.uniform1f(U.u_safe, u.safe ? 1 : 0);
+    if (U.u_progress) gl.uniform1f(U.u_progress, Math.min(1, Math.max(0, +u.progress || 0)));
+    if (U.u_audio) gl.uniform1fv(U.u_audio, u.audio && u.audio.length === 8 ? u.audio : ZERO8);
+    ['u_bg', 'u_ink', 'u_a0', 'u_a1', 'u_a2'].forEach((n, j) => { if (U[n]) gl.uniform3fv(U[n], pal[j]); });
+    entry.inputs.forEach((q, j) => {
+      const loc = U['u_' + q.id]; const m = u.media && u.media[q.id];
+      if (U['u_' + q.id + 'On']) gl.uniform1f(U['u_' + q.id + 'On'], m ? 1 : 0);
+      if (U['u_' + q.id + 'Size']) gl.uniform2f(U['u_' + q.id + 'Size'], m ? m.w : 0, m ? m.h : 0);
+      if (U['u_' + q.id + 'Time']) gl.uniform1f(U['u_' + q.id + 'Time'], m ? m.time || 0 : 0);
+      if (!loc) return;
+      gl.activeTexture(gl.TEXTURE0 + MEDIA_UNIT + j); gl.bindTexture(gl.TEXTURE_2D, media[j]); gl.uniform1i(loc, MEDIA_UNIT + j);
+    });
+    for (const [k, sp] of Object.entries(u.spec)) {
+      const loc = U['p_' + k]; if (!loc) continue; const v = u.params[k];
+      if (sp.type === 'range') gl.uniform1f(loc, +v);
+      else if (sp.type === 'int') gl.uniform1i(loc, Math.round(v));
+      else if (sp.type === 'toggle') gl.uniform1i(loc, v ? 1 : 0);
+      else if (sp.type === 'select') gl.uniform1i(loc, Math.max(0, sp.options.findIndex(o => o.v === v)));
+    }
+  }
+  function runGraph(key, entry, w, h, u, pal, bands) {
+    const g = entry.graph, cur = {}, ext = {};
+    for (const n of g.externals || []) ext[n] = u.ext && u.ext[n] ? mediaTexture(u.ext[n]) : blankTex;
+    const media = entry.inputs.map(q => u.media && u.media[q.id] ? mediaTexture(u.media[q.id]) : blankTex);
+    entry.passes.forEach((ps, i) => {
+      const gp = g.passes[i], out = gp.writes === 'output';
+      const sc = out ? 1 : (g.buffers[gp.writes] && g.buffers[gp.writes].scale) || 1;
+      const pw = out ? w : Math.max(1, Math.round(w * sc)), ph = out ? h : Math.max(1, Math.round(h * sc));
+      const self = !out && gp.reads.includes(gp.writes), n = out ? 1 : Math.max(1, Math.min(16, gp.iterate || 1));
+      for (let it = 0; it < n; it++) {
+        let dest = null;
+        if (out) gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+        else { const c = cur[gp.writes], slot = self && c ? 1 - c.slot : 0; dest = target(key, `g:${gp.writes}:${slot}`, pw, ph); dest.slot = slot; gl.bindFramebuffer(gl.FRAMEBUFFER, dest.fbo); }
+        gl.viewport(0, 0, pw, ph);
+        gl.useProgram(ps.prog); const U = ps.uniforms;
+        stdUniforms(U, pw, ph, u, pal, entry, media);
+        if (U.u_iter) gl.uniform1i(U.u_iter, it);
+        if (U.u_iters) gl.uniform1i(U.u_iters, n);
+        // A buffer read before it is written this frame (first ping-pong step) samples transparent black, never last frame.
+        gp.reads.forEach((r, j) => { const loc = U['g_' + r]; if (!loc) return; gl.activeTexture(gl.TEXTURE0 + GRAPH_UNIT + j); gl.bindTexture(gl.TEXTURE_2D, ext[r] || (cur[r] ? cur[r].tex : blankTex)); gl.uniform1i(loc, GRAPH_UNIT + j); });
+        for (let b = 0; b < MAX_PASSES; b++) { const nm = 'u_buf' + b; if (!U[nm]) continue; const c = g.linear && b < i ? cur['p' + b] : null; gl.activeTexture(gl.TEXTURE0 + b); gl.bindTexture(gl.TEXTURE_2D, c ? c.tex : blankTex); gl.uniform1i(U[nm], b); }
+        gl.enable(gl.SCISSOR_TEST);
+        if (out) { gl.scissor(0, 0, pw, ph); gl.clearColor(0, 0, 0, 0); gl.clear(gl.COLOR_BUFFER_BIT); }
+        const nb = Math.min(bands, ph);
+        for (let b = 0; b < nb; b++) {
+          const y0 = Math.floor((b * ph) / nb), y1 = Math.floor(((b + 1) * ph) / nb);
+          gl.scissor(0, y0, pw, y1 - y0); gl.drawArrays(gl.TRIANGLES, 0, 3);
+          if (nb > 1) gl.flush();
+        }
+        gl.disable(gl.SCISSOR_TEST);
+        if (dest) cur[gp.writes] = { tex: dest.tex, slot: dest.slot };
+      }
+    });
+  }
+  // Canary: draw once at w×h and wait for the GPU (1-pixel readback) so the wall time covers execution.
+  // Returns { ms, px } or null when the style cannot draw (not compiled, context lost).
+  function probe(key, w, h, u, opt) {
+    if (!init() || lost) return null;
+    const t0 = performance.now();
+    if (!draw(key, w, h, u, opt)) return null;
+    const px = new Uint8Array(4); gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, px);
+    return { ms: performance.now() - t0, px: Array.from(px), lost: gl.isContextLost() };
+  }
+  // Non-blocking canary: draw once, then poll from timers so the main thread never waits on the GPU.
+  // With EXT_disjoint_timer_query the result is the GPU time of this draw alone (other contexts' queued work, such
+  // as stage frames, does not count); otherwise a fence gives the wall time until it completes.
+  // Resolves { ms, wall, done, timer } — done:false when nothing came back within timeoutMs of wall time (that
+  // frame keeps running on the GPU, bounded by the static limits; nothing on the main thread waits for it).
+  function probeAsync(key, w, h, u, timeoutMs, opt = {}) {
+    if (!init() || lost) return Promise.resolve(null);
+    const t0 = performance.now();
+    const q = timerExt ? gl.createQuery() : null;
+    if (q) gl.beginQuery(timerExt.TIME_ELAPSED_EXT, q);
+    const ok = draw(key, w, h, u, { ...opt, noTimer: true });
+    if (q) gl.endQuery(timerExt.TIME_ELAPSED_EXT);
+    if (!ok) { if (q) gl.deleteQuery(q); return Promise.resolve(null); }
+    const sync = gl.fenceSync(gl.SYNC_GPU_COMMANDS_COMPLETE, 0); gl.flush();
+    return new Promise(resolve => {
+      const end = r => { if (q) gl.deleteQuery(q); if (sync) gl.deleteSync(sync); resolve(r); };
+      const tick = () => {
+        const wall = performance.now() - t0;
+        if (lost || gl.isContextLost()) { resolve({ ms: wall, wall, done: false, lost: true }); return; }
+        if (q && gl.getQueryParameter(q, gl.QUERY_RESULT_AVAILABLE)) {
+          const ns = gl.getQueryParameter(q, gl.QUERY_RESULT), disjoint = gl.getParameter(timerExt.GPU_DISJOINT_EXT);
+          if (!disjoint && ns > 0) { end({ ms: ns / 1e6, wall, done: true, timer: true }); return; }
+        }
+        const st = sync ? gl.clientWaitSync(sync, 0, 0) : gl.WAIT_FAILED;
+        if (!q && (st === gl.ALREADY_SIGNALED || st === gl.CONDITION_SATISFIED)) { end({ ms: wall, wall, done: true, timer: false }); return; }
+        if (q && (st === gl.ALREADY_SIGNALED || st === gl.CONDITION_SATISFIED) && wall > 250) { end({ ms: wall, wall, done: true, timer: false }); return; } // timer result never came (disjoint): fall back to wall time
+        if (st === gl.WAIT_FAILED && !q) { end({ ms: wall, wall, done: false }); return; }
+        if (wall > timeoutMs) { end({ ms: wall, wall, done: false }); return; }
+        setTimeout(tick, 2);
+      };
+      setTimeout(tick, 0);
+    });
+  }
   // Copy the last draw (bottom-left of the GL canvas) into a 2D context at 0,0, scaled to w×h.
   function blit(ctx, w, h) {
     const sw = last.w || Math.round(w), sh = last.h || Math.round(h);
@@ -673,14 +801,16 @@ function createGlRuntime() {
     ctx.drawImage(canvas, 0, canvas.height - sh, sw, sh, 0, 0, w, h);
   }
   return {
-    init, compile, poll, forget, draw, blit, canvas, hexToLin, programs, get pendingCompiles() { return compiling.size; },
+    init, compile, poll, forget, draw, blit, probe, probeAsync, canvas, hexToLin, programs, get pendingCompiles() { return compiling.size; }, isCompiling(key) { return compiling.has(key); },
     get ok() { return init(); }, get reason() { return reason; }, get halfFloat() { return halfFloat; },
     get lost() { return lost; }, get lostCount() { return lostCount; }, get timer() { return !!timerExt; }, get renderer() { init(); return rendererName; }, get software() { init(); return software; },
     costOf(key) { return gpuMs.get(key); }, on(fn) { listeners.add(fn); return () => listeners.delete(fn); },
   };
 }
 
-return { KIT_FORMAT, KIT_LIMITS, SDK_VERSION: '1.2.0', validateKit, createGlRuntime, PRELUDE, MAIN_FINAL, MAIN_PASS, buildSource, paramUniforms, inputSource, RESERVED, MAX_PASSES, hexToLin };
+return { KIT_FORMAT, KIT_LIMITS, SDK_VERSION: '2.0.0', validateKit, createGlRuntime, PRELUDE, MAIN_FINAL, MAIN_PASS, buildSource, paramUniforms, inputSource, RESERVED, MAX_PASSES, hexToLin,
+  // Shared with kit-sandbox (motif-kit@2 validation); not part of the author-facing API.
+  normParams, normInputs, resolveInputs, INPUT_RESERVED, ID_RE, KEY_RE, HEX_RE, SEMVER_RE, RESERVED_KITS };
 
 })();
 

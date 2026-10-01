@@ -1,7 +1,7 @@
 // Export + Deliver page check, run offline (every http(s) request is refused): MP4 / WebM / ZIP through the render queue with container header
 // and duration checks, queue ordering, reload recovery (interrupted -> retry), hardware-preference fallback, capability matrix, the quick-export
 // dialog, and the Deliver page UI. Prints real numbers; with SOFTWARE_GL=1 these are software GL + software encoders, not a real Mac.
-//   SOFTWARE_GL=1 PLAYWRIGHT_MODULE=$(npm root -g)/playwright/index.mjs node tools/export-check.mjs [motif5.html]
+//   SOFTWARE_GL=1 PLAYWRIGHT_MODULE=$(npm root -g)/playwright/index.mjs node tools/export-check.mjs [motif7.html]
 import path from 'node:path';
 import fs from 'node:fs';
 import { pathToFileURL } from 'node:url';
@@ -16,7 +16,7 @@ try {
   const blocked = []; await context.route(/^https?:/, r => { blocked.push(r.request().url()); r.abort(); });
   const page = await context.newPage(); const errors = [];
   page.on('pageerror', e => errors.push(e.message)); page.on('console', m => { if (m.type() === 'error' && !/Failed to load resource/.test(m.text())) errors.push('console: ' + m.text()); });
-  const url = pathToFileURL(path.join(root, process.argv[2] || 'motif5.html')).href;
+  const url = pathToFileURL(path.join(root, process.argv[2] || 'motif7.html')).href;
   const boot = async () => { await page.goto(url); await page.waitForFunction(() => window.__lab && window.__lab.queue); await page.waitForTimeout(800); };
   // A small, cheap project: one 2D style, 1 s loop at 12 fps = 12 frames, square 720 x 720.
   const smallProject = async (loop = 1) => page.evaluate(l => { const pr = __lab.project; pr.layers = [pr.layers[pr.layers.length - 1]]; pr.active = pr.layers[0].id; pr.finish.loop = l; pr.output.fps = 12; __lab.setProject(pr); __lab.setAspect('1x1'); }, loop);

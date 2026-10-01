@@ -1,5 +1,8 @@
-// Deep kit audit: compile, NaN/Inf scan, coverage at defaults + random params across palettes, and GPU cost.
-import { chromium } from '/opt/node22/lib/node_modules/playwright/index.mjs';
+// Deep kit audit: compile, NaN/Inf scan, coverage at defaults + random params across palettes, GPU cost, and the
+// sandbox's static bounds (loop iterations / texture fetches per pixel). motif-kit@2 graph entries are listed with
+// their static bounds only; preview them with `motif-kit preview`.
+//   node tools/kit-audit.mjs <catalog.json> <motif7.html> <out.json> [kit,ids]
+const { chromium } = await import(process.env.PLAYWRIGHT_MODULE || '/opt/node22/lib/node_modules/playwright/index.mjs');
 import fs from 'fs';
 const [,, catFile, appFile, outFile, only] = process.argv;
 const CAT = JSON.parse(fs.readFileSync(catFile, 'utf8')).filter(k => !only || only.split(',').includes(k.manifest.id));
@@ -10,7 +13,7 @@ await page.goto('file://' + appFile);
 await page.waitForTimeout(1200);
 await page.evaluate(() => { document.body.innerHTML = ''; });
 const res = await page.evaluate(async (CAT) => {
-  const KG = __m_kit_gl, E = __m_engine_core, SL = __m_style_library;
+  const KG = __m_kit_gl, E = __m_engine_core, SL = __m_style_library, SB = __m_kit_sandbox;
   const W = 192, H = 108;
   const cv = document.createElement('canvas'); cv.width = 480; cv.height = 270;
   const gl = cv.getContext('webgl2', { preserveDrawingBuffer: true }); gl.getExtension('EXT_color_buffer_float');
@@ -44,10 +47,14 @@ const res = await page.evaluate(async (CAT) => {
   }
   const out = [];
   for (const raw of CAT) { const m = raw.manifest; const common = raw.files[m.common] || '';
-    for (const sm of m.styles) {
+    const sv = SB.validate(m, raw.files); const bounds = new Map(((sv.report && sv.report.entries) || []).map(e => [e.localId, e]));
+    if (!sv.ok) { out.push({ id: m.id, err: 'sandbox: ' + sv.errors.slice(0, 3).join(' | ') }); continue; }
+    for (const sm of m.styles || []) {
+      const b = bounds.get(sm.id) || {};
+      if (sm.graph) { out.push({ id: m.id + '/' + sm.id, group: sm.group, passes: sm.graph.passes.length, iters: b.iterations, fetches: b.fetches, note: 'graph entry: static bounds only' }); continue; }
       const st = SL.STYLES.find(s => s.id === m.id + '/' + sm.id); const spec = st.params;
       const passes = sm.passes || [{ src: `styles/${sm.id}.glsl` }];
-      const rec = { id: st.id, group: sm.group, passes: passes.length };
+      const rec = { id: st.id, group: sm.group, passes: passes.length, iters: b.iterations, fetches: b.fetches };
       const progs = []; let err = null;
       for (let i=0;i<passes.length;i++){ const last=i===passes.length-1; let { src } = KG.buildSource(raw.files[passes[i].src], common, spec, last);
         if (last) src = src.replace(/if \(any\(isnan\(c\)\)\) c = vec4\(0\.0\);/, 'if (any(isnan(c))||any(isinf(c))) { M_out = vec4(1.0,0.0,1.0,1.0); return; }');
@@ -74,5 +81,5 @@ const res = await page.evaluate(async (CAT) => {
   return out;
 }, CAT);
 fs.writeFileSync(outFile, JSON.stringify(res, null, 1));
-for (const r of res) console.log(((r.err||r.nan>0.002||r.lowCover&&r.lowCover.length)?'!!':'  ')+' '+r.id.padEnd(32)+' ms '+String(r.ms).padStart(5)+'  cov '+r.meanCover+'  nan '+r.nan+'  lows '+(r.lowCover?r.lowCover.length:'')+' '+(r.err||''));
+for (const r of res) console.log(((r.err||r.nan>0.002||r.lowCover&&r.lowCover.length)?'!!':'  ')+' '+r.id.padEnd(32)+' ms '+String(r.ms).padStart(5)+'  cov '+r.meanCover+'  nan '+r.nan+'  lows '+(r.lowCover?r.lowCover.length:'')+'  iters/px '+(r.iters??'')+'  fetches/px '+(r.fetches??'')+' '+(r.err||r.note||''));
 await browser.close();

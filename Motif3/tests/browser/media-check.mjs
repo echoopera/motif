@@ -1,12 +1,12 @@
 // Media pipeline check (OPFS pool, WebCodecs decode, Media page). Browser test: needs Playwright + Chromium + ffmpeg.
-//   SOFTWARE_GL=1 PLAYWRIGHT_MODULE=$(npm root -g)/playwright/index.mjs node tests/browser/media-check.mjs [motif5.html]
+//   SOFTWARE_GL=1 PLAYWRIGHT_MODULE=$(npm root -g)/playwright/index.mjs node tests/browser/media-check.mjs [motif7.html]
 // Fixtures are generated locally with ffmpeg (VP9 in MP4: the Chromium builds Playwright ships cannot decode H.264).
 // Software-GL timings printed here are NOT representative of real hardware; they only prove the paths run.
 import fs from 'node:fs'; import os from 'node:os'; import path from 'node:path'; import http from 'node:http';
 import { execFileSync } from 'node:child_process';
 const { chromium } = await import(process.env.PLAYWRIGHT_MODULE || 'playwright');
 const root = path.resolve(import.meta.dirname, '../..');
-const file = path.resolve(root, process.argv[2] || 'motif5.html');
+const file = path.resolve(root, process.argv[2] || 'motif7.html');
 const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'motif-media-'));
 const ff = (...a) => execFileSync('ffmpeg', ['-y', '-loglevel', 'error', ...a], { cwd: tmp });
 const fx = { idx: path.join(tmp, 'idx.mp4'), idxu: path.join(tmp, 'idx-untagged.mp4'), long: path.join(tmp, 'long.mp4'), rot: path.join(tmp, 'rot.mp4') };

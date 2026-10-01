@@ -1,7 +1,7 @@
 // The built app must not need a CDN for scripts: muxers and fflate are vendored and inlined. Only fonts stay external.
 import test from 'node:test'; import assert from 'node:assert/strict'; import fs from 'node:fs'; import path from 'node:path'; import crypto from 'node:crypto';
 const root = path.resolve(import.meta.dirname, '..');
-const html = fs.readFileSync(path.join(root, 'motif5.html'), 'utf8');
+const html = fs.readFileSync(path.join(root, 'motif7.html'), 'utf8');
 const vendorMd = fs.readFileSync(path.join(root, 'vendor/VENDOR.md'), 'utf8');
 
 test('built file has no external script dependency (fonts only)', () => {

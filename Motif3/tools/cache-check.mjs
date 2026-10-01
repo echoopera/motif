@@ -9,7 +9,7 @@ const browser = await chromium.launch({ headless: true, args: process.env.SOFTWA
 try { for (const q of ['', '?worker=0']) {
   const page = await browser.newPage({ viewport: { width: 1280, height: 800 } }); const errors = [];
   page.on('pageerror', e => errors.push(e.message));
-  await page.goto(pathToFileURL(path.join(root, process.argv[2] || 'motif5.html')).href + q); await page.waitForFunction(() => window.__lab); await page.waitForTimeout(1200);
+  await page.goto(pathToFileURL(path.join(root, process.argv[2] || 'motif7.html')).href + q); await page.waitForFunction(() => window.__lab); await page.waitForTimeout(1200);
   const r = await page.evaluate(async () => {
     const { stage } = __lab; const out = {}; const px = async () => Array.from((await stage.readPixels()).data);
     const want = location.search ? 'main' : 'worker'; for (let i = 0; i < 600 && stage.engineMode !== want; i++) await new Promise(r => setTimeout(r, 50)); out.mode = stage.engineMode;

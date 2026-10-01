@@ -2,7 +2,7 @@ import test from 'node:test'; import assert from 'node:assert/strict'; import fs
 import { load } from './load.mjs';
 const root = path.resolve(import.meta.dirname, '..');
 
-test('motif5.html is built from src-v5', () => { execFileSync('python3', [path.join(root, 'src-v5/build.py'), '--check']); });
+test('motif7.html is built from src-v5', () => { execFileSync('python3', [path.join(root, 'src-v5/build.py'), '--check']); });
 
 test('every module is wrapped and versioned', () => {
   for (const f of fs.readdirSync(path.join(root, 'src-v5/modules')).filter(f => /^\d\d[a-z]?-/.test(f))) {
@@ -19,7 +19,7 @@ test('engine-core is deterministic', () => {
 });
 
 test('timeline sanitizes and round-trips a new project', () => {
-  const m = load('tokens', 'engine-core', 'style-library', 'kit-gl', 'kits', 'colour', 'timeline');
+  const m = load('tokens', 'engine-core', 'style-library', 'kit-gl', 'kit-sandbox', 'kits', 'colour', 'timeline');
   assert.ok(m.__m_timeline.newProject);
 });
 
@@ -29,7 +29,7 @@ test('budgets.json is well formed', () => {
 });
 
 test('engine modules are embedded once, as worker-loadable text', () => {
-  const html = fs.readFileSync(path.join(root, 'motif5.html'), 'utf8');
+  const html = fs.readFileSync(path.join(root, 'motif7.html'), 'utf8');
   const a = html.indexOf('<script type="text/plain" id="motif-engine-src">'), b = html.indexOf('</script>', a);
   assert.ok(a > 0 && b > a, 'engine source block present');
   for (const name of ['__m_tokens', '__m_kits', '__m_renderer', '__m_worker_shim', '__m_render_worker']) {
@@ -54,7 +54,7 @@ test('worker shim stands in for the engine DOM touchpoints', () => {
 });
 
 test('kit registry mirrors into a second realm (render worker) via snapshot', () => {
-  const names = ['tokens', 'engine-core', 'style-library', 'kit-gl', 'kits'];
+  const names = ['tokens', 'engine-core', 'style-library', 'kit-gl', 'kit-sandbox', 'kits'];
   const page = load(...names), worker = load(...names);
   const raw = JSON.parse(execFileSync('python3', ['-c', 'import zipfile,json,sys;z=zipfile.ZipFile(sys.argv[1]);print(json.dumps({"manifest":json.loads(z.read("manifest.json")),"files":{n:z.read(n).decode() for n in z.namelist() if n!="manifest.json" and not n.endswith("/")}}))', path.join(root, 'kits/param-lab-0.1.0.motifkit')], { encoding: 'utf8' }));
   const r = page.__m_kits.install(raw, { source: 'file' }); assert.ok(r.ok, (r.errors || []).join('; '));

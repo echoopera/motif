@@ -1,11 +1,11 @@
 // Grade page + GPU scopes + LUTs, in a real browser.
-//   SOFTWARE_GL=1 PLAYWRIGHT_MODULE=$(npm root -g)/playwright/index.mjs node tests/browser/grade-check.mjs [motif5.html]
-// Optional BASE_HTML=<older motif5.html>: also proves a v5 project renders bit-identically to that build (grade absent).
+//   SOFTWARE_GL=1 PLAYWRIGHT_MODULE=$(npm root -g)/playwright/index.mjs node tests/browser/grade-check.mjs [motif7.html]
+// Optional BASE_HTML=<older motif7.html>: also proves a v5 project renders bit-identically to that build (grade absent).
 // Prints one JSON line of measurements, then "grade OK". Numbers under SwiftShader are not representative of a GPU.
 import path from 'node:path'; import { pathToFileURL } from 'node:url'; import assert from 'node:assert/strict';
 const { chromium } = await import(process.env.PLAYWRIGHT_MODULE || 'playwright');
 const root = path.resolve(import.meta.dirname, '../..');
-const file = process.argv[2] || 'motif5.html';
+const file = process.argv[2] || 'motif7.html';
 const browser = await chromium.launch({ headless: true, args: process.env.SOFTWARE_GL ? ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'] : [] });
 const R = {}; let passed = false;
 const open = async (html, opts = {}) => {

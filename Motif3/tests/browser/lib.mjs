@@ -18,7 +18,7 @@ export async function launch(extraArgs = []) {
 
 // Opens the app in a fresh context. External hosts (fonts, CDN muxers) are blocked so runs are hermetic and fast; the app
 // is designed to work without them. `errors` collects uncaught page errors and console errors that are not blocked requests.
-export async function openApp(browser, { file = 'motif5.html', viewport = { width: 1440, height: 900 }, context = {}, settle = 1200, pauseStage = true, initScript = null } = {}) {
+export async function openApp(browser, { file = 'motif7.html', viewport = { width: 1440, height: 900 }, context = {}, settle = 1200, pauseStage = true, initScript = null } = {}) {
   const ctx = await browser.newContext({ viewport, ...context });
   const page = await ctx.newPage(); const errors = [], consoleErrors = [], warnings = [];
   page.on('pageerror', e => errors.push(String(e.message || e)));

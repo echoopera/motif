@@ -35,7 +35,7 @@ function run(id, label, cmd, args, { expect = 0, parse } = {}) {
 
 console.log(`Motif verify · ${new Date().toISOString()} · revision ${rev}${dirty} · ${real ? 'real GPU where available' : 'SwiftShader (software GL)'}\n`);
 const T0 = Date.now();
-run('build', 'motif5.html matches src-v5', 'python3', ['src-v5/build.py', '--check']);
+run('build', 'motif7.html matches src-v5', 'python3', ['src-v5/build.py', '--check']);
 run('unit', 'unit tests (node --test)', 'node', ['--test', ...fs.readdirSync(path.join(root, 'tests')).filter(f => f.endsWith('.test.mjs')).map(f => 'tests/' + f)], { parse: o => { const p = /(?:#|ℹ) pass (\d+)/.exec(o), f = /(?:#|ℹ) fail (\d+)/.exec(o); return { pass: p ? +p[1] : 0, fail: f ? +f[1] : 0, note: `${p ? p[1] : '?'} pass, ${f ? f[1] : '?'} fail` }; } });
 run('cache', 'render cache pixel-identity', 'node', ['tools/cache-check.mjs']);
 run('visual', 'visual regression vs goldens', 'node', ['tests/browser/visual.mjs'], { parse: () => { const j = readJson('tests/visual-out/summary.json'); return { sum: j, note: j ? `${j.compared} scenes, ${j.failedScenes} outside tolerance${j.envMismatch ? ', ENV MISMATCH' : ''}` : '' }; } });

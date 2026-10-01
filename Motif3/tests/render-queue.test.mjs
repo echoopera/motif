@@ -1,7 +1,7 @@
 // Render queue logic against a fake backend and an in-memory store (no browser): ordering, pause/resume, cancel, retry, reload recovery.
 import test from 'node:test'; import assert from 'node:assert/strict';
 import { load } from './load.mjs';
-const m = load('tokens', 'engine-core', 'style-library', 'kit-gl', 'kits', 'colour', 'timeline', 'audio', 'gpu-engine', 'compositor', 'finish', 'renderer', 'exporter', 'render-queue');
+const m = load('tokens', 'engine-core', 'style-library', 'kit-gl', 'kit-sandbox', 'kits', 'colour', 'timeline', 'audio', 'gpu-engine', 'compositor', 'finish', 'renderer', 'exporter', 'render-queue');
 const RQ = m.__m_render_queue, T = m.__m_timeline;
 const project = () => { const p = T.newProject(); p.finish.loop = 1; p.output.fps = 24; return p; };
 const fakeBlob = n => ({ size: n, type: 'video/mp4' });

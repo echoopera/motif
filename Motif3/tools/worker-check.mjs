@@ -3,7 +3,7 @@
 //   2. relief  — during deliberately heavy scenes the main thread has far fewer long tasks (and, on a real GPU, a steadier rAF) in worker mode
 //   3. fallback — ?worker=0, no canvas transfer, image/video layers and a worker crash all land on the main thread automatically
 //   4. no page errors
-//   SOFTWARE_GL=1 PLAYWRIGHT_MODULE=$(npm root -g)/playwright/index.mjs node tools/worker-check.mjs [--seconds 6] [--webgpu] [--cpu2d] [--file motif5.html]
+//   SOFTWARE_GL=1 PLAYWRIGHT_MODULE=$(npm root -g)/playwright/index.mjs node tools/worker-check.mjs [--seconds 6] [--webgpu] [--cpu2d] [--file motif7.html]
 //   --only parity,relief,fallback runs a subset. --cpu2d rasterises Canvas 2D on the calling thread (no GPU process), which isolates main-thread cost under software GL.
 // Writes performance-review/worker-check-<date>.json. Software GL timings are not representative of a real GPU.
 import fs from 'node:fs';
@@ -12,7 +12,7 @@ import { pathToFileURL } from 'node:url';
 const { chromium } = await import(process.env.PLAYWRIGHT_MODULE || 'playwright');
 const root = path.resolve(import.meta.dirname, '..');
 const arg = (k, d) => { const i = process.argv.indexOf('--' + k); return i < 0 ? d : (process.argv[i + 1] && !process.argv[i + 1].startsWith('--') ? process.argv[i + 1] : true); };
-const file = arg('file', 'motif5.html'), seconds = +arg('seconds', 6), webgpu = !!arg('webgpu', false), cpu2d = !!arg('cpu2d', false), only = String(arg('only', 'parity,relief,fallback')).split(',');
+const file = arg('file', 'motif7.html'), seconds = +arg('seconds', 6), webgpu = !!arg('webgpu', false), cpu2d = !!arg('cpu2d', false), only = String(arg('only', 'parity,relief,fallback')).split(',');
 const args = [...(process.env.SOFTWARE_GL ? ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'] : ['--ignore-gpu-blocklist']), ...(webgpu || !process.env.SOFTWARE_GL ? ['--enable-unsafe-webgpu'] : []), ...(cpu2d ? ['--disable-accelerated-2d-canvas'] : [])];
 const browser = await chromium.launch({ channel: process.env.CHROME_CHANNEL || undefined, headless: true, args });
 const url = q => pathToFileURL(path.join(root, file)).href + (q || '');

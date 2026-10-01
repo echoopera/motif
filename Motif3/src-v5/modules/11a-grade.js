@@ -197,7 +197,7 @@ function identityLut(N = 33) {
 }
 function serializeCube(data3, N, title = 'Motif grade') {
   if (!data3 || data3.length !== N * N * N * 3) throw new LutError('count', 'Export table has the wrong size.');
-  const out = [`TITLE "${String(title).replace(/"/g, '').slice(0, 80)}"`, '# Created by Motif 5 — node grade baked to a 3D LUT (input and output 0–1, display-referred)', `LUT_3D_SIZE ${N}`, 'DOMAIN_MIN 0.0 0.0 0.0', 'DOMAIN_MAX 1.0 1.0 1.0'];
+  const out = [`TITLE "${String(title).replace(/"/g, '').slice(0, 80)}"`, '# Created by Motif 7 — node grade baked to a 3D LUT (input and output 0–1, display-referred)', `LUT_3D_SIZE ${N}`, 'DOMAIN_MIN 0.0 0.0 0.0', 'DOMAIN_MAX 1.0 1.0 1.0'];
   const f = v => (Math.abs(v) < 5e-7 ? 0 : v).toFixed(6);
   for (let i = 0; i < N * N * N; i++) out.push(`${f(data3[i * 3])} ${f(data3[i * 3 + 1])} ${f(data3[i * 3 + 2])}`);
   return out.join('\n') + '\n';

@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="color-scheme" content="dark">
-<title>Motif 5</title>
+<title>Motif 7</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anybody:wdth,wght@50..150,100..900&family=Fraunces:opsz,wght@9..144,300..900&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@300;400;500;700;800&display=swap">
 <style>
@@ -407,6 +407,27 @@ input[type=range]:focus-visible::-moz-range-thumb{background:var(--accent)}
 .kit-status[data-kind="error"]{color:var(--danger);border:var(--hairline) solid var(--danger)}
 .kit-status[data-kind="ok"]{color:var(--ok);border:var(--hairline) solid var(--ok)}
 .kit-row{display:flex;align-items:center;justify-content:space-between;gap:var(--space-3);font-size:var(--text-sm);min-height:var(--target)}
+/* motif-kit@2: format, kinds, capabilities, report, quarantine, review */
+.kit-badges{display:flex;flex-wrap:wrap;gap:var(--space-1)}
+.kit-badges span{font:600 9px/14px var(--font-mono);letter-spacing:.04em;color:var(--text-muted);border:var(--hairline) solid var(--line-strong);border-radius:2px;padding:0 4px}
+.kit-badges span[data-cap]{color:var(--accent);border-color:var(--accent-line)}
+.kit-q{display:flex;align-items:center;gap:var(--space-2);font-size:var(--text-sm);color:var(--danger);border:var(--hairline) solid var(--danger);border-radius:var(--radius-s);padding:var(--space-1) var(--space-2)}
+.kit-q span{flex:1;min-width:0}
+.kit-q[data-checking]{color:var(--text-muted);border-color:var(--line-strong)}
+.kit-report summary{cursor:pointer;font-size:var(--text-xs);color:var(--text-muted);min-height:var(--target-sm);display:flex;align-items:center}
+.kit-report summary:focus-visible,.kit-review:focus-visible{outline:var(--focus-w) solid var(--focus);outline-offset:2px}
+.kit-report table{width:100%;border-collapse:collapse;font:400 var(--text-xs)/16px var(--font-mono);color:var(--text-muted)}
+.kit-report th,.kit-report td{text-align:left;padding:2px 4px;border-bottom:var(--hairline) solid var(--line)}
+.kit-report td.n,.kit-report th.n{text-align:right}
+.kit-report ol,.kit-report ul{margin:var(--space-1) 0;padding-left:1.4em;font-size:var(--text-xs);color:var(--text-muted)}
+.kit-diags{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px;font-size:var(--text-xs);line-height:16px;max-height:16em;overflow:auto}
+.kit-diags li{padding-left:var(--space-2);border-left:2px solid var(--danger)}
+.kit-diags li[data-sev="warning"]{border-left-color:var(--line-strong);color:var(--text-muted)}
+.kit-diags code{font-family:var(--font-mono);color:var(--text-strong)}
+.kit-review{border-color:var(--accent-line)}
+.kit-review h2{margin:0;font:600 var(--text-lg)/20px var(--font-ui);color:var(--text-strong)}
+.kit-caps{margin:0;padding-left:1.2em;font-size:var(--text-sm)}
+.kit-empty{border:var(--hairline) dashed var(--line);border-radius:var(--radius-m);padding:var(--space-3);font-size:var(--text-sm);color:var(--text-muted)}
 .dropzone{position:fixed;inset:0;z-index:50;display:grid;place-items:center;background:#08080ACC;backdrop-filter:blur(4px)}
 .dropzone div{border:2px dashed var(--accent);border-radius:var(--radius-l);padding:var(--space-6) var(--space-8);display:flex;flex-direction:column;align-items:center;gap:var(--space-2);background:var(--surface-1)}
 .dropzone b{font:600 var(--text-2xl)/24px var(--font-ui);color:var(--text-strong)}
@@ -771,7 +792,7 @@ input[type=range]::-moz-range-track{background:var(--edge)}
 
 <div class="app" id="app" data-tab="layer" data-lib="on" data-insp="on">
   <header class="bar">
-    <div class="brand"><span class="mark"><i aria-hidden="true"></i>MOTIF<b>5</b></span></div>
+    <div class="brand"><span class="mark"><i aria-hidden="true"></i>MOTIF<b>7</b></span></div>
     <div class="proj"><span class="dot" aria-hidden="true"></span><b id="projName">Demo project</b><span id="projMeta">· 3 layers · 6.00 s loop</span></div>
     <div class="xport" role="group" aria-label="Transport">
       <div class="tbtns">
@@ -896,7 +917,7 @@ input[type=range]::-moz-range-track{background:var(--edge)}
         <button class="tog" id="togLane" aria-pressed="true" title="Timeline (K)" aria-label="Timeline"><svg class="i" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="1.5"/><path d="M3 14h18"/><path d="M3.5 14.5h17v5h-17z" fill="currentColor" stroke="none"/></svg></button>
         <button class="tog" id="togInsp" aria-pressed="true" title="Inspector (I)" aria-label="Inspector"><svg class="i" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="1.5"/><path d="M15 4v16"/><path d="M15.5 4.5h5v15h-5z" fill="currentColor" stroke="none"/></svg></button>
       </div>
-      <span class="ver">MOTIF 5.0</span><button class="chipbtn" id="engineChip" title="Render engine">CPU</button>
+      <span class="ver">MOTIF 7.0</span><button class="chipbtn" id="engineChip" title="Render engine">CPU</button>
     </div>
     <div class="pb-c seg pages" role="radiogroup" aria-label="Workspace layout" id="layouts">
       <button role="radio" data-l="explore" aria-checked="false" title="Explore: library and viewer (Alt 1)">Explore</button>

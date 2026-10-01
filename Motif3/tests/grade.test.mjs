@@ -1,7 +1,7 @@
 // Node grade: .cube / .3dl / HALD parsing, .cube serialisation, schema sanitiser, project round-trip and GLSL planning.
 import test from 'node:test'; import assert from 'node:assert/strict';
 import { load } from './load.mjs';
-const MODS = ['tokens', 'engine-core', 'style-library', 'kit-gl', 'kits', 'colour', 'timeline', 'grade'];
+const MODS = ['tokens', 'engine-core', 'style-library', 'kit-gl', 'kit-sandbox', 'kits', 'colour', 'timeline', 'grade'];
 const m = load(...MODS); const G = m.__m_grade, T = m.__m_timeline;
 
 const cube = (N, f = (r, g, b) => [r, g, b], head = '') => {
