@@ -615,6 +615,7 @@ function boot() {
   const extApi = {
     get project() { return project; }, commit: (next, msg) => commit(next, msg), live: next => live(next), toast: m => toast(m),
     stage, pipeline, T, C, K, A, media, $, get tab() { return tab; }, setTab: t => setTab(t), clone,
+    X, get aspect() { return aspect; }, get hasAudio() { return !!player.buffer; }, exportCtx: () => exportCtx(), queue: __m_render_queue.getQueue(), downloads: () => getDownloads(), gpuStatus: () => K.gpuStatus(),
   };
   extensions.forEach(ext => {
     const b = document.createElement('button'); b.setAttribute('role', 'tab'); b.dataset.tab = ext.id; b.setAttribute('aria-selected', 'false'); b.setAttribute('aria-controls', 'panel-' + ext.id);
@@ -1195,6 +1196,9 @@ function boot() {
     const alphaOk = ['webm', 'png', 'png-seq'].includes(ex.format);
     $('exAlpha').disabled = !alphaOk; if (!alphaOk) $('exAlpha').checked = false;
     ['exFps', 'exLoops'].forEach(id => { $(id).disabled = still; }); $('exQuality').disabled = !(ex.format === 'mp4' || ex.format === 'webm'); $('exTier').disabled = ex.format === 'json';
+    const cids = ex.format === 'mp4' ? ['avc', 'hevc', 'av1', 'vp9'] : ex.format === 'webm' ? ['vp9', 'av1', 'vp8'] : [], cav = cids.filter(id => caps && caps.codecs && caps.codecs[id]);
+    if (!cav.includes(ex.codec)) ex.codec = cav[0] || '';
+    $('exCodec').innerHTML = cav.map(id => `<option value="${id}"${id === ex.codec ? ' selected' : ''}>${X.CODECS[id].label}</option>`).join(''); $('exCodec').disabled = !cav.length; $('exQueue').disabled = still;
     $('exAudioRow').hidden = !video; $('exAudio').disabled = !player.buffer; $('exAudio').checked = !!player.buffer && ex.withAudio;
     const f = project.finish; $('exBlur').textContent = f.shutter > 0 ? `${f.shutter}° · ${f.samples} samples` : 'Off';
     const sp = C.spaceById(project.output.space);
@@ -1265,19 +1269,24 @@ function boot() {
     renderFormats(); exSummary();
     if (!caps) { caps = await X.probeCapabilities(); if (!caps.mp4 && ex.format === 'mp4') ex.format = caps.webm ? 'webm' : 'png-seq'; renderFormats(); exSummary(); }
   }
-  $('formats').addEventListener('click', e => { const b = e.target.closest('.fmt'); if (!b || b.disabled) return; ex.format = b.dataset.f; renderFormats(); exSummary(); });
+  $('formats').addEventListener('click', e => { const b = e.target.closest('.fmt'); if (!b || b.disabled) return; ex.format = b.dataset.f; ex.codec = ''; renderFormats(); exSummary(); });
   $('exAspect').addEventListener('change', e => { setAspect(e.target.value); openExport(); });
   $('exTier').addEventListener('change', e => { ex.tier = Number(e.target.value); exSummary(); });
   $('exFps').addEventListener('change', e => { const next = clone(project); next.output.fps = Number(e.target.value); commit(next); exSummary(); });
   $('exLoops').addEventListener('change', e => { ex.loops = Number(e.target.value); exSummary(); });
   $('exQuality').addEventListener('change', e => { ex.quality = e.target.value; });
+  $('exCodec').addEventListener('change', e => { ex.codec = e.target.value; });
+  $('exQueue').addEventListener('click', async () => {
+    const preset = { id: 'quick', name: 'Quick export', format: ex.format, codec: ex.codec, tier: ex.tier, fps: project.output.fps, aspect, quality: ex.quality, transparent: ex.transparent, withAudio: ex.withAudio && !!player.buffer, loops: ex.loops };
+    try { await Q.add(clone(project), preset, { aspect, hasAudio: !!player.buffer }); $('exportDlg').close(); toast('Added to the render queue'); setTab('deliver'); } catch (e) { status(e && e.message ? e.message : 'Could not add to the queue.', true); }
+  });
   $('exSpace').addEventListener('change', e => { const next = clone(project); next.output.space = e.target.value; commit(next); stage.setSpace(project.output.space); exSummary(); });
   $('exLegal').addEventListener('change', e => { const next = clone(project); next.output.broadcastSafe = e.target.checked; commit(next); exSummary(); });
   $('exAlpha').addEventListener('change', e => { ex.transparent = e.target.checked; });
   $('exAudio').addEventListener('change', e => { ex.withAudio = e.target.checked; });
   function status(msg, err) { $('exStatus').textContent = msg; $('exStatus').className = 'status' + (err ? ' err' : ''); }
   async function offer() {
-    if (!lastFile) return; const dl = await getDownloads(); const extra = [lastFile.audioCodec ? `Audio: ${lastFile.audioCodec}.` : (lastFile.audio === false && ex.withAudio ? 'No audio track.' : ''), lastFile.note, lastFile.colorTag ? `Colour tag: ${lastFile.colorTag}.` : ''].filter(Boolean).join(' ');
+    if (!lastFile) return; const dl = await getDownloads(); const extra = [lastFile.audioCodec ? `Audio: ${lastFile.audioCodec}.` : (lastFile.audio === false && ex.withAudio ? 'No audio track.' : ''), lastFile.stats ? `Rendered at ${lastFile.stats.fps} frames/s.` : '', lastFile.note, lastFile.colorTag ? `Colour tag: ${lastFile.colorTag}.` : ''].filter(Boolean).join(' ');
     if (dl) {
       try { await dl.save({ filename: lastFile.filename, data: lastFile.blob }); status(`Saved ${lastFile.filename}. ${extra}`); $('exSave').hidden = true; }
       catch (e) { const code = e && e.code; if (code === 'declined') status('Save cancelled. The render is still here if you want to try again.'); else if (code === 'too_large') status('That file is too large to save here. Try a smaller size or fewer loops.', true); else if (code === 'rate_limited') status('A save prompt is already open. Try again in a moment.'); else status('Saving files isn’t available in this view.', true); $('exSave').hidden = false; }
@@ -1288,7 +1297,16 @@ function boot() {
   }
   $('exSave').addEventListener('click', offer);
   const exportCtx = () => ({ pipeline, env: envFn, job: K.job, media, audio: player.buffer ? { buffer: player.buffer, offset: project.audio ? project.audio.offset : 0 } : null });
+  // Render queue host: background jobs run through the same exportCtx; the viewer is held (no drawing) while one renders so the pipeline is never shared.
+  const Q = __m_render_queue.getQueue();
+  Q.setProvider({
+    context: () => exportCtx(),
+    begin: () => { stage.pause(); if (stage.hold) stage.hold(true); media.pauseAll(); if (player.playing) player.stop(); app.dataset.rendering = '1'; },
+    end: () => { delete app.dataset.rendering; if (stage.hold) stage.hold(false); stage.setSpace(project.output.space); pipeline.finisher.setSpace(project.output.space); stage.invalidate(); },
+  });
+  Q.init();
   $('exRender').addEventListener('click', async () => {
+    const unlock = Q.lock(); if (!unlock) { status('The render queue is rendering. Pause or cancel that job first, or add this export to the queue.', true); return; }
     exAbort = new AbortController(); $('exRender').disabled = true; $('exSave').hidden = true; $('exProgress').hidden = false; $('exProgress').value = 0; status('Preparing…');
     $('exCancel').textContent = 'Stop render'; $('exCancel').classList.add('danger');
     const t0 = performance.now(); let msg = 'Preparing…', frac = 0, stopping = false;
@@ -1299,10 +1317,10 @@ function boot() {
     const wasPlaying = stage.playing; stage.pause(); media.pauseAll(); if (player.playing) player.stop();
     try {
       lastFile = await X.runExport(clone(project), { ...ex, withAudio: ex.withAudio && !!player.buffer, aspect, fps: project.output.fps, time: stage.time }, { ...exportCtx(), signal: exAbort.signal, onProgress: (f, m) => { frac = f; msg = m; $('exProgress').value = f; paint(); } });
-      $('exProgress').value = 1; status(`Rendered ${lastFile.filename} (${(lastFile.blob.size / 1048576).toFixed(1)} MB)`);
+      $('exProgress').value = 1; status(`Rendered ${lastFile.filename} (${(lastFile.blob.size / 1048576).toFixed(1)} MB${lastFile.stats ? ` · ${lastFile.stats.fps} frames/s render + encode` : ''})`);
       await offer();
     } catch (e) { if (e && e.name === 'AbortError') status('Export cancelled.'); else { console.error(e); status(e && e.message ? e.message : 'Export failed.', true); } }
-    finally { clearInterval(ticker); exStop = null; exAbort = null; $('exCancel').disabled = false; $('exCancel').textContent = 'Cancel'; $('exCancel').classList.remove('danger'); $('exRender').disabled = false; stage.setSpace(project.output.space); pipeline.finisher.setSpace(project.output.space); if (wasPlaying) { stage.play(); if (player.buffer && audioSync) player.start(stage.time); } else stage.invalidate(); }
+    finally { unlock(); clearInterval(ticker); exStop = null; exAbort = null; $('exCancel').disabled = false; $('exCancel').textContent = 'Cancel'; $('exCancel').classList.remove('danger'); $('exRender').disabled = false; stage.setSpace(project.output.space); pipeline.finisher.setSpace(project.output.space); if (wasPlaying) { stage.play(); if (player.buffer && audioSync) player.start(stage.time); } else stage.invalidate(); }
   });
   function closeExport() { if (exStop) { exStop(); return; } $('exportDlg').close(); }
   $('exCancel').addEventListener('click', closeExport); $('exportClose').addEventListener('click', closeExport);
@@ -1812,8 +1830,8 @@ function boot() {
     selectStyle, addLayer, mutate: doMutate, randomize: doRandom, undo, redo, openEvolve, keep, get children() { return children.length; }, openExport, toggleKey,
     get styles() { return STYLES.map(s => ({ id: s.id, gpu: !!s.gpu, engine: s.engine || (s.gpu ? 'webgpu' : 'canvas'), kit: s.kit || null, params: Object.keys(s.params).length })); },
     renderAt(pr, t, w, h, opts = {}) { const c = document.createElement('canvas'); c.width = w; c.height = h; const x = c.getContext('2d', { willReadFrequently: true }); const t0 = performance.now(); const info = pipeline.renderFrame(x, w, h, pr, t, { env: envFn, ...opts }); const ms = performance.now() - t0; return { data: x.getImageData(0, 0, w, h).data, ms, info }; },
-    exportNow: (s) => X.runExport(clone(project), { aspect, time: stage.time, tier: 720, fps: 24, loops: 1, transparent: false, withAudio: true, ...s }, exportCtx()).then(async r => ({ head: Array.from(new Uint8Array(await r.blob.slice(0, 65536).arrayBuffer())), size: r.blob.size, type: r.blob.type, filename: r.filename, note: r.note || '', colorTag: r.colorTag || '', encoderTag: r.encoderTag || '', audio: !!r.audio })),
-    probe: () => X.probeCapabilities(),
+    exportNow: (s) => X.runExport(clone(project), { aspect, time: stage.time, tier: 720, fps: 24, loops: 1, transparent: false, withAudio: true, ...s }, exportCtx()).then(async r => (window.__lab.lastBlob = r.blob, { head: Array.from(new Uint8Array(await r.blob.slice(0, 65536).arrayBuffer())), size: r.blob.size, type: r.blob.type, filename: r.filename, note: r.note || '', colorTag: r.colorTag || '', encoderTag: r.encoderTag || '', audio: !!r.audio, codec: r.codec || '', stats: r.stats || null })),
+    probe: () => X.probeCapabilities(), queue: Q, capabilityMatrix: (a, f) => X.capabilityMatrix(a, f),
     loadAudio, get analysis() { return analysis ? { bpm: analysis.bpm, offset: analysis.beatOffset, confidence: analysis.confidence, duration: analysis.duration } : null },
     parsePreset: X.parsePreset, presetJSON: () => X.presetJSON(project, aspect),
     api: { timeline: T, colour: C, audio: A, kits: K },

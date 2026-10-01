@@ -9,6 +9,16 @@ const { makeCanvas } = __m_engine_core;
 const { FORMAT, sanitizeProject, fromV1, clone } = __m_timeline;
 const { spaceById, sanitizeCustom } = __m_colour;
 const { sliceBuffer } = __m_audio;
+// Video codecs the exporter can drive through WebCodecs. `mux` is the muxer's codec id; strings are tried in order (level 5.1 first so
+// 4K at 60 fps is accepted). `hw` says which codecs are worth asking for prefer-hardware.
+const CODECS = {
+  avc: { label: 'H.264', mp4: 'avc', webm: null, strings: ['avc1.640033', 'avc1.4d0033', 'avc1.42e033'], extra: { avc: { format: 'avc' } }, bpp: 1 },
+  hevc: { label: 'HEVC', mp4: 'hevc', webm: null, strings: ['hvc1.1.6.L153.B0', 'hev1.1.6.L153.B0'], extra: { hevc: { format: 'hevc' } }, bpp: 0.7 },
+  vp9: { label: 'VP9', mp4: 'vp9', webm: 'V_VP9', strings: ['vp09.00.51.08', 'vp09.00.41.08'], extra: {}, bpp: 1, alpha: true },
+  av1: { label: 'AV1', mp4: 'av1', webm: 'V_AV1', strings: ['av01.0.13M.08', 'av01.0.08M.08'], extra: {}, bpp: 0.6 },
+  vp8: { label: 'VP8', mp4: null, webm: 'V_VP8', strings: ['vp8'], extra: {}, bpp: 1.2, alpha: true },
+};
+const CODEC_ORDER = { mp4: ['avc', 'hevc', 'av1', 'vp9'], webm: ['vp9', 'av1', 'vp8'] };
 const V1_FORMAT = 'motif-style-lab/preset@1';
 const TIERS = [720, 1080, 1440, 2160];
 const FPS = [24, 25, 30, 50, 60];
@@ -21,12 +31,14 @@ async function audioSupported(cfg) { try { const r = await g.AudioEncoder.isConf
 function probeCapabilities() {
   if (capsPromise) return capsPromise;
   capsPromise = (async () => {
-    const caps = { webcodecs: typeof g.VideoEncoder === 'function' && typeof g.VideoFrame === 'function', mp4: null, webm: null, webmAlpha: false, recorder: typeof g.MediaRecorder === 'function', zip: !!g.fflate, muxers: !!g.Mp4Muxer && !!g.WebMMuxer, aac: false, opus: false, p3: false };
+    const caps = { codecs: {}, webcodecs: typeof g.VideoEncoder === 'function' && typeof g.VideoFrame === 'function', mp4: null, webm: null, webmAlpha: false, recorder: typeof g.MediaRecorder === 'function', zip: !!g.fflate, muxers: !!g.Mp4Muxer && !!g.WebMMuxer, aac: false, opus: false, p3: false };
     if (caps.webcodecs && caps.muxers) {
-      const base = { width: 1920, height: 1080, bitrate: 12e6, framerate: 30 };
-      for (const c of ['avc1.640033', 'avc1.4d0033', 'avc1.42e033']) if (await supported({ ...base, codec: c })) { caps.mp4 = c; break; }
-      for (const c of ['vp09.00.41.08', 'vp8']) if (await supported({ ...base, codec: c })) { caps.webm = c; break; }
-      if (caps.webm) caps.webmAlpha = await supported({ ...base, codec: caps.webm, alpha: 'keep' });
+      // caps.codecs[id] = the accepted codec string at 1080p30 (null when none). caps.mp4 / caps.webm stay truthy when any codec fits the container.
+      for (const id of Object.keys(CODECS)) { caps.codecs[id] = null; for (const c of CODECS[id].strings) if (await supported({ width: 1920, height: 1080, bitrate: 12e6, framerate: 30, codec: c, ...CODECS[id].extra })) { caps.codecs[id] = c; break; } }
+      caps.mp4 = CODEC_ORDER.mp4.map(id => caps.codecs[id]).find(Boolean) || null;
+      caps.webm = CODEC_ORDER.webm.map(id => caps.codecs[id]).find(Boolean) || null;
+      caps.webmAlpha = false;
+      for (const id of ['vp9', 'vp8']) if (caps.codecs[id] && await supported({ width: 1280, height: 720, bitrate: 4e6, framerate: 30, codec: caps.codecs[id], alpha: 'keep' })) { caps.webmAlpha = true; break; }
     }
     if (typeof g.AudioEncoder === 'function') {
       caps.aac = await audioSupported({ codec: 'mp4a.40.2', sampleRate: 48000, numberOfChannels: 2, bitrate: 192000 });
@@ -38,11 +50,43 @@ function probeCapabilities() {
   return capsPromise;
 }
 
+// Config for one codec at one size: prefer-hardware first (Chrome only accepts it when a hardware encoder exists), then no-preference.
+async function pickConfig(id, w, h, fps, bitrate, alpha, hardware = true) {
+  const cd = CODECS[id]; if (!cd) return null;
+  for (const pref of hardware ? ['prefer-hardware', 'no-preference'] : ['no-preference'])
+    for (const codec of cd.strings) {
+      const cfg = { codec, width: w, height: h, bitrate, framerate: fps, hardwareAcceleration: pref, ...(alpha ? { alpha: 'keep' } : {}), ...cd.extra };
+      if (await supported(cfg)) return { cfg, hardware: pref === 'prefer-hardware' };
+    }
+  return null;
+}
+// Capability matrix: codec × size tier × { supported, hardware preferred accepted, alpha }. The browser does not say which encoder will
+// really run; "hardware" means isConfigSupported accepted prefer-hardware. Cached per aspect and frame rate.
+const matrixCache = new Map();
+function capabilityMatrix(aspect = '16x9', fps = 30) {
+  const key = aspect + '@' + fps; if (matrixCache.has(key)) return matrixCache.get(key);
+  const p = (async () => {
+    const rows = []; const ok = !!(g.VideoEncoder && g.VideoEncoder.isConfigSupported);
+    for (const id of Object.keys(CODECS)) for (const tier of TIERS) {
+      const { w, h } = exportSize(aspect, tier), cd = CODECS[id], bitrate = Math.round(w * h * fps * 0.3 * cd.bpp);
+      const row = { codec: id, label: cd.label, tier, w, h, containers: [cd.mp4 && 'mp4', cd.webm && 'webm'].filter(Boolean), supported: false, hardware: false, alpha: false };
+      if (ok) {
+        const sw = await pickConfig(id, w, h, fps, bitrate, false, false); row.supported = !!sw;
+        if (sw) { const hw = await pickConfig(id, w, h, fps, bitrate, false, true); row.hardware = !!(hw && hw.hardware); if (cd.alpha) row.alpha = !!(await pickConfig(id, w, h, fps, bitrate, true, false)); }
+      }
+      rows.push(row);
+    }
+    return { aspect, fps, tiers: TIERS, codecs: Object.keys(CODECS).map(id => ({ id, label: CODECS[id].label, containers: [CODECS[id].mp4 && 'mp4', CODECS[id].webm && 'webm'].filter(Boolean) })), rows };
+  })();
+  matrixCache.set(key, p); return p;
+}
+
 function slug(project) { return project.layers.map(l => l.styleId).join('+').slice(0, 60); }
 function fileName(project, s, ext) {
   const { w, h } = exportSize(s.aspect, s.tier);
+  const cx = (ext === 'mp4' || ext === 'webm') && s.codec && !(ext === 'mp4' && s.codec === 'avc') && !(ext === 'webm' && s.codec === 'vp9') ? `-${s.codec}` : '';
   const sp = project.output.space === 'srgb' ? '' : `-${project.output.space}`;
-  return `motif-${slug(project)}-${s.aspect}-${w}x${h}${ext === 'png' || ext === 'json' ? '' : `-${s.fps}fps`}${ext === 'json' ? '' : sp}.${ext}`;
+  return `motif-${slug(project)}-${s.aspect}-${w}x${h}${ext === 'png' || ext === 'json' ? '' : `-${s.fps}fps`}${cx}${ext === 'json' ? '' : sp}.${ext}`;
 }
 function presetJSON(project, aspect) {
   const p = clone(project); delete p.active;
@@ -58,6 +102,8 @@ function parsePreset(text) {
 const tick = (() => { try { const ch = new MessageChannel(), q = []; ch.port1.onmessage = () => { const f = q.shift(); f && f(); }; return () => new Promise(r => { q.push(r); ch.port2.postMessage(0); }); } catch (e) { return () => new Promise(r => setTimeout(r, 0)); } })();
 // Media hook for the export in progress: awaited before each frame (loads assets, seeks videos to that frame).
 let mediaPrep = null;
+// Optional ctx.gate(): awaited once per frame; a pending promise pauses the render (render queue Pause) without losing progress.
+let gate = null;
 // One frame, rendered in short slices so Cancel is honoured within ~100 ms even for very heavy frames.
 async function frameCoop(pipeline, ctx, w, h, project, t, ropts, job, signal) {
   if (mediaPrep) { await mediaPrep(project, t); if (signal && signal.aborted) throw abortErr(); }
@@ -90,9 +136,9 @@ function toI420(rgba, w, h, fullRange, withAlpha) {
   return out;
 }
 const abortErr = () => { const e = new Error('Export cancelled'); e.name = 'AbortError'; return e; };
-function makeExportCanvas(w, h, space) {
+function makeExportCanvas(w, h, space, readback = true) {
   const c = document.createElement('canvas'); c.width = w; c.height = h;
-  const ctx = c.getContext('2d', { colorSpace: spaceById(space).canvas, willReadFrequently: true, alpha: true });
+  const ctx = c.getContext('2d', { colorSpace: spaceById(space).canvas, willReadFrequently: readback, alpha: true });
   return { c, ctx };
 }
 
@@ -136,35 +182,68 @@ function splitAdts(u8) { // → raw AAC access units
   }
   return out;
 }
+// Picks the codec, asks for a hardware encoder first, and retries once without the preference if the encoder dies before producing output.
 async function encodeVideo(pipeline, project, s, caps, env, audio, onProgress, signal, job) {
+  const isMp4 = s.format === 'mp4', { w, h } = exportSize(s.aspect, s.tier);
+  const id = s.codec && CODECS[s.codec] ? s.codec : CODEC_ORDER[isMp4 ? 'mp4' : 'webm'].find(c => caps.codecs[c]);
+  const cd = CODECS[id];
+  if (!cd || !(isMp4 ? cd.mp4 : cd.webm)) throw new Error(`${cd ? cd.label : 'That codec'} can’t be stored in ${isMp4 ? 'MP4' : 'WebM'}. Choose ${isMp4 ? 'H.264, HEVC or AV1' : 'VP9, AV1 or VP8'}.`);
+  const alpha = !isMp4 && !!s.transparent && caps.webmAlpha && !!cd.alpha;
+  const mbps = Number(s.bitrateMbps) > 0 ? Number(s.bitrateMbps) * 1e6 : 0;
+  const bitrate = mbps || Math.round(w * h * s.fps * ({ standard: 0.3, high: 0.55, max: 1.0 }[s.quality] || 0.55) * cd.bpp);
+  const attempts = s.hardware === false ? [false] : [true, false]; let first = null;
+  for (const hw of attempts) {
+    const pick = await pickConfig(id, w, h, s.fps, bitrate, alpha, hw);
+    if (!pick) { if (hw) continue; throw new Error(`This browser can’t encode ${cd.label} at ${w} × ${h}. Try a smaller size or another codec.`); }
+    try { return await encodeVideoOnce(pipeline, project, s, caps, env, audio, onProgress, signal, job, { id, cd, pick, alpha, bitrate }); }
+    catch (e) { if (e && e.name === 'AbortError') throw e; if (!(pick.hardware && e && e.encoderEarly)) throw e; first = e; if (signal && signal.aborted) throw abortErr(); }
+  }
+  throw first || new Error('The video encoder could not start.');
+}
+async function encodeVideoOnce(pipeline, project, s, caps, env, audio, onProgress, signal, job, { id, cd, pick, alpha, bitrate }) {
   const { w, h } = exportSize(s.aspect, s.tier); const N = frameCount(project, s.fps, s.loops);
-  const isMp4 = s.format === 'mp4', alpha = !isMp4 && s.transparent && caps.webmAlpha;
+  const isMp4 = s.format === 'mp4';
   const space = spaceById(project.output.space);
-  const { c: canvas, ctx } = makeExportCanvas(w, h, space.id);
+  // Direct path: VideoFrame(canvas) lets the browser convert RGB to YUV (GPU where it can) instead of a JS getImageData + I420 loop.
+  // Opaque sRGB / Rec.709 only (alpha stays on the straight-alpha I420A path; P3 stays on the explicitly tagged path). Falls back on error.
+  // 'auto' picks it only when WebGL is hardware-backed: on software GL (CPU rasterised) it measured slower than the I420 loop. s.frameSource 'canvas' | 'i420' forces a path.
+  const softwareGl = typeof __m_kits !== 'undefined' && __m_kits.gpuStatus && (() => { try { const st = __m_kits.gpuStatus(); return !st.ok || st.software; } catch (e) { return true; } })();
+  let direct = s.frameSource === 'canvas' || (s.frameSource !== 'i420' && !alpha && space.id !== 'p3' && !softwareGl);
+  if (typeof g.VideoFrame !== 'function') direct = false;
+  const { c: canvas, ctx } = makeExportCanvas(w, h, space.id, !direct);
   const M = isMp4 ? g.Mp4Muxer : g.WebMMuxer;
   const fdk = audio && isMp4 && !caps.aac ? await loadFdk() : null;
   const acodec = audio ? (isMp4 ? ((caps.aac || fdk) ? 'aac' : caps.opus ? 'opus' : null) : (caps.opus ? 'opus' : null)) : null;
   const muxOpts = isMp4
-    ? { target: new M.ArrayBufferTarget(), video: { codec: 'avc', width: w, height: h, frameRate: s.fps }, fastStart: 'in-memory', ...(acodec ? { audio: { codec: acodec, sampleRate: 48000, numberOfChannels: 2 } } : {}) }
-    : { target: new M.ArrayBufferTarget(), video: { codec: caps.webm === 'vp8' ? 'V_VP8' : 'V_VP9', width: w, height: h, frameRate: s.fps, alpha }, ...(acodec ? { audio: { codec: 'A_OPUS', sampleRate: 48000, numberOfChannels: 2 } } : {}) };
+    ? { target: new M.ArrayBufferTarget(), video: { codec: cd.mp4, width: w, height: h, frameRate: s.fps }, fastStart: 'in-memory', ...(acodec ? { audio: { codec: acodec, sampleRate: 48000, numberOfChannels: 2 } } : {}) }
+    : { target: new M.ArrayBufferTarget(), video: { codec: cd.webm, width: w, height: h, frameRate: s.fps, alpha }, ...(acodec ? { audio: { codec: 'A_OPUS', sampleRate: 48000, numberOfChannels: 2 } } : {}) };
   const muxer = new M.Muxer(muxOpts);
-  let failure = null, reportedSpace = null;
-  const enc = new g.VideoEncoder({ output: (chunk, meta) => { if (meta && meta.decoderConfig) { reportedSpace = meta.decoderConfig.colorSpace || null; meta = { ...meta, decoderConfig: { ...meta.decoderConfig, colorSpace: { ...space.video } } }; } muxer.addVideoChunk(chunk, meta); }, error: e => { failure = e; } });
-  enc.configure({ codec: isMp4 ? caps.mp4 : caps.webm, width: w, height: h, bitrate: Math.round(w * h * s.fps * ({ standard: 0.3, high: 0.55, max: 1.0 }[s.quality] || 0.55)), framerate: s.fps, latencyMode: /^((?!chrome|android).)*safari/i.test(navigator.userAgent) ? 'realtime' : 'quality', ...(alpha ? { alpha: 'keep' } : {}), ...(isMp4 ? { avc: { format: 'avc' } } : {}) });
+  let failure = null, reportedSpace = null, chunksOut = 0, bytesOut = 0;
+  const earlyFail = e => { if (!chunksOut && e && typeof e === 'object') e.encoderEarly = true; return e; };
+  // The tag written to the file is ours (space.video) on the I420 path, where we chose the matrix and range; the direct path writes what the encoder reports.
+  const enc = new g.VideoEncoder({ output: (chunk, meta) => { chunksOut++; bytesOut += chunk.byteLength; if (meta && meta.decoderConfig) { reportedSpace = meta.decoderConfig.colorSpace || null; const tag = direct && reportedSpace ? { ...reportedSpace } : { ...space.video, ...(direct ? { fullRange: false } : {}) }; meta = { ...meta, decoderConfig: { ...meta.decoderConfig, colorSpace: tag } }; } muxer.addVideoChunk(chunk, meta); }, error: e => { failure = failure || earlyFail(e); } });
+  try { enc.configure({ ...pick.cfg, latencyMode: /^((?!chrome|android).)*safari/i.test(navigator.userAgent) ? 'realtime' : 'quality' }); } catch (e) { throw earlyFail(e); }
   const ropts = { transparent: !isMp4 && s.transparent, env, space: space.id };
-  g.__exportTiming = null;
+  g.__exportTiming = null; let framePathNote = '';
   await frameCoop(pipeline, ctx, w, h, project, 0, ropts, job, signal); // warm-up: scratch canvases settle before frame 0
+  const tStart = performance.now(); let tEnd = tStart;
   for (let i = 0; i < N; i++) {
+    if (gate) await gate();
     if (signal && signal.aborted) { try { enc.close(); } catch (e) { /* closed */ } throw abortErr(); }
     if (failure) throw failure;
     const T0 = performance.now();
     await frameCoop(pipeline, ctx, w, h, project, frameTime(project, s.fps, i), ropts, job, signal);
     const T1 = performance.now();
-    const img = ctx.getImageData(0, 0, w, h);
-    const T2 = performance.now();
-    const yuv = toI420(img.data, w, h, space.video.fullRange, alpha);
-    const T3 = performance.now();
-    const frame = new g.VideoFrame(yuv, { format: alpha ? 'I420A' : 'I420', codedWidth: w, codedHeight: h, timestamp: Math.round((i * 1e6) / s.fps), duration: Math.round(1e6 / s.fps), colorSpace: space.video });
+    const ts = Math.round((i * 1e6) / s.fps), dur = Math.round(1e6 / s.fps);
+    let frame = null, T2 = T1, T3 = T1;
+    if (direct) { try { frame = new g.VideoFrame(canvas, { timestamp: ts, duration: dur }); } catch (e) { direct = false; framePathNote = 'Direct canvas frames failed (' + (e && e.message || e) + '); used the I420 path.'; } T2 = T3 = performance.now(); }
+    if (!frame) {
+      const img = ctx.getImageData(0, 0, w, h);
+      T2 = performance.now();
+      const yuv = toI420(img.data, w, h, space.video.fullRange, alpha);
+      T3 = performance.now();
+      frame = new g.VideoFrame(yuv, { format: alpha ? 'I420A' : 'I420', codedWidth: w, codedHeight: h, timestamp: ts, duration: dur, colorSpace: space.video });
+    }
     enc.encode(frame, { keyFrame: i % (s.fps * 2) === 0 }); frame.close();
     const T4 = performance.now();
     // Bounded backpressure: some encoders (Safari's) hold frames until more arrive, so never wait on the queue forever.
@@ -179,7 +258,11 @@ async function encodeVideo(pipeline, project, s, caps, env, audio, onProgress, s
   }
   onProgress && onProgress(acodec ? 0.95 : 1, 'Finishing video');
   await enc.flush(); enc.close(); if (failure) throw failure;
-  let audioNote = '';
+  tEnd = performance.now();
+  const tm = g.__exportTiming || { n: 1, draw: 0, read: 0, conv: 0, enc: 0, wait: 0 }, avg = k => Math.round(tm[k] / Math.max(1, tm.n) * 10) / 10;
+  // Throughput of the whole render + encode loop (frames per second of wall time, flush included), not of the encoder alone.
+  const stats = { codec: id, codecString: pick.cfg.codec, hardwareRequested: pick.hardware, frames: N, width: w, height: h, ms: Math.round(tEnd - tStart), fps: Math.round(N / Math.max(0.001, (tEnd - tStart) / 1000) * 100) / 100, bitrate, videoBytes: bytesOut, framePath: direct ? 'canvas' : 'i420', avgMs: { draw: avg('draw'), read: avg('read'), convert: avg('conv'), encode: avg('enc'), wait: avg('wait') } };
+  let audioNote = framePathNote;
   if (audio && acodec) {
     onProgress && onProgress(0.96, 'Encoding audio');
     const [L, R] = await audioFor(audio.buffer, audio.offset, N / s.fps);
@@ -222,12 +305,12 @@ async function encodeVideo(pipeline, project, s, caps, env, audio, onProgress, s
     if (aerr) throw new Error('Audio encoding failed: ' + (aerr.message || aerr));
     if (!achunks) throw new Error('Audio encoding produced no data, so the file would be silent. Try WebM, or another browser.');
     }
-  } else if (audio && !acodec) audioNote = ' This browser has no audio encoder, so the file is silent.';
+  } else if (audio && !acodec) audioNote += ' This browser has no audio encoder, so the file is silent.';
   if (acodec === 'opus' && isMp4) audioNote += ' MP4 audio is Opus, which QuickTime and many editors will not play; use WebM or a browser with AAC.';
   muxer.finalize();
-  const v = space.video, tag = `${v.primaries}/${v.transfer}/${v.matrix}/${v.fullRange ? 'full' : 'limited'}`;
+  const v = space.video, tag = `${v.primaries}/${v.transfer}/${v.matrix}/${v.fullRange && !direct ? 'full' : 'limited'}`;
   const encTag = reportedSpace ? `${reportedSpace.primaries}/${reportedSpace.transfer}/${reportedSpace.matrix}/${reportedSpace.fullRange ? 'full' : 'limited'}` : 'none';
-  return { blob: new Blob([muxer.target.buffer], { type: isMp4 ? 'video/mp4' : 'video/webm' }), note: audioNote.trim(), colorTag: tag, encoderTag: encTag, audio: !!acodec, audioCodec: acodec ? (acodec === 'aac' ? 'AAC' : 'Opus') : null };
+  return { blob: new Blob([muxer.target.buffer], { type: isMp4 ? 'video/mp4' : 'video/webm' }), note: audioNote.trim(), colorTag: direct && reportedSpace ? encTag : tag, encoderTag: encTag, stats, codec: id, audio: !!acodec, audioCodec: acodec ? (acodec === 'aac' ? 'AAC' : 'Opus') : null };
 }
 
 async function canvasPng(canvas) { return new Promise(r => canvas.toBlob(r, 'image/png')); }
@@ -237,6 +320,7 @@ async function pngSequence(pipeline, project, s, env, onProgress, signal, job) {
   const pad = Math.max(4, String(N).length); const base = slug(project).replace(/\+/g, '_');
   await frameCoop(pipeline, ctx, w, h, project, 0, { transparent: s.transparent, env }, job, signal);
   for (let i = 0; i < N; i++) {
+    if (gate) await gate();
     if (signal && signal.aborted) throw abortErr();
     await frameCoop(pipeline, ctx, w, h, project, frameTime(project, s.fps, i), { transparent: s.transparent, env }, job, signal);
     files[`${base}_${String(i).padStart(pad, '0')}.png`] = [new Uint8Array(await (await canvasPng(canvas)).arrayBuffer()), { level: 0 }];
@@ -249,9 +333,9 @@ async function pngSequence(pipeline, project, s, env, onProgress, signal, job) {
 // Run one export. s: { format, aspect, tier, fps, loops, transparent, time, withAudio }.
 // ctx: { pipeline, env, audio: { buffer, offset } | null, onProgress, signal }. Returns { blob, filename, note, colorTag }.
 async function runExport(project, s, ctx = {}) {
-  mediaPrep = ctx.media && ctx.media.prepare ? ctx.media.prepare : null;
+  mediaPrep = ctx.media && ctx.media.prepare ? ctx.media.prepare : null; gate = typeof ctx.gate === 'function' ? ctx.gate : null;
   try { return await runExportInner(project, s, ctx); }
-  finally { mediaPrep = null; if (ctx.media && ctx.media.release) ctx.media.release(); }
+  finally { mediaPrep = null; gate = null; if (ctx.media && ctx.media.release) ctx.media.release(); }
 }
 async function runExportInner(project, s, { pipeline, env, audio, onProgress, signal, job } = {}) {
   const caps = await probeCapabilities();
@@ -263,19 +347,19 @@ async function runExportInner(project, s, { pipeline, env, audio, onProgress, si
     return { blob: await canvasPng(c), filename: fileName(project, s, 'png') };
   }
   if (s.format === 'png-seq') {
-    if (!caps.zip) throw new Error('The ZIP library did not load. Check your connection and reload.');
+    if (!caps.zip) throw new Error('The ZIP library is unavailable in this build.');
     return { blob: await pngSequence(pipeline, project, s, env, onProgress, signal, job), filename: fileName(project, s, 'zip') };
   }
-  const want = s.format === 'mp4' ? caps.mp4 : caps.webm;
+  const want = s.codec ? caps.codecs[s.codec] : s.format === 'mp4' ? caps.mp4 : caps.webm;
   if (caps.webcodecs && caps.muxers && want) {
     const r = await encodeVideo(pipeline, project, s, caps, env, s.withAudio ? audio : null, onProgress, signal, job);
-    const alphaNote = s.format === 'webm' && s.transparent && !caps.webmAlpha ? 'This browser can’t encode alpha, so the background was kept.' : '';
-    return { blob: r.blob, filename: fileName(project, s, s.format), note: [alphaNote, r.note].filter(Boolean).join(' '), colorTag: r.colorTag, encoderTag: r.encoderTag, audio: r.audio, audioCodec: r.audioCodec };
+    const alphaNote = s.format === 'webm' && s.transparent && (!caps.webmAlpha || (s.codec && CODECS[s.codec] && !CODECS[s.codec].alpha)) ? 'This browser can’t encode alpha, so the background was kept.' : '';
+    return { blob: r.blob, filename: fileName(project, s, s.format), note: [alphaNote, r.note].filter(Boolean).join(' '), colorTag: r.colorTag, encoderTag: r.encoderTag, audio: r.audio, audioCodec: r.audioCodec, codec: r.codec, stats: r.stats };
   }
-  throw new Error(`This browser can’t encode ${s.format === 'mp4' ? 'H.264' : 'VP9'}. Try ${s.format === 'mp4' ? 'WebM' : 'PNG sequence'}.`);
+  throw new Error(`This browser can’t encode ${s.codec && CODECS[s.codec] ? CODECS[s.codec].label : s.format === 'mp4' ? 'H.264' : 'VP9'}. Try ${s.format === 'mp4' ? 'WebM' : 'PNG sequence'}.`);
 }
 
-return { FORMAT, TIERS, FPS, probeCapabilities, fileName, presetJSON, parsePreset, runExport };
+return { FORMAT, TIERS, FPS, CODECS, probeCapabilities, capabilityMatrix, fileName, presetJSON, parsePreset, runExport };
 
 })();
 

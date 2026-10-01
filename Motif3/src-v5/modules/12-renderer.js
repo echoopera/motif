@@ -112,7 +112,7 @@ function renderProjectThumb(pipeline, canvas, project, t) {
 // Stage: owns the preview canvas and the loop. clock() may return transport time from audio.
 function createStage({ host, box, pipeline, getProject, onTick, onError, clock, env, extras }) {
   let canvas = null, ctx = null, space = 'srgb';
-  let aspect = '16x9', quality = 'auto', playing = true, t = 0, last = 0, raf = 0, cssW = 0, cssH = 0, dirty = true;
+  let aspect = '16x9', quality = 'auto', playing = true, t = 0, last = 0, raf = 0, cssW = 0, cssH = 0, dirty = true, held = false;
   const timings = []; let lastInfo = null;
   // Render cache: finished preview frames on the project's frame grid, keyed by a hash of the project plus
   // everything else that changes pixels. Scrubbing, stepping and looping replay from here instead of re-rendering.
@@ -189,7 +189,7 @@ function createStage({ host, box, pipeline, getProject, onTick, onError, clock, 
     last = now;
     if (playing) { const ct = clock ? clock() : null; t = ct != null ? ct % L : (t + dt) % L; dirty = true; }
     else if (extras && extras.live && extras.live()) dirty = true;
-    if (dirty && !(__m_kits.job && __m_kits.job.on)) draw();
+    if (dirty && !held && !(__m_kits.job && __m_kits.job.on)) draw();
   }
   makeCanvasEl(); ro.observe(host); raf = requestAnimationFrame(frame);
   const loopLen = () => getProject().finish.loop;
@@ -198,6 +198,7 @@ function createStage({ host, box, pipeline, getProject, onTick, onError, clock, 
     setQuality(q) { quality = q; layout(); },
     setSpace(s) { if (s === space) return; space = s; makeCanvasEl(); },
     get canvas() { return canvas; },
+    hold(on) { held = !!on; if (!held) dirty = true; }, get held() { return held; }, // background renders (render queue) own the pipeline: the viewer stops drawing until released
     play() { playing = true; last = 0; }, pause() { playing = false; dirty = true; },
     toggle() { playing = !playing; last = 0; dirty = true; return playing; },
     get playing() { return playing; }, get time() { return t; }, get info() { return lastInfo; },
