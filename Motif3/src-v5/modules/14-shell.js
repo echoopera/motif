@@ -39,25 +39,15 @@ function boot() {
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
   // ---------- media inputs (images and video for kit styles that declare `inputs`) ----------
-  // Assets are kept by content hash. Bytes live in IndexedDB (per browser, never uploaded); the project only stores
+  // Assets are kept by content hash. Bytes live in the media pool (13a: OPFS with an IndexedDB fallback; per browser, never uploaded); the project only stores
   // { asset, name, kind, w, h, dur, fit, timing } per layer input, so autosave, undo and saved looks stay small.
   // Rendering bakes each asset into a canvas with the frame's aspect ratio (fit applied), which the kit runtime
   // uploads as an sRGB texture. Video: preview plays and drifts back into sync; export seeks every frame exactly.
   function createMediaStore({ onChange, isPlaying }) {
-    const MAX_IMAGE = 60 * 1048576, MAX_VIDEO = 1024 * 1048576, MAX_BAKE = 4096;
+    const MAX_IMAGE = 60 * 1048576, MAX_VIDEO = 4096 * 1048576, MAX_BAKE = 4096;
     const assets = new Map();
     let passive = false;
-    const dbP = (async () => {
-      try {
-        if (!window.indexedDB) return null;
-        return await new Promise((res, rej) => { const r = indexedDB.open('motif3-media', 1); r.onupgradeneeded = () => r.result.createObjectStore('assets', { keyPath: 'id' }); r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); });
-      } catch (e) { return null; }
-    })();
-    const idb = async (mode, fn) => { const d = await dbP; if (!d) return null; return new Promise(res => { try { const tx = d.transaction('assets', mode); const q = fn(tx.objectStore('assets')); tx.oncomplete = () => res(q ? q.result : true); tx.onerror = () => res(null); tx.onabort = () => res(null); } catch (e) { res(null); } }); };
-    async function hashId(buf) {
-      try { const h = await crypto.subtle.digest('SHA-256', buf); return 'm_' + [...new Uint8Array(h)].slice(0, 12).map(b => b.toString(16).padStart(2, '0')).join(''); }
-      catch (e) { return 'm_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 10); }
-    }
+    const pool = __m_media_pool.create();
     const kindOf = f => /^video\//.test(f.type) || /\.(mp4|m4v|mov|webm|ogv)$/i.test(f.name || '') ? 'video' : /^image\//.test(f.type) || /\.(png|jpe?g|webp|gif|avif|bmp)$/i.test(f.name || '') ? 'image' : null;
     function decode(a) {
       a.ready = (async () => {
@@ -78,6 +68,9 @@ function boot() {
             a.frameCallback = v.requestVideoFrameCallback(decoded);
           }
           v.addEventListener('seeked', () => { a.frameRev++; if (!passive) onChange(a.id); });
+          // Optional frame-accurate WebCodecs path (13b) for scrubbing and export seeks; null when unsupported.
+          a.curRev = 0;
+          a.decP = __m_webcodecs.open(a.blob, { reference: v }).then(d => { if (d && a.forgotten) { d.dispose(); return null; } if (d && Math.abs(d.w - a.w) <= 1 && Math.abs(d.h - a.h) <= 1) { a.dec = d; a.codec = d.codec; } else if (d) d.dispose(); return a.dec || null; }).catch(() => null);
         }
         a.state = 'ready';
       })().catch(e => { a.state = 'error'; a.error = e.message || String(e); }).finally(() => onChange(a.id));
@@ -86,22 +79,24 @@ function boot() {
     function ensure(id) {
       let a = assets.get(id); if (a) return a;
       a = { id, state: 'loading', bakes: new Map() }; assets.set(id, a);
-      a.ready = idb('readonly', s => s.get(id)).then(rec => { if (!rec || !rec.blob) { a.state = 'missing'; onChange(id); return; } Object.assign(a, { name: rec.name, kind: rec.kind, mime: rec.mime, blob: rec.blob }); return decode(a); });
+      a.ready = pool.get(id).then(rec => { if (!rec || !rec.blob) { a.state = 'missing'; onChange(id); return; } Object.assign(a, { name: rec.name, kind: rec.kind, mime: rec.mime, blob: rec.blob, size: rec.size, thumb: rec.thumb }); return decode(a); });
       return a;
     }
     // Add a File/Blob. Returns the layer-input metadata to store in the project.
     async function add(file) {
       const kind = kindOf(file); if (!kind) throw new Error(`${file.name || 'That file'} isn’t an image or video.`);
-      if (file.size > (kind === 'image' ? MAX_IMAGE : MAX_VIDEO)) throw new Error(`${file.name} is larger than ${kind === 'image' ? '60 MB' : '1 GB'}.`);
-      const buf = await file.arrayBuffer(); const id = await hashId(buf);
+      if (file.size > (kind === 'image' ? MAX_IMAGE : MAX_VIDEO)) throw new Error(`${file.name} is larger than ${kind === 'image' ? '60 MB' : '4 GB'}.`);
+      const id = await pool.hashFile(file);
       let a = assets.get(id);
       if (!a || a.state === 'missing' || a.state === 'error') {
-        a = { id, state: 'loading', bakes: new Map(), name: String(file.name || kind).slice(0, 80), kind, mime: file.type || '', blob: new Blob([buf], { type: file.type || '' }) };
+        a = { id, state: 'loading', bakes: new Map(), name: String(file.name || kind).slice(0, 80), kind, mime: file.type || '', blob: file, size: file.size };
         assets.set(id, a); await decode(a);
         if (a.state !== 'ready') throw new Error(a.error || 'That file could not be decoded.');
-        a.stored = await idb('readwrite', s => s.put({ id, name: a.name, kind, mime: a.mime, blob: a.blob, w: a.w, h: a.h, dur: a.dur, added: Date.now() }));
+        a.thumb = pool.thumbnail(a.el, a.w, a.h); a.storeError = '';
+        a.stored = await pool.put(id, { name: a.name, kind, mime: a.mime, w: a.w, h: a.h, dur: a.dur, thumb: a.thumb }, a.blob).then(r => r.ok, e => { a.storeError = e.code || 'error'; return false; });
+        if (a.stored && a.decP) a.decP.then(d => d && pool.update(id, { codec: d.codec }));
       } else await a.ready;
-      return { asset: id, name: a.name, kind: a.kind, w: a.w, h: a.h, dur: a.dur ? Math.round(a.dur * 1000) / 1000 : 0, stored: !!a.stored || a.stored === undefined };
+      return { asset: id, name: a.name, kind: a.kind, w: a.w, h: a.h, dur: a.dur ? Math.round(a.dur * 1000) / 1000 : 0, stored: !!a.stored || a.stored === undefined, ...(a.storeError ? { storeError: a.storeError } : {}) };
     }
     function bakeFor(a, fit, w, h) {
       const ar = w / h, key = fit === 'stretch' ? 'stretch' : `${fit}|${ar.toFixed(4)}`;
@@ -121,8 +116,9 @@ function boot() {
     }
     function paint(a, b) {
       const c = b.canvas, x = b.ctx; x.setTransform(1, 0, 0, 1, 0, 0); x.clearRect(0, 0, c.width, c.height); x.imageSmoothingEnabled = true; x.imageSmoothingQuality = 'high';
-      if (b.fit === 'stretch') x.drawImage(a.el, 0, 0, c.width, c.height);
-      else { const s = b.fit === 'fill' ? Math.max(c.width / a.w, c.height / a.h) : Math.min(c.width / a.w, c.height / a.h); const dw = a.w * s, dh = a.h * s; x.drawImage(a.el, (c.width - dw) / 2, (c.height - dh) / 2, dw, dh); }
+      const src = a.cur || a.el;   // decoded WebCodecs frame while scrubbing, else the image / <video>
+      if (b.fit === 'stretch') x.drawImage(src, 0, 0, c.width, c.height);
+      else { const s = b.fit === 'fill' ? Math.max(c.width / a.w, c.height / a.h) : Math.min(c.width / a.w, c.height / a.h); const dw = a.w * s, dh = a.h * s; x.drawImage(src, (c.width - dw) / 2, (c.height - dh) / 2, dw, dh); }
       b.rev++;
     }
     // Video time for project time t. 'loop' retimes the clip to exactly one Motif loop (seamless);
@@ -135,6 +131,7 @@ function boot() {
     function steer(a, m, vt, L) {
       const v = a.el;
       if (isPlaying()) {
+        a.cur = null; a.decWant = NaN;
         const rate = m.timing === 'free' ? 1 : Math.max(0.0625, Math.min(16, (a.dur || 1) / L));
         if (Math.abs(v.playbackRate - rate) > 1e-3) v.playbackRate = rate;
         if (v.paused) v.play().catch(() => {});
@@ -142,8 +139,14 @@ function boot() {
         if (!v.seeking && drift > 0.2 && drift < a.dur - 0.2) v.currentTime = vt;
       } else {
         if (!v.paused) v.pause();
-        if (!v.seeking && Math.abs(v.currentTime - vt) > 1e-3) v.currentTime = vt;
+        if (a.dec) scrubDecoded(a, vt);
+        if ((!a.dec || !a.cur) && !v.seeking && Math.abs(v.currentTime - vt) > 1e-3) v.currentTime = vt;
       }
+    }
+    // Paused with a WebCodecs decoder: decode the exact frame (coalesced to the newest target) and show it when it lands.
+    function scrubDecoded(a, vt) {
+      if (a.decWant === vt) return; a.decWant = vt;
+      a.dec.scrub(vt).then(f => { if (!f || passive || a.decWant !== vt) return; a.cur = f.bitmap; a.curTs = f.ts; a.curRev++; onChange(a.id); }, () => { a.dec = null; a.cur = null; });
     }
     // Called by the kit runtime for every draw of a style that declares inputs.
     // opts.preview: this is the stage (may steer videos). Other renders (thumbnails) never seek.
@@ -158,8 +161,8 @@ function boot() {
         if (a.kind === 'video') {
           const L = S.L || 6;
           if (opts.preview && !passive) steer(a, m, videoTime(a, m, S.t || 0, L), L);
-          time = a.el.currentTime;
-          const frame = a.frameCallbacks ? a.frameRev : time;
+          time = a.cur ? a.curTs : a.el.currentTime;
+          const frame = a.cur ? 'c' + a.curRev : a.frameCallbacks ? a.frameRev : time;
           if (b.frame !== frame || !b.rev) { paint(a, b); b.frame = frame; b.time = time; }
         } else if (!b.rev) paint(a, b);
         (out || (out = {}))[q.id] = { canvas: b.canvas, rev: b.rev, w: a.w, h: a.h, time };
@@ -180,12 +183,18 @@ function boot() {
         for (const m of Object.values(l.media)) {
           if (!m || !m.asset) continue;
           const a = ensure(m.asset); await a.ready; if (a.state !== 'ready') continue;
-          if (a.kind === 'video') { a.el.pause(); await seekTo(a.el, videoTime(a, m, t, L)); }
+          if (a.kind === 'video') {
+            a.el.pause(); const vt = videoTime(a, m, t, L); await a.decP;
+            if (a.dec) { try { const f = await a.dec.frameAt(vt); a.cur = f.bitmap; a.curTs = f.ts; a.curRev++; a.decWant = vt; continue; } catch (e) { a.dec = null; a.cur = null; } }
+            await seekTo(a.el, vt);
+          }
         }
       }
     }
-    function release() { passive = false; onChange(null); }
-    function info(id) { const a = assets.get(id); return a ? { state: a.state, error: a.error, el: a.el, w: a.w, h: a.h, kind: a.kind } : { state: 'unknown' }; }
+    function release() { passive = false; for (const a of assets.values()) if (a.dec) a.dec.release(); onChange(null); }
+    // Drop an asset's decoders, frames and object URL (the pool entry is separate: pool.remove).
+    function forget(id) { const a = assets.get(id); if (!a) return; a.forgotten = true; if (a.dec) a.dec.dispose(); a.cur = null; if (a.el && a.kind === 'video') { a.el.pause(); a.el.removeAttribute('src'); a.el.load(); } if (a.el && a.el.close) a.el.close(); assets.delete(id); onChange(id); }
+    function info(id) { const a = assets.get(id); return a ? { state: a.state, error: a.error, el: a.el, w: a.w, h: a.h, kind: a.kind, dur: a.dur, codec: a.codec || '', decoder: a.dec ? 'webcodecs' : 'video', decoderStats: a.dec ? a.dec.stats() : null } : { state: 'unknown' }; }
     function used(project) { const ids = new Set(); for (const l of project.layers) for (const m of Object.values(l.media || {})) if (m && m.asset) ids.add(m.asset); return [...ids]; }
     function pauseAll() { for (const a of assets.values()) if (a.el && a.kind === 'video' && !a.el.paused) a.el.pause(); }
     // Stop decoders for unused layers, preserving hidden and animated track-matte dependencies.
@@ -201,7 +210,7 @@ function boot() {
       }
       for (const a of assets.values()) if (a.kind === 'video' && a.el && !a.el.paused && !active.has(a.id)) a.el.pause();
     }
-    return { add, ensure, resolve, prepare, release, info, used, kindOf, pauseAll, syncPlayback, get persistent() { return dbP.then(d => !!d); } };
+    return { add, ensure, resolve, prepare, release, info, used, kindOf, pauseAll, syncPlayback, forget, ids: () => [...assets.keys()], pool, get persistent() { return pool.backend.then(b => b !== 'none'); } };
   }
 
   const media = createMediaStore({ isPlaying: () => stage.playing, onChange: () => { stage.invalidate(); if (tab === 'layer') paintMediaThumbs(); } });
@@ -774,6 +783,7 @@ function boot() {
       nl.media = { ...(nl.media || {}), [q.id]: { ...meta, fit: prev ? prev.fit : q.fit, timing: prev ? prev.timing : 'loop' } };
       commit(next, `${meta.kind === 'video' ? 'Video' : 'Image'} attached · ${meta.name}`);
       if (!(await media.persistent)) toast('Attached. This browser blocks local storage, so the file won’t survive a reload.');
+      else if (meta.storeError === 'quota') toast('Attached, but browser storage is full. Free space on the Media page so it survives a reload.');
       return true;
     } catch (err) { toast(err.message || String(err)); return false; }
   }
