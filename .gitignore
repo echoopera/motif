@@ -12,3 +12,4 @@ Motif3/verify-out/
 Motif3/tests/golden/real*/
 .claude/worktrees/
 dist/
+Motif3/performance-review/worker-check-*.json
