@@ -2,6 +2,9 @@
 
 Motif 6.1 (header, Arrange, Clips, Move tool, project save/open: unchanged) plus the engine, media, colour, delivery and extensibility work below. v3–v6 projects and kits open as-is. One self-contained file: `Motif.html`.
 
+## Interface
+- **Timeline is now Animate** (switch, panel, shortcut hints, palette). Animate and Arrange share one panel height and the switch has fixed size and position, so it no longer moves when you toggle. The default panel is taller than in 6.1 (clamp 320–460 px) to match Arrange.
+
 ## Engine
 - **Render Worker.** Preview renders in a dedicated worker on a transferred OffscreenCanvas; the UI thread stays free. Automatic main-thread fallback for media layers, live audio, LUT grades, Arrange playback, unsupported browsers, worker crash or `?worker=0`. Footer reads "· Worker" when active.
 - **Render cache.** Scrub, step and loop replay frames from a bounded cache (pixel-identical). Footer chip shows coverage.

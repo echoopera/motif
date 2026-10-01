@@ -1071,7 +1071,7 @@ function boot() {
   }
   function renderLane() { renderLaneHead(); renderLaneRows(); }
   // Timeline | Arrange: one switch, centred in the strip above whichever surface is showing.
-  const surfSeg = () => `<div class="seg surf-seg" role="radiogroup" aria-label="Timeline or Arrange"><button role="radio" data-surf="timeline" aria-checked="${!arrMode}" data-tip="Timeline" data-kbd="K">Timeline</button><button role="radio" data-surf="arrange" aria-checked="${arrMode}" data-tip="Arrange" data-kbd="Alt A">Arrange</button></div>`;
+  const surfSeg = () => `<div class="seg surf-seg" role="radiogroup" aria-label="Animate or Arrange"><button role="radio" data-surf="timeline" aria-checked="${!arrMode}" data-tip="Animate" data-kbd="K">Animate</button><button role="radio" data-surf="arrange" aria-checked="${arrMode}" data-tip="Arrange" data-kbd="Alt A">Arrange</button></div>`;
   function setSurface(name) {
     if (name === 'arrange') { if (!arrMode) { focusSaved = null; setArrange(true); } return; }
     if (arrMode) { setArrange(false); laneCollapsed = false; focusSaved = null; layoutChanged(); return; }
@@ -1451,7 +1451,7 @@ function boot() {
       set('--lib-w', LAY.libOff ? '0px' : LAY.lib ? LAY.lib + 'px' : null);
       set('--insp-w', LAY.inspOff ? '0px' : LAY.insp ? LAY.insp + 'px' : null);
       const foc = layoutName() === 'focus'; app.dataset.focus = foc ? '1' : '';
-      set('--lane-h', foc ? '0px' : arrMode ? (LAY.lane ? Math.max(LAY.lane, ARR_MIN) + 'px' : 'clamp(320px, 42vh, 480px)') : laneCollapsed ? '40px' : LAY.tall ? Math.max(LAY.lane || 0, 336) + 'px' : LAY.lane ? LAY.lane + 'px' : null);
+      set('--lane-h', foc ? '0px' : !arrMode && laneCollapsed ? '40px' : LAY.tall ? Math.max(LAY.lane || 0, 336) + 'px' : LAY.lane ? Math.max(LAY.lane, ARR_MIN) + 'px' : null); // Animate and Arrange share one height, so the switch between them stays put
     } else { set('--lib-w'); set('--insp-w'); set('--lane-h'); }
     $('togLib').setAttribute('aria-pressed', !LAY.libOff); $('togInsp').setAttribute('aria-pressed', !LAY.inspOff); $('togLane').setAttribute('aria-pressed', !laneCollapsed || arrMode);
     const cur = layoutName();
@@ -1611,7 +1611,7 @@ function boot() {
     out.push(c('new', 'New project', IS_MAC ? '⌥N' : 'Alt N', newProject, 'blank slate empty start'));
     out.push(c('import-clips', 'Import clips…', '', openImportDialog, 'clips from project finder files'));
     [['explore', 'Explore', 'Alt 1'], ['build', 'Build', 'Alt 2'], ['time', 'Time', 'Alt 3'], ['focus', 'Focus', 'F']].forEach(([n, l, k]) => out.push(c('lay-' + n, `Workspace: ${l}`, k, () => setLayout(n), 'layout panels')));
-    out.push(c('t-lib', 'Toggle library', 'L', togLib, 'panel')); out.push(c('t-insp', 'Toggle inspector', 'I', togInsp, 'panel')); out.push(c('t-lane', 'Toggle timeline', 'K', togLane, 'panel keys'));
+    out.push(c('t-lib', 'Toggle library', 'L', togLib, 'panel')); out.push(c('t-insp', 'Toggle inspector', 'I', togInsp, 'panel')); out.push(c('t-lane', 'Toggle Animate', 'K', togLane, 'panel keys'));
     out.push(c('guides', 'Toggle safe-area guides', 'G', toggleGuides));
     out.push(c('aud', audOn ? 'Turn hover preview off' : 'Turn hover preview on', '', () => $('audBtn').click(), 'audition'));
     ASPECTS.forEach((a, i) => out.push(c('asp-' + a.id, `Aspect ratio ${a.label}`, String(i + 1), () => setAspect(a.id), 'format size')));
@@ -1956,7 +1956,7 @@ function boot() {
   }
   function clipMenu(c, anchor, at) {
     const items = [
-      { label: arrMode ? 'Load into Timeline' : 'Load', kbd: '↵', run: () => loadClip(c) },
+      { label: arrMode ? 'Load into Animate' : 'Load', kbd: '↵', run: () => loadClip(c) },
       { label: 'Add to Arrange', run: () => addClipToArrange(c.id) }, { sep: true },
       { label: 'Rename…', run: () => renameClip(c) },
       { label: 'Duplicate', run: () => { const i = clips.indexOf(c); clips.splice(i, 0, { ...clone(c), id: newId('c'), name: `${c.name} copy` }); saveClips(); renderClips(); } }, { sep: true },
@@ -2590,7 +2590,7 @@ void main(){
   }
   function renderArrangeNotice() {
     const id = { layer: 'panel-layer', colour: 'panel-colour', finish: 'panel-finish', audio: 'panel-audio' }[tab]; if (!id) return;
-    $(id).innerHTML = `<div class="panel-head"><div class="lbl">Arrange</div><h1>Sequence view</h1></div><div class="arr-note"><p>The viewer is playing your arrangement, so this page, which edits the working project, is paused.</p><p>Drag clips from <b>Clips</b> onto the tracks, crop and loop them by their edges, then choose a transition for a region. To change a clip itself, double-click it on a track: it opens in the Timeline.</p><div class="btnrow"><button class="btn primary" data-arr-act="exit">Back to Timeline</button><button class="btn" data-arr-act="clips">Open Clips</button></div></div>`;
+    $(id).innerHTML = `<div class="panel-head"><div class="lbl">Arrange</div><h1>Sequence view</h1></div><div class="arr-note"><p>The viewer is playing your arrangement, so this page, which edits the working project, is paused.</p><p>Drag clips from <b>Clips</b> onto the tracks, crop and loop them by their edges, then choose a transition for a region. To change a clip itself, double-click it on a track: it opens in Animate.</p><div class="btnrow"><button class="btn primary" data-arr-act="exit">Back to Timeline</button><button class="btn" data-arr-act="clips">Open Clips</button></div></div>`;
   }
   document.addEventListener('click', e => { const b = e.target.closest && e.target.closest('[data-arr-act]'); if (!b) return; if (b.dataset.arrAct === 'exit') { setArrange(false); laneCollapsed = false; layoutChanged(); } else setTab('clips'); });
   function setArrange(on) {
