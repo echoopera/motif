@@ -2,21 +2,129 @@ name: motif-ci
 on:
   push: { paths: ['Motif3/**', '.github/workflows/motif-ci.yml'] }
   pull_request: { paths: ['Motif3/**'] }
+  workflow_dispatch:
+    inputs:
+      gpu_gate:
+        description: 'Run the self-hosted GPU job (budget gate + comparison against the last GPU run)'
+        type: boolean
+        default: false
+      update_budgets:
+        description: 'GPU job: also propose tools/budgets.json from this run (uploaded as an artifact; never auto-committed)'
+        type: boolean
+        default: false
+      update_goldens:
+        description: 'Regenerate the SwiftShader visual goldens on a hosted runner and upload them (never auto-committed)'
+        type: boolean
+        default: false
+permissions: { contents: read, actions: read }
 defaults: { run: { working-directory: Motif3 } }
+
 jobs:
   test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - run: npm install --no-audit --no-fund
+      - name: build check (motif5.html must equal src-v5 output)
+        run: python3 src-v5/build.py --check
+      - name: unit tests
+        run: npm test
+      - run: npx playwright install --with-deps chromium
+      - name: browser tests (render cache identity, accessibility/keyboard, soak) on SwiftShader
+        run: npm run test:browser
+      # Goldens are SwiftShader-class only. If this runner's fonts/driver differ from the committed goldens the step reports
+      # "NOT VERIFIED" (exit 0) instead of failing on environment noise; use the update_goldens dispatch to regenerate on this runner.
+      - name: visual regression (SwiftShader goldens)
+        run: npm run test:visual
+      - name: benchmark (software GL: trend only, never gated)
+        run: >
+          node tools/bench.mjs --budget --frames 20 --size 640x360
+          --styles particle-form,lissajous,halftone,neuro/mitosis,quantum/nebula-genesis,cyberpunk/neon-rain
+          --out performance-review/bench-ci.json
+        env: { SOFTWARE_GL: '1' }
+      - name: fetch the last main bench artifact (baseline)
+        if: github.ref != 'refs/heads/main'
+        continue-on-error: true
+        env: { GH_TOKEN: '${{ github.token }}' }
+        run: |
+          id=$(gh run list --workflow motif-ci --branch main --status success --limit 1 --json databaseId -q '.[0].databaseId')
+          if [ -n "$id" ]; then gh run download "$id" -n bench-swiftshader -D performance-review/baseline || echo "baseline artifact not available"; else echo "no successful main run yet"; fi
+      # Shared runners are noisy: the comparison is reported (step summary) but does not fail the build. The GPU job below is the gate.
+      - name: compare with baseline (fails on >15% p95 regression, advisory on software GL)
+        if: github.ref != 'refs/heads/main'
+        continue-on-error: true
+        run: |
+          if [ -f performance-review/baseline/bench-ci.json ]; then node tools/bench-compare.mjs performance-review/baseline/bench-ci.json performance-review/bench-ci.json --md performance-review/compare.md
+          else echo "No baseline yet: comparison skipped."; fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: { name: bench-swiftshader, path: 'Motif3/performance-review/bench-ci.*', retention-days: 30 }
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: quality-evidence
+          path: |
+            Motif3/tests/visual-out
+            Motif3/tests/a11y-out
+            Motif3/tests/soak-out
+            Motif3/performance-review/compare.md
+          if-no-files-found: ignore
+          retention-days: 14
+
+  update-goldens:
+    if: github.event_name == 'workflow_dispatch' && inputs.update_goldens
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with: { node-version: 22 }
       - run: npm install --no-audit --no-fund
-      - run: python3 src-v5/build.py --check
-      - run: npm test
       - run: npx playwright install --with-deps chromium
-      - run: npm run test:browser
-      # Software GL numbers are not representative: upload for trend only. Gate on a self-hosted GPU runner with `npm run bench:gate`.
-      - run: node tools/bench.mjs --styles particle-form --frames 10 --size 640x360
-        env: { SOFTWARE_GL: '1' }
+      - run: npm run test:visual:update
       - uses: actions/upload-artifact@v4
-        with: { name: bench, path: Motif3/performance-review/bench-*.json }
+        with: { name: golden-swiftshader, path: Motif3/tests/golden/swiftshader }
+
+  # Gating run on a real GPU. Needs a self-hosted runner labelled `gpu` with: a hardware GPU and display/driver stack usable by headless
+  # Chrome, Google Chrome stable installed (CHROME_CHANNEL=chrome), Node 22, no SOFTWARE_GL. Run it from Actions > motif-ci > Run workflow
+  # with gpu_gate = true. It fails when any style exceeds its tools/budgets.json p95 budget, and when p95 regresses >15% against the previous
+  # GPU run on the same device. First run on a new device: set update_budgets = true, review budgets-proposed.json, commit it with the device named.
+  gpu-gate:
+    if: github.event_name == 'workflow_dispatch' && inputs.gpu_gate
+    runs-on: [self-hosted, gpu]
+    timeout-minutes: 90
+    env: { CHROME_CHANNEL: chrome }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - run: npm install --no-audit --no-fund
+      - name: fetch the previous GPU bench (same device only; the comparer refuses a different GPU)
+        continue-on-error: true
+        env: { GH_TOKEN: '${{ github.token }}' }
+        run: |
+          for id in $(gh run list --workflow motif-ci --status success --limit 30 --json databaseId -q '.[].databaseId'); do
+            gh run download "$id" -n bench-gpu -D performance-review/baseline 2>/dev/null && { echo "baseline from run $id"; break; }
+          done
+          [ -f performance-review/baseline/bench-gpu.json ] || echo "no previous GPU artifact"
+      - name: benchmark every style on the GPU and enforce budgets
+        run: node tools/bench.mjs --budget --runs 3 --out performance-review/bench-gpu.json
+      - name: compare with the previous GPU run (>15% p95 regression fails; exit 2 = different device, not gated)
+        run: |
+          if [ -f performance-review/baseline/bench-gpu.json ]; then node tools/bench-compare.mjs performance-review/baseline/bench-gpu.json performance-review/bench-gpu.json --md performance-review/compare-gpu.md || { c=$?; [ $c -eq 2 ] && echo "not comparable" || exit $c; }
+          else echo "No previous GPU artifact: comparison skipped."; fi
+      - name: propose budgets from this run (only when requested)
+        if: inputs.update_budgets
+        run: node tools/bench.mjs --update-budgets --runs 3 --out performance-review/bench-gpu-budget-run.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: bench-gpu
+          path: |
+            Motif3/performance-review/bench-gpu.*
+            Motif3/performance-review/compare-gpu.md
+            Motif3/performance-review/budgets-proposed.json
+          if-no-files-found: ignore
+          retention-days: 90

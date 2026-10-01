@@ -1,4 +1,14 @@
 node_modules/
 Motif3/performance-review/bench-*.json
+Motif3/performance-review/bench-*.md
+Motif3/performance-review/budgets-proposed.json
+Motif3/performance-review/baseline/
+Motif3/performance-review/compare*.md
+Motif3/tests/visual-out/
+Motif3/tests/a11y-out/
+Motif3/tests/soak-out/
+Motif3/verify-out/
+# Real-GPU goldens differ per device and are never committed; only tests/golden/swiftshader is.
+Motif3/tests/golden/real*/
 .claude/worktrees/
 dist/

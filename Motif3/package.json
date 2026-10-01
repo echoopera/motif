@@ -5,11 +5,19 @@
   "scripts": {
     "build": "python3 src-v5/build.py",
     "test": "node --test tests/*.test.mjs",
+    "test:browser": "SOFTWARE_GL=1 node tools/cache-check.mjs && SOFTWARE_GL=1 node tests/browser/a11y.mjs && SOFTWARE_GL=1 node tests/browser/soak.mjs",
     "test:export": "SOFTWARE_GL=1 node tools/export-check.mjs",
-    "test:browser": "SOFTWARE_GL=1 node tools/cache-check.mjs",
+    "test:media": "SOFTWARE_GL=1 node tests/browser/media-check.mjs",
+    "test:grade": "SOFTWARE_GL=1 node tests/browser/grade-check.mjs",
+    "test:visual": "SOFTWARE_GL=1 node tests/browser/visual.mjs",
+    "test:visual:update": "SOFTWARE_GL=1 node tests/browser/visual.mjs --update",
+    "test:a11y": "SOFTWARE_GL=1 node tests/browser/a11y.mjs",
+    "test:soak": "SOFTWARE_GL=1 node tests/browser/soak.mjs",
     "bench": "node tools/bench.mjs",
     "bench:gate": "node tools/bench.mjs --budget",
-    "test:media": "SOFTWARE_GL=1 node tests/browser/media-check.mjs"
+    "bench:compare": "node tools/bench-compare.mjs",
+    "bench:update-budgets": "node tools/bench.mjs --update-budgets --runs 3",
+    "verify": "node tools/verify.mjs"
   },
   "devDependencies": { "playwright": "^1.56.1" }
 }
