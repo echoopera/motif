@@ -26,8 +26,8 @@ const { createGpuEngine, GPU_STYLES } = __m_gpu_engine;
 const { createPipeline, createStage, renderThumb, renderProjectThumb, exportSize, frameCount, aspectRatio } = __m_renderer;
 const X = __m_exporter;
 
-// Extension seam: feature modules (20-*.js ...) call __m_shell.use({ id, name, icon, panel(host, api), tick(t, api) })
-// before boot. Each becomes an inspector tab + panel. `api` is the narrow surface a page may touch.
+// Extension seam: feature modules (20-*.js ...) call __m_shell.use({ id, name, icon, panel(host, api), tick(t, api, info), init(host, api), commands(api) })
+// before boot. Each becomes an inspector tab + panel (+ ⌘K entries). `api` is the narrow surface a page may touch.
 const extensions = [];
 function use(ext) { if (!ext || !ext.id || typeof ext.panel !== 'function') throw new Error('shell.use: { id, name, panel } required'); if (extensions.some(e => e.id === ext.id)) throw new Error('shell.use: duplicate page ' + ext.id); extensions.push(ext); }
 
@@ -311,6 +311,7 @@ function boot() {
     $('perf').textContent = `${rate}${stage.frameMs().toFixed(1)} ms${info && info.samples > 1 ? ` · ${info.samples}× blur` : ''}${eng}`;
     $('perf').title = `Main-thread render submission time. ${stage.playing && cadence.fps ? `Recent frame interval: ${cadence.meanMs.toFixed(1)} ms average, ${cadence.p95Ms.toFixed(1)} ms at the 95th percentile. ` : ''}The Shaders indicator shows internal preview resolution; exports use full resolution.`;
     $('lane').style.setProperty('--ph', u.toFixed(4));
+    for (const x of extensions) if (x.tick) { try { x.tick(t, extApi, info); } catch (e) { console.error(e); } }
     if (evolveOpen && now - lastEvo > 90) { lastEvo = now; drawChildren(t); }
     updateAnimatedRows(t);
     if (tab === 'audio') updateMeters(t);
@@ -515,12 +516,12 @@ function boot() {
   function keyState(path) { const ks = project.keys[path]; if (!ks || !ks.length) return 'none'; return T.keyIndexAt(ks, uNow()) >= 0 ? 'on' : 'anim'; }
   const isMapped = path => !!(project.audio && project.audio.maps.some(m => m.path === path));
   function shownValue(path) { if (!project.keys[path]) return T.getBase(project, path); const ev = T.evaluate(project, stage.time, null); return valueFromEval(ev, path); }
-  function valueFromEval(ev, path) { const p = T.parsePath(path); if (!p) return undefined; if (p.kind === 'F') return ev.finish[p.key]; const l = ev.layers.find(x => x.id === p.layer); if (!l) return undefined; return (p.scope === 'p' ? l.params : p.scope === 's' ? l.shared : l.comp)[p.key]; }
+  function valueFromEval(ev, path) { const p = T.parsePath(path); if (!p) return undefined; if (p.kind === 'F') return ev.finish[p.key]; if (p.kind === 'G') { const n = ev.finish.grade && ev.finish.grade.nodes.find(x => x.id === p.node); return n ? n.params[p.key] : undefined; } const l = ev.layers.find(x => x.id === p.layer); if (!l) return undefined; return (p.scope === 'p' ? l.params : p.scope === 's' ? l.shared : l.comp)[p.key]; }
   const rid = path => 'r_' + path.replace(/[^a-z0-9]/gi, '_');
   function rowHtml(path, opts = {}) {
     const s = T.schemaAt(project, path); if (!s) return '';
     const v = shownValue(path), id = rid(path), ks = keyState(path), locked = locks.has(path), mapped = isMapped(path);
-    const lockable = /^L:[^:]+:[ps]:/.test(path) && s.type !== 'text' && (s.mutate ?? 1) !== 0;
+    const lockable = /^(L:[^:]+:[ps]:|G:)/.test(path) && s.type !== 'text' && (s.mutate ?? 1) !== 0;
     const lock = lockable ? `<button class="ib lock" data-lock="${path}" aria-pressed="${locked}" aria-label="Lock ${s.label}" title="Lock from Mutate, Evolve and Randomize">${LOCK_SVG}</button>` : '<span></span>';
     const key = opts.nokey ? '<span></span>' : `<button class="ib kb" data-key="${path}" data-state="${ks}" aria-label="${ks === 'on' ? 'Remove key' : 'Add key'} for ${s.label}" title="${ks === 'none' ? 'Key this value at the playhead' : ks === 'on' ? 'Remove the key at the playhead' : 'Add a key at the playhead'}">${KEY_SVG}</button>`;
     const cls = `row${s.type === 'toggle' ? ' toggle' : ''}${locked ? ' locked' : ''}${mapped ? ' mapped' : ''}`;
@@ -615,11 +616,16 @@ function boot() {
   const extApi = {
     get project() { return project; }, commit: (next, msg) => commit(next, msg), live: next => live(next), toast: m => toast(m),
     stage, pipeline, T, C, K, A, media, $, get tab() { return tab; }, setTab: t => setTab(t), clone,
+    // Inspector building blocks so pages look and behave like the core panels (scrub labels, keys, locks, filled sliders).
+    rowHtml: (path, o) => rowHtml(path, o), group: (id, title, body, extra) => group(id, title, body, extra), openGroups, locks, toggleKey: p => toggleKey(p),
+    keyState: p => keyState(p), shownValue: p => shownValue(p), uNow: () => uNow(), paintRanges: r => paintRanges(r), refreshRows: () => refreshRowsOnly(), esc, store, reduce,
+    get history() { return { cursor, size: history.length }; },
   };
   extensions.forEach(ext => {
     const b = document.createElement('button'); b.setAttribute('role', 'tab'); b.dataset.tab = ext.id; b.setAttribute('aria-selected', 'false'); b.setAttribute('aria-controls', 'panel-' + ext.id);
     b.innerHTML = `${ext.icon || '<svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/></svg>'}<span>${ext.name}</span>`; $('tabs').appendChild(b);
     const sec = document.createElement('section'); sec.setAttribute('role', 'tabpanel'); sec.id = 'panel-' + ext.id; sec.dataset.panel = ext.id; sec.hidden = true; $('insp').appendChild(sec);
+    bindRows(sec); if (ext.init) { try { ext.init(sec, extApi); } catch (e) { console.error(e); } }
   });
   function renderPanel() { const ext = extensions.find(e => e.id === tab); if (ext) { try { ext.panel($('panel-' + ext.id), extApi); } catch (e) { console.error(e); $('panel-' + ext.id).textContent = 'This page failed to load.'; } paintRanges($('insp')); return; } if (tab === 'layer') renderLayerPanel(); else if (tab === 'colour') renderColourPanel(); else if (tab === 'finish') renderFinishPanel(); else if (tab === 'audio') renderAudioPanel(); else if (tab === 'looks') renderLooks(); else if (tab === 'kits') renderKitsPanel(); paintRanges($('insp')); }
 
@@ -1535,7 +1541,8 @@ function boot() {
     out.push(c('guides', 'Toggle safe-area guides', 'G', toggleGuides));
     out.push(c('aud', audOn ? 'Turn hover preview off' : 'Turn hover preview on', '', () => $('audBtn').click(), 'audition'));
     ASPECTS.forEach((a, i) => out.push(c('asp-' + a.id, `Aspect ratio ${a.label}`, String(i + 1), () => setAspect(a.id), 'format size')));
-    PAGE_NAMES.forEach(([t, n]) => out.push(c('page-' + t, `Open ${n}`, '', () => { showInsp(); setTab(t); }, 'inspector page')));
+    [...PAGE_NAMES, ...extensions.map(x => [x.id, x.name])].forEach(([t, n]) => out.push(c('page-' + t, `Open ${n}`, '', () => { showInsp(); setTab(t); }, 'inspector page')));
+    for (const x of extensions) if (x.commands) { try { for (const m of x.commands(extApi)) out.push(c(m.id, m.label, m.kbd || '', () => { showInsp(); m.run(); }, m.kw || '')); } catch (e) { console.error(e); } }
     [['dense', 'dense'], ['grid', 'thumbnails'], ['list', 'list']].forEach(([v, n]) => out.push(c('view-' + v, `Library view: ${n}`, '', () => setLibView(v), 'density')));
     [['auto', 'Auto'], ['high', 'Full'], ['draft', 'Half'], ['quarter', 'Quarter']].forEach(([v, n]) => out.push(c('q-' + v, `Preview quality: ${n}`, '', () => { $('quality').value = v; stage.setQuality(v); toast(`Preview ${n}`); }, 'resolution performance')));
     out.push(c('cache-toggle', stage.cacheOn ? 'Render cache: turn off' : 'Render cache: turn on', '', () => toggleCache(), 'performance scrub loop'));

@@ -4,6 +4,7 @@ const __m_timeline = (() => {
 // one path grammar for every value, cyclic keyframes, audio modulation and project-level
 // mutate / randomize. Pure: no DOM.
 // Paths:  L:<layerId>:p:<key> (style)  L:<layerId>:s:<key> (layer shared)  L:<layerId>:c:<key> (composite)  F:<key> (finish)
+//         G:<nodeId>:<key> (node grade, 11a-grade; optional `grade` block, absent in v3–v5 projects)
 const { P, defaults, sanitize, mutate, randomize, ease, clamp, lerp, fract } = __m_engine_core;
 const { SHARED_SCHEMA, getStyle, defaultLook, sanitizeLook, mulberry32 } = __m_style_library;
 
@@ -56,6 +57,7 @@ const easeFn = { linear: ease.linear, smooth: ease.inOutCubic, in: ease.inCubic,
 let lid = 0;
 const newLayerId = () => `l${Date.now().toString(36).slice(-4)}${(lid++).toString(36)}`;
 const clone = o => JSON.parse(JSON.stringify(o));
+const GR = () => (typeof __m_grade !== 'undefined' ? __m_grade : null); // resolved at call time (module loads later)
 
 // ---------- construction ----------
 function newLayer(styleId, shared, comp) {
@@ -93,6 +95,7 @@ function sanitizeProject(pr, sanitizeCustom) {
     palettes: (Array.isArray(pr.palettes) ? pr.palettes : []).map(p => (sanitizeCustom ? sanitizeCustom(p) : p)).filter(Boolean).slice(0, 24),
     keys: {}, audio: null, output: { ...OUTPUT_DEFAULT, ...(pr.output || {}) },
   };
+  if (pr.grade && GR()) { const g = GR().sanitizeGrade(pr.grade); if (g) out.grade = g; }
   out.output.space = ['srgb', 'p3', 'rec709'].includes(out.output.space) ? out.output.space : 'srgb';
   out.output.broadcastSafe = !!out.output.broadcastSafe;
   out.output.fps = [24, 25, 30, 50, 60].includes(Number(out.output.fps)) ? Number(out.output.fps) : 30;
@@ -124,11 +127,13 @@ function layerById(pr, id) { return pr.layers.find(l => l.id === id) || null; }
 function parsePath(path) {
   const m = /^L:([^:]+):([psc]):(.+)$/.exec(path); if (m) return { kind: 'L', layer: m[1], scope: m[2], key: m[3] };
   const f = /^F:(.+)$/.exec(path); if (f) return { kind: 'F', key: f[1] };
+  const g = /^G:([^:]+):(.+)$/.exec(path); if (g) return { kind: 'G', node: g[1], key: g[2] };
   return null;
 }
 function schemaAt(pr, path) {
   const p = parsePath(path); if (!p) return null;
   if (p.kind === 'F') return FINISH_SCHEMA[p.key] || null;
+  if (p.kind === 'G') return GR() && pr.grade ? GR().schemaAt(pr.grade, p.node, p.key) : null;
   const l = layerById(pr, p.layer); if (!l) return null;
   const sc = p.scope === 'p' ? getStyle(l.styleId).params : p.scope === 's' ? SHARED_SCHEMA : COMP_SCHEMA;
   return sc[p.key] || null;
@@ -138,17 +143,19 @@ function bucket(obj, p) { return p.scope === 'p' ? obj.params : p.scope === 's' 
 function getBase(pr, path) {
   const p = parsePath(path); if (!p) return undefined;
   if (p.kind === 'F') return pr.finish[p.key];
+  if (p.kind === 'G') { const n = GR() && GR().nodeById(pr.grade, p.node); return n ? n.params[p.key] : undefined; }
   const l = layerById(pr, p.layer); return l ? bucket(l, p)[p.key] : undefined;
 }
 function setBase(pr, path, v) {
   const p = parsePath(path), s = schemaAt(pr, path); if (!p || !s) return pr;
   const next = clone(pr); v = sanitizeValue(v, s);
-  if (p.kind === 'F') next.finish[p.key] = v; else bucket(layerById(next, p.layer), p)[p.key] = v;
+  if (p.kind === 'F') next.finish[p.key] = v; else if (p.kind === 'G') GR().nodeById(next.grade, p.node).params[p.key] = v; else bucket(layerById(next, p.layer), p)[p.key] = v;
   return next;
 }
 function pathLabel(pr, path) {
   const p = parsePath(path), s = schemaAt(pr, path); if (!p || !s) return path;
   if (p.kind === 'F') return s.label;
+  if (p.kind === 'G') return `Grade ${pr.grade.nodes.findIndex(n => n.id === p.node) + 1} ${s.label}`;
   const idx = pr.layers.findIndex(l => l.id === p.layer);
   return `L${idx + 1} ${s.label}`;
 }
@@ -160,6 +167,7 @@ function allPaths(pr, numericOnly) {
     push('p', getStyle(l.styleId).params); push('s', SHARED_SCHEMA); push('c', COMP_SCHEMA);
   });
   for (const [k, s] of Object.entries(FINISH_SCHEMA)) if (k !== 'loop' && (!numericOnly || s.type === 'range' || s.type === 'int')) out.push({ path: `F:${k}`, label: s.label, group: 'Finish' });
+  if (pr.grade && GR()) out.push(...GR().paths(pr.grade, numericOnly));
   return out;
 }
 
@@ -206,9 +214,11 @@ function evaluate(pr, t, env) {
   const layers = pr.layers.map(l => ({ id: l.id, styleId: l.styleId, params: { ...l.params }, shared: { ...l.shared, loop: L }, comp: { ...l.comp }, visible: l.visible, pmix: null, media: l.media || null }));
   const finish = { ...pr.finish };
   const byId = new Map(layers.map(l => [l.id, l]));
+  const grade = pr.grade && GR() ? GR().evalCopy(pr.grade) : null; if (grade) finish.grade = grade;
   const apply = (path, fn) => {
     const p = parsePath(path); if (!p) return;
     if (p.kind === 'F') { finish[p.key] = fn(finish[p.key], FINISH_SCHEMA[p.key]); return; }
+    if (p.kind === 'G') { const n = grade && grade.nodes.find(x => x.id === p.node), s = n && GR().schemaFor(n.type)[p.key]; if (s) n.params[p.key] = fn(n.params[p.key], s); return; }
     const l = byId.get(p.layer); if (!l) return;
     const sc = p.scope === 'p' ? getStyle(l.styleId).params : p.scope === 's' ? SHARED_SCHEMA : COMP_SCHEMA;
     const b = bucket(l, p); if (!sc[p.key]) return; b[p.key] = fn(b[p.key], sc[p.key], l, p.key);
