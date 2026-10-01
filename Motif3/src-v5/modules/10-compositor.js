@@ -21,7 +21,7 @@ function createCompositor({ gpu } = {}) {
   // One style ("look" = styleId + params + shared) into ctx. bg: fill the palette background.
   function renderLook(ctx, w, h, look, t, pal, opts = {}) {
     const { style, S } = frameState(look, w, h, t);
-    S.pal = pal; S.media = look.media || null; S.font = (weight, size) => `${weight} ${size}px ${fontCss(look.params.font)}`;
+    S.pal = pal; S.media = look.media || null; S.text = look.text || null; S.layerId = look.id || null; S.font = (weight, size) => `${weight} ${size}px ${fontCss(look.params.font)}`;
     const sh = look.shared;
     ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over'; ctx.filter = 'none';
     if (opts.clear !== false) ctx.clearRect(0, 0, w, h);

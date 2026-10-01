@@ -477,7 +477,7 @@ function boot() {
         count++;
         const li = document.createElement('li'); li.className = 'style-row'; li.setAttribute('role', 'option'); li.id = 'opt-' + st.id; li.tabIndex = -1;
         li.setAttribute('aria-selected', st.id === active().styleId);
-        li.title = st.name + ' · ' + st.blurb; li.dataset.name = st.name; li.innerHTML = `<canvas width="128" height="80" aria-hidden="true"></canvas><div><b>${esc(st.name)}</b><span class="n"><span class="cat">${st.kit ? esc(st.group || cat.name) : cat.name}</span>${st.gpu ? '<span class="gpu">GPU</span>' : ''}${st.inputs && st.inputs.length ? '<span class="medtag" title="Takes an image or video">MEDIA</span>' : ''}${st.engine === 'glsl' && !(st.inputs && st.inputs.length) ? '<span class="glsl">GLSL</span>' : ''}${st.flash ? '<span title="Contains flashing; the photosensitive limiter is ' + (K.safe ? 'on' : 'off') + '">⚡</span>' : ''}</span></div>`;
+        li.title = st.name + ' · ' + st.blurb; li.dataset.name = st.name; li.innerHTML = `<canvas width="128" height="80" aria-hidden="true"></canvas><div><b>${esc(st.name)}</b><span class="n"><span class="cat">${st.kit ? esc(st.group || cat.name) : cat.name}</span>${st.gpu ? '<span class="gpu">GPU</span>' : ''}${st.inputs && st.inputs.some(q => q.type !== 'text') ? '<span class="medtag" title="Takes an image or video">MEDIA</span>' : ''}${st.inputs && st.inputs.some(q => q.type === 'text') ? '<span class="medtag" title="Draws text you type in the inspector">TEXT</span>' : ''}${st.engine === 'glsl' && !(st.inputs && st.inputs.length) ? '<span class="glsl">GLSL</span>' : ''}${st.flash ? '<span title="Contains flashing; the photosensitive limiter is ' + (K.safe ? 'on' : 'off') + '">⚡</span>' : ''}</span></div>`;
         li.addEventListener('click', () => selectStyle(st.id));
         const c = li.querySelector('canvas'); thumbs.set(st.id, c);
         li.addEventListener('pointerenter', () => { animateThumb(st, c, true); libHover(st, true); });
@@ -514,13 +514,63 @@ function boot() {
     // Kit styles carry a suggested palette: adopt it when entering a kit from outside it.
     let palMsg = '';
     if (ns.palette && ns.kit !== os.kit && !Object.keys(next.keys).some(p => p === `L:${l.id}:s:palette`)) { nl.shared.palette = ns.palette; nl.shared.invert = false; palMsg = ` · ${ns.palette.split('.')[1]} palette`; }
-    let dropped = 0; for (const p of Object.keys(next.keys)) if (p.startsWith(`L:${l.id}:p:`)) { delete next.keys[p]; dropped++; }
-    if (next.audio) next.audio.maps = next.audio.maps.filter(m => !m.path.startsWith(`L:${l.id}:p:`));
+    // Text (motif-kit@3) belongs to the kit: styles of the same kit keep it, another kit starts from its own defaults.
+    const textKit = !!ns.kit && ns.kit === os.kit;
+    if (!textKit) delete nl.text;
+    let dropped = 0; for (const p of Object.keys(next.keys)) if (p.startsWith(`L:${l.id}:p:`) || (!textKit && p.startsWith(`L:${l.id}:t:`))) { delete next.keys[p]; dropped++; }
+    if (next.audio) next.audio.maps = next.audio.maps.filter(m => !m.path.startsWith(`L:${l.id}:p:`) && (textKit || !m.path.startsWith(`L:${l.id}:t:`)));
     commit(next, dropped ? `${getStyle(id).name} · removed ${dropped} key${dropped > 1 ? ' rows' : ' row'} from the old style${palMsg}` : palMsg ? `${ns.name}${palMsg}` : null);
     const el = $('opt-' + id); if (el) el.scrollIntoView({ block: 'nearest' });
     if (!mqDesktop.matches && tab === 'library') toast(`Layer ${project.layers.findIndex(x => x.id === l.id) + 1} is now ${getStyle(id).name}`);
   }
   function stepStyle(d) { const i = STYLES.findIndex(s => s.id === active().styleId); selectStyle(STYLES[(i + d + STYLES.length) % STYLES.length].id); }
+
+  // ---------- text inputs (motif-kit@3): imported font files, installed-font browsing, typography rows ----------
+  // Fonts are content-addressed (f_<sha256>) in IndexedDB "motif-fonts" (per browser, never uploaded); a project stores
+  // only { family, weight, source }. Missing files show Relink. The engine (04b) draws with them on the page and, after
+  // the bytes are posted once, in the render worker.
+  const TA = __m_text_atlas;
+  const fontStore = (() => {
+    let dbp = null;
+    const open = () => dbp || (dbp = new Promise((res, rej) => { try { const r = indexedDB.open('motif-fonts', 1); r.onupgradeneeded = () => r.result.createObjectStore('fonts', { keyPath: 'id' }); r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); } catch (e) { rej(e); } }));
+    const tx = (mode, fn) => open().then(db => new Promise((res, rej) => { const t = db.transaction('fonts', mode); const q = fn(t.objectStore('fonts')); t.oncomplete = () => res(q && q.result); t.onerror = t.onabort = () => rej(t.error); }));
+    return { all: () => tx('readonly', st => st.getAll()).catch(() => []), put: rec => tx('readwrite', st => st.put(rec)), remove: id => tx('readwrite', st => st.delete(id)) };
+  })();
+  const FONT_MAX = 16 * 1048576;
+  const fontKind = b => { const t = String.fromCharCode(b[0], b[1], b[2], b[3]); return b[0] === 0 && b[1] === 1 && b[2] === 0 && b[3] === 0 ? 'ttf' : t === 'OTTO' ? 'otf' : t === 'true' ? 'ttf' : t === 'wOFF' ? 'woff' : t === 'wOF2' ? 'woff2' : null; };
+  // Family name from an sfnt 'name' table (TTF/OTF; typographic family 16 preferred over family 1). WOFF/WOFF2 use the file name.
+  function sfntFamily(buf) {
+    try {
+      const v = new DataView(buf), n = v.getUint16(4);
+      for (let i = 0; i < Math.min(n, 64); i++) {
+        const o = 12 + 16 * i; if (String.fromCharCode(v.getUint8(o), v.getUint8(o + 1), v.getUint8(o + 2), v.getUint8(o + 3)) !== 'name') continue;
+        const off = v.getUint32(o + 8), count = Math.min(v.getUint16(off + 2), 512), so = off + v.getUint16(off + 4); let best = null;
+        for (let j = 0; j < count; j++) {
+          const r = off + 6 + 12 * j, pid = v.getUint16(r), nid = v.getUint16(r + 6), len = Math.min(v.getUint16(r + 8), 128), at = so + v.getUint16(r + 10);
+          if (nid !== 1 && nid !== 16) continue; let t = '';
+          if (pid === 3 || pid === 0) for (let k = 0; k + 1 < len; k += 2) t += String.fromCharCode(v.getUint16(at + k)); else if (pid === 1) for (let k = 0; k < len; k++) t += String.fromCharCode(v.getUint8(at + k)); else continue;
+          if (t && (!best || nid === 16)) best = t;
+        }
+        return best;
+      }
+    } catch (e) { /* malformed table: fall back to the file name */ }
+    return null;
+  }
+  async function importFont(file) {
+    if (!file || file.size > FONT_MAX) throw new Error(`${file ? file.name : 'That file'} is larger than 16 MB.`);
+    const buf = await file.arrayBuffer();
+    if (buf.byteLength < 12 || !fontKind(new Uint8Array(buf, 0, 4))) throw new Error(`${file.name} isn’t a TTF, OTF, WOFF or WOFF2 font.`);
+    const h = new Uint8Array(await crypto.subtle.digest('SHA-256', buf)), id = 'f_' + [...h.slice(0, 12)].map(b => b.toString(16).padStart(2, '0')).join('');
+    const family = TA.cleanFamily(sfntFamily(buf) || String(file.name || '').replace(/\.[^.]*$/, '').replace(/[^\p{L}\p{N} _.&+()-]+/gu, ' '), 'Imported font');
+    const rec = await TA.registerFont(id, buf, { family, keep: true });
+    if (!rec || rec.state !== 'ready') throw new Error(`${file.name} couldn’t be loaded as a font${rec && rec.error ? ` (${rec.error})` : ''}.`);
+    let stored = true; try { await fontStore.put({ id, family: rec.family, name: String(file.name || '').slice(0, 80), size: buf.byteLength, data: buf, added: Date.now() }); } catch (e) { stored = false; }
+    return { id, family: rec.family, stored };
+  }
+  fontStore.all().then(rows => { for (const r of rows || []) if (r && TA.FONT_ID_RE.test(r.id) && r.data) TA.registerFont(r.id, r.data, { family: r.family, keep: true }); });
+  let localFamilies = [], hintTimer = 0;
+  // A font finished loading (here or, via the worker's "fonts" message, there): redraw and refresh the fallback hints.
+  TA.on(() => { stage.invalidate(); clearTimeout(hintTimer); hintTimer = setTimeout(() => refreshFontHints(), 60); });
 
   // ---------- parameter rows ----------
   const fmtNum = (v, s) => { if (s.type === 'int') return `${Math.round(v).toLocaleString('en-US')}${s.unit || ''}`; const dec = s.step >= 1 ? 0 : s.step >= 0.1 ? 1 : 2; return `${Number(v).toFixed(dec)}${s.unit || ''}`; };
@@ -617,7 +667,10 @@ function boot() {
     for (const path of new Set(paths)) {
       const el = $(rid(path)); if (!el || el === document.activeElement) continue;
       const s = T.schemaAt(project, path); const v = valueFromEval(ev, path); if (v === undefined) continue;
-      if (s.type === 'range' || s.type === 'int') el.value = toSlider(v, s); else if (s.type === 'toggle') el.checked = !!v; else if (el.tagName === 'SELECT') el.value = v; else if (el.dataset && el.dataset.blend) { const o = s.options.find(q => q.v === v); if (o && el.firstElementChild) el.firstElementChild.textContent = o.l; }
+      if (s.type === 'range' || s.type === 'int') el.value = toSlider(v, s); else if (s.type === 'toggle') el.checked = !!v; else if (el.tagName === 'SELECT') el.value = v;
+      else if (s.type === 'text') el.value = v;
+      else if (s.type === 'font') { el.value = v.family; const w = $(el.id + '-w'); if (w && w !== document.activeElement) w.value = String(v.weight); }
+      else if (el.dataset && el.dataset.blend) { const o = s.options.find(q => q.v === v); if (o && el.firstElementChild) el.firstElementChild.textContent = o.l; }
       const out = $(el.id + '-v'); if (out) out.textContent = fmt(v, s);
       const kb = el.closest('.row') && el.closest('.row').querySelector('.kb'); if (kb) kb.dataset.state = keyState(path);
     }
@@ -758,7 +811,8 @@ function boot() {
           <button class="btn sm" id="delLayer"${n <= 1 ? ' disabled' : ''}>Delete</button>
         </div>
       </details>
-      ${st.inputs && st.inputs.length ? group('media', 'Media', st.inputs.map(q => mediaSlotHtml(l, q)).join(''), (l.media && st.inputs.some(q => l.media[q.id])) ? ' <span class="count">●</span>' : '') : ''}
+      ${textGroupsHtml(st)}
+      ${mediaInputsOf(st).length ? group('media', 'Media', mediaInputsOf(st).map(q => mediaSlotHtml(l, q)).join(''), (l.media && mediaInputsOf(st).some(q => l.media[q.id])) ? ' <span class="count">●</span>' : '') : ''}
       ${styleGroups(st)}
       ${group('comp', 'Composite', compKeys.map(k => rowHtml(lpath('c', k))).join('') + (bottom ? '<p class="info">The base layer always fills its background.</p>' : ''))}
       ${l.comp.mask !== 'none' ? group('mask', 'Mask', maskKeys.map(k => rowHtml(lpath('c', k))).join('') + matteNote) : ''}
@@ -766,6 +820,85 @@ function boot() {
     paintMediaThumbs();
     $('panel-layer').querySelectorAll('#layerList canvas').forEach(c => { const x = T.layerById(project, c.closest('.layer').dataset.layer); renderThumb(pipeline, c, { ...x, shared: { ...x.shared, loop: project.finish.loop } }, 0.3, project.palettes); });
   }
+  // ---- text inputs (motif-kit@3) ----
+  // One group per text input; per line: text (live, maxlength), font family (installed, typed or imported) + weight,
+  // size, tracking, alignment. Every field keys like any channel: strings, fonts and alignment hold; size and tracking ease.
+  const textInputsOf = st => (st.inputs || []).filter(q => q.type === 'text');
+  const mediaInputsOf = st => (st.inputs || []).filter(q => q.type !== 'text');
+  const WEIGHTS = [[100, 'Thin'], [200, 'Extra light'], [300, 'Light'], [400, 'Regular'], [500, 'Medium'], [600, 'Semibold'], [700, 'Bold'], [800, 'Extra bold'], [900, 'Black']];
+  function fontHintHtml(path, f) {
+    const s = TA.fontStatus(f);
+    const text = s.state === 'ok' ? '' : s.state === 'loading' ? 'Loading font…' : s.state === 'missing' ? `The font file for “${f.family}” isn’t in this browser. Drawing with ${s.using} until you relink it.` : s.state === 'error' ? `Couldn’t use the font file (${s.detail}). Drawing with ${s.using}.` : `Fallback in use: ${s.detail} Drawing with ${s.using}.`;
+    return `<div class="fhint" data-fhint="${path}" data-state="${s.state}" role="status">${text ? `<span>${esc(text)}</span>` : ''}${s.state === 'missing' || s.state === 'error' ? `<button class="btn sm" data-frelink="${path}">Relink…</button>` : ''}</div>`;
+  }
+  function refreshFontHints() {
+    const root = $('panel-layer'); if (!root || tab !== 'layer') return;
+    root.querySelectorAll('[data-fhint]').forEach(el => { const f = shownValue(el.dataset.fhint); if (f && typeof f === 'object' && !el.contains(document.activeElement)) el.outerHTML = fontHintHtml(el.dataset.fhint, f); });
+  }
+  function fontRowHtml(path) {
+    const s = T.schemaAt(project, path); if (!s) return '';
+    const f = shownValue(path) || s.def, id = rid(path), ks = keyState(path);
+    const key = `<button class="ib kb" data-key="${path}" data-state="${ks}" aria-label="${ks === 'on' ? 'Remove key' : 'Add key'} for ${esc(s.line)} font" title="Key the font at the playhead (a font holds until the next key)">${KEY_SVG}</button>`;
+    return `<div class="row" data-row="${path}"><label for="${id}">Font</label><span></span>${key}<span></span><input type="text" id="${id}" data-ffam="${path}" list="motifFontList" maxlength="64" spellcheck="false" autocomplete="off" value="${esc(f.family)}" aria-describedby="${id}-h" title="Type an installed family, pick one from the list, or import a font file"></div>
+      <div class="row"><label for="${id}-w">Weight</label><span></span><span></span><span></span><select id="${id}-w" data-fweight="${path}">${WEIGHTS.map(([w, n]) => `<option value="${w}"${w === f.weight ? ' selected' : ''}>${w} · ${n}</option>`).join('')}</select></div>
+      <div id="${id}-h">${fontHintHtml(path, f)}</div>
+      <div class="btnrow"><button class="btn sm" data-fimport="${path}">Import font file…</button>${typeof window.queryLocalFonts === 'function' ? `<button class="btn sm" data-flocal="${path}">Installed fonts…</button>` : ''}${f.source && TA.fontInfo(f.source) ? '<span class="info">Imported file</span>' : ''}</div>`;
+  }
+  function fontListHtml() {
+    const names = new Set(['Instrument Sans', 'Anybody', 'Fraunces', 'JetBrains Mono', 'system-ui', 'sans-serif', 'serif', 'monospace']);
+    for (const r of TA.fontPayload()) names.add(r.family);
+    for (const n of localFamilies) names.add(n);
+    return `<datalist id="motifFontList">${[...names].slice(0, 2000).map(n => `<option value="${esc(n)}"></option>`).join('')}</datalist>`;
+  }
+  function textGroupsHtml(st) {
+    const qs = textInputsOf(st); if (!qs.length) return '';
+    return qs.map((q, qi) => {
+      const gid = 'text-' + q.id; if (openGroups[gid] === undefined) openGroups[gid] = true;
+      const body = q.lines.map(ln => {
+        const p = f => lpath('t', `${q.id}.${ln.id}.${f}`);
+        return `<div class="tline" role="group" aria-label="${esc(q.label)} · ${esc(ln.label)}"><div class="lbl tl-h" aria-hidden="true">${esc(ln.label)}</div>${rowHtml(p('text'))}${fontRowHtml(p('font'))}${rowHtml(p('size'))}${rowHtml(p('tracking'))}${rowHtml(p('align'))}</div>`;
+      }).join('');
+      return group(gid, `${esc(q.label)} · text`, (q.hint ? `<p class="info">${esc(q.hint)}</p>` : '') + body + (qi === 0 ? fontListHtml() : ''));
+    }).join('');
+  }
+  // Font edits (family, weight, import, relink, installed fonts). Text, size, tracking and align use the generic row handlers.
+  let fontTarget = null;
+  const fontOf = path => { const v = shownValue(path); return v && typeof v === 'object' ? v : (T.schemaAt(project, path) || {}).def; };
+  function setFont(path, patch, msg) { if (!T.schemaAt(project, path)) return; const next = { ...fontOf(path), ...patch }; if (!next.source) delete next.source; commit(applyValue(path, next), msg); }
+  $('panel-layer').addEventListener('change', e => {
+    const el = e.target;
+    if (el.dataset && el.dataset.ffam) {
+      const fam = TA.cleanFamily(el.value, null);
+      if (!fam) { toast('Font names use letters, digits, spaces and . _ & + ( ) - only.'); el.value = fontOf(el.dataset.ffam).family; return; }
+      const imp = TA.fontPayload().find(r => r.family === fam); // typing an imported font's name selects that file
+      setFont(el.dataset.ffam, { family: fam, source: imp ? imp.id : undefined }, `Font · ${fam}`);
+    } else if (el.dataset && el.dataset.fweight) setFont(el.dataset.fweight, { weight: Number(el.value) }, `Weight · ${el.value}`);
+  });
+  $('panel-layer').addEventListener('click', async e => {
+    const im = e.target.closest('[data-fimport], [data-frelink]');
+    if (im) { fontTarget = { path: im.dataset.fimport || im.dataset.frelink, relink: !!im.dataset.frelink }; $('fontFile').click(); return; }
+    const lf = e.target.closest('[data-flocal]');
+    if (lf) {
+      try {
+        const list = await window.queryLocalFonts();
+        localFamilies = [...new Set(list.map(f => TA.cleanFamily(f.family, null)).filter(Boolean))].sort((a, b) => a.localeCompare(b)).slice(0, 2000);
+        const dl = $('motifFontList'); if (dl) dl.outerHTML = fontListHtml();
+        toast(localFamilies.length ? `${localFamilies.length} installed families: type in Font to search them` : 'No installed fonts were shared. Type a family name instead.');
+        const inp = $(rid(lf.dataset.flocal)); if (inp) inp.focus();
+      } catch (err) { toast(err && err.name === 'NotAllowedError' ? 'Font access was not allowed. Type a family name, or import a font file.' : 'This browser can’t list installed fonts. Type a family name, or import a font file.'); }
+    }
+  });
+  async function useFontFile(f, tgt) {
+    try {
+      const r = await importFont(f);
+      setFont(tgt.path, { family: r.family, source: r.id }, `${tgt.relink ? 'Relinked' : 'Imported'} ${r.family}${r.stored ? '' : ' · browser storage refused it, so it lasts until reload'}`);
+      return true;
+    } catch (err) { toast(err.message || String(err)); return false; }
+  }
+  $('fontFile').addEventListener('change', async e => {
+    const f = e.target.files && e.target.files[0]; e.target.value = ''; const tgt = fontTarget; fontTarget = null; if (!f || !tgt) return;
+    await useFontFile(f, tgt);
+  });
   // ---- media slots ----
   const fmtDur = s => s >= 60 ? `${Math.floor(s / 60)}:${String(Math.round(s % 60)).padStart(2, '0')}` : `${s.toFixed(1)} s`;
   function mediaSlotHtml(l, q) {
@@ -796,7 +929,7 @@ function boot() {
   let mediaTarget = null;
   async function attachMedia(file, inputId, layerId = project.active) {
     const l = T.layerById(project, layerId), st = l && getStyle(l.styleId);
-    const q = st && (st.inputs || []).find(x => x.id === inputId) || (st && st.inputs && st.inputs[0]);
+    const mi = st ? mediaInputsOf(st) : [], q = mi.find(x => x.id === inputId) || mi[0];
     if (!q) { toast('This layer’s style has no media input. Pick a style marked MEDIA in the library.'); return false; }
     const kind = media.kindOf(file);
     if (!kind) { toast(`${file.name} isn’t an image or video.`); return false; }
@@ -850,7 +983,7 @@ function boot() {
   }
   function dupLayer() {
     if (project.layers.length >= T.MAX_LAYERS) return;
-    const src = active(), next = clone(project), copy = T.newLayer(src.styleId); Object.assign(copy, { params: clone(src.params), shared: clone(src.shared), comp: clone(src.comp), visible: true }); if (src.media) copy.media = clone(src.media);
+    const src = active(), next = clone(project), copy = T.newLayer(src.styleId); Object.assign(copy, { params: clone(src.params), shared: clone(src.shared), comp: clone(src.comp), visible: true }); if (src.media) copy.media = clone(src.media); if (src.text) copy.text = clone(src.text);
     const i = next.layers.findIndex(l => l.id === src.id); next.layers.splice(i + 1, 0, copy); next.active = copy.id;
     for (const [p, ks] of Object.entries(project.keys)) if (p.startsWith(`L:${src.id}:`)) next.keys[p.replace(`L:${src.id}:`, `L:${copy.id}:`)] = clone(ks);
     commit(next, 'Layer duplicated');
@@ -3048,7 +3181,7 @@ void main(){
 
   // Test and automation hooks (read-only views plus the same actions the UI offers).
   window.__lab = {
-    media, attachMedia, bench: runBench,
+    media, attachMedia, bench: runBench, textAtlas: TA, importFontFile: (file, path) => useFontFile(file, { path, relink: false }), fontStore,
     get project() { return clone(project); }, setProject(p) { commit(p); stage.setSpace(project.output.space); }, get historySize() { return history.length; }, stage, gpu, pipeline, setAspect, setTab,
     selectStyle, addLayer, mutate: doMutate, randomize: doRandom, undo, redo, openEvolve, keep, get children() { return children.length; }, openExport, toggleKey,
     get styles() { return STYLES.map(s => ({ id: s.id, gpu: !!s.gpu, engine: s.engine || (s.gpu ? 'webgpu' : 'canvas'), kit: s.kit || null, params: Object.keys(s.params).length })); },

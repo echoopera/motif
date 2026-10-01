@@ -22,7 +22,7 @@ A `.motifkit` file is a zip with `manifest.json` at the root (or one folder down
 
 | Field | Rules |
 | --- | --- |
-| `format` | `"motif-kit@2"` (or `"motif-kit@1"`, read unchanged) |
+| `format` | `"motif-kit@2"` (or `"motif-kit@1"`, read unchanged; `"motif-kit@3"` = @2 plus [text inputs](text-inputs.md)) |
 | `id`, `name`, `version` | As in @1: id `^[a-z][a-z0-9-]{1,31}$` (not `core`, `motif`, `builtin` or `all`), name ≤ 32 characters, semver version |
 | `author`, `description`, `license`, `accent`, `common`, `inputs`, `palettes` | As in @1 |
 | `capabilities` | **New.** The access the kit needs, shown at install for the user to approve: `"media"`, `"audio"`, `"feedback"`. See below. |

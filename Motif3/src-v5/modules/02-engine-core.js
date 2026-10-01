@@ -125,6 +125,7 @@ function sanitize(values, schema) {
   const out = {};
   for (const [k, s] of Object.entries(schema)) {
     let v = values && k in values ? values[k] : s.def;
+    if (typeof s.clean === 'function') { out[k] = s.clean(v); continue; } // structured values (text-input fonts) bring their own sanitizer
     if (s.type === 'range' || s.type === 'int') {
       v = Number(v); if (!Number.isFinite(v)) v = s.def;
       v = clamp(v, s.min, s.max); if (s.type === 'int') v = Math.round(v);

@@ -13,10 +13,11 @@ const { STYLES, CATEGORIES } = __m_style_library;
 const { PALETTES } = __m_tokens;
 const { P } = __m_engine_core;
 const KG = __m_kit_gl;
-const SB = __m_kit_sandbox; // motif-kit@1/@2 validation, migration, static GLSL analysis
+const SB = __m_kit_sandbox; // motif-kit@1/@2/@3 validation, migration, static GLSL analysis
+const TA = __m_text_atlas;  // motif-kit@3 text inputs: the host-built glyph atlas
 
 const STORE_KEY = 'motif-kits-v3';
-const APP_KIT_API = 2; // motif-kit@2 (reads motif-kit@1 unchanged)
+const APP_KIT_API = 3; // motif-kit@3 (reads motif-kit@1 and @2 unchanged)
 const rt = KG.createGlRuntime();
 const listeners = new Set();
 let safe = true;                  // photosensitive limiter (WCAG 2.3.1), on by default
@@ -168,6 +169,7 @@ function defOf(kit, st, params) { return { passes: st.passes.map(x => ({ src: x.
 function toStyle(kit, st) {
   const params = paramsOf(st);
   const def = defOf(kit, st, params);
+  const hasText = (st.inputs || []).some(q => q.type === 'text');
   return {
     id: st.id, name: st.name, category: 'kit:' + kit.id, blurb: st.blurb, tags: st.tags, group: st.group,
     kit: kit.id, kitName: kit.name, palette: st.palette, flash: st.flash, engine: 'glsl', passes: st.passes.length, cost: st.cost || 1, inputs: st.inputs || [], params,
@@ -183,6 +185,8 @@ function toStyle(kit, st) {
       }
       const tempo = S.tempo || 1, Leff = (S.L || 6) / tempo;
       const u = { p: S.p, L: Leff, seed: S.seed, safe, pal: S.pal, params: S.P, spec: params, media: st.inputs && st.inputs.length && mediaResolver && S.media ? mediaResolver(st.inputs, S, { preview }) : null, audio: audioResolver && kit.capabilities && kit.capabilities.includes('audio') ? audioResolver(S) : null };
+      // Text inputs (motif-kit@3): the atlas is built here, engine-side, from the layer's text state (rebuilt only when it changes).
+      if (hasText) { const tm = TA.resolve(st.inputs, S); if (tm) u.media = { ...(u.media || {}), ...tm }; }
       const opt = drawPlan(st, S.w, S.h);
       lastDrawn = st.id; const t0 = performance.now();
       // Photosensitive low-pass: when the effective loop is shorter than LOWPASS_BELOW seconds, even ordinary
@@ -423,7 +427,7 @@ function previousRaw(id) { const e = installed.get(id); if (!e || !e.previous) r
 function byKind(kind) { const out = []; for (const e of installed.values()) if (e.enabled) for (const x of (kind === 'effect' ? e.kit.effects : kind === 'transition' ? e.kit.transitions : e.kit.exporters) || []) out.push({ ...x, kitId: e.kit.id, kitName: e.kit.name }); return out; }
 
 return {
-  KIT_FORMAT: SB.KIT_FORMAT_2, APP_KIT_API, LOWPASS_BELOW, runtime: rt, setPreview, reportFrame, gpuStatus, job: JOB, setMediaResolver, install, remove, setEnabled, setSafe, get safe() { return safe; }, list, catalog, installCatalog,
+  KIT_FORMAT: SB.KIT_FORMAT_3, APP_KIT_API, LOWPASS_BELOW, runtime: rt, setPreview, reportFrame, gpuStatus, job: JOB, setMediaResolver, install, remove, setEnabled, setSafe, get safe() { return safe; }, list, catalog, installCatalog,
   readFile, parseBytes, exportBytes, starterKit, validate: SB.validate, validateV1: KG.validateKit, kitOfStyle, missingKits, on, errors: errorsByStyle, persist, ready,
   KIT_FORMATS: SB.FORMATS, MS_PER_MPX, paramsOf, defOf, entry, quarantine, setQuarantine, setChecking, isChecking: id => checking.has(id), previousRaw,
   effects: () => byKind('effect'), transitions: () => byKind('transition'), exporters: () => byKind('exporter'),

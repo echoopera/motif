@@ -1,12 +1,12 @@
 #!/usr/bin/env node
-// motif-kit — validate, pack, migrate, bench and preview Motif kits (motif-kit@2; reads motif-kit@1 unchanged).
+// motif-kit — validate, pack, migrate, bench and preview Motif kits (motif-kit@3; reads motif-kit@1 and @2 unchanged).
 //   motif-kit validate <kit-folder | file.motifkit> [--json]   schema, static GLSL analysis, capability checks
 //   motif-kit pack <kit-folder> [--out dir]                     validate, then write <id>-<version>.motifkit
 //   motif-kit migrate <kit-folder>                              rewrite a motif-kit@1 manifest as motif-kit@2
 //   motif-kit bench <kit-folder | file.motifkit> [--app motif7.html] [--size 1280x720] [--frames 60]
 //                                                               headless benchmark (tools/bench.mjs) vs. declared cost
 //   motif-kit new <folder> [--id my-kit]                        copy the starter template
-//   motif-kit preview <kit-folder> [entry ...] [--media a.jpg]  contact sheet + compile/loop/timing report (playwright)
+//   motif-kit preview <kit-folder> [entry ...] [--media a.jpg] [--text "A|B|C"]  contact sheet + compile/loop/timing (playwright)
 //   motif-kit prelude                                           print the GLSL prelude and runtime declarations
 import fs from 'node:fs'; import path from 'node:path'; import os from 'node:os'; import { fileURLToPath } from 'node:url'; import { createRequire } from 'node:module'; import { spawnSync } from 'node:child_process';
 const here = path.dirname(fileURLToPath(import.meta.url));
@@ -18,7 +18,7 @@ for (let i = 0; i < rest.length; i++) {
   const a = rest[i];
   if (!a.startsWith('--')) { args.push(a); continue; }
   const [k, v] = a.slice(2).split('=');
-  if (v !== undefined) flags[k] = v; else if (rest[i + 1] && !rest[i + 1].startsWith('--') && ['out', 'id', 'name', 'w', 'h', 'chromium', 'media', 'app', 'size', 'frames', 'harness'].includes(k)) flags[k] = rest[++i]; else flags[k] = true;
+  if (v !== undefined) flags[k] = v; else if (rest[i + 1] && !rest[i + 1].startsWith('--') && ['out', 'id', 'name', 'w', 'h', 'chromium', 'media', 'app', 'size', 'frames', 'harness', 'text'].includes(k)) flags[k] = rest[++i]; else flags[k] = true;
 }
 const die = m => { console.error(m); process.exit(1); };
 function fflate() { try { return require('fflate'); } catch (e) { die('This command needs fflate: npm i fflate'); } }
@@ -72,7 +72,7 @@ if (cmd === 'validate') {
 } else if (cmd === 'migrate') {
   if (!args[0]) die('usage: motif-kit migrate <kit-folder>');
   const raw = readDir(args[0]);
-  if (raw.manifest.format === KG.KIT_FORMAT_2) { console.log(`  ${raw.manifest.id} is already ${KG.KIT_FORMAT_2}`); process.exit(0); }
+  if (raw.manifest.format === KG.KIT_FORMAT_2 || raw.manifest.format === KG.KIT_FORMAT_3) { console.log(`  ${raw.manifest.id} is already ${raw.manifest.format} (no migration needed; @3 only adds text inputs)`); process.exit(0); }
   const v = KG.validateKit(raw.manifest, raw.files); if (!report(v)) process.exit(1);
   // Same result the app records on load: format bump + capabilities inferred; styles, params and shaders unchanged.
   const m = { ...raw.manifest, format: KG.KIT_FORMAT_2 };
@@ -101,6 +101,7 @@ if (cmd === 'validate') {
   console.log(`  created ${dest}. Edit manifest.json and styles/*.glsl, then: motif-kit preview ${dest}`);
 } else if (cmd === 'prelude') {
   process.stdout.write(KG.PRELUDE + '\n// ---- your params become: uniform <float|int|bool> p_<key>; select options also #define KEY_OPTION <index>\n'
+    + '// ---- motif-kit@3 text input "type" with 3 lines (strings never reach GLSL; see docs/text-inputs.md):\n' + KG.textSource({ id: 'type', lines: [{}, {}, {}], aspect: 8 }).replace(/^/gm, '//   ') + '\n'
     + '// ---- motif-kit@2 runtime declarations (added per pass when they apply):\n' + KG.runtimeDecls('transition', ['audio'], ['input']).replace(/^/gm, '//   ') + '\n' + KG.MAIN_FINAL);
 } else if (cmd === 'preview') {
   const { runPreview } = await import('../lib/preview.mjs'); await runPreview(KG, readDir(args[0]), args.slice(1), flags);

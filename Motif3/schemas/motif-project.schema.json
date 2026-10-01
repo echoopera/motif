@@ -189,9 +189,9 @@
     },
     "keys": {
       "type": "object",
-      "description": "Keyframes by value path: L:<layerId>:p|s|c:<key> (style param, shared, composite) or F:<key> (finish). u is loop phase 0..1.",
+      "description": "Keyframes by value path: L:<layerId>:p|s|c:<key> (style param, shared, composite), L:<layerId>:t:<inputId>.<lineId>.<text|font|size|tracking|align> (text input), F:<key> (finish) or G:<node>:<key> (grade). u is loop phase 0..1. Text, font and align keys hold.",
       "propertyNames": {
-        "pattern": "^(L:[^:]+:[psc]:.+|F:.+)$"
+        "pattern": "^(L:[^:]+:[psct]:.+|F:.+|G:[^:]+:.+)$"
       },
       "additionalProperties": {
         "type": "array",
@@ -214,7 +214,8 @@
               "type": [
                 "number",
                 "string",
-                "boolean"
+                "boolean",
+                "object"
               ]
             },
             "e": {
@@ -569,6 +570,33 @@
         "visible": {
           "type": "boolean"
         },
+        "text": {
+          "type": "object",
+          "maxProperties": 2,
+          "description": "Text inputs of a motif-kit@3 style: { <inputId>: { lines: { <lineId>: line } } }. Sanitised by text-atlas.sanitizeState(): only the inputs and lines the style declares, defaults filled in.",
+          "propertyNames": {
+            "pattern": "^[a-z][a-zA-Z0-9]{0,15}$"
+          },
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "lines"
+            ],
+            "properties": {
+              "lines": {
+                "type": "object",
+                "maxProperties": 3,
+                "propertyNames": {
+                  "pattern": "^[a-z][a-zA-Z0-9]{0,15}$"
+                },
+                "additionalProperties": {
+                  "$ref": "#/$defs/textLine"
+                }
+              }
+            }
+          }
+        },
         "media": {
           "type": "object",
           "maxProperties": 4,
@@ -630,6 +658,75 @@
               }
             }
           }
+        }
+      }
+    },
+    "textLine": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "text",
+        "font",
+        "size",
+        "tracking",
+        "align"
+      ],
+      "properties": {
+        "text": {
+          "type": "string",
+          "maxLength": 128,
+          "pattern": "^[^\\u0000-\\u001F\\u007F-\\u009F\\u2028\\u2029]*$"
+        },
+        "font": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "family",
+            "weight"
+          ],
+          "properties": {
+            "family": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64,
+              "pattern": "^[\\p{L}\\p{N} _.&+()-]{1,64}$"
+            },
+            "weight": {
+              "enum": [
+                100,
+                200,
+                300,
+                400,
+                500,
+                600,
+                700,
+                800,
+                900
+              ]
+            },
+            "source": {
+              "type": "string",
+              "pattern": "^f_[a-f0-9]{8,40}$",
+              "description": "content id of an imported font file (per browser; Relink when missing)"
+            }
+          }
+        },
+        "size": {
+          "type": "number",
+          "minimum": 0.1,
+          "maximum": 1
+        },
+        "tracking": {
+          "type": "number",
+          "minimum": -0.2,
+          "maximum": 0.8
+        },
+        "align": {
+          "enum": [
+            "left",
+            "center",
+            "right"
+          ]
         }
       }
     },

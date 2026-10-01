@@ -28,7 +28,7 @@ Every pass is analysed as it will be compiled: prelude, generated param and runt
 | `#pragma` | only `optimize(on\|off)` and `debug(on\|off)` | `pragma` |
 | `#version`, `#line`, unknown directives | not allowed (the runtime sets them) | `directive` |
 | Non-ASCII or control characters | not allowed | `syntax` |
-| Capability use (`u_audio`, media inputs, feedback) without declaring it | — | `capability` |
+| Capability use (`u_audio`, media inputs, text inputs, feedback) without declaring it | — | `capability` |
 
 Loop bounds can be numbers, `const` values, macros, simple arithmetic, `min`/`max`/`clamp`/`floor`/`ceil`/`abs`/`int()`/`float()`, local variables that are never reassigned, outer loop counters (`for (int j = 0; j < i; j++)`), and declared parameters, which count at their `max`. The heaviest bundled passes reach about 6,300 iterations (`cellula/image`) and 690 fetches (`afterglow/night-drive`) per pixel.
 

@@ -126,7 +126,9 @@ function createFrameCache(pipeline) {
     const usable = cache.on && !s.live && !media && !__m_kits.runtime.pendingCompiles && !(__m_kits.job && __m_kits.job.on);
     let key = null, rt = t;
     if (usable) {
-      const sig = sigOf(pr) + '|' + canvas.width + 'x' + canvas.height + '|' + s.space + '|' + !!s.zebra + '|' + s.quality;
+      // Text layers: the project hash covers strings and typography; the font epoch covers fonts that finished loading
+      // (or imported files registered) after frames were cached, so a late font never replays stale glyphs.
+      const sig = sigOf(pr) + '|' + canvas.width + 'x' + canvas.height + '|' + s.space + '|' + !!s.zebra + '|' + s.quality + '|f' + __m_text_atlas.epoch;
       if (sig !== cache.sig || e !== cache.env) { clear(); cache.sig = sig; cache.env = e; }
       const i = Math.min(N - 1, Math.floor((t / L) * N + 1e-6)); rt = (i / N) * L; key = (playing ? 'p' : 's') + i;
       const hit = cache.map.get(key);
@@ -175,7 +177,8 @@ function createStage({ host, box, pipeline, getProject, onTick, onError, clock, 
   const fc = createFrameCache(pipeline);
   const RW = typeof __m_render_worker !== 'undefined' ? __m_render_worker : null;
   let mode = 'main', why = 'render worker starting', forced = false, wk = null, wstat = null, inflight = 0, sentAt = 0, fid = 0, gen = 0, pend = null;
-  const sent = { pr: null, env: undefined, kits: -1, clear: true }, waiters = [], reads = new Map();
+  const sent = { pr: null, env: undefined, kits: -1, clear: true, fonts: new Set() }, waiters = [], reads = new Map();
+  let wAtlas = null; // the worker's text-atlas stats (rebuild count), for the inspector and tests
   const zebraOn = () => !!(extras && extras.zebra), liveOn = () => !!(extras && extras.live && extras.live());
   const timing = ms => { timings.push(ms); if (timings.length > 60) timings.shift(); };
   // Clearing is sent with the next frame request; until the worker answers, stats read as the (empty) local cache.
@@ -236,7 +239,7 @@ function createStage({ host, box, pipeline, getProject, onTick, onError, clock, 
     if (m.type === 'ready' || m.type === 'caps') { if (wk) wk.caps = m.caps; sent.clear = true; dirty = true; }
     else if (m.type === 'frame') {
       if (m.id === inflight) inflight = 0;
-      if (m.ok) { lastInfo = m.info; drawn++; } timing(m.ms); wstat = { cache: m.cache, gpu: m.gpu };
+      if (m.ok) { lastInfo = m.info; drawn++; } timing(m.ms); wstat = { cache: m.cache, gpu: m.gpu }; if (m.atlas) wAtlas = m.atlas;
       if (pend && m.gen === pend.gen) pend.ready = true;
       if (mode === 'worker' && dirty && !(__m_kits.job && __m_kits.job.on)) post();
       settled();
@@ -291,9 +294,11 @@ function createStage({ host, box, pipeline, getProject, onTick, onError, clock, 
     if (pr !== sent.pr) m.project = pr;
     if (e !== sent.env) m.env = e ? e.source : null;
     if (__m_kits.revision !== sent.kits) m.kits = __m_kits.snapshot();
+    // Imported font files go to the worker once per content id (it registers the same bytes with its own FontFace).
+    const fonts = __m_text_atlas.fontPayload(sent.fonts); if (fonts.length) m.fonts = fonts;
     if (sent.clear) m.clear = true;
     try { wk.post(m); } catch (er) { fail('scene could not be sent: ' + (er && er.message)); return; }
-    sent.pr = pr; sent.env = e; sent.kits = __m_kits.revision; sent.clear = false;
+    sent.pr = pr; sent.env = e; sent.kits = __m_kits.revision; sent.clear = false; for (const f of fonts) sent.fonts.add(f.id);
     inflight = m.id; sentAt = performance.now(); dirty = false; if (onTick) onTick(t, lastInfo);
   }
   function frame(now) {
@@ -333,6 +338,7 @@ function createStage({ host, box, pipeline, getProject, onTick, onError, clock, 
     frameMs() { return timings.length ? timings.reduce((a, b) => a + b, 0) / timings.length : 0; },
     size() { return { w: pxW, h: pxH, cssW, cssH }; },
     // Render backend: 'worker' (off the UI thread) or 'main'; engineReason says why main is in use.
+    get atlasStats() { return mode === 'worker' ? wAtlas : __m_text_atlas.stats(); },
     get engineMode() { return mode; }, get engineReason() { return mode === 'main' ? why : ''; }, get engineCaps() { return wk && wk.caps ? { ...wk.caps } : null; }, get framesDrawn() { return drawn; },
     gpuStatus() { return mode === 'worker' && wstat && wstat.gpu ? wstat.gpu : __m_kits.gpuStatus(); },
     setEngine(pref) { forced = pref === 'main'; dirty = true; },

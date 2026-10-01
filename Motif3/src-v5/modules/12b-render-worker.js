@@ -5,8 +5,8 @@ const __m_render_worker = (() => {
 // same text via a Blob URL (shim first), and `serve` is the worker's side: it owns the transferred stage canvas, its
 // own GPU engine, kit runtime, finisher and render cache, and answers one frame request at a time.
 // Protocol (page → worker): init { fonts } · canvas { canvas, space, gen } · frame { id, t, w, h, playing, quality,
-// zebra, cache, forceCpu, project?, env?, kits?, clear? } · read { id }.
-// (worker → page): ready { caps } · caps { caps } · frame { id, gen, ok, info, ms, cache, gpu } · gpu · fonts · error · fatal · pixels.
+// zebra, cache, forceCpu, project?, env?, kits?, fonts?: [{ id, family, data }] (imported font files, once each), clear? } · read { id }.
+// (worker → page): ready { caps } · caps { caps } · frame { id, gen, ok, info, ms, cache, gpu, atlas } · gpu · fonts · error · fatal · pixels.
 
 function forcedMain() { try { return new URLSearchParams(location.search).get('worker') === '0'; } catch (e) { return false; } }
 function unsupported() {
@@ -45,6 +45,9 @@ function serve(scope) {
   const post = (m, tr) => scope.postMessage(m, tr || []);
   const onError = er => post({ type: 'error', message: String((er && er.message) || er) });
   K.on(ev => { if (ev.type === 'gpu') post({ type: 'gpu', gpu: ev.gpu }); });
+  // A font that finishes loading here (web font, installed face or an imported file) changes text atlases: drop cached
+  // frames and ask the page for a fresh frame (the cache signature carries the font epoch as well).
+  __m_text_atlas.on(() => { if (fc) fc.clear(); post({ type: 'fonts' }); });
   // Text styles need the page's web fonts; document.fonts is page-only, so the worker loads the same Google CSS itself.
   // Latin subsets load eagerly (then cached frames are dropped and the page redraws); other subsets load on use.
   async function loadFonts(hrefs) {
@@ -83,6 +86,7 @@ function serve(scope) {
       if (m.project) project = m.project;
       if ('env' in m) env = m.env ? A.makeEnv(m.env) : null;
       if (m.kits) { K.applySnapshot(m.kits); fc.clear(); }
+      if (m.fonts) for (const f of m.fonts) __m_text_atlas.registerFont(f.id, f.data, { family: f.family });
       if (m.clear) fc.clear();
       fc.on = m.cache;
       if (gpu.forceCpu !== !!m.forceCpu) { gpu.setForceCpu(m.forceCpu); fc.clear(); }
@@ -93,7 +97,7 @@ function serve(scope) {
       if (m.playing && lastPlaying && !K.runtime.pendingCompiles) K.reportFrame(t0 - lastStart);
       lastStart = t0; lastPlaying = m.playing;
       const r = fc.draw(ctx, canvas, project, m.t, { playing: m.playing, quality: m.quality, space, zebra: m.zebra, env, live: false, onError });
-      post({ type: 'frame', id: m.id, gen, ok: !r.failed, info: r.info, ms: performance.now() - t0, cache: fc.stats(project), gpu: K.gpuStatus() });
+      post({ type: 'frame', id: m.id, gen, ok: !r.failed, info: r.info, ms: performance.now() - t0, cache: fc.stats(project), gpu: K.gpuStatus(), atlas: __m_text_atlas.stats() });
     } else if (m.type === 'read') {
       const d = ctx ? ctx.getImageData(0, 0, canvas.width, canvas.height) : null;
       post({ type: 'pixels', id: m.id, w: d ? d.width : 0, h: d ? d.height : 0, data: d ? d.data : null }, d ? [d.data.buffer] : []);

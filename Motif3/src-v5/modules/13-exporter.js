@@ -107,11 +107,14 @@ let gate = null;
 // One frame, rendered in short slices so Cancel is honoured within ~100 ms even for very heavy frames.
 const arrN = (project, s) => (s.arrange ? Math.max(1, Math.round(s.arrange.duration * s.fps)) : frameCount(project, s.fps, s.loops));
 async function frameAt(s, pipeline, ctx, w, h, project, i, t0, ropts, job, signal) {
-  if (s.arrange) { if (signal && signal.aborted) throw abortErr(); return s.arrange.draw(ctx, w, h, t0 != null ? t0 : i / s.fps, ropts); }
+  if (s.arrange) { await __m_text_atlas.whenReady(); if (signal && signal.aborted) throw abortErr(); return s.arrange.draw(ctx, w, h, t0 != null ? t0 : i / s.fps, ropts); }
   return frameCoop(pipeline, ctx, w, h, project, t0 != null ? t0 : frameTime(project, s.fps, i), ropts, job, signal);
 }
 async function frameCoop(pipeline, ctx, w, h, project, t, ropts, job, signal) {
   if (mediaPrep) { await mediaPrep(project, t); if (signal && signal.aborted) throw abortErr(); }
+  // Text layers: every font the project uses has finished loading (or failed) before a frame is drawn, so the first
+  // exported frame never shows a fallback face that later frames replace. Cheap once settled.
+  await __m_text_atlas.whenReady(project); if (signal && signal.aborted) throw abortErr();
   if (!job) { if (signal && signal.aborted) throw abortErr(); return pipeline.renderFrame(ctx, w, h, project, t, ropts); }
   job.begin();
   try {

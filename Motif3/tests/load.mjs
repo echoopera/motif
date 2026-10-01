@@ -6,6 +6,7 @@ export function load(...names) {
   const ctx = vm.createContext({ console, setTimeout, clearTimeout, performance, structuredClone, AbortController, TextEncoder, TextDecoder, localStorage: { getItem: () => null, setItem() {} }, document: undefined, OffscreenCanvas: undefined });
   const files = fs.readdirSync(dir).filter(f => f.endsWith('.js')).sort();
   const want = new Set(names);
+  if (want.has('kits')) want.add('text-atlas'); // the kit registry draws text inputs through 04b (motif-kit@3)
   const code = files.filter(f => want.has(f.replace(/^\d+[a-z]?-|\.js$/g, ''))).map(f => fs.readFileSync(path.join(dir, f), 'utf8')).join('\n');
   const exportsList = names.map(n => `__m_${n.replace(/-/g, '_')}`);
   return vm.runInContext(`"use strict";\n${code}\n({ ${exportsList.join(', ')} })`, ctx, { filename: 'motif-modules.js' });

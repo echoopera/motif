@@ -8,6 +8,7 @@
     "test:browser": "SOFTWARE_GL=1 node tools/cache-check.mjs && SOFTWARE_GL=1 node tests/browser/a11y.mjs && SOFTWARE_GL=1 node tests/browser/soak.mjs",
     "test:export": "SOFTWARE_GL=1 node tools/export-check.mjs",
     "test:media": "SOFTWARE_GL=1 node tests/browser/media-check.mjs",
+    "test:text": "SOFTWARE_GL=1 node tests/browser/text.browser.mjs",
     "test:grade": "SOFTWARE_GL=1 node tests/browser/grade-check.mjs",
     "test:visual": "SOFTWARE_GL=1 node tests/browser/visual.mjs",
     "test:visual:update": "SOFTWARE_GL=1 node tests/browser/visual.mjs --update",

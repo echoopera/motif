@@ -4,7 +4,8 @@ const __m_kit_host = (() => {
 // (a Worker running the same modules can use it unchanged); only setTimeout, performance and the kit runtime.
 //
 //  install(raw, opts)     validate (kit-sandbox: schema + static GLSL analysis) → capability approval → background
-//                         compile with a time budget → first-frame canary at 64×64 with a measured-time limit →
+//                         compile with a time budget → first-frame canary at 64×64 with a measured-time limit (text
+//                         inputs carry their default strings in a real glyph atlas) →
 //                         register. Compile errors reject the kit with line-numbered diagnostics; a pathologically
 //                         slow entry is installed QUARANTINED (it draws a designed placeholder, never its shader).
 //  watchdog               preview draws that stay far over budget, and GPU resets that keep following one entry,
@@ -13,7 +14,7 @@ const __m_kit_host = (() => {
 // Limits, stated honestly: the canary measures one small frame on this GPU; it bounds the damage of a slow shader,
 // it does not prove a shader is safe. A driver can still hang inside a single draw call; the browser then resets
 // the GPU context, which kit-gl recovers from (and this module quarantines a repeat offender).
-const K = __m_kits, SB = __m_kit_sandbox, rt = K.runtime;
+const K = __m_kits, SB = __m_kit_sandbox, TA = __m_text_atlas, rt = K.runtime;
 const { defaults } = __m_engine_core;
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const now = () => performance.now();
@@ -47,9 +48,13 @@ function compileDiagnostics(text, e, kit) {
   }
   return out;
 }
+// Text inputs (motif-kit@3) are probed with their DEFAULT strings rasterized into a real atlas, never a blank texture,
+// so a shader whose cost depends on glyph coverage (FaceType-style edge and trail loops) is measured as users will run it.
 function canaryUniforms(kit, e) {
   const spec = K.paramsOf(e), pal = (kit.palettes.find(p => p.id === e.palette) || kit.palettes[0] || DEFAULT_PAL);
-  return { p: 0.37, L: 6, seed: 417, safe: true, pal, params: defaults(spec), spec, media: null, audio: null, progress: 0.5, ext: null };
+  let media = null;
+  for (const q of TA.textInputs(e.inputs)) (media || (media = {}))[q.id] = TA.defaultAtlas(q, 1024);
+  return { p: 0.37, L: 6, seed: 417, safe: true, pal, params: defaults(spec), spec, media, audio: null, progress: 0.5, ext: null };
 }
 // Compile one entry in the background (KHR_parallel_shader_compile when present) under a time budget, then canary it.
 // Returns { ok, error?, diagnostics, quarantine?, canary }.

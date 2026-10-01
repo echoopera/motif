@@ -486,6 +486,15 @@ progress{width:100%;accent-color:var(--accent);height:8px}
 
 /* ---- media inputs ---- */
 .style-row .medtag,.medtag{font:600 9px/12px var(--font-mono);letter-spacing:.06em;color:#8DD9C4;border:var(--hairline) solid #2C5A4E;border-radius:2px;padding:0 4px}
+.tline .row > input[type=text]{grid-column:2/4}
+.tline .row > select{grid-column:2/4}
+.tline{display:flex;flex-direction:column;gap:var(--space-1);padding:var(--space-2) 0;border-top:var(--hairline) solid var(--line)}
+.tline:first-of-type{border-top:0;padding-top:0}
+.tline .tl-h{padding:0 var(--space-1)}
+.fhint:empty{display:none}
+.fhint{display:flex;flex-wrap:wrap;align-items:center;gap:var(--space-2);padding:var(--space-1) var(--space-2);border-radius:var(--radius-s);font-size:var(--text-xs);line-height:16px;color:var(--text-muted);border:var(--hairline) solid var(--line)}
+.fhint[data-state="fallback"],.fhint[data-state="missing"],.fhint[data-state="error"]{color:var(--text);border-color:var(--lock);background:var(--lock-soft)}
+.tline .btnrow{padding:0 var(--space-1)}
 .mslot{display:flex;flex-direction:column;gap:var(--space-2);padding:var(--space-1) 0 var(--space-2)}
 .mslot + .mslot{border-top:var(--hairline) solid var(--line);padding-top:var(--space-3)}
 .mdrop{all:unset;box-sizing:border-box;cursor:pointer;display:grid;grid-template-columns:32px 1fr;grid-template-rows:auto auto;column-gap:var(--space-3);row-gap:0;align-items:center;padding:var(--space-3);border:1px dashed var(--line-strong);border-radius:var(--radius-m);background:var(--surface-0);transition:border-color var(--dur-fast),background var(--dur-fast)}
@@ -1256,6 +1265,7 @@ input[type=range]::-moz-range-track{background:var(--edge)}
 <input type="file" id="kitFile" class="file" accept=".motifkit,.zip,application/zip,application/json,.json" multiple tabindex="-1" aria-hidden="true">
 <div class="dropzone" id="dropzone" hidden><div><b>Drop to add</b><span>.motifkit kits · images and video for MEDIA styles</span></div></div>
 <input type="file" id="mediaFile" class="file" accept="image/*,video/*" tabindex="-1" aria-hidden="true">
+<input type="file" id="fontFile" class="file" accept=".ttf,.otf,.woff,.woff2,font/ttf,font/otf,font/woff,font/woff2" tabindex="-1" aria-hidden="true">
 <input type="file" id="imgFile" class="file" accept="image/*" tabindex="-1" aria-hidden="true">
 <input type="file" id="audioFile" class="file" accept="audio/*,.mp3,.wav,.m4a,.aac,.ogg,.flac" tabindex="-1" aria-hidden="true">
 <dialog id="exportDlg" aria-labelledby="exportTitle">

@@ -27,11 +27,23 @@ Rules the app follows:
 | `motif-kit@1` (any SDK) | **Motif 5.2+** | `motif-kit@2` | Unchanged styles, params and shaders. Capabilities inferred (`media` when there are inputs). Static GLSL analysis now applies. |
 | `motif-kit@2` (SDK 2.0) | **Motif 5.2+** | `motif-kit@2` | Adds `capabilities`, `effects`, `transitions`, `exporters`, pass `graph` |
 | `motif-kit@2` | Motif ≤ 5.1 | rejected | Older apps reject the format string. Ship a separate @1 build if you need them. |
+| `motif-kit@3` (SDK 3.0) | **Motif 7.0+** | `motif-kit@3` | `motif-kit@2` plus `text` inputs (1–3 editable lines in one host-built atlas) and the `text` capability. See [Text inputs](text-inputs.md). |
+| `motif-kit@3` | Motif 5.2–7.0 before text inputs, SDK ≤ 2.0 | rejected | They reject the format string: `format must be "motif-kit@1" or "motif-kit@2" (got "motif-kit@3")`. Keep an @2 build (for example with a media plate) for them. |
 
 | Project format | App | Migration |
 | --- | --- | --- |
 | `motif-style-lab/preset@1` | read by all | `timeline.fromV1()` builds a one-layer @2 project. `shared.loop`, `grain` and `vignette` move to `finish`. |
 | `motif-style-lab/preset@2` | current | `sanitizeProject()` drops unknown fields, fills defaults, clamps ranges and caps lists (4 layers, 24 custom palettes, 16 audio maps) |
+
+## Migrating to motif-kit@3
+
+Nothing to migrate for existing kits: Motif 7 keeps reading @1 and @2 manifests exactly as before (same normalized styles, same shaders, same pixels; the identity tests in `tests/sandbox.test.mjs` and `tests/browser/kits.browser.mjs` guard it). Move a kit to @3 only to use text inputs:
+
+1. Set `"format": "motif-kit@3"` and add `"text"` to `capabilities` (drop `"media"` if a text input replaces the only media input).
+2. Replace an image "type plate" input with `{ "id": "...", "type": "text", "lines": [...] }`.
+3. Sample with `textLine_<id>(i, q)` (line-local coordinates) instead of the plate's bands, and apply each line's transform once.
+
+FaceType 1.2.0 → 1.3.0 is the worked example (`kits/source/facetype/README.md`). Projects keep every parameter; the text is typed again, since a plate's pixels can't become text.
 
 ## Deprecation rules
 

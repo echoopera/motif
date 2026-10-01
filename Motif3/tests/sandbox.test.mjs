@@ -8,9 +8,9 @@ import { validator } from './lib/json-schema.mjs';
 import { HOSTILE, SLOW_KIT, NICE_KIT } from './lib/hostile.mjs';
 
 const mods = path.join(root, 'src-v5/modules');
-const M = load('tokens', 'engine-core', 'style-library', 'kit-gl', 'kit-sandbox', 'kits', 'colour', 'timeline');
+const M = load('tokens', 'engine-core', 'style-library', 'kit-gl', 'kit-sandbox', 'text-atlas', 'kits', 'colour', 'timeline');
 const KG = M.__m_kit_gl, SB = M.__m_kit_sandbox, K = M.__m_kits, T = M.__m_timeline;
-const kitSchema = validator(JSON.parse(fs.readFileSync(path.join(root, 'schemas/motif-kit-2.schema.json'), 'utf8')));
+const kitSchema = validator(JSON.parse(fs.readFileSync(path.join(root, 'schemas/motif-kit-3.schema.json'), 'utf8')));
 const projectSchema = validator(JSON.parse(fs.readFileSync(path.join(root, 'schemas/motif-project.schema.json'), 'utf8')));
 const KITS = bundledKits();
 const LUMEN = rawFromDir(path.join(root, 'sdk/motif-kit-sdk/examples/lumen-fx'));
@@ -106,7 +106,7 @@ test('kits are data + GLSL only: the kit path never evaluates code or touches ne
   const EXEC = /\beval\s*\(|\bnew\s+Function\b|\bFunction\s*\(|\bimport\s*\(|\bimportScripts\b|\bsetTimeout\s*\(\s*['"`]|\bWorker\s*\(|\bReflect\.construct/;
   const NET = /\bfetch\s*\(|XMLHttpRequest|WebSocket|EventSource|navigator\.sendBeacon|\bimport\s*\(/;
   const DOM = /\bdocument\b|\bwindow\b|\binnerHTML\b|\blocalStorage\b|\bpostMessage\b/;
-  for (const f of ['04-kit-gl.js', '04a-kit-sandbox.js', '05-kits.js', '05a-kit-host.js']) {
+  for (const f of ['04-kit-gl.js', '04a-kit-sandbox.js', '04b-text-atlas.js', '05-kits.js', '05a-kit-host.js']) {
     const c = code(src(f)); assert.doesNotMatch(c, EXEC, `${f} must not evaluate code`); assert.doesNotMatch(c, NET, `${f} must not reach the network`);
   }
   // The sandbox and host modules are engine-side: they must run in a Worker (no DOM, no window).
@@ -132,6 +132,7 @@ test('graph rules: ordering, ping-pong, output, executions', () => {
 
 test('published project schema is generated from the timeline and matches sanitizeProject output', () => {
   execFileSync(process.execPath, [path.join(root, 'tools/gen-project-schema.mjs'), '--check']);
+  execFileSync(process.execPath, [path.join(root, 'tools/gen-kit-schema.mjs'), '--check']);
   const p = T.newProject();
   assert.deepEqual(projectSchema(T.sanitizeProject(JSON.parse(JSON.stringify(p)))), []);
   // A messy document (old fields, out-of-range numbers, junk) sanitizes into a valid project.

@@ -211,6 +211,58 @@ const INPUT_RE = /^[a-z][a-zA-Z0-9]{0,15}$/;
 const INPUT_TYPES = ['image', 'video', 'media'];
 const INPUT_FITS = ['fill', 'fit', 'stretch'];
 const INPUT_RESERVED = new Set(['res', 'p', 'l', 'seed', 'safe', 'bg', 'ink', 'a0', 'a1', 'a2', 'buf0', 'buf1', 'buf2', 'buf3', 'out']);
+// Text inputs (motif-kit@3): up to three separately editable lines the host rasterizes into ONE atlas texture.
+// Strings never become uniforms; the shader samples glyph coverage through textLine_<id>(i, q). See 04b-text-atlas.
+const TEXT = {
+  lines: 3, chars: 128, defChars: 64, family: 64, aspect: [2, 16], defAspect: 8,
+  weights: [100, 200, 300, 400, 500, 600, 700, 800, 900], aligns: ['left', 'center', 'right'],
+  size: [0.1, 1], defSize: 0.72, tracking: [-0.2, 0.8], defTracking: 0, defFamily: 'Instrument Sans', defWeight: 700,
+};
+const LINE_ID_RE = /^[a-z][a-zA-Z0-9]{0,15}$/;
+// Font family names reach a CSS font shorthand: letters, digits, spaces and a few punctuation marks only (no quotes,
+// commas, semicolons, backslashes or control characters), so a kit or a project can never inject a second family.
+const FAMILY_RE = /^[\p{L}\p{N} _.&+()-]{1,64}$/u;
+const CTRL_RE = /[\u0000-\u0008\u000B-\u001F\u007F-\u009F\u2028\u2029]/;
+// One declared line → { id, label, def, maxLength, font:{ family, weight }, size, tracking, align }. Returns a string on error.
+function normTextLine(x, w, i) {
+  if (!x || typeof x !== 'object' || Array.isArray(x)) return `${w} must be an object like { "id": "line1", "label": "Line 1", "def": "HELLO" }.`;
+  if (!LINE_ID_RE.test(x.id || '')) return `${w}.id must be camelCase letters/digits (max 16), e.g. "line1".`;
+  const maxLength = x.maxLength == null ? TEXT.defChars : Number(x.maxLength);
+  if (!Number.isInteger(maxLength) || maxLength < 1 || maxLength > TEXT.chars) return `${w}.maxLength must be an integer 1–${TEXT.chars}.`;
+  const def = x.def == null ? '' : x.def;
+  if (typeof def !== 'string') return `${w}.def must be a string.`;
+  if (CTRL_RE.test(def) || /[\r\n]/.test(def)) return `${w}.def must be one line of text without control characters.`;
+  if (def.length > maxLength) return `${w}.def is ${def.length} characters; maxLength is ${maxLength}.`;
+  if (x.label != null && typeof x.label !== 'string') return `${w}.label must be a string.`;
+  const f = x.font == null ? {} : x.font;
+  if (!f || typeof f !== 'object' || Array.isArray(f)) return `${w}.font must be an object like { "family": "Instrument Sans", "weight": 700 }.`;
+  for (const k of Object.keys(f)) if (!['family', 'weight'].includes(k)) return `${w}.font.${k.slice(0, 24)}: a font declares only family and weight (fonts are never loaded from a kit).`;
+  const family = f.family == null ? TEXT.defFamily : f.family;
+  if (typeof family !== 'string' || !FAMILY_RE.test(family)) return `${w}.font.family must be 1–64 letters, digits, spaces or . _ & + ( ) - (no quotes, commas or semicolons).`;
+  const weight = f.weight == null ? TEXT.defWeight : Number(f.weight);
+  if (!TEXT.weights.includes(weight)) return `${w}.font.weight must be one of ${TEXT.weights.join(', ')}.`;
+  const size = x.size == null ? TEXT.defSize : Number(x.size);
+  if (!(size >= TEXT.size[0] && size <= TEXT.size[1])) return `${w}.size must be ${TEXT.size[0]}–${TEXT.size[1]} (em size as a fraction of the band height).`;
+  const tracking = x.tracking == null ? TEXT.defTracking : Number(x.tracking);
+  if (!(tracking >= TEXT.tracking[0] && tracking <= TEXT.tracking[1])) return `${w}.tracking must be ${TEXT.tracking[0]}–${TEXT.tracking[1]} em.`;
+  const align = x.align == null ? 'center' : x.align;
+  if (!TEXT.aligns.includes(align)) return `${w}.align must be left, center or right.`;
+  return { id: x.id, label: String(x.label || `Line ${i + 1}`).slice(0, 24), def, maxLength, font: { family, weight }, size, tracking, align };
+}
+function normTextInput(x, w, err) {
+  if (!Array.isArray(x.lines) || x.lines.length < 1 || x.lines.length > TEXT.lines) { err(`${w}.lines must list 1–${TEXT.lines} lines.`); return null; }
+  const lines = [], ids = new Set();
+  for (let i = 0; i < x.lines.length; i++) {
+    const l = normTextLine(x.lines[i], `${w}.lines[${i}]`, i);
+    if (typeof l === 'string') { err(l); return null; }
+    if (ids.has(l.id)) { err(`${w}.lines[${i}]: duplicate line id "${l.id}".`); return null; }
+    ids.add(l.id); lines.push(l);
+  }
+  const aspect = x.aspect == null ? TEXT.defAspect : Number(x.aspect);
+  if (!(aspect >= TEXT.aspect[0] && aspect <= TEXT.aspect[1])) { err(`${w}.aspect must be ${TEXT.aspect[0]}–${TEXT.aspect[1]} (band width : height).`); return null; }
+  for (const k of ['fit', 'required']) if (x[k] != null) { err(`${w}.${k} does not apply to a text input.`); return null; }
+  return { id: x.id, type: 'text', label: String(x.label || x.id[0].toUpperCase() + x.id.slice(1)).slice(0, 24), hint: String(x.hint || '').slice(0, 120), aspect, lines };
+}
 // A `show` condition hides a control unless another control has a given value.
 //   { "param": "mode", "is": "ripple" }   { "param": "mode", "is": ["a","b"] }   { "param": "mode", "not": "off" }
 //   { "param": "count", "gt": 3 }   { "param": "glow", "lt": 0.5 }   toggles use true / false.
@@ -228,7 +280,8 @@ function normShow(sh, raw, self) {
   if (t.type === 'select' && ('is' in out || 'not' in out)) { const vals = [].concat(out.is !== undefined ? out.is : out.not); const known = (t.options || []).map(x => (typeof x === 'string' ? x : x && x.v)); if (vals.some(v => !known.includes(v))) return `value not among ${sh.param}'s options.`; }
   return out;
 }
-function normInputs(list, where, err) {
+// opts.text: the manifest format allows text inputs (motif-kit@3). Earlier formats reject them by name.
+function normInputs(list, where, err, opts = {}) {
   if (list == null) return null;
   if (!Array.isArray(list)) { err(`${where}inputs must be an array.`); return []; }
   if (list.length > KIT_LIMITS.inputs) err(`${where}inputs: at most ${KIT_LIMITS.inputs} media inputs.`);
@@ -239,7 +292,11 @@ function normInputs(list, where, err) {
     if (INPUT_RESERVED.has(String(x.id).toLowerCase())) return err(`${w}.id "${x.id}" clashes with a built-in uniform.`);
     if (seen.has(x.id)) return err(`${w}: duplicate input id "${x.id}".`); seen.add(x.id);
     const type = x.type == null ? 'media' : x.type;
-    if (!INPUT_TYPES.includes(type)) return err(`${w}.type must be image, video or media.`);
+    if (type === 'text') {
+      if (!opts.text) return err(`${w}.type "text" needs "format": "motif-kit@3".`);
+      const t = normTextInput(x, w, err); if (t) out.push(t); return;
+    }
+    if (!INPUT_TYPES.includes(type)) return err(`${w}.type must be image, video or media${opts.text ? ', or text' : ''}.`);
     const fit = x.fit == null ? 'fill' : x.fit;
     if (!INPUT_FITS.includes(fit)) return err(`${w}.fit must be fill, fit or stretch.`);
     out.push({ id: x.id, type, label: String(x.label || x.id[0].toUpperCase() + x.id.slice(1)).slice(0, 24), fit, required: !!x.required, hint: String(x.hint || '').slice(0, 120) });
@@ -369,8 +426,8 @@ function normParams(raw0, where, err, warn) {
 // Media inputs: the entry's own list wins, else the kit-level list. Kits written before SDK 1.1 that declare
 // `uniform sampler2D u_<name>;` themselves get an implicit input so they work unchanged.
 // text: the entry's GLSL (common + passes); prior: entries already normalized (one implicit-input warning per kit).
-function resolveInputs(s, where, kitInputs, text, prior, params, err, warn) {
-    let inputs = normInputs(s.inputs, `${where}.`, err);
+function resolveInputs(s, where, kitInputs, text, prior, params, err, warn, opts) {
+    let inputs = normInputs(s.inputs, `${where}.`, err, opts);
     if (inputs == null) inputs = kitInputs;
     if (inputs == null) {
       inputs = []; const re = /\buniform\s+sampler2D\s+u_([A-Za-z][A-Za-z0-9]{0,15})\s*;/g; let mm;
@@ -421,15 +478,39 @@ function paramUniforms(params) {
 //   m_<id>UV(uv)  vec4       sample at the centred uv that motif() receives
 //   m_<id>Px(fc)  vec4       sample at pixel coordinates
 function inputSource(inputs) {
-  let s = '';
+  let s = '', firstText = null;
   for (const q of inputs || []) {
     const n = q.id;
+    if (q.type === 'text') { s += textSource(q); if (!firstText) firstText = n; continue; }
     s += `uniform sampler2D u_${n};\nuniform float u_${n}On;\nuniform vec2 u_${n}Size;\nuniform float u_${n}Time;\n`;
     s += `vec4 m_${n}(vec2 q) { return texture(u_${n}, clamp(q, vec2(0.0), vec2(1.0))); }\n`;
     s += `vec4 m_${n}Px(vec2 fc) { return m_${n}(fc / u_res); }\n`;
     s += `vec4 m_${n}UV(vec2 uv) { return m_${n}(uv * min(u_res.x, u_res.y) / u_res + 0.5); }\n`;
   }
+  if (firstText) s += `vec4 textLine(int i, vec2 q) { return textLine_${firstText}(i, q); }\n`;
   return s;
+}
+// Text inputs (motif-kit@3). One atlas texture per input, built by the host (04b-text-atlas), never by the kit:
+//   u_<id>            sampler2D  RGBA8, linear (no sRGB decode), PREMULTIPLIED white glyphs: rgb == a == coverage
+//   u_<id>On          float      1.0 once the host has rasterized the atlas (0.0: transparent black everywhere)
+//   u_<id>Size        vec2       atlas size in pixels (width × lines·width/aspect)
+//   textLines_<id>    const int  number of declared lines (1–3)
+//   textAspect_<id>   const float band width : height (manifest "aspect", default 8)
+//   m_<id>(q)         vec4       the whole atlas at q (0..1, origin bottom-left; line 1 is the TOP band)
+//   textLine_<id>(i, q) vec4     line i (0-based) at line-local q: centred, isotropic, the band spans
+//                                x -0.5..0.5 and y -0.5/aspect..0.5/aspect. Outside the band: vec4(0).
+//   textLine(i, q)    vec4       the same for the entry's first text input
+// Each line is drawn CENTRED (vertically on its cap height) and UNTRANSFORMED in its band, so the shader applies
+// position, scale, rotation and motion exactly once. Coverage is sampled with mipmaps: minified text stays smooth.
+function textSource(q) {
+  const n = q.id, N = q.lines.length, A = Number(q.aspect).toFixed(4);
+  return `uniform sampler2D u_${n};\nuniform float u_${n}On;\nuniform vec2 u_${n}Size;\n`
+    + `const int textLines_${n} = ${N};\nconst float textAspect_${n} = ${A};\n`
+    + `vec4 m_${n}(vec2 q) { return texture(u_${n}, clamp(q, vec2(0.0), vec2(1.0))); }\n`
+    + `vec4 textLine_${n}(int i, vec2 q) {\n  if (i < 0 || i >= ${N}) return vec4(0.0);\n  vec2 b = vec2(q.x + 0.5, q.y * ${A} + 0.5);\n`
+    + `  float inside = step(0.0, b.x) * step(b.x, 1.0) * step(0.0, b.y) * step(b.y, 1.0);\n`
+    + `  vec2 t = vec2(clamp(b.x, 0.0, 1.0), (float(${N - 1} - i) + clamp(b.y, 0.0, 1.0)) / ${N}.0);\n`
+    + `  return texture(u_${n}, t) * inside;\n}\n`;
 }
 // Kits may declare the input uniforms themselves (SDK 1.0 style); strip those so the runtime's declarations win.
 // The declaration is blanked in place, so pass-local line numbers stay correct.
@@ -476,21 +557,25 @@ function createGlRuntime() {
     blankTex = gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D, blankTex);
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array(4));
   }
-  // Upload (or refresh) a baked media canvas as an sRGB texture, so shaders sample linear light.
+  // Upload (or refresh) a baked media canvas as an sRGB texture, so shaders sample linear light. Text atlases
+  // (m.linear, motif-kit@3) are coverage, not colour: RGBA8 without sRGB decode, so premultiplied white keeps rgb == a.
+  // Storage is allocated once per (canvas, size, format); a changed rev re-uploads into it with texSubImage2D.
+  let uploads = 0;
   function mediaTexture(m) {
     let e = mediaTex.get(m.canvas);
     if (e) { mediaTex.delete(m.canvas); mediaTex.set(m.canvas, e); } // true LRU, including unchanged frames
-    if (e && e.rev === m.rev && e.w === m.canvas.width && e.h === m.canvas.height) return e.tex;
+    const lin = !!m.linear;
+    if (e && e.rev === m.rev && e.w === m.canvas.width && e.h === m.canvas.height && e.lin === lin) return e.tex;
     if (!e) {
       e = { tex: gl.createTexture(), rev: -1 }; mediaTex.set(m.canvas, e);
       if (mediaTex.size > 12) { const [k0, e0] = mediaTex.entries().next().value; gl.deleteTexture(e0.tex); mediaTex.delete(k0); }
     }
     const w = m.canvas.width, h = m.canvas.height;
-    if (e.w != null && (e.w !== w || e.h !== h)) { gl.deleteTexture(e.tex); e.tex = gl.createTexture(); e.w = null; }
+    if (e.w != null && (e.w !== w || e.h !== h || e.lin !== lin)) { gl.deleteTexture(e.tex); e.tex = gl.createTexture(); e.w = null; }
     gl.activeTexture(gl.TEXTURE0 + MEDIA_UNIT + 3); gl.bindTexture(gl.TEXTURE_2D, e.tex);
     if (e.w == null) {
-      gl.texStorage2D(gl.TEXTURE_2D, 1 + Math.floor(Math.log2(Math.max(w, h))), gl.SRGB8_ALPHA8, w, h);
-      e.w = w; e.h = h;
+      gl.texStorage2D(gl.TEXTURE_2D, 1 + Math.floor(Math.log2(Math.max(w, h))), lin ? gl.RGBA8 : gl.SRGB8_ALPHA8, w, h);
+      e.w = w; e.h = h; e.lin = lin;
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
     }
@@ -498,7 +583,7 @@ function createGlRuntime() {
     try { gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, gl.RGBA, gl.UNSIGNED_BYTE, m.canvas); }
     finally { gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false); gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false); }
     gl.generateMipmap(gl.TEXTURE_2D); // Preserve minification quality, including rotated/scaled media.
-    e.rev = m.rev; return e.tex;
+    e.rev = m.rev; uploads++; return e.tex;
   }
   function init() {
     if (gl || !canvas) return !!gl;
@@ -804,11 +889,11 @@ function createGlRuntime() {
     init, compile, poll, forget, draw, blit, probe, probeAsync, canvas, hexToLin, programs, get pendingCompiles() { return compiling.size; }, isCompiling(key) { return compiling.has(key); },
     get ok() { return init(); }, get reason() { return reason; }, get halfFloat() { return halfFloat; },
     get lost() { return lost; }, get lostCount() { return lostCount; }, get timer() { return !!timerExt; }, get renderer() { init(); return rendererName; }, get software() { init(); return software; },
-    costOf(key) { return gpuMs.get(key); }, on(fn) { listeners.add(fn); return () => listeners.delete(fn); },
+    costOf(key) { return gpuMs.get(key); }, on(fn) { listeners.add(fn); return () => listeners.delete(fn); }, get uploads() { return uploads; },
   };
 }
 
-return { KIT_FORMAT, KIT_LIMITS, SDK_VERSION: '2.0.0', validateKit, createGlRuntime, PRELUDE, MAIN_FINAL, MAIN_PASS, buildSource, paramUniforms, inputSource, RESERVED, MAX_PASSES, hexToLin,
+return { KIT_FORMAT, KIT_LIMITS, SDK_VERSION: '3.0.0', validateKit, createGlRuntime, PRELUDE, MAIN_FINAL, MAIN_PASS, buildSource, paramUniforms, inputSource, textSource, RESERVED, MAX_PASSES, hexToLin, TEXT, FAMILY_RE, LINE_ID_RE, normTextLine,
   // Shared with kit-sandbox (motif-kit@2 validation); not part of the author-facing API.
   normParams, normInputs, resolveInputs, INPUT_RESERVED, ID_RE, KEY_RE, HEX_RE, SEMVER_RE, RESERVED_KITS };
 

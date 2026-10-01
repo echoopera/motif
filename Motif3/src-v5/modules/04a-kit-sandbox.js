@@ -1,23 +1,25 @@
-// ---- module: kit-sandbox v1.0.0 (motif-kit@2 format, static GLSL analysis, capability manifest)
+// ---- module: kit-sandbox v1.1.0 (motif-kit@3 text inputs, motif-kit@2 format, static GLSL analysis, capability manifest)
 const __m_kit_sandbox = (() => {
 // kit-sandbox — the trust boundary for third-party kits. Pure: no DOM, no window, no timers, no network; safe to
 // run in a Worker or in the SDK CLI. Kits are DATA (JSON manifest) + GLSL ONLY. Nothing in a kit is ever
 // evaluated as JavaScript: there is no eval, no Function, no dynamic import and no URL fetch on this path.
 //
-//  · validate(manifest, files)  motif-kit@1 and motif-kit@2 → one normalized kit (format "motif-kit@2"), with a
-//                               recorded migration for @1, a capability manifest, and a report.
+//  · validate(manifest, files)  motif-kit@1, @2 and @3 → one normalized kit (format "motif-kit@2", or "motif-kit@3" for
+//                               an @3 manifest), with a recorded migration for @1, a capability manifest, and a report.
+//                               @3 = @2 plus `text` inputs and the `text` capability (additive; @1/@2 kits are read as before).
 //  · analyzeGlsl(...)           static analysis of every pass as it will be compiled (prelude + params + common +
 //                               pass, macros expanded): unbounded loops, loop-iteration and texture-fetch budgets
 //                               per pixel, recursion, huge arrays, nesting depth, extension / pragma allowlists.
 // Static analysis bounds the work a shader can ask for; it is NOT a proof that a shader is fast or that a GPU
 // driver cannot hang. The host adds a runtime canary and quarantine on top (kit-host).
 const KG = __m_kit_gl;
-const KIT_FORMAT_1 = KG.KIT_FORMAT, KIT_FORMAT_2 = 'motif-kit@2', FORMATS = [KIT_FORMAT_1, KIT_FORMAT_2];
+const KIT_FORMAT_1 = KG.KIT_FORMAT, KIT_FORMAT_2 = 'motif-kit@2', KIT_FORMAT_3 = 'motif-kit@3', FORMATS = [KIT_FORMAT_1, KIT_FORMAT_2, KIT_FORMAT_3];
 const KINDS = ['style', 'effect', 'transition', 'exporter'];
 const CAPABILITIES = {
   media: 'Reads images or video you attach to a layer.',
   audio: 'Reads the loudness of your soundtrack (8 frequency bands).',
   feedback: 'Re-runs its own passes on their output within a frame (bounded), which multiplies GPU work.',
+  text: 'Draws text you type into the layer, rasterized with fonts on this device (no font files or text leave it).',
 };
 // Hard limits reject a kit; soft limits warn. Calibrated against every bundled kit (tests/sandbox.test.mjs): the
 // heaviest bundled passes reach ~6.3k iterations (cellula/image) and ~690 fetches (afterglow/night-drive) per pixel,
@@ -622,7 +624,9 @@ function normPreset(p, where, err) {
   if (!out.format) err(`${where}.preset.format is required.`);
   return out;
 }
+// motif-kit@2 and @3 share one validator; @3 adds text inputs and the text capability.
 function validateV2(m, files) {
+  const v3 = m.format === KIT_FORMAT_3;
   const errors = [], warnings = [];
   const err = x => errors.push(x), warn = x => warnings.push(x);
   if (!KG.ID_RE.test(m.id || '')) err('id must be 2–32 chars: lowercase letters, digits and hyphens, starting with a letter.');
@@ -639,9 +643,10 @@ function validateV2(m, files) {
   // Capabilities: declared up front, shown at install, approved by the user.
   const caps = m.capabilities == null ? [] : m.capabilities;
   if (!Array.isArray(caps)) err('capabilities must be an array, e.g. ["media"].');
-  const capabilities = [];
+  const capabilities = [], known = Object.keys(CAPABILITIES).filter(c => v3 || c !== 'text');
   for (const c of Array.isArray(caps) ? caps : []) {
-    if (!CAPABILITIES[c]) { err(`capability "${String(c).slice(0, 24)}" does not exist. Kits can ask for ${Object.keys(CAPABILITIES).join(', ')}; never network, DOM or script access.`); continue; }
+    if (c === 'text' && !v3) { err('capability "text" needs "format": "motif-kit@3".'); continue; }
+    if (!CAPABILITIES[c]) { err(`capability "${String(c).slice(0, 24)}" does not exist. Kits can ask for ${known.join(', ')}; never network, DOM or script access.`); continue; }
     if (!capabilities.includes(c)) capabilities.push(c);
   }
   // Palettes (as motif-kit@1).
@@ -655,7 +660,7 @@ function validateV2(m, files) {
     palettes.push({ id: `${m.id}.${p.id}`, name: String(p.name || p.id).slice(0, 24), bg: p.bg.toUpperCase(), ink: p.ink.toUpperCase(), a: p.a.map(c => c.toUpperCase()), kit: m.id });
   });
   if (Array.isArray(m.palettes) && m.palettes.length > KG.KIT_LIMITS.palettes) warn(`Only the first ${KG.KIT_LIMITS.palettes} palettes are used.`);
-  const kitInputs = KG.normInputs(m.inputs, '', err);
+  const kitInputs = KG.normInputs(m.inputs, '', err, { text: v3 });
   const seen = new Set(), out = { style: [], effect: [], transition: [], exporter: [] };
   const lists = { style: m.styles, effect: m.effects, transition: m.transitions, exporter: m.exporters };
   for (const [kind, key] of [['style', 'styles'], ['effect', 'effects'], ['transition', 'transitions'], ['exporter', 'exporters']]) {
@@ -690,7 +695,8 @@ function validateV2(m, files) {
       } else { graph = linearGraph(s.passes, kind, where, fileText, err); if (!graph) return; passes = graph.passes.map(p => ({ file: p.file, src: p.src, scale: 1 })); }
       for (const p of passes) if (/\buniform\b/.test(strip(p.src))) warn(`${where}: ${p.file} declares its own uniforms; only params and u_ inputs are set by the runtime.`);
       const params = KG.normParams(s.params, where, err, kind === 'style' ? warn : x => { if (!/fewer than 4 params/.test(x)) warn(x); });
-      const inputs = KG.resolveInputs(s, where, kitInputs, [common || '', ...passes.map(x => x.src || '')].join('\n'), [...out.style, ...out.effect, ...out.transition], params, err, warn);
+      const inputs = KG.resolveInputs(s, where, kitInputs, [common || '', ...passes.map(x => x.src || '')].join('\n'), [...out.style, ...out.effect, ...out.transition], params, err, warn, { text: v3 });
+      if (kind !== 'style' && inputs.some(q => q.type === 'text')) err(`${where}: text inputs belong to styles (an ${kind} draws over host canvases).`);
       const cost = Math.max(0.25, Math.min(24, Number(s.cost) || 1));
       const e = { ...base, cost, flash: !!s.flash, passes, params, inputs };
       if (graph) e.graph = graph;
@@ -702,7 +708,8 @@ function validateV2(m, files) {
   }
   if (!out.style.length && !out.effect.length && !out.transition.length && !out.exporter.length) err('A kit needs at least one style, effect, transition or exporter.');
   const ok = errors.length === 0;
-  return { ok, errors, warnings, kit: ok ? { format: KIT_FORMAT_2, sourceFormat: KIT_FORMAT_2, id: m.id, name: String(m.name), version: m.version, author: String(m.author || '').slice(0, 48), description: String(m.description || '').slice(0, 280), accent: m.accent || null, license: String(m.license || '').slice(0, 32), palettes, common: common || '', commonFile: m.common || null, capabilities, styles: out.style, effects: out.effect, transitions: out.transition, exporters: out.exporter, migration: null } : null };
+  const fmt = v3 ? KIT_FORMAT_3 : KIT_FORMAT_2;
+  return { ok, errors, warnings, kit: ok ? { format: fmt, sourceFormat: fmt, id: m.id, name: String(m.name), version: m.version, author: String(m.author || '').slice(0, 48), description: String(m.description || '').slice(0, 280), accent: m.accent || null, license: String(m.license || '').slice(0, 32), palettes, common: common || '', commonFile: m.common || null, capabilities, styles: out.style, effects: out.effect, transitions: out.transition, exporters: out.exporter, migration: null } : null };
 }
 // motif-kit@1 → @2: the normalized @1 kit is already a valid @2 kit with styles only. Record what changed.
 function upgradeV1(v, m) {
@@ -729,8 +736,8 @@ function validate(manifest, files, opts = {}) {
   if (pre.length) return { ok: false, errors: pre, warnings: [], diagnostics: asDiag(pre, 'error'), kit: null, report: null };
   let v;
   if (manifest.format === KIT_FORMAT_1) v = upgradeV1(KG.validateKit(manifest, files), manifest);
-  else if (manifest.format === KIT_FORMAT_2) v = validateV2(manifest, files);
-  else { const e = [`format must be "${KIT_FORMAT_1}" or "${KIT_FORMAT_2}" (got ${JSON.stringify(manifest.format)}).`]; return { ok: false, errors: e, warnings: [], diagnostics: asDiag(e, 'error'), kit: null, report: null }; }
+  else if (manifest.format === KIT_FORMAT_2 || manifest.format === KIT_FORMAT_3) v = validateV2(manifest, files);
+  else { const e = [`format must be "${KIT_FORMAT_1}", "${KIT_FORMAT_2}" or "${KIT_FORMAT_3}" (got ${JSON.stringify(manifest.format)}).`]; return { ok: false, errors: e, warnings: [], diagnostics: asDiag(e, 'error'), kit: null, report: null }; }
   const diagnostics = [...asDiag(v.errors, 'error'), ...asDiag(v.warnings, 'warning')];
   if (!v.ok) return { ...v, diagnostics, report: null };
   const kit = v.kit, errors = [], warnings = v.warnings.slice(), entries = [];
@@ -740,7 +747,8 @@ function validate(manifest, files, opts = {}) {
     const rep = { id: e.id, localId: e.localId, kind: e.kind, passes: gp.length, executions: e.graph ? e.graph.executions : gp.length, iterations: 0, fetches: 0, maxTrip: 0, cost: e.cost };
     const text = [kit.common, ...gp.map(p => p.src)].join('\n');
     if (usesAudio(text) && !kit.capabilities.includes('audio')) errors.push(`${e.localId}: reads u_audio but the kit does not declare the "audio" capability.`);
-    if (e.inputs.length && kit.sourceFormat === KIT_FORMAT_2 && !kit.capabilities.includes('media')) errors.push(`${e.localId}: has media inputs but the kit does not declare the "media" capability.`);
+    if (e.inputs.some(q => q.type !== 'text') && kit.sourceFormat !== KIT_FORMAT_1 && !kit.capabilities.includes('media')) errors.push(`${e.localId}: has media inputs but the kit does not declare the "media" capability.`);
+    if (e.inputs.some(q => q.type === 'text') && !kit.capabilities.includes('text')) errors.push(`${e.localId}: has a text input but the kit does not declare the "text" capability.`);
     if (e.graph && e.graph.feedback && !kit.capabilities.includes('feedback')) errors.push(`${e.localId}: iterates a pass on its own output but the kit does not declare the "feedback" capability.`);
     if (opts.analyze !== false) {
       for (const p of gp) {
@@ -760,7 +768,7 @@ function validate(manifest, files, opts = {}) {
     entries.push(rep);
   }
   for (const c of kit.capabilities) {
-    const used = c === 'audio' ? renderables(kit).some(e => usesAudio([kit.common, ...e.passes.map(p => p.src)].join('\n'))) : c === 'media' ? renderables(kit).some(e => e.inputs.length) : renderables(kit).some(e => e.graph && e.graph.feedback);
+    const used = c === 'audio' ? renderables(kit).some(e => usesAudio([kit.common, ...e.passes.map(p => p.src)].join('\n'))) : c === 'media' ? renderables(kit).some(e => e.inputs.some(q => q.type !== 'text')) : c === 'text' ? renderables(kit).some(e => e.inputs.some(q => q.type === 'text')) : renderables(kit).some(e => e.graph && e.graph.feedback);
     if (!used) warnings.push(`Declares the "${c}" capability but does not use it.`);
   }
   for (const m of errors) if (!diagnostics.some(d => m.endsWith(d.message))) diagnostics.push({ severity: 'error', code: 'capability', file: 'manifest.json', line: null, message: m });
@@ -771,6 +779,6 @@ function validate(manifest, files, opts = {}) {
 // Capabilities a user must approve for this kit (bundled kits are trusted by the app build itself).
 function capabilityInfo(list) { return (list || []).map(c => ({ id: c, text: CAPABILITIES[c] || c })); }
 
-return { KIT_FORMAT_1, KIT_FORMAT_2, FORMATS, KINDS, CAPABILITIES, LIMITS, PRAGMA_ALLOW, EXTENSION_ALLOW, validate, scanPackage, analyzePass, preprocess, runtimeDecls, runtimeOf, renderables, capabilityInfo, upgradeV1 };
+return { KIT_FORMAT_1, KIT_FORMAT_2, KIT_FORMAT_3, FORMATS, KINDS, CAPABILITIES, LIMITS, PRAGMA_ALLOW, EXTENSION_ALLOW, validate, scanPackage, analyzePass, preprocess, runtimeDecls, runtimeOf, renderables, capabilityInfo, upgradeV1 };
 
 })();

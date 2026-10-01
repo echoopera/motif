@@ -1,7 +1,7 @@
 {
   "name": "motif-kit-sdk",
-  "version": "2.0.0",
-  "description": "Build, validate, migrate, bench, preview and pack Motif kits (motif-kit@2; reads motif-kit@1). SDK 2.0 adds effects, transitions, pass graphs, export presets, capabilities and the shader sandbox.",
+  "version": "3.0.0",
+  "description": "Build, validate, migrate, bench, preview and pack Motif kits (motif-kit@3; reads motif-kit@1 and @2). SDK 3.0 adds text inputs; SDK 2.0 added effects, transitions, pass graphs, export presets, capabilities and the shader sandbox.",
   "type": "module",
   "bin": {
     "motif-kit": "bin/motif-kit.mjs"

@@ -1,6 +1,6 @@
 // Minimal JSON Schema (draft 2020-12 subset) validator for the published schemas, so tests need no packages.
 // Supports: type, enum, const, properties, required, additionalProperties, propertyNames, maxProperties, items,
-// prefixItems, minItems, maxItems, uniqueItems, minLength, maxLength, pattern, minimum, maximum, exclusiveMinimum,
+// prefixItems, contains, minItems, maxItems, uniqueItems, minLength, maxLength, pattern, minimum, maximum, exclusiveMinimum,
 // exclusiveMaximum, $ref (local #/...), allOf, anyOf, oneOf, not, if/then/else. Unknown keywords are ignored.
 export function validator(root) {
   const resolve = ref => { if (!ref.startsWith('#/')) throw new Error('only local $ref: ' + ref); return ref.slice(2).split('/').reduce((o, k) => o[decodeURIComponent(k)], root); };
@@ -29,6 +29,7 @@ export function validator(root) {
       if (s.maxItems != null && v.length > s.maxItems) errs.push(`${path}: more than ${s.maxItems} items`);
       if (s.uniqueItems && new Set(v.map(x => JSON.stringify(x))).size !== v.length) errs.push(`${path}: items not unique`);
       const pre = s.prefixItems || [];
+      if (s.contains !== undefined && !v.some(x => { const e = []; check(s.contains, x, path, e); return !e.length; })) errs.push(`${path}: no item matches "contains"`);
       v.forEach((x, i) => { if (i < pre.length) check(pre[i], x, `${path}[${i}]`, errs); else if (s.items !== undefined) check(s.items, x, `${path}[${i}]`, errs); });
     }
     if (v && typeof v === 'object' && !Array.isArray(v)) {

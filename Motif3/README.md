@@ -48,6 +48,10 @@ MP4 and MOV clips are also decoded with WebCodecs (demuxed by the vendored media
 
 Vendored: `src-v5/vendor/mediabunny-lite.js` (mediabunny 1.61.0, MPL-2.0, MP4/MOV demux and video decode only; about 190 KB, which is what it adds to `motif5.html`). Rebuild it with `sh src-v5/vendor/build-mediabunny.sh`. Media checks: `SOFTWARE_GL=1 node tests/browser/media-check.mjs` (needs Playwright, Chromium and ffmpeg).
 
+## Using text (motif-kit@3)
+
+Styles marked **TEXT** in the library (FaceType 1.3.0: install `kits/facetype-1.3.0.motifkit` from the Kits tab and approve **text**) draw lines you type. **Layers › Type · text** has, per line: the text (live), font (type a family, pick from **Installed fonts…** where the browser allows, or **Import font file…**: TTF, OTF, WOFF, WOFF2, kept in this browser by content hash), weight, size, tracking and alignment. A family the browser can't draw shows **Fallback in use** and the face used instead; an imported file missing in another browser shows **Relink**. Every field can be keyed (text, font and alignment hold; size and tracking ease). Motif rasterizes the lines into one atlas the kit's shader samples (`textLine_<id>(i, q)`): spec in `sdk/motif-kit-sdk/docs/text-inputs.md`. Tests: `node --test tests/text.test.mjs` and `SOFTWARE_GL=1 node tests/browser/text.browser.mjs`.
+
 ## Building kits with media
 
 ```
