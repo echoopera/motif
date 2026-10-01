@@ -1,0 +1,84 @@
+{
+  "$id": "design-harness/brief/v3",
+  "type": "object",
+  "required": ["project", "client", "problem", "users", "platforms", "domain", "journeys", "acceptance"],
+  "properties": {
+    "project": { "type": "string", "minLength": 1 },
+    "client": {
+      "type": "object",
+      "required": ["name"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "designLanguage": { "type": "string" },
+        "references": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "engagementMode": {
+      "type": "string",
+      "enum": ["design", "prototype", "design-system", "build"]
+    },
+    "problem": { "type": "string", "minLength": 20 },
+    "users": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["persona", "goal"],
+        "properties": {
+          "persona": { "type": "string", "minLength": 1 },
+          "goal": { "type": "string", "minLength": 1 },
+          "context": { "type": "string" },
+          "pain": { "type": "string" }
+        }
+      }
+    },
+    "platforms": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "enum": ["ios", "ipados", "macos", "web", "web-immersive", "web-saas", "web-editorial", "web-internal"]
+      }
+    },
+    "domain": {
+      "type": "string",
+      "enum": ["music", "art", "content", "saas", "editorial", "marketing", "productivity", "commerce", "education", "health", "finance", "general"]
+    },
+    "riskLanes": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": ["ai", "prototype", "data-visualization", "localization", "security", "performance"]
+      }
+    },
+    "journeys": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["name", "steps"],
+        "properties": {
+          "name": { "type": "string", "minLength": 1 },
+          "steps": { "type": "array", "minItems": 2, "items": { "type": "string" } }
+        }
+      }
+    },
+    "scenarios": { "type": "array", "items": { "type": "string" } },
+    "constraints": { "type": "array", "items": { "type": "string" } },
+    "acceptance": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "criterion"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "criterion": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "tone": { "type": "string" },
+    "outOfScope": { "type": "array", "items": { "type": "string" } }
+  }
+}
+

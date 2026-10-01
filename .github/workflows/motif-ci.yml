@@ -1,0 +1,22 @@
+name: motif-ci
+on:
+  push: { paths: ['Motif3/**', '.github/workflows/motif-ci.yml'] }
+  pull_request: { paths: ['Motif3/**'] }
+defaults: { run: { working-directory: Motif3 } }
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - run: npm install --no-audit --no-fund
+      - run: python3 src-v5/build.py --check
+      - run: npm test
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:browser
+      # Software GL numbers are not representative: upload for trend only. Gate on a self-hosted GPU runner with `npm run bench:gate`.
+      - run: node tools/bench.mjs --styles particle-form --frames 10 --size 640x360
+        env: { SOFTWARE_GL: '1' }
+      - uses: actions/upload-artifact@v4
+        with: { name: bench, path: Motif3/performance-review/bench-*.json }

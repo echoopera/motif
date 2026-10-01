@@ -1,0 +1,8 @@
+handoff/
+design/
+brief.json
+harness/state/**/*.json
+harness/state/**/*.jsonl
+harness/state/**/*.md
+modules/*/
+!modules/.gitkeep

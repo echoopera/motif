@@ -1,0 +1,17 @@
+{
+  "$id": "design-harness/module/v3",
+  "type": "object",
+  "required": ["name", "version", "kind", "entry", "owner", "dependsOn", "exports"],
+  "properties": {
+    "name": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+    "version": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" },
+    "kind": { "type": "string", "enum": ["ui", "feature", "domain", "data", "platform", "tokens", "shell", "util"] },
+    "platforms": { "type": "array", "items": { "type": "string" } },
+    "entry": { "type": "string" },
+    "owner": { "type": "string" },
+    "dependsOn": { "type": "array", "items": { "type": "string" } },
+    "exports": { "type": "array", "items": { "type": "string" } },
+    "status": { "type": "string", "enum": ["stub", "draft", "review", "stable", "deprecated"] },
+    "description": { "type": "string" }
+  }
+}

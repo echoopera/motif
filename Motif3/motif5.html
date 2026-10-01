@@ -5088,6 +5088,11 @@ const { createGpuEngine, GPU_STYLES } = __m_gpu_engine;
 const { createPipeline, createStage, renderThumb, renderProjectThumb, exportSize, frameCount, aspectRatio } = __m_renderer;
 const X = __m_exporter;
 
+// Extension seam: feature modules (20-*.js ...) call __m_shell.use({ id, name, icon, panel(host, api), tick(t, api) })
+// before boot. Each becomes an inspector tab + panel. `api` is the narrow surface a page may touch.
+const extensions = [];
+function use(ext) { if (!ext || !ext.id || typeof ext.panel !== 'function') throw new Error('shell.use: { id, name, panel } required'); if (extensions.some(e => e.id === ext.id)) throw new Error('shell.use: duplicate page ' + ext.id); extensions.push(ext); }
+
 function boot() {
   const $ = id => document.getElementById(id);
   const app = $('app');
@@ -5668,7 +5673,17 @@ function boot() {
   ['layer', 'colour', 'finish', 'audio'].forEach(p => bindRows($('panel-' + p)));
   $('insp').addEventListener('pointerover', e => { const l = e.target.closest && e.target.closest('.row label, .row .rl'); if (l && !l.title && l.scrollWidth > l.clientWidth) l.title = l.textContent; });
   $('insp').addEventListener('toggle', e => { const d = e.target; if (d.dataset && d.dataset.g) openGroups[d.dataset.g] = d.open; }, true);
-  function renderPanel() { if (tab === 'layer') renderLayerPanel(); else if (tab === 'colour') renderColourPanel(); else if (tab === 'finish') renderFinishPanel(); else if (tab === 'audio') renderAudioPanel(); else if (tab === 'looks') renderLooks(); else if (tab === 'kits') renderKitsPanel(); paintRanges($('insp')); }
+  // Extension pages: tabs + panels are created once; panel() re-runs on every visit and on project refresh.
+  const extApi = {
+    get project() { return project; }, commit: (next, msg) => commit(next, msg), live: next => live(next), toast: m => toast(m),
+    stage, pipeline, T, C, K, A, media, $, get tab() { return tab; }, setTab: t => setTab(t), clone,
+  };
+  extensions.forEach(ext => {
+    const b = document.createElement('button'); b.setAttribute('role', 'tab'); b.dataset.tab = ext.id; b.setAttribute('aria-selected', 'false'); b.setAttribute('aria-controls', 'panel-' + ext.id);
+    b.innerHTML = `${ext.icon || '<svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/></svg>'}<span>${ext.name}</span>`; $('tabs').appendChild(b);
+    const sec = document.createElement('section'); sec.setAttribute('role', 'tabpanel'); sec.id = 'panel-' + ext.id; sec.dataset.panel = ext.id; sec.hidden = true; $('insp').appendChild(sec);
+  });
+  function renderPanel() { const ext = extensions.find(e => e.id === tab); if (ext) { try { ext.panel($('panel-' + ext.id), extApi); } catch (e) { console.error(e); $('panel-' + ext.id).textContent = 'This page failed to load.'; } paintRanges($('insp')); return; } if (tab === 'layer') renderLayerPanel(); else if (tab === 'colour') renderColourPanel(); else if (tab === 'finish') renderFinishPanel(); else if (tab === 'audio') renderAudioPanel(); else if (tab === 'looks') renderLooks(); else if (tab === 'kits') renderKitsPanel(); paintRanges($('insp')); }
 
   // Layers
   // ---- style parameters: grouped sections, colour / point compounds, show conditions ----
@@ -6869,10 +6884,11 @@ function boot() {
   };
 }
 
-return { boot };
+return { boot, use };
 
 })();
 
+// ---- boot
 __m_shell.boot();
 </script>
 </body>

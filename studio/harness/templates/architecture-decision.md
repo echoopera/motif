@@ -1,0 +1,11 @@
+# Architecture decision
+- ID / status / date / owner:
+- Problem and scenario:
+- Existing constraints and dependency inventory:
+- Options and tradeoffs:
+- Decision and evidence:
+- Module ownership / public interfaces / dependency rules:
+- Data authority, concurrency and failure behavior:
+- Compatibility, migration and rollback:
+- Consumers and affected tests:
+- Revisit trigger:

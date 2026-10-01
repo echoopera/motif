@@ -1,0 +1,11 @@
+# Client review
+- Desired outcome:
+- Artifact and revision:
+- Demonstrated user journey:
+- Important design decisions and why they help:
+- Recommended direction and tradeoffs:
+- Alternatives only if useful to the decision:
+- Implemented / simulated / untested:
+- Feedback addressed:
+- Decision required, with decision owner; or delivery status:
+- Next step within agreed scope:
