@@ -19,6 +19,7 @@ const APP_KIT_API = 1;
 const rt = KG.createGlRuntime();
 const listeners = new Set();
 let safe = true;                  // photosensitive limiter (WCAG 2.3.1), on by default
+let revision = 0;                 // bumps on every registry change; the render worker mirrors on change
 const installed = new Map();      // id -> { kit (normalized), raw: {manifest, files}, enabled, source }
 const errorsByStyle = new Map();
 const LOWPASS_BELOW = 1.0, LOWPASS_TAPS = 8, FULL_TAPS = 12, LOWPASS_SECONDS = 2 / 3; // triangle filter over 2/3 s: ≥ 3 Hz content drops below ~5%
@@ -192,7 +193,7 @@ function toStyle(kit, st) {
 }
 
 function register(entry) {
-  const kit = entry.kit;
+  const kit = entry.kit; revision++;
   unregister(kit.id);
   if (!entry.enabled) return;
   CATEGORIES.push({ id: 'kit:' + kit.id, name: kit.name, kit: kit.id, accent: kit.accent });
@@ -200,6 +201,7 @@ function register(entry) {
   for (const st of kit.styles) STYLES.push(toStyle(kit, st));
 }
 function unregister(kitId) {
+  revision++;
   for (let i = STYLES.length - 1; i >= 0; i--) if (STYLES[i].kit === kitId) STYLES.splice(i, 1);
   for (let i = CATEGORIES.length - 1; i >= 0; i--) if (CATEGORIES[i].kit === kitId) CATEGORIES.splice(i, 1);
   for (let i = PALETTES.length - 1; i >= 0; i--) if (PALETTES[i].kit === kitId) PALETTES.splice(i, 1);
@@ -243,7 +245,7 @@ function setEnabled(id, on) {
   const e = installed.get(id); if (!e) return false;
   e.enabled = !!on; register(e); persist(); emit({ type: on ? 'enable' : 'disable', id }); return true;
 }
-function setSafe(on) { safe = !!on; persist(); emit({ type: 'safe', safe }); }
+function setSafe(on) { safe = !!on; revision++; persist(); emit({ type: 'safe', safe }); }
 
 // Parse a dropped/opened file: .motifkit / .zip (needs the fflate global) or a .json bundle.
 async function readFile(file) {
@@ -310,10 +312,28 @@ function installCatalog(id) { const raw = (typeof KIT_CATALOG !== 'undefined' ? 
 function kitOfStyle(styleId) { const i = styleId.indexOf('/'); return i > 0 ? styleId.slice(0, i) : null; }
 function missingKits(project) { const ids = new Set(); for (const l of (project && project.layers) || []) { const k = kitOfStyle(String(l.styleId || '')); if (k && !STYLES.some(s => s.id === l.styleId)) ids.add(k); } return [...ids]; }
 function on(fn) { listeners.add(fn); return () => listeners.delete(fn); }
+// Render-worker mirror: the installed set as plain data, re-applied in the worker's own registry. Main already
+// validated and compiled these kits, so the worker only validates (cheap) and compiles lazily on first draw.
+function snapshot() { return { safe, kits: [...installed.values()].map(e => ({ id: e.kit.id, enabled: e.enabled, source: e.source, raw: e.source === 'catalog' ? null : e.raw })) }; }
+function applySnapshot(s) {
+  if (!s || !Array.isArray(s.kits)) return;
+  const want = new Map(s.kits.map(k => [k.id, k]));
+  for (const id of [...installed.keys()]) if (!want.has(id)) { unregister(id); installed.delete(id); }
+  for (const k of s.kits) {
+    const raw = k.raw || (typeof KIT_CATALOG !== 'undefined' ? KIT_CATALOG : []).find(r => r.manifest.id === k.id); if (!raw) continue;
+    const sig = k.raw ? JSON.stringify(k.raw) : 'catalog', cur = installed.get(k.id);
+    if (cur && cur.sig === sig) { if (cur.enabled !== (k.enabled !== false)) { cur.enabled = k.enabled !== false; register(cur); } continue; }
+    const v = KG.validateKit(raw.manifest, raw.files); if (!v.ok) continue;
+    const entry = { kit: v.kit, raw, enabled: k.enabled !== false, source: k.source || 'file', sig };
+    installed.set(k.id, entry); register(entry);
+  }
+  safe = s.safe !== false;
+}
 
 return {
   KIT_FORMAT: KG.KIT_FORMAT, APP_KIT_API, LOWPASS_BELOW, runtime: rt, setPreview, reportFrame, gpuStatus, job: JOB, setMediaResolver, install, remove, setEnabled, setSafe, get safe() { return safe; }, list, catalog, installCatalog,
   readFile, parseBytes, exportBytes, starterKit, validate: KG.validateKit, kitOfStyle, missingKits, on, errors: errorsByStyle, persist,
+  snapshot, applySnapshot, get revision() { return revision; },
 };
 
 })();

@@ -284,7 +284,7 @@ function boot() {
   function updateGpuChip() {
     const c = $('gpuChip'); if (!c) return;
     const kitLayers = project.layers.filter(l => l.visible !== false && getStyle(l.styleId).engine === 'glsl');
-    const g = K.gpuStatus();
+    const g = stage.gpuStatus ? stage.gpuStatus() : K.gpuStatus(); // the stage's kit runtime (in the render worker when it runs there)
     let text, state, title;
     if (!g.ok) { text = 'Shaders off'; state = 'err'; title = 'WebGL2 is unavailable, so kit shader styles cannot render in this browser.'; }
     else if (g.software) { text = 'Software GL'; state = 'err'; title = `WebGL is running in software (${g.renderer}), so kit shaders render on the CPU: previews are low resolution and exports are very slow. Turn on hardware acceleration in the browser and reload.`; }
@@ -306,10 +306,10 @@ function boot() {
     updateGpuChip(); updateCacheChip();
     const engines = info && info.engines || [];
     const eng = engines.includes('gpu') ? ' · WebGPU' : engines.includes('webgl') ? ' · WebGL' : engines.includes('software-gl') ? ' · Software GL' : '';
-    const cadence = K.gpuStatus().cadence;
+    const cadence = (stage.gpuStatus ? stage.gpuStatus() : K.gpuStatus()).cadence, inWorker = stage.engineMode === 'worker';
     const rate = stage.playing && cadence.fps ? `${Math.round(cadence.fps)} fps · ` : '';
-    $('perf').textContent = `${rate}${stage.frameMs().toFixed(1)} ms${info && info.samples > 1 ? ` · ${info.samples}× blur` : ''}${eng}`;
-    $('perf').title = `Main-thread render submission time. ${stage.playing && cadence.fps ? `Recent frame interval: ${cadence.meanMs.toFixed(1)} ms average, ${cadence.p95Ms.toFixed(1)} ms at the 95th percentile. ` : ''}The Shaders indicator shows internal preview resolution; exports use full resolution.`;
+    $('perf').textContent = `${rate}${stage.frameMs().toFixed(1)} ms${info && info.samples > 1 ? ` · ${info.samples}× blur` : ''}${eng}${inWorker ? ' · Worker' : ''}`;
+    $('perf').title = `${inWorker ? 'Preview renders in a background worker, off the UI thread; time is worker render submission per frame.' : `Main-thread render submission time.${stage.engineReason ? ` Preview renders on the main thread: ${stage.engineReason}.` : ''}`} ${stage.playing && cadence.fps ? `Recent frame interval: ${cadence.meanMs.toFixed(1)} ms average, ${cadence.p95Ms.toFixed(1)} ms at the 95th percentile. ` : ''}The Shaders indicator shows internal preview resolution; exports use full resolution.`;
     $('lane').style.setProperty('--ph', u.toFixed(4));
     if (evolveOpen && now - lastEvo > 90) { lastEvo = now; drawChildren(t); }
     updateAnimatedRows(t);

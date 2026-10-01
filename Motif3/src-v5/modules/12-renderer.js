@@ -1,4 +1,4 @@
-// ---- module: renderer v2.0.0
+// ---- module: renderer v2.1.0
 const __m_renderer = (() => {
 // renderer — the frame pipeline (evaluate → layers → motion blur → finishing), the stage loop
 // with an optional audio clock, library thumbnails and export sizing.
@@ -83,7 +83,7 @@ function createPipeline({ gpu }) {
     ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalCompositeOperation = 'copy'; ctx.drawImage(glc, 0, 0, w, h); ctx.restore();
     return { u: ev0.u, engines, samples, post: 'gpu' };
   }
-  return { renderFrame, compositor, finisher };
+  return { renderFrame, compositor, finisher, gpu };
 }
 
 function exportSize(aspectId, tier) {
@@ -109,59 +109,38 @@ function renderProjectThumb(pipeline, canvas, project, t) {
   pipeline.renderFrame(canvas.getContext('2d'), canvas.width, canvas.height, { ...project, finish: { ...project.finish, shutter: 0 } }, t, { cpu: true });
 }
 
-// Stage: owns the preview canvas and the loop. clock() may return transport time from audio.
-function createStage({ host, box, pipeline, getProject, onTick, onError, clock, env, extras }) {
-  let canvas = null, ctx = null, space = 'srgb';
-  let aspect = '16x9', quality = 'auto', playing = true, t = 0, last = 0, raf = 0, cssW = 0, cssH = 0, dirty = true;
-  const timings = []; let lastInfo = null;
-  // Render cache: finished preview frames on the project's frame grid, keyed by a hash of the project plus
-  // everything else that changes pixels. Scrubbing, stepping and looping replay from here instead of re-rendering.
+// Render cache + one cached preview draw, shared by the main-thread stage and the render worker so both cache alike.
+// Finished preview frames live on the project's frame grid, keyed by a hash of the project plus everything else that
+// changes pixels. Scrubbing, stepping and looping replay from here instead of re-rendering.
+function createFrameCache(pipeline) {
   const cache = { on: true, map: new Map(), bytes: 0, sig: '', env: null, hits: 0, misses: 0, budget: Math.min(768, Math.max(128, ((navigator.deviceMemory || 4) * 64))) * 1048576, full: false };
   const sigOf = pr => { const str = JSON.stringify(pr); let h = 2166136261 >>> 0; for (let i = 0; i < str.length; i += 1) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619) >>> 0; } return h.toString(36) + '.' + str.length; };
-  function cacheClear() { cache.map.clear(); cache.bytes = 0; cache.full = false; }
-  function cacheStats() { const pr = getProject(), n = framesPerLoop(pr, pr.output.fps || 30); return { on: cache.on, frames: cache.map.size, loopFrames: n, bytes: cache.bytes, budget: cache.budget, hits: cache.hits, misses: cache.misses, full: cache.full, fraction: Math.min(1, cache.map.size / n) }; }
-  function makeCanvasEl() {
-    const c = document.createElement('canvas'); c.id = 'stage'; c.setAttribute('role', 'img'); c.setAttribute('aria-label', 'Animation preview');
-    if (canvas) { c.setAttribute('aria-label', canvas.getAttribute('aria-label')); canvas.replaceWith(c); } else box.prepend(c);
-    canvas = c; ctx = c.getContext('2d', { colorSpace: space === 'p3' ? 'display-p3' : 'srgb' }); layout();
-  }
-  const dprFor = () => { const d = window.devicePixelRatio || 1; return quality === 'quarter' ? 0.25 : quality === 'draft' ? 0.5 : quality === 'high' ? Math.min(d, 2) : Math.min(d, 1.5); };
-  function layout() {
-    const r = host.getBoundingClientRect(), cs = getComputedStyle(host); const ar = aspectRatio(aspect);
-    const aw = Math.max(1, r.width - (parseFloat(cs.paddingLeft) || 0) - (parseFloat(cs.paddingRight) || 0)), ah = Math.max(1, r.height - (parseFloat(cs.paddingTop) || 0) - (parseFloat(cs.paddingBottom) || 0));
-    let w = aw, h = w / ar; if (h > ah) { h = ah; w = h * ar; }
-    cssW = Math.max(1, Math.floor(w)); cssH = Math.max(1, Math.floor(h));
-    canvas.style.width = cssW + 'px'; canvas.style.height = cssH + 'px';
-    box.style.width = cssW + 'px'; box.style.height = cssH + 'px';
-    const d = dprFor(); canvas.width = Math.max(2, Math.round(cssW * d)); canvas.height = Math.max(2, Math.round(cssH * d));
-    dirty = true;
-  }
-  const ro = new ResizeObserver(() => layout());
-  function draw() {
-    const pr = getProject(); const t0 = performance.now();
-    const e = env && env(), live = !!(extras && extras.live && extras.live()), zebra = !!(extras && extras.zebra);
+  function clear() { cache.map.clear(); cache.bytes = 0; cache.full = false; }
+  function stats(pr) { const n = framesPerLoop(pr, pr.output.fps || 30); return { on: cache.on, frames: cache.map.size, loopFrames: n, bytes: cache.bytes, budget: cache.budget, hits: cache.hits, misses: cache.misses, full: cache.full, fraction: Math.min(1, cache.map.size / n) }; }
+  // s: { playing, quality, space, zebra, env, live, onError } → { info, failed }
+  function draw(ctx, canvas, pr, t, s) {
+    const e = s.env, playing = s.playing;
     const fps = pr.output.fps || 30, N = framesPerLoop(pr, fps), L = pr.finish.loop;
     // Cache only deterministic scenes: no live audio, no video or image media (decoded in real time), no pending shader compiles.
     const media = pr.layers.some(l => l.media && Object.keys(l.media).length);
-    const usable = cache.on && !live && !media && !__m_kits.runtime.pendingCompiles && !(__m_kits.job && __m_kits.job.on);
+    const usable = cache.on && !s.live && !media && !__m_kits.runtime.pendingCompiles && !(__m_kits.job && __m_kits.job.on);
     let key = null, rt = t;
     if (usable) {
-      const sig = sigOf(pr) + '|' + canvas.width + 'x' + canvas.height + '|' + space + '|' + zebra + '|' + quality;
-      if (sig !== cache.sig || e !== cache.env) { cacheClear(); cache.sig = sig; cache.env = e; }
+      const sig = sigOf(pr) + '|' + canvas.width + 'x' + canvas.height + '|' + s.space + '|' + !!s.zebra + '|' + s.quality;
+      if (sig !== cache.sig || e !== cache.env) { clear(); cache.sig = sig; cache.env = e; }
       const i = Math.min(N - 1, Math.floor((t / L) * N + 1e-6)); rt = (i / N) * L; key = (playing ? 'p' : 's') + i;
       const hit = cache.map.get(key);
       if (hit) {
         cache.hits++; cache.map.delete(key); cache.map.set(key, hit);
         ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalCompositeOperation = 'copy'; ctx.drawImage(hit.c, 0, 0); ctx.restore();
-        lastInfo = hit.info; timings.push(performance.now() - t0); if (timings.length > 60) timings.shift();
-        dirty = false; if (onTick) onTick(t, lastInfo); return;
+        return { info: hit.info, failed: false };
       }
       cache.misses++;
     }
     __m_kits.setPreview(true, playing);
-    let failed = false;
-    try { lastInfo = pipeline.renderFrame(ctx, canvas.width, canvas.height, pr, usable ? rt : t, { preview: playing, previewSamples: quality === 'high' ? 8 : 4, env: e, zebra: extras && extras.zebra, onError }); }
-    catch (er) { failed = true; if (onError) onError(er); }
+    let failed = false, info = null;
+    try { info = pipeline.renderFrame(ctx, canvas.width, canvas.height, pr, usable ? rt : t, { preview: playing, previewSamples: s.quality === 'high' ? 8 : 4, env: e, zebra: s.zebra, onError: s.onError }); }
+    catch (er) { failed = true; if (s.onError) s.onError(er); }
     finally { __m_kits.setPreview(false); }
     // Frames drawn while shaders were still downscaled for load are not stored: the loop would replay them blurry.
     if (key && !failed && !(playing && __m_kits.gpuStatus().scale < 0.95) && !__m_kits.runtime.pendingCompiles) {
@@ -174,29 +153,150 @@ function createStage({ host, box, pipeline, getProject, onTick, onError, clock, 
       if (cache.bytes + bytes <= cache.budget) {
         try {
           const c = typeof OffscreenCanvas !== 'undefined' ? new OffscreenCanvas(canvas.width, canvas.height) : Object.assign(document.createElement('canvas'), { width: canvas.width, height: canvas.height });
-          c.getContext('2d').drawImage(canvas, 0, 0); cache.map.set(key, { c, bytes, info: lastInfo }); cache.bytes += bytes;
-        } catch (er) { cache.on = false; cacheClear(); }
+          c.getContext('2d').drawImage(canvas, 0, 0); cache.map.set(key, { c, bytes, info }); cache.bytes += bytes;
+        } catch (er) { cache.on = false; clear(); }
       }
     }
-    timings.push(performance.now() - t0); if (timings.length > 60) timings.shift();
-    dirty = false; if (onTick) onTick(t, lastInfo);
+    return { info, failed };
+  }
+  return { draw, clear, stats, get on() { return cache.on; }, set on(v) { cache.on = !!v; if (!cache.on) clear(); } };
+}
+
+// Stage: owns the preview canvas and the loop. clock() may return transport time from audio.
+// Two backends behind one API. Worker: the canvas is transferred to the render worker (__m_render_worker), which
+// draws (and caches) off the UI thread; main posts one frame request at a time and the next carries the then-current
+// time, so a slow worker drops stale frames instead of queueing them. Main: the original in-page path, used when
+// OffscreenCanvas or worker WebGL2/WebGPU is missing, after a worker failure, with ?worker=0, and for scenes whose
+// inputs live on the page (image/video layers, live audio input).
+function createStage({ host, box, pipeline, getProject, onTick, onError, clock, env, extras }) {
+  let canvas = null, ctx = null, space = 'srgb';
+  let aspect = '16x9', quality = 'auto', playing = true, t = 0, last = 0, raf = 0, cssW = 0, cssH = 0, pxW = 2, pxH = 2, dirty = true;
+  const timings = []; let lastInfo = null, drawn = 0;
+  const fc = createFrameCache(pipeline);
+  const RW = typeof __m_render_worker !== 'undefined' ? __m_render_worker : null;
+  let mode = 'main', why = 'render worker starting', forced = false, wk = null, wstat = null, inflight = 0, sentAt = 0, fid = 0, gen = 0, pend = null;
+  const sent = { pr: null, env: undefined, kits: -1, clear: true }, waiters = [], reads = new Map();
+  const zebraOn = () => !!(extras && extras.zebra), liveOn = () => !!(extras && extras.live && extras.live());
+  const timing = ms => { timings.push(ms); if (timings.length > 60) timings.shift(); };
+  // Clearing is sent with the next frame request; until the worker answers, stats read as the (empty) local cache.
+  function dropStats() { fc.clear(); sent.clear = true; if (wstat) wstat.cache = null; }
+  // settle() waiters: idle (nothing dirty or in flight), or, while playing, once a newer frame has been drawn.
+  function settled() { if (!waiters.length || pend) return; for (let i = waiters.length - 1; i >= 0; i--) { const w = waiters[i]; if ((!dirty && !inflight) || (playing && drawn > w.d0)) { waiters.splice(i, 1); w.r(); } } }
+  function newEl() {
+    const c = document.createElement('canvas'); c.setAttribute('role', 'img'); c.setAttribute('aria-label', canvas ? canvas.getAttribute('aria-label') : 'Animation preview');
+    c.style.width = cssW + 'px'; c.style.height = cssH + 'px'; c.width = pxW; c.height = pxH; return c;
+  }
+  function dropPending() { if (pend) { pend.el.remove(); pend = null; } }
+  // Main-thread canvas. Also how worker mode ends: a transferred canvas can never get a 2D context again.
+  function makeCanvasEl() {
+    dropPending();
+    const c = newEl(); c.id = 'stage';
+    if (canvas) canvas.replaceWith(c); else box.prepend(c);
+    canvas = c; ctx = c.getContext('2d', { colorSpace: space === 'p3' ? 'display-p3' : 'srgb' }); layout();
+  }
+  // Worker canvas: transferred, then kept hidden under the current one until the worker's first frame lands (no blank flash).
+  function toWorker() {
+    dropPending();
+    const c = newEl(); Object.assign(c.style, { position: 'absolute', left: '0', top: '0', visibility: 'hidden' }); box.prepend(c);
+    const off = c.transferControlToOffscreen(); pend = { el: c, gen: ++gen, ready: false };
+    wk.post({ type: 'canvas', canvas: off, space, gen }, [off]);
+    mode = 'worker'; why = ''; sent.pr = null; sent.clear = true; dirty = true;
+  }
+  function adopt() {
+    const old = canvas; canvas = pend.el; pend = null; ctx = null;
+    Object.assign(canvas.style, { position: '', left: '', top: '', visibility: '' }); canvas.id = 'stage';
+    if (old && old !== canvas) old.remove();
+  }
+  function toMain(reason) {
+    why = reason; if (mode === 'main') { dropPending(); return; }
+    mode = 'main'; if (wk) wk.post({ type: 'canvas', canvas: null }); makeCanvasEl(); dirty = true;
+  }
+  function fail(reason) {
+    if (wk) { try { wk.terminate(); } catch (e) { /* already gone */ } wk = null; }
+    inflight = 0; reads.forEach(r => r(null)); reads.clear(); waiters.splice(0).forEach(w => w.r());
+    console.warn('Motif render worker stopped, preview continues on the main thread:', reason);
+    toMain('render worker stopped (' + reason + ')');
+  }
+  // Why the preview must stay on the main thread right now ('' = the worker can take it).
+  function mainReason() {
+    if (forced) return 'switched to the main thread';
+    if (!wk) return why;
+    if (!wk.caps) return 'render worker starting';
+    if (wk.caps.webgl2 === false && __m_kits.gpuStatus().ok) return 'WebGL2 is unavailable in workers';
+    const g = pipeline.gpu; if (g && wk.caps.webgpu === false && (g.state === 'ready' || g.state === 'off')) return 'WebGPU is unavailable in workers';
+    const pr = getProject();
+    if (pr.layers.some(l => l.media && Object.keys(l.media).length)) return 'image or video layers render on the main thread';
+    if (liveOn()) return 'live audio input renders on the main thread';
+    const e = env && env(); if (e && !e.source) return 'audio envelope cannot be sent to the worker';
+    return '';
+  }
+  function onMessage(m) {
+    if (m.type === 'ready' || m.type === 'caps') { if (wk) wk.caps = m.caps; sent.clear = true; dirty = true; }
+    else if (m.type === 'frame') {
+      if (m.id === inflight) inflight = 0;
+      if (m.ok) { lastInfo = m.info; drawn++; } timing(m.ms); wstat = { cache: m.cache, gpu: m.gpu };
+      if (pend && m.gen === pend.gen) pend.ready = true;
+      if (mode === 'worker' && dirty && !(__m_kits.job && __m_kits.job.on)) post();
+      settled();
+    } else if (m.type === 'gpu' || m.type === 'fonts') dirty = true;
+    else if (m.type === 'error') { if (onError) onError(new Error(m.message)); }
+    else if (m.type === 'pixels') { const r = reads.get(m.id); reads.delete(m.id); if (r) r({ w: m.w, h: m.h, data: m.data }); }
+    else if (m.type === 'fatal') fail(m.message);
+  }
+  if (!RW) why = 'render worker unavailable';
+  else { const r = RW.connect(onMessage, fail); if (r.ok) wk = r.client; else why = r.reason; }
+  const dprFor = () => { const d = window.devicePixelRatio || 1; return quality === 'quarter' ? 0.25 : quality === 'draft' ? 0.5 : quality === 'high' ? Math.min(d, 2) : Math.min(d, 1.5); };
+  function layout() {
+    const r = host.getBoundingClientRect(), cs = getComputedStyle(host); const ar = aspectRatio(aspect);
+    const aw = Math.max(1, r.width - (parseFloat(cs.paddingLeft) || 0) - (parseFloat(cs.paddingRight) || 0)), ah = Math.max(1, r.height - (parseFloat(cs.paddingTop) || 0) - (parseFloat(cs.paddingBottom) || 0));
+    let w = aw, h = w / ar; if (h > ah) { h = ah; w = h * ar; }
+    cssW = Math.max(1, Math.floor(w)); cssH = Math.max(1, Math.floor(h));
+    for (const c of [canvas, pend && pend.el]) if (c) { c.style.width = cssW + 'px'; c.style.height = cssH + 'px'; }
+    box.style.width = cssW + 'px'; box.style.height = cssH + 'px';
+    const d = dprFor(); pxW = Math.max(2, Math.round(cssW * d)); pxH = Math.max(2, Math.round(cssH * d));
+    if (mode === 'main') { canvas.width = pxW; canvas.height = pxH; } // the worker resizes its canvas from each frame request
+    dirty = true;
+  }
+  const ro = new ResizeObserver(() => layout());
+  function draw() {
+    const t0 = performance.now();
+    const r = fc.draw(ctx, canvas, getProject(), t, { playing, quality, space, zebra: zebraOn(), env: env && env(), live: liveOn(), onError });
+    if (!r.failed) { lastInfo = r.info; drawn++; }
+    timing(performance.now() - t0); dirty = false; if (onTick) onTick(t, lastInfo);
+  }
+  function post() {
+    if (inflight || !wk) return;
+    const pr = getProject(), e = env && env();
+    const m = { type: 'frame', id: ++fid, t, w: pxW, h: pxH, playing, quality, zebra: zebraOn(), cache: fc.on, forceCpu: !!(pipeline.gpu && pipeline.gpu.forceCpu) };
+    if (pr !== sent.pr) m.project = pr;
+    if (e !== sent.env) m.env = e ? e.source : null;
+    if (__m_kits.revision !== sent.kits) m.kits = __m_kits.snapshot();
+    if (sent.clear) m.clear = true;
+    try { wk.post(m); } catch (er) { fail('scene could not be sent: ' + (er && er.message)); return; }
+    sent.pr = pr; sent.env = e; sent.kits = __m_kits.revision; sent.clear = false;
+    inflight = m.id; sentAt = performance.now(); dirty = false; if (onTick) onTick(t, lastInfo);
   }
   function frame(now) {
     raf = requestAnimationFrame(frame);
+    if (pend && pend.ready) adopt();
     const L = getProject().finish.loop;
     const dt = last ? Math.min(0.1, (now - last) / 1000) : 0;
-    if (last && playing && !document.hidden && !__m_kits.job.on && !__m_kits.runtime.pendingCompiles) __m_kits.reportFrame(now - last);
+    if (last && playing && mode === 'main' && !document.hidden && !__m_kits.job.on && !__m_kits.runtime.pendingCompiles) __m_kits.reportFrame(now - last);
     last = now;
     if (playing) { const ct = clock ? clock() : null; t = ct != null ? ct % L : (t + dt) % L; dirty = true; }
-    else if (extras && extras.live && extras.live()) dirty = true;
-    if (dirty && !(__m_kits.job && __m_kits.job.on)) draw();
+    else if (liveOn()) dirty = true;
+    const reason = mainReason();
+    if (reason && mode === 'worker') toMain(reason); else if (!reason && mode === 'main') toWorker(); else if (reason) why = reason;
+    if (inflight && now - sentAt > 30000) fail('no reply for 30 s');
+    if (dirty && !(__m_kits.job && __m_kits.job.on)) { if (mode === 'worker') post(); else draw(); }
+    settled();
   }
   makeCanvasEl(); ro.observe(host); raf = requestAnimationFrame(frame);
   const loopLen = () => getProject().finish.loop;
   return {
     setAspect(a) { aspect = a; layout(); }, get aspect() { return aspect; },
     setQuality(q) { quality = q; layout(); },
-    setSpace(s) { if (s === space) return; space = s; makeCanvasEl(); },
+    setSpace(s) { if (s === space) return; space = s; if (mode === 'worker') toWorker(); else makeCanvasEl(); },
     get canvas() { return canvas; },
     play() { playing = true; last = 0; }, pause() { playing = false; dirty = true; },
     toggle() { playing = !playing; last = 0; dirty = true; return playing; },
@@ -204,15 +304,27 @@ function createStage({ host, box, pipeline, getProject, onTick, onError, clock, 
     seek(frac) { t = Math.min(0.999999, Math.max(0, frac)) * loopLen(); dirty = true; },
     seekTime(s) { const L = loopLen(); t = ((s % L) + L) % L; dirty = true; },
     step(frames, fps = 30) { const L = loopLen(); t = (((t + frames / fps) % L) + L) % L; dirty = true; },
-    invalidate() { cacheClear(); dirty = true; },
-    setCache(on) { cache.on = !!on; if (!on) cacheClear(); dirty = true; }, get cacheOn() { return cache.on; }, cacheStats, cacheClear,
+    invalidate() { dropStats(); sent.pr = null; dirty = true; },
+    setCache(on) { fc.on = on; dropStats(); dirty = true; }, get cacheOn() { return fc.on; },
+    cacheStats() { return mode === 'worker' && wstat && wstat.cache ? { ...wstat.cache, on: fc.on } : fc.stats(getProject()); },
+    cacheClear: dropStats,
     frameMs() { return timings.length ? timings.reduce((a, b) => a + b, 0) / timings.length : 0; },
-    size() { return { w: canvas.width, h: canvas.height, cssW, cssH }; },
-    destroy() { cancelAnimationFrame(raf); ro.disconnect(); },
+    size() { return { w: pxW, h: pxH, cssW, cssH }; },
+    // Render backend: 'worker' (off the UI thread) or 'main'; engineReason says why main is in use.
+    get engineMode() { return mode; }, get engineReason() { return mode === 'main' ? why : ''; }, get engineCaps() { return wk && wk.caps ? { ...wk.caps } : null; }, get framesDrawn() { return drawn; },
+    gpuStatus() { return mode === 'worker' && wstat && wstat.gpu ? wstat.gpu : __m_kits.gpuStatus(); },
+    setEngine(pref) { forced = pref === 'main'; dirty = true; },
+    // Resolves once the requested frame has been drawn (in either backend): when idle, or while playing after the next frame.
+    settle() { return new Promise(r => { waiters.push({ r, d0: drawn }); }); },
+    readPixels() {
+      if (mode === 'main') { const d = ctx.getImageData(0, 0, canvas.width, canvas.height); return Promise.resolve({ w: d.width, h: d.height, data: d.data }); }
+      return new Promise(r => { const id = ++fid; reads.set(id, r); wk.post({ type: 'read', id }); });
+    },
+    debugWorker(kind) { if (wk) wk.post({ type: 'debug-' + kind }); }, // test hook: 'crash' exercises the fallback
+    destroy() { cancelAnimationFrame(raf); ro.disconnect(); if (wk) { wk.terminate(); wk = null; } },
   };
 }
 
-return { createPipeline, exportSize, aspectRatio, frameCount, frameTime, framesPerLoop, renderThumb, renderProjectThumb, createStage };
+return { createPipeline, createFrameCache, exportSize, aspectRatio, frameCount, frameTime, framesPerLoop, renderThumb, renderProjectThumb, createStage };
 
 })();
-
