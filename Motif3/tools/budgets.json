@@ -1,0 +1,5 @@
+{
+  "note": "p95 wall time per frame in ms at 1280x720 including GPU readback, on the reference machine (Apple M-series, hardware GPU). Tighten as the engine improves.",
+  "default": 16.7,
+  "styles": {}
+}

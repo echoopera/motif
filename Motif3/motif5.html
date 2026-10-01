@@ -816,7 +816,7 @@ dialog#keysDlg{width:min(94vw,720px)}
       <span class="t">Viewer</span><span class="clip" id="vClip"></span><span class="grow"></span>
       <div class="seg" role="radiogroup" aria-label="Aspect ratio" id="aspects"></div>
       <select id="aspectSel" class="aspect-sel" aria-label="Aspect ratio"></select>
-      <label class="mini"><span class="mlabel">Preview</span><select id="quality" aria-label="Preview quality"><option value="auto">Auto</option><option value="high">Full</option><option value="draft">Half</option></select></label>
+      <label class="mini"><span class="mlabel">Preview</span><select id="quality" aria-label="Preview quality"><option value="auto">Auto</option><option value="high">Full</option><option value="draft">Half</option><option value="quarter">Quarter</option></select></label>
       <button class="btn ghost icon" id="guidesBtn" aria-pressed="false" aria-label="Safe-area guides" title="Safe-area guides (G)"><svg class="i" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="1"/><rect x="6" y="8" width="12" height="8" stroke-dasharray="2 2"/></svg></button>
     </div>
     <div class="stage-host" id="stageHost">
@@ -874,7 +874,7 @@ dialog#keysDlg{width:min(94vw,720px)}
       <button role="radio" data-l="time" aria-checked="false" title="Time: inspector and tall timeline (Alt 3)">Time</button>
       <button role="radio" data-l="focus" aria-checked="false" title="Focus: viewer only (F)">Focus</button>
     </div>
-    <div class="pb-r"><span class="readout" id="perf" title="Render time per frame"></span><button class="chipbtn" id="gpuChip" title="Shader render scale">Shaders</button></div>
+    <div class="pb-r"><span class="readout" id="perf" title="Render time per frame"></span><button class="chipbtn" id="cacheChip" title="Render cache">Cache</button><button class="chipbtn" id="benchChip" title="Benchmark the current scene on this GPU and download frame-time data">Bench</button><button class="chipbtn" id="gpuChip" title="Shader render scale">Shaders</button></div>
   </footer>
   <aside class="insp" id="insp" aria-label="Inspector">
     <section role="tabpanel" id="panel-layer" data-panel="layer"></section>
@@ -4677,12 +4677,18 @@ function createStage({ host, box, pipeline, getProject, onTick, onError, clock, 
   let canvas = null, ctx = null, space = 'srgb';
   let aspect = '16x9', quality = 'auto', playing = true, t = 0, last = 0, raf = 0, cssW = 0, cssH = 0, dirty = true;
   const timings = []; let lastInfo = null;
+  // Render cache: finished preview frames on the project's frame grid, keyed by a hash of the project plus
+  // everything else that changes pixels. Scrubbing, stepping and looping replay from here instead of re-rendering.
+  const cache = { on: true, map: new Map(), bytes: 0, sig: '', env: null, hits: 0, misses: 0, budget: Math.min(768, Math.max(128, ((navigator.deviceMemory || 4) * 64))) * 1048576, full: false };
+  const sigOf = pr => { const str = JSON.stringify(pr); let h = 2166136261 >>> 0; for (let i = 0; i < str.length; i += 1) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619) >>> 0; } return h.toString(36) + '.' + str.length; };
+  function cacheClear() { cache.map.clear(); cache.bytes = 0; cache.full = false; }
+  function cacheStats() { const pr = getProject(), n = framesPerLoop(pr, pr.output.fps || 30); return { on: cache.on, frames: cache.map.size, loopFrames: n, bytes: cache.bytes, budget: cache.budget, hits: cache.hits, misses: cache.misses, full: cache.full, fraction: Math.min(1, cache.map.size / n) }; }
   function makeCanvasEl() {
     const c = document.createElement('canvas'); c.id = 'stage'; c.setAttribute('role', 'img'); c.setAttribute('aria-label', 'Animation preview');
     if (canvas) { c.setAttribute('aria-label', canvas.getAttribute('aria-label')); canvas.replaceWith(c); } else box.prepend(c);
     canvas = c; ctx = c.getContext('2d', { colorSpace: space === 'p3' ? 'display-p3' : 'srgb' }); layout();
   }
-  const dprFor = () => { const d = window.devicePixelRatio || 1; return quality === 'draft' ? 0.6 : quality === 'high' ? Math.min(d, 2) : Math.min(d, 1.5); };
+  const dprFor = () => { const d = window.devicePixelRatio || 1; return quality === 'quarter' ? 0.25 : quality === 'draft' ? 0.5 : quality === 'high' ? Math.min(d, 2) : Math.min(d, 1.5); };
   function layout() {
     const r = host.getBoundingClientRect(), cs = getComputedStyle(host); const ar = aspectRatio(aspect);
     const aw = Math.max(1, r.width - (parseFloat(cs.paddingLeft) || 0) - (parseFloat(cs.paddingRight) || 0)), ah = Math.max(1, r.height - (parseFloat(cs.paddingTop) || 0) - (parseFloat(cs.paddingBottom) || 0));
@@ -4696,10 +4702,45 @@ function createStage({ host, box, pipeline, getProject, onTick, onError, clock, 
   const ro = new ResizeObserver(() => layout());
   function draw() {
     const pr = getProject(); const t0 = performance.now();
+    const e = env && env(), live = !!(extras && extras.live && extras.live()), zebra = !!(extras && extras.zebra);
+    const fps = pr.output.fps || 30, N = framesPerLoop(pr, fps), L = pr.finish.loop;
+    // Cache only deterministic scenes: no live audio, no video or image media (decoded in real time), no pending shader compiles.
+    const media = pr.layers.some(l => l.media && Object.keys(l.media).length);
+    const usable = cache.on && !live && !media && !__m_kits.runtime.pendingCompiles && !(__m_kits.job && __m_kits.job.on);
+    let key = null, rt = t;
+    if (usable) {
+      const sig = sigOf(pr) + '|' + canvas.width + 'x' + canvas.height + '|' + space + '|' + zebra + '|' + quality;
+      if (sig !== cache.sig || e !== cache.env) { cacheClear(); cache.sig = sig; cache.env = e; }
+      const i = Math.min(N - 1, Math.floor((t / L) * N + 1e-6)); rt = (i / N) * L; key = (playing ? 'p' : 's') + i;
+      const hit = cache.map.get(key);
+      if (hit) {
+        cache.hits++; cache.map.delete(key); cache.map.set(key, hit);
+        ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalCompositeOperation = 'copy'; ctx.drawImage(hit.c, 0, 0); ctx.restore();
+        lastInfo = hit.info; timings.push(performance.now() - t0); if (timings.length > 60) timings.shift();
+        dirty = false; if (onTick) onTick(t, lastInfo); return;
+      }
+      cache.misses++;
+    }
     __m_kits.setPreview(true, playing);
-    try { lastInfo = pipeline.renderFrame(ctx, canvas.width, canvas.height, pr, t, { preview: playing, previewSamples: quality === 'high' ? 8 : 4, env: env && env(), zebra: extras && extras.zebra, onError }); }
-    catch (e) { if (onError) onError(e); }
+    let failed = false;
+    try { lastInfo = pipeline.renderFrame(ctx, canvas.width, canvas.height, pr, usable ? rt : t, { preview: playing, previewSamples: quality === 'high' ? 8 : 4, env: e, zebra: extras && extras.zebra, onError }); }
+    catch (er) { failed = true; if (onError) onError(er); }
     finally { __m_kits.setPreview(false); }
+    // Frames drawn while shaders were still downscaled for load are not stored: the loop would replay them blurry.
+    if (key && !failed && !(playing && __m_kits.gpuStatus().scale < 0.95) && !__m_kits.runtime.pendingCompiles) {
+      const bytes = canvas.width * canvas.height * 4;
+      if (cache.bytes + bytes > cache.budget) {
+        // Scrubbing evicts the oldest frame; playback keeps the first frames of the loop instead of thrashing.
+        if (!playing && cache.map.size) { const k0 = cache.map.keys().next().value, v = cache.map.get(k0); cache.map.delete(k0); cache.bytes -= v.bytes; }
+        else cache.full = true;
+      }
+      if (cache.bytes + bytes <= cache.budget) {
+        try {
+          const c = typeof OffscreenCanvas !== 'undefined' ? new OffscreenCanvas(canvas.width, canvas.height) : Object.assign(document.createElement('canvas'), { width: canvas.width, height: canvas.height });
+          c.getContext('2d').drawImage(canvas, 0, 0); cache.map.set(key, { c, bytes, info: lastInfo }); cache.bytes += bytes;
+        } catch (er) { cache.on = false; cacheClear(); }
+      }
+    }
     timings.push(performance.now() - t0); if (timings.length > 60) timings.shift();
     dirty = false; if (onTick) onTick(t, lastInfo);
   }
@@ -4726,7 +4767,8 @@ function createStage({ host, box, pipeline, getProject, onTick, onError, clock, 
     seek(frac) { t = Math.min(0.999999, Math.max(0, frac)) * loopLen(); dirty = true; },
     seekTime(s) { const L = loopLen(); t = ((s % L) + L) % L; dirty = true; },
     step(frames, fps = 30) { const L = loopLen(); t = (((t + frames / fps) % L) + L) % L; dirty = true; },
-    invalidate() { dirty = true; },
+    invalidate() { cacheClear(); dirty = true; },
+    setCache(on) { cache.on = !!on; if (!on) cacheClear(); dirty = true; }, get cacheOn() { return cache.on; }, cacheStats, cacheClear,
     frameMs() { return timings.length ? timings.reduce((a, b) => a + b, 0) / timings.length : 0; },
     size() { return { w: canvas.width, h: canvas.height, cssW, cssH }; },
     destroy() { cancelAnimationFrame(raf); ro.disconnect(); },
@@ -5318,7 +5360,7 @@ function boot() {
     $('time').innerHTML = timecode(t) + `<small>/ ${timecode(L)}</small>`; $('lcd').style.setProperty('--u', u.toFixed(4));
     if (document.activeElement !== $('scrub')) $('scrub').value = Math.round(u * 1000);
     $('frameRead').textContent = `f ${String(Math.floor(t * project.output.fps + 1e-6)).padStart(3, '0')} / ${Math.round(L * project.output.fps)}`;
-    updateGpuChip();
+    updateGpuChip(); updateCacheChip();
     const engines = info && info.engines || [];
     const eng = engines.includes('gpu') ? ' · WebGPU' : engines.includes('webgl') ? ' · WebGL' : engines.includes('software-gl') ? ' · Software GL' : '';
     const cadence = K.gpuStatus().cadence;
@@ -5330,6 +5372,62 @@ function boot() {
     updateAnimatedRows(t);
     if (tab === 'audio') updateMeters(t);
   }
+
+  // ---------- render cache chip ----------
+  let cacheChipKey = '';
+  function updateCacheChip() {
+    const c = $('cacheChip'); if (!c) return;
+    const st = stage.cacheStats(); let text, state, title;
+    if (!st.on) { text = 'Cache off'; state = ''; title = 'Render cache is off: every frame renders live. Click to turn it on.'; }
+    else if (!st.frames) { text = 'Cache'; state = ''; title = 'Frames you play or scrub are kept so the loop replays instantly. Click to turn off.'; }
+    else { const pct = Math.round(st.fraction * 100); text = `Cache ${pct}%`; state = pct >= 95 ? 'gpu' : 'warn'; title = `${st.frames} of ${st.loopFrames} loop frames cached (${(st.bytes / 1048576).toFixed(0)} of ${(st.budget / 1048576).toFixed(0)} MB)${st.full ? '. Memory budget reached: lower Preview quality to cache the whole loop' : ''}. Preview plays on the output frame grid (${project.output.fps} fps), as the export will. Click to turn off.`; }
+    const key = text + state; if (key === cacheChipKey) return; cacheChipKey = key;
+    c.textContent = text; c.dataset.state = state; c.title = title;
+  }
+  function toggleCache() { stage.setCache(!stage.cacheOn); cacheChipKey = ''; updateCacheChip(); toast(stage.cacheOn ? 'Render cache on' : 'Render cache off'); }
+  $('cacheChip').addEventListener('click', toggleCache);
+
+  // ---------- benchmark ----------
+  // Renders each scene at a fixed size and time sweep, forcing a GPU readback per frame so the wall time covers
+  // submission plus execution. Output is JSON with p50/p95/max frame times for CI budgets and cross-machine comparison.
+  const pctile = (a, q) => { const b = [...a].sort((x, y) => x - y); return b[Math.min(b.length - 1, Math.ceil(b.length * q) - 1)]; };
+  async function benchScene(pr, { w, h, frames, warm }) {
+    const cv = document.createElement('canvas'); cv.width = w; cv.height = h; const x = cv.getContext('2d', { willReadFrequently: false });
+    const fps = pr.output.fps || 30, N = frames, L = pr.finish.loop, ms = [], errs = [];
+    __m_kits.setPreview(false);
+    for (let i = -warm; i < N; i++) {
+      const t = (((i + warm) % N) / N) * L, t0 = performance.now();
+      try { pipeline.renderFrame(x, w, h, pr, t, { env: null, onError: e => errs.push(String(e && e.message || e)) }); x.getImageData(0, 0, 1, 1); } catch (e) { errs.push(String(e && e.message || e)); }
+      if (i >= 0) ms.push(performance.now() - t0);
+      if (i % 8 === 7) await new Promise(r => setTimeout(r, 0)); // keep the page responsive
+    }
+    const mean = ms.reduce((a, b) => a + b, 0) / ms.length;
+    return { p50: +pctile(ms, 0.5).toFixed(2), p95: +pctile(ms, 0.95).toFixed(2), max: +Math.max(...ms).toFixed(2), mean: +mean.toFixed(2), fps60: pctile(ms, 0.95) <= 16.7, errors: [...new Set(errs)].slice(0, 3) };
+  }
+  async function runBench(opt = {}) {
+    const w = opt.w || 1280, h = opt.h || 720, frames = opt.frames || 60, warm = opt.warm == null ? 6 : opt.warm;
+    const wasPlaying = stage.playing; stage.pause(); const wasCache = stage.cacheOn; stage.setCache(false);
+    const g = K.gpuStatus(), report = { app: 'Motif 5', date: new Date().toISOString(), ua: navigator.userAgent, renderer: g.renderer || null, software: !!g.software, timerQuery: !!g.timer, cores: navigator.hardwareConcurrency || null, memoryGB: navigator.deviceMemory || null, dpr: window.devicePixelRatio || 1, size: `${w}x${h}`, frames, scenes: [] };
+    try {
+      const list = opt.all ? (opt.styles || STYLES.map(s => s.id)).map(id => ({ id, pr: (() => { const p = T.newProject(id); p.finish = { ...p.finish, shutter: 0 }; return p; })() })) : [{ id: 'current scene', pr: (() => { const p = clone(project); return p; })() }];
+      let n = 0;
+      for (const sc of list) {
+        toast(`Benchmark ${++n}/${list.length} · ${sc.id}`);
+        pipeline.renderFrame(document.createElement('canvas').getContext('2d'), 8, 8, sc.pr, 0, {}); // starts shader compiles before timing
+        if (K.runtime.pendingCompiles) { const t0 = performance.now(); while (K.runtime.pendingCompiles && performance.now() - t0 < 8000) await new Promise(r => setTimeout(r, 30)); }
+        report.scenes.push({ id: sc.id, ...(await benchScene(sc.pr, { w, h, frames, warm })) });
+      }
+    } finally { stage.setCache(wasCache); if (wasPlaying) stage.play(); else stage.invalidate(); }
+    const worst = report.scenes.reduce((a, b) => (b.p95 > a.p95 ? b : a), report.scenes[0]);
+    report.summary = { scenes: report.scenes.length, over60fpsBudget: report.scenes.filter(x => !x.fps60).map(x => x.id), worst: worst && { id: worst.id, p95: worst.p95 } };
+    if (!opt.silent) {
+      const blob = new Blob([JSON.stringify(report, null, 2)], { type: 'application/json' }), a = document.createElement('a');
+      a.href = URL.createObjectURL(blob); a.download = `motif-bench-${new Date().toISOString().slice(0, 16).replace(/[:T]/g, '-')}.json`; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+      toast(`Benchmark done · worst p95 ${report.summary.worst.p95} ms · ${report.summary.over60fpsBudget.length} over 16.7 ms`);
+    }
+    return report;
+  }
+  $('benchChip').addEventListener('click', () => runBench());
 
   // ---------- top bar ----------
   const aspectsEl = $('aspects');
@@ -6486,7 +6584,11 @@ function boot() {
     ASPECTS.forEach((a, i) => out.push(c('asp-' + a.id, `Aspect ratio ${a.label}`, String(i + 1), () => setAspect(a.id), 'format size')));
     PAGE_NAMES.forEach(([t, n]) => out.push(c('page-' + t, `Open ${n}`, '', () => { showInsp(); setTab(t); }, 'inspector page')));
     [['dense', 'dense'], ['grid', 'thumbnails'], ['list', 'list']].forEach(([v, n]) => out.push(c('view-' + v, `Library view: ${n}`, '', () => setLibView(v), 'density')));
-    [['auto', 'Auto'], ['high', 'Full'], ['draft', 'Half']].forEach(([v, n]) => out.push(c('q-' + v, `Preview quality: ${n}`, '', () => { $('quality').value = v; stage.setQuality(v); toast(`Preview ${n}`); }, 'resolution performance')));
+    [['auto', 'Auto'], ['high', 'Full'], ['draft', 'Half'], ['quarter', 'Quarter']].forEach(([v, n]) => out.push(c('q-' + v, `Preview quality: ${n}`, '', () => { $('quality').value = v; stage.setQuality(v); toast(`Preview ${n}`); }, 'resolution performance')));
+    out.push(c('cache-toggle', stage.cacheOn ? 'Render cache: turn off' : 'Render cache: turn on', '', () => toggleCache(), 'performance scrub loop'));
+    out.push(c('cache-clear', 'Render cache: clear', '', () => { stage.cacheClear(); stage.invalidate(); toast('Render cache cleared'); }, 'performance'));
+    out.push(c('bench', 'Benchmark this scene (download frame-time JSON)', '', () => runBench(), 'performance speed fps gpu'));
+    out.push(c('bench-all', 'Benchmark every style (download frame-time JSON)', '', () => runBench({ all: true }), 'performance speed fps gpu budget'));
     out.push(c('keys', 'Keyboard shortcuts', '?', () => $('keysDlg').showModal()));
     const pals = [...PALETTES, ...project.palettes];
     pals.forEach(p => out.push({ key: 'pal:' + p.id, label: p.name, kind: 'Palette', kw: 'colour color', sw: [p.bg, p.ink, ...p.a], run: () => commit(applyValue(lpath('s', 'palette'), p.id), `Palette · ${p.name}`), preview: () => applyValue(lpath('s', 'palette'), p.id), hint: 'Palette' }));
@@ -6752,7 +6854,7 @@ function boot() {
 
   // Test and automation hooks (read-only views plus the same actions the UI offers).
   window.__lab = {
-    media, attachMedia,
+    media, attachMedia, bench: runBench,
     get project() { return clone(project); }, setProject(p) { commit(p); stage.setSpace(project.output.space); }, get historySize() { return history.length; }, stage, gpu, pipeline, setAspect, setTab,
     selectStyle, addLayer, mutate: doMutate, randomize: doRandom, undo, redo, openEvolve, keep, get children() { return children.length; }, openExport, toggleKey,
     get styles() { return STYLES.map(s => ({ id: s.id, gpu: !!s.gpu, engine: s.engine || (s.gpu ? 'webgpu' : 'canvas'), kit: s.kit || null, params: Object.keys(s.params).length })); },
