@@ -1042,7 +1042,7 @@ function boot() {
   function renderLaneRows() {
     const { keyed, mapped } = laneRows();
     const bandsFor = p => project.audio ? project.audio.maps.filter(x => x.path === p).map(x => x.band).join(', ') : '';
-    const rows = keyed.map(p => { const ks = project.keys[p]; const lab = T.pathLabel(project, p); const bands = bandsFor(p); return `<div class="lrow" data-lpath="${p}"><span class="nm" title="${esc(lab)}${bands ? ' + audio ' + bands : ''}">${esc(lab)}${bands ? ` <small>∿ ${bands}</small>` : ''}</span><div class="track" data-track="${p}">${ks.map((k, i) => `<button class="kf" style="left:${(k.u * 100).toFixed(3)}%" data-kp="${p}" data-ki="${i}" data-ease="${k.e}" aria-pressed="${!!(selKey && selKey.path === p && selKey.idx === i)}" aria-label="${esc(lab)} key ${i + 1} at ${(k.u * project.finish.loop).toFixed(2)} seconds"></button>`).join('')}</div><button class="ib" data-clear="${p}" aria-label="Remove all keys for ${esc(lab)}" title="Remove all keys" style="opacity:.8">✕</button></div>`; }).join('');
+    const rows = keyed.map(p => { const ks = project.keys[p]; const lab = T.pathLabel(project, p); const bands = bandsFor(p); return `<div class="lrow" data-lpath="${p}"><span class="nm" title="${esc(lab)}${bands ? ' + audio ' + bands : ''}">${esc(lab)}${bands ? ` <small>∿ ${bands}</small>` : ''}</span><div class="track" data-track="${p}">${ks.map((k, i) => `<button class="kf" style="left:${(k.u * 100).toFixed(3)}%" data-kp="${p}" data-ki="${i}" data-ease="${k.e}" aria-pressed="${!!(selKey && selKey.path === p && selKey.idx === i)}" aria-label="${esc(lab)} key ${i + 1} at ${(k.u * project.finish.loop).toFixed(2)} seconds"></button>`).join('')}</div><button class="ib" data-clear="${p}" aria-label="Remove all keys for ${esc(lab)}" title="Remove all keys">✕</button></div>`; }).join('');
     const maps = mapped.map(p => { const lab = T.pathLabel(project, p); const m = project.audio.maps.filter(x => x.path === p).map(x => x.band).join(', '); return `<div class="lrow"><span class="nm" title="${esc(lab)}">${esc(lab)} <small>∿ ${m}</small></span><div class="track" data-track="${p}" data-env="${p}"><canvas width="300" height="20"></canvas></div><span></span></div>`; }).join('');
     const L = project.finish.loop, stepS = L <= 4 ? 0.5 : L <= 12 ? 1 : L <= 30 ? 2 : 5;
     let ticks = ''; for (let s = 0; s < L - 1e-6; s += stepS) ticks += `<span style="left:${(s / L * 100).toFixed(3)}%">${timecode(s).slice(3)}</span>`;
@@ -1804,6 +1804,31 @@ function boot() {
     if (ev.type !== 'safe' && tab === 'kits') renderKitsPanel();
     if (tab === 'layer') renderLayerPanel();
   });
+
+  // ---------- accessibility: roving tabindex + arrow keys (tablists, radiogroups) and splitter values ----------
+  // Additive and delegated so dynamically rendered groups are covered. Evidence: tests/browser/a11y.mjs, docs/a11y-findings.md.
+  (() => {
+    const G = '[role=tablist],[role=radiogroup]', shown = e => e.getClientRects().length > 0;
+    const itemsOf = g => [...g.querySelectorAll(g.getAttribute('role') === 'tablist' ? '[role=tab]' : '[role=radio]')].filter(b => !b.disabled && shown(b));
+    const stateOf = g => (g.getAttribute('role') === 'tablist' ? 'aria-selected' : 'aria-checked');
+    const rove = g => { const its = itemsOf(g), cur = its.find(b => b.getAttribute(stateOf(g)) === 'true') || its[0]; its.forEach(b => { b.tabIndex = b === cur ? 0 : -1; }); };
+    let queued = 0; const syncAll = () => { queued = 0; document.querySelectorAll(G).forEach(rove); };
+    new MutationObserver(recs => { if (recs.some(r => r.attributeName === 'hidden' || r.attributeName === 'open' || (r.target.closest && r.target.closest(G)) || [...r.addedNodes].some(n => n.nodeType === 1 && (n.matches(G) || n.querySelector(G))))) syncAll(); })
+      .observe(document.body, { subtree: true, childList: true, attributes: true, attributeFilter: ['aria-checked', 'aria-selected', 'hidden', 'disabled', 'open'] });
+    syncAll(); addEventListener('resize', () => { if (!queued) queued = requestAnimationFrame(syncAll); });
+    document.addEventListener('keydown', e => {
+      if (e.altKey || e.ctrlKey || e.metaKey || !/^(Arrow(Left|Right|Up|Down)|Home|End)$/.test(e.key) || !e.target.closest) return;
+      const g = e.target.closest(G), me = g && e.target.closest('[role=tab],[role=radio]'); if (!me) return;
+      if (g.getAttribute('role') === 'tablist' && /Up|Down/.test(e.key)) return;
+      const its = itemsOf(g), i = its.indexOf(me); if (i < 0) return;
+      const n = e.key === 'Home' ? its[0] : e.key === 'End' ? its[its.length - 1] : its[(i + (/Right|Down/.test(e.key) ? 1 : -1) + its.length) % its.length];
+      e.preventDefault(); e.stopPropagation(); n.focus(); n.click();
+      if (!n.isConnected) requestAnimationFrame(() => { const g2 = [...document.querySelectorAll(G)].find(x => x.getAttribute('aria-label') === g.getAttribute('aria-label')), n2 = g2 && itemsOf(g2)[its.indexOf(n)]; if (n2) n2.focus(); }); // the click re-rendered the panel
+    }, true);
+    // Focusable separators need value semantics (ARIA 1.2): kept current on focus and after arrow keys.
+    const splitVal = h => { const k = h.dataset.split, now = k === 'lib' ? $('panel-library').getBoundingClientRect().width : k === 'insp' ? $('insp').getBoundingClientRect().width : $('lane').getBoundingClientRect().height, [lo, hi] = k === 'lib' ? [216, 520] : k === 'insp' ? [296, 600] : [112, Math.max(160, Math.round(innerHeight * 0.62))]; h.setAttribute('aria-valuemin', lo); h.setAttribute('aria-valuemax', hi); h.setAttribute('aria-valuenow', Math.round(Math.min(hi, Math.max(lo, now)))); };
+    document.querySelectorAll('.split').forEach(h => { h.addEventListener('focus', () => splitVal(h)); h.addEventListener('keyup', () => splitVal(h)); splitVal(h); });
+  })();
 
   // Test and automation hooks (read-only views plus the same actions the UI offers).
   window.__lab = {

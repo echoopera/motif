@@ -1,0 +1,2373 @@
+{
+ "scenes": {
+  "style/stagger-rise@0": {
+   "file": "style__stagger-rise__0.png",
+   "w": 96,
+   "h": 54,
+   "engines": "cpu",
+   "post": "cpu",
+   "bytes": 1656
+  },
+  "style/stagger-rise@2": {
+   "file": "style__stagger-rise__2.png",
+   "w": 96,
+   "h": 54,
+   "engines": "cpu",
+   "post": "cpu",
+   "bytes": 2893
+  },
+  "style/stagger-rise@4.1": {
+   "file": "style__stagger-rise__4.1.png",
+   "w": 96,
+   "h": 54,
+   "engines": "cpu",
+   "post": "cpu",
+   "bytes": 2890
+  },
+  "style/width-wave@0": {
+   "file": "style__width-wave__0.png",
+   "w": 96,
+   "h": 54,
+   "engines": "cpu",
+   "post": "cpu",
+   "bytes": 7228
+  },
+  "style/width-wave@2": {
+   "file": "style__width-wave__2.png",
+   "w": 96,
+   "h": 54,
+   "engines": "cpu",
+   "post": "cpu",
+   "bytes": 7153
+  },
+  "style/width-wave@4.1": {
+   "file": "style__width-wave__4.1.png",
+   "w": 96,
+   "h": 54,
+   "engines": "cpu",
+   "post": "cpu",
+   "bytes": 7113
+  },
+  "style/type-tunnel@0": {
+   "file": "style__type-tunnel__0.png",
+   "w": 96,
+   "h": 54,
+   "engines": "cpu",
+   "post": "cpu",
+   "bytes": 14262
+  },
+  "style/type-tunnel@2": {
+   "file": "style__type-tunnel__2.png",
+   "w": 96,
+   "h": 54,
+   "engines": "cpu",
+   "post": "cpu",
+   "bytes": 14372
+  },
+  "style/type-tunnel@4.1": {
+   "file": "style__type-tunnel__4.1.png",
+   "w": 96,
+   "h": 54,
+   "engines": "cpu",
+   "post": "cpu",
+   "bytes": 14357
+  },
+  "style/slit-scan@0": {
+   "file": "style__slit-scan__0.png",
+   "w": 96,
+   "h": 54,
+   "engines": "cpu",
+   "post": "cpu",
+   "bytes": 4848
+  },
+  "style/slit-scan@2": {
+   "file": "style__slit-scan__2.png",
+   "w": 96,
+   "h": 54,
+   "engines": "cpu",
+   "post": "cpu",
+   "bytes": 4873
+  },
+  "style/slit-scan@4.1": {
+   "file": "style__slit-scan__4.1.png",
+   "w": 96,
+   "h": 54,
+   "engines": "cpu",
+   "post": "cpu",
+   "bytes": 4772
+  },
+  "style/marquee-stack@0": {
+   "file": "style__marquee-stack__0.png",
+   "w": 96,
+   "h": 54,
+   "engines": "cpu",
+   "post": "cpu",
+   "bytes": 9589
+  },
+  "style/marquee-stack@2": {
+   "file": "style__marquee-stack__2.png",
+   "w": 96,
+   "h": 54,
+   "engines": "cpu",
+   "post": "cpu",
+   "bytes": 9829
+  },
+  "style/marquee-stack@4.1": {
+   "file": "style__marquee-stack__4.1.png",
+   "w": 96,
+   "h": 54,
+   "engines": "cpu",
+   "post": "cpu",
+   "bytes": 9929
+  },
+  "style/scramble-decode@0": {
+   "file": "style__scramble-decode__0.png",
+   "w": 96,
+   "h": 54,
+   "engines": "cpu",
+   "post": "cpu",
+   "bytes": 3191
+  },
+  "style/scramble-decode@2": {
+   "file": "style__scramble-decode__2.png",
+   "w": 96,
+   "h": 54,
+   "engines": "cpu",
+   "post": "cpu",
+   "bytes": 3361
+  },
+  "style/scramble-decode@4.1": {
+   "file": "style__scramble-decode__4.1.png",
+   "w": 96,
+   "h": 54,
+   "engines": "cpu",
+   "post": "cpu",
+   "bytes": 3271
+  },
+  "style/orbit-rings@0": {
+   "file": "style__orbit-rings__0.png",
+   "w": 96,
+   "h": 54,
+   "engines": "cpu",
+   "post": "cpu",
+   "bytes": 5140
+  },
+  "style/orbit-rings@2": {
+   "file": "style__orbit-rings__2.png",
+   "w": 96,
+   "h": 54,
+   "engines": "cpu",
+   "post": "cpu",
+   "bytes": 5012
+  },
+  "style/orbit-rings@4.1": {
+   "file": "style__orbit-rings__4.1.png",
+   "w": 96,
+   "h": 54,
+   "engines": "cpu",
+   "post": "cpu",
+   "bytes": 5137
+  },
+  "style/grid-pulse@0": {
+   "file": "style__grid-pulse__0.png",
+   "w": 96,
+   "h": 54,
+   "engines": "cpu",
+   "post": "cpu",
+   "bytes": 7800
+  },
+  "style/grid-pulse@2": {
+   "file": "style__grid-pulse__2.png",
+   "w": 96,
+   "h": 54,
+   "engines": "cpu",
+   "post": "cpu",
+   "bytes": 8310
+  },
+  "style/grid-pulse@4.1": {
+   "file": "style__grid-pulse__4.1.png",
+   "w": 96,
+   "h": 54,
+   "engines": "cpu",
+   "post": "cpu",
+   "bytes": 7738
+  },
+  "style/radial-burst@0": {
+   "file": "style__radial-burst__0.png",
+   "w": 96,
+   "h": 54,
+   "engines": "cpu",
+   "post": "cpu",
+   "bytes": 5331
+  },
+  "style/radial-burst@2": {
+   "file": "style__radial-burst__2.png",
+   "w": 96,
+   "h": 54,
+   "engines": "cpu",
+   "post": "cpu",
+   "bytes": 6468
+  },
+  "style/radial-burst@4.1": {
+   "file": "style__radial-burst__4.1.png",
+   "w": 96,
+   "h": 54,
+   "engines": "cpu",
+   "post": "cpu",
+   "bytes": 9705
+  },
+  "style/shape-morph@0": {
+   "file": "style__shape-morph__0.png",
+   "w": 96,
+   "h": 54,
+   "engines": "cpu",
+   "post": "cpu",
+   "bytes": 2359
+  },
+  "style/shape-morph@2": {
+   "file": "style__shape-morph__2.png",
+   "w": 96,
+   "h": 54,
+   "engines": "cpu",
+   "post": "cpu",
+   "bytes": 2914
+  },
+  "style/shape-morph@4.1": {
+   "file": "style__shape-morph__4.1.png",
+   "w": 96,
+   "h": 54,
+   "engines": "cpu",
+   "post": "cpu",
+   "bytes": 3467
+  },
+  "style/lissajous@0": {
+   "file": "style__lissajous__0.png",
+   "w": 96,
+   "h": 54,
+   "engines": "cpu",
+   "post": "cpu",
+   "bytes": 5765
+  },
+  "style/lissajous@2": {
+   "file": "style__lissajous__2.png",
+   "w": 96,
+   "h": 54,
+   "engines": "cpu",
+   "post": "cpu",
+   "bytes": 5943
+  },
+  "style/lissajous@4.1": {
+   "file": "style__lissajous__4.1.png",
+   "w": 96,
+   "h": 54,
+   "engines": "cpu",
+   "post": "cpu",
+   "bytes": 5953
+  },
+  "style/moire@0": {
+   "file": "style__moire__0.png",
+   "w": 96,
+   "h": 54,
+   "engines": "cpu",
+   "post": "cpu",
+   "bytes": 14772
+  },
+  "style/moire@2": {
+   "file": "style__moire__2.png",
+   "w": 96,
+   "h": 54,
+   "engines": "cpu",
+   "post": "cpu",
+   "bytes": 14735
+  },
+  "style/moire@4.1": {
+   "file": "style__moire__4.1.png",
+   "w": 96,
+   "h": 54,
+   "engines": "cpu",
+   "post": "cpu",
+   "bytes": 14777
+  },
+  "style/iso-blocks@0": {
+   "file": "style__iso-blocks__0.png",
+   "w": 96,
+   "h": 54,
+   "engines": "cpu",
+   "post": "cpu",
+   "bytes": 5146
+  },
+  "style/iso-blocks@2": {
+   "file": "style__iso-blocks__2.png",
+   "w": 96,
+   "h": 54,
+   "engines": "cpu",
+   "post": "cpu",
+   "bytes": 5120
+  },
+  "style/iso-blocks@4.1": {
+   "file": "style__iso-blocks__4.1.png",
+   "w": 96,
+   "h": 54,
+   "engines": "cpu",
+   "post": "cpu",
+   "bytes": 5520
+  },
+  "style/truchet@0": {
+   "file": "style__truchet__0.png",
+   "w": 96,
+   "h": 54,
+   "engines": "cpu",
+   "post": "cpu",
+   "bytes": 10262
+  },
+  "style/truchet@2": {
+   "file": "style__truchet__2.png",
+   "w": 96,
+   "h": 54,
+   "engines": "cpu",
+   "post": "cpu",
+   "bytes": 10166
+  },
+  "style/truchet@4.1": {
+   "file": "style__truchet__4.1.png",
+   "w": 96,
+   "h": 54,
+   "engines": "cpu",
+   "post": "cpu",
+   "bytes": 10012
+  },
+  "style/particle-form@0": {
+   "file": "style__particle-form__0.png",
+   "w": 96,
+   "h": 54,
+   "engines": "cpu",
+   "post": "cpu",
+   "bytes": 5221
+  },
+  "style/particle-form@2": {
+   "file": "style__particle-form__2.png",
+   "w": 96,
+   "h": 54,
+   "engines": "cpu",
+   "post": "cpu",
+   "bytes": 5287
+  },
+  "style/particle-form@4.1": {
+   "file": "style__particle-form__4.1.png",
+   "w": 96,
+   "h": 54,
+   "engines": "cpu",
+   "post": "cpu",
+   "bytes": 5143
+  },
+  "style/flow-field@0": {
+   "file": "style__flow-field__0.png",
+   "w": 96,
+   "h": 54,
+   "engines": "cpu",
+   "post": "cpu",
+   "bytes": 6855
+  },
+  "style/flow-field@2": {
+   "file": "style__flow-field__2.png",
+   "w": 96,
+   "h": 54,
+   "engines": "cpu",
+   "post": "cpu",
+   "bytes": 7098
+  },
+  "style/flow-field@4.1": {
+   "file": "style__flow-field__4.1.png",
+   "w": 96,
+   "h": 54,
+   "engines": "cpu",
+   "post": "cpu",
+   "bytes": 6969
+  },
+  "style/orbital-swarm@0": {
+   "file": "style__orbital-swarm__0.png",
+   "w": 96,
+   "h": 54,
+   "engines": "cpu",
+   "post": "cpu",
+   "bytes": 4264
+  },
+  "style/orbital-swarm@2": {
+   "file": "style__orbital-swarm__2.png",
+   "w": 96,
+   "h": 54,
+   "engines": "cpu",
+   "post": "cpu",
+   "bytes": 4298
+  },
+  "style/orbital-swarm@4.1": {
+   "file": "style__orbital-swarm__4.1.png",
+   "w": 96,
+   "h": 54,
+   "engines": "cpu",
+   "post": "cpu",
+   "bytes": 4261
+  },
+  "style/fireworks@0": {
+   "file": "style__fireworks__0.png",
+   "w": 96,
+   "h": 54,
+   "engines": "cpu",
+   "post": "cpu",
+   "bytes": 4096
+  },
+  "style/fireworks@2": {
+   "file": "style__fireworks__2.png",
+   "w": 96,
+   "h": 54,
+   "engines": "cpu",
+   "post": "cpu",
+   "bytes": 3694
+  },
+  "style/fireworks@4.1": {
+   "file": "style__fireworks__4.1.png",
+   "w": 96,
+   "h": 54,
+   "engines": "cpu",
+   "post": "cpu",
+   "bytes": 3973
+  },
+  "style/bounce@0": {
+   "file": "style__bounce__0.png",
+   "w": 96,
+   "h": 54,
+   "engines": "cpu",
+   "post": "cpu",
+   "bytes": 2296
+  },
+  "style/bounce@2": {
+   "file": "style__bounce__2.png",
+   "w": 96,
+   "h": 54,
+   "engines": "cpu",
+   "post": "cpu",
+   "bytes": 2729
+  },
+  "style/bounce@4.1": {
+   "file": "style__bounce__4.1.png",
+   "w": 96,
+   "h": 54,
+   "engines": "cpu",
+   "post": "cpu",
+   "bytes": 2635
+  },
+  "style/rope-chain@0": {
+   "file": "style__rope-chain__0.png",
+   "w": 96,
+   "h": 54,
+   "engines": "cpu",
+   "post": "cpu",
+   "bytes": 3487
+  },
+  "style/rope-chain@2": {
+   "file": "style__rope-chain__2.png",
+   "w": 96,
+   "h": 54,
+   "engines": "cpu",
+   "post": "cpu",
+   "bytes": 3645
+  },
+  "style/rope-chain@4.1": {
+   "file": "style__rope-chain__4.1.png",
+   "w": 96,
+   "h": 54,
+   "engines": "cpu",
+   "post": "cpu",
+   "bytes": 3630
+  },
+  "style/plexus@0": {
+   "file": "style__plexus__0.png",
+   "w": 96,
+   "h": 54,
+   "engines": "cpu",
+   "post": "cpu",
+   "bytes": 5474
+  },
+  "style/plexus@2": {
+   "file": "style__plexus__2.png",
+   "w": 96,
+   "h": 54,
+   "engines": "cpu",
+   "post": "cpu",
+   "bytes": 5293
+  },
+  "style/plexus@4.1": {
+   "file": "style__plexus__4.1.png",
+   "w": 96,
+   "h": 54,
+   "engines": "cpu",
+   "post": "cpu",
+   "bytes": 5464
+  },
+  "style/ridgelines@0": {
+   "file": "style__ridgelines__0.png",
+   "w": 96,
+   "h": 54,
+   "engines": "cpu",
+   "post": "cpu",
+   "bytes": 9980
+  },
+  "style/ridgelines@2": {
+   "file": "style__ridgelines__2.png",
+   "w": 96,
+   "h": 54,
+   "engines": "cpu",
+   "post": "cpu",
+   "bytes": 9912
+  },
+  "style/ridgelines@4.1": {
+   "file": "style__ridgelines__4.1.png",
+   "w": 96,
+   "h": 54,
+   "engines": "cpu",
+   "post": "cpu",
+   "bytes": 10033
+  },
+  "style/halftone@0": {
+   "file": "style__halftone__0.png",
+   "w": 96,
+   "h": 54,
+   "engines": "cpu",
+   "post": "cpu",
+   "bytes": 9312
+  },
+  "style/halftone@2": {
+   "file": "style__halftone__2.png",
+   "w": 96,
+   "h": 54,
+   "engines": "cpu",
+   "post": "cpu",
+   "bytes": 9858
+  },
+  "style/halftone@4.1": {
+   "file": "style__halftone__4.1.png",
+   "w": 96,
+   "h": 54,
+   "engines": "cpu",
+   "post": "cpu",
+   "bytes": 9235
+  },
+  "style/metaballs@0": {
+   "file": "style__metaballs__0.png",
+   "w": 96,
+   "h": 54,
+   "engines": "cpu",
+   "post": "cpu",
+   "bytes": 5327
+  },
+  "style/metaballs@2": {
+   "file": "style__metaballs__2.png",
+   "w": 96,
+   "h": 54,
+   "engines": "cpu",
+   "post": "cpu",
+   "bytes": 4764
+  },
+  "style/metaballs@4.1": {
+   "file": "style__metaballs__4.1.png",
+   "w": 96,
+   "h": 54,
+   "engines": "cpu",
+   "post": "cpu",
+   "bytes": 4241
+  },
+  "style/kaleidoscope@0": {
+   "file": "style__kaleidoscope__0.png",
+   "w": 96,
+   "h": 54,
+   "engines": "cpu",
+   "post": "cpu",
+   "bytes": 4701
+  },
+  "style/kaleidoscope@2": {
+   "file": "style__kaleidoscope__2.png",
+   "w": 96,
+   "h": 54,
+   "engines": "cpu",
+   "post": "cpu",
+   "bytes": 3999
+  },
+  "style/kaleidoscope@4.1": {
+   "file": "style__kaleidoscope__4.1.png",
+   "w": 96,
+   "h": 54,
+   "engines": "cpu",
+   "post": "cpu",
+   "bytes": 5307
+  },
+  "style/cyberpunk/neon-rain@0": {
+   "file": "style__cyberpunk__neon-rain__0.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 5677
+  },
+  "style/cyberpunk/neon-rain@2": {
+   "file": "style__cyberpunk__neon-rain__2.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 5684
+  },
+  "style/cyberpunk/neon-rain@4.1": {
+   "file": "style__cyberpunk__neon-rain__4.1.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 5677
+  },
+  "style/cyberpunk/datamosh@0": {
+   "file": "style__cyberpunk__datamosh__0.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 5580
+  },
+  "style/cyberpunk/datamosh@2": {
+   "file": "style__cyberpunk__datamosh__2.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 5578
+  },
+  "style/cyberpunk/datamosh@4.1": {
+   "file": "style__cyberpunk__datamosh__4.1.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 5569
+  },
+  "style/cyberpunk/holo-decay@0": {
+   "file": "style__cyberpunk__holo-decay__0.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 6340
+  },
+  "style/cyberpunk/holo-decay@2": {
+   "file": "style__cyberpunk__holo-decay__2.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 7798
+  },
+  "style/cyberpunk/holo-decay@4.1": {
+   "file": "style__cyberpunk__holo-decay__4.1.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 7179
+  },
+  "style/cyberpunk/signal-loss@0": {
+   "file": "style__cyberpunk__signal-loss__0.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 9367
+  },
+  "style/cyberpunk/signal-loss@2": {
+   "file": "style__cyberpunk__signal-loss__2.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 9772
+  },
+  "style/cyberpunk/signal-loss@4.1": {
+   "file": "style__cyberpunk__signal-loss__4.1.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 8866
+  },
+  "style/cyberpunk/megastructure@0": {
+   "file": "style__cyberpunk__megastructure__0.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 8785
+  },
+  "style/cyberpunk/megastructure@2": {
+   "file": "style__cyberpunk__megastructure__2.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 8685
+  },
+  "style/cyberpunk/megastructure@4.1": {
+   "file": "style__cyberpunk__megastructure__4.1.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 8036
+  },
+  "style/cyberpunk/cipher-fall@0": {
+   "file": "style__cyberpunk__cipher-fall__0.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 6586
+  },
+  "style/cyberpunk/cipher-fall@2": {
+   "file": "style__cyberpunk__cipher-fall__2.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 6927
+  },
+  "style/cyberpunk/cipher-fall@4.1": {
+   "file": "style__cyberpunk__cipher-fall__4.1.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 6679
+  },
+  "style/cyberpunk/ice-breach@0": {
+   "file": "style__cyberpunk__ice-breach__0.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 4891
+  },
+  "style/cyberpunk/ice-breach@2": {
+   "file": "style__cyberpunk__ice-breach__2.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 6038
+  },
+  "style/cyberpunk/ice-breach@4.1": {
+   "file": "style__cyberpunk__ice-breach__4.1.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 4708
+  },
+  "style/cyberpunk/crt-burn@0": {
+   "file": "style__cyberpunk__crt-burn__0.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 9957
+  },
+  "style/cyberpunk/crt-burn@2": {
+   "file": "style__cyberpunk__crt-burn__2.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 9999
+  },
+  "style/cyberpunk/crt-burn@4.1": {
+   "file": "style__cyberpunk__crt-burn__4.1.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 9987
+  },
+  "style/cyberpunk/pixel-sort@0": {
+   "file": "style__cyberpunk__pixel-sort__0.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 5637
+  },
+  "style/cyberpunk/pixel-sort@2": {
+   "file": "style__cyberpunk__pixel-sort__2.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 5831
+  },
+  "style/cyberpunk/pixel-sort@4.1": {
+   "file": "style__cyberpunk__pixel-sort__4.1.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 5620
+  },
+  "style/cyberpunk/circuit-growth@0": {
+   "file": "style__cyberpunk__circuit-growth__0.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 4672
+  },
+  "style/cyberpunk/circuit-growth@2": {
+   "file": "style__cyberpunk__circuit-growth__2.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 6538
+  },
+  "style/cyberpunk/circuit-growth@4.1": {
+   "file": "style__cyberpunk__circuit-growth__4.1.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 6660
+  },
+  "style/cyberpunk/drone-swarm@0": {
+   "file": "style__cyberpunk__drone-swarm__0.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 5633
+  },
+  "style/cyberpunk/drone-swarm@2": {
+   "file": "style__cyberpunk__drone-swarm__2.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 5789
+  },
+  "style/cyberpunk/drone-swarm@4.1": {
+   "file": "style__cyberpunk__drone-swarm__4.1.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 5743
+  },
+  "style/cyberpunk/thermal-scan@0": {
+   "file": "style__cyberpunk__thermal-scan__0.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 6717
+  },
+  "style/cyberpunk/thermal-scan@2": {
+   "file": "style__cyberpunk__thermal-scan__2.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 6682
+  },
+  "style/cyberpunk/thermal-scan@4.1": {
+   "file": "style__cyberpunk__thermal-scan__4.1.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 6998
+  },
+  "style/cyberpunk/chrome-liquid@0": {
+   "file": "style__cyberpunk__chrome-liquid__0.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 5766
+  },
+  "style/cyberpunk/chrome-liquid@2": {
+   "file": "style__cyberpunk__chrome-liquid__2.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 5463
+  },
+  "style/cyberpunk/chrome-liquid@4.1": {
+   "file": "style__cyberpunk__chrome-liquid__4.1.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 5873
+  },
+  "style/cyberpunk/net-tunnel@0": {
+   "file": "style__cyberpunk__net-tunnel__0.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 5767
+  },
+  "style/cyberpunk/net-tunnel@2": {
+   "file": "style__cyberpunk__net-tunnel__2.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 6020
+  },
+  "style/cyberpunk/net-tunnel@4.1": {
+   "file": "style__cyberpunk__net-tunnel__4.1.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 8935
+  },
+  "style/cyberpunk/smog-sprawl@0": {
+   "file": "style__cyberpunk__smog-sprawl__0.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 6167
+  },
+  "style/cyberpunk/smog-sprawl@2": {
+   "file": "style__cyberpunk__smog-sprawl__2.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 6165
+  },
+  "style/cyberpunk/smog-sprawl@4.1": {
+   "file": "style__cyberpunk__smog-sprawl__4.1.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 6129
+  },
+  "style/cyberpunk/bit-crush@0": {
+   "file": "style__cyberpunk__bit-crush__0.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 3367
+  },
+  "style/cyberpunk/bit-crush@2": {
+   "file": "style__cyberpunk__bit-crush__2.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 2349
+  },
+  "style/cyberpunk/bit-crush@4.1": {
+   "file": "style__cyberpunk__bit-crush__4.1.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 2486
+  },
+  "style/cyberpunk/emp@0": {
+   "file": "style__cyberpunk__emp__0.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 3506
+  },
+  "style/cyberpunk/emp@2": {
+   "file": "style__cyberpunk__emp__2.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 4314
+  },
+  "style/cyberpunk/emp@4.1": {
+   "file": "style__cyberpunk__emp__4.1.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 2397
+  },
+  "style/cyberpunk/ar-overlay@0": {
+   "file": "style__cyberpunk__ar-overlay__0.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 6913
+  },
+  "style/cyberpunk/ar-overlay@2": {
+   "file": "style__cyberpunk__ar-overlay__2.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 6792
+  },
+  "style/cyberpunk/ar-overlay@4.1": {
+   "file": "style__cyberpunk__ar-overlay__4.1.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 6807
+  },
+  "style/neuro/neural-arbor@0": {
+   "file": "style__neuro__neural-arbor__0.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 4261
+  },
+  "style/neuro/neural-arbor@2": {
+   "file": "style__neuro__neural-arbor__2.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 7026
+  },
+  "style/neuro/neural-arbor@4.1": {
+   "file": "style__neuro__neural-arbor__4.1.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 6934
+  },
+  "style/neuro/action-potential@0": {
+   "file": "style__neuro__action-potential__0.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 7051
+  },
+  "style/neuro/action-potential@2": {
+   "file": "style__neuro__action-potential__2.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 6940
+  },
+  "style/neuro/action-potential@4.1": {
+   "file": "style__neuro__action-potential__4.1.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 6774
+  },
+  "style/neuro/synaptic-cleft@0": {
+   "file": "style__neuro__synaptic-cleft__0.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 7326
+  },
+  "style/neuro/synaptic-cleft@2": {
+   "file": "style__neuro__synaptic-cleft__2.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 7653
+  },
+  "style/neuro/synaptic-cleft@4.1": {
+   "file": "style__neuro__synaptic-cleft__4.1.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 7243
+  },
+  "style/neuro/connectome@0": {
+   "file": "style__neuro__connectome__0.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 6314
+  },
+  "style/neuro/connectome@2": {
+   "file": "style__neuro__connectome__2.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 5341
+  },
+  "style/neuro/connectome@4.1": {
+   "file": "style__neuro__connectome__4.1.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 6381
+  },
+  "style/neuro/cortical-fold@0": {
+   "file": "style__neuro__cortical-fold__0.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 6314
+  },
+  "style/neuro/cortical-fold@2": {
+   "file": "style__neuro__cortical-fold__2.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 6254
+  },
+  "style/neuro/cortical-fold@4.1": {
+   "file": "style__neuro__cortical-fold__4.1.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 6164
+  },
+  "style/neuro/mitosis@0": {
+   "file": "style__neuro__mitosis__0.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 5783
+  },
+  "style/neuro/mitosis@2": {
+   "file": "style__neuro__mitosis__2.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 6391
+  },
+  "style/neuro/mitosis@4.1": {
+   "file": "style__neuro__mitosis__4.1.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 6141
+  },
+  "style/neuro/physarum@0": {
+   "file": "style__neuro__physarum__0.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 7621
+  },
+  "style/neuro/physarum@2": {
+   "file": "style__neuro__physarum__2.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 7438
+  },
+  "style/neuro/physarum@4.1": {
+   "file": "style__neuro__physarum__4.1.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 7352
+  },
+  "style/neuro/morphogen@0": {
+   "file": "style__neuro__morphogen__0.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 12881
+  },
+  "style/neuro/morphogen@2": {
+   "file": "style__neuro__morphogen__2.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 12216
+  },
+  "style/neuro/morphogen@4.1": {
+   "file": "style__neuro__morphogen__4.1.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 12679
+  },
+  "style/neuro/epithelium@0": {
+   "file": "style__neuro__epithelium__0.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 12238
+  },
+  "style/neuro/epithelium@2": {
+   "file": "style__neuro__epithelium__2.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 12212
+  },
+  "style/neuro/epithelium@4.1": {
+   "file": "style__neuro__epithelium__4.1.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 12122
+  },
+  "style/neuro/calcium-wave@0": {
+   "file": "style__neuro__calcium-wave__0.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 7964
+  },
+  "style/neuro/calcium-wave@2": {
+   "file": "style__neuro__calcium-wave__2.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 8657
+  },
+  "style/neuro/calcium-wave@4.1": {
+   "file": "style__neuro__calcium-wave__4.1.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 7861
+  },
+  "style/neuro/microtubule-transit@0": {
+   "file": "style__neuro__microtubule-transit__0.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 8269
+  },
+  "style/neuro/microtubule-transit@2": {
+   "file": "style__neuro__microtubule-transit__2.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 8270
+  },
+  "style/neuro/microtubule-transit@4.1": {
+   "file": "style__neuro__microtubule-transit__4.1.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 8173
+  },
+  "style/neuro/protein-fold@0": {
+   "file": "style__neuro__protein-fold__0.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 4530
+  },
+  "style/neuro/protein-fold@2": {
+   "file": "style__neuro__protein-fold__2.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 4956
+  },
+  "style/neuro/protein-fold@4.1": {
+   "file": "style__neuro__protein-fold__4.1.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 5419
+  },
+  "style/neuro/organoid@0": {
+   "file": "style__neuro__organoid__0.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 5078
+  },
+  "style/neuro/organoid@2": {
+   "file": "style__neuro__organoid__2.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 5217
+  },
+  "style/neuro/organoid@4.1": {
+   "file": "style__neuro__organoid__4.1.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 5276
+  },
+  "style/neuro/eeg-cascade@0": {
+   "file": "style__neuro__eeg-cascade__0.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 11229
+  },
+  "style/neuro/eeg-cascade@2": {
+   "file": "style__neuro__eeg-cascade__2.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 11068
+  },
+  "style/neuro/eeg-cascade@4.1": {
+   "file": "style__neuro__eeg-cascade__4.1.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 10955
+  },
+  "style/neuro/grid-cells@0": {
+   "file": "style__neuro__grid-cells__0.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 3868
+  },
+  "style/neuro/grid-cells@2": {
+   "file": "style__neuro__grid-cells__2.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 4009
+  },
+  "style/neuro/grid-cells@4.1": {
+   "file": "style__neuro__grid-cells__4.1.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 3829
+  },
+  "style/neuro/neural-lace@0": {
+   "file": "style__neuro__neural-lace__0.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 6726
+  },
+  "style/neuro/neural-lace@2": {
+   "file": "style__neuro__neural-lace__2.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 6824
+  },
+  "style/neuro/neural-lace@4.1": {
+   "file": "style__neuro__neural-lace__4.1.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 6818
+  },
+  "style/neuro/chromatin@0": {
+   "file": "style__neuro__chromatin__0.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 4825
+  },
+  "style/neuro/chromatin@2": {
+   "file": "style__neuro__chromatin__2.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 5040
+  },
+  "style/neuro/chromatin@4.1": {
+   "file": "style__neuro__chromatin__4.1.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 5005
+  },
+  "style/neuro/confocal@0": {
+   "file": "style__neuro__confocal__0.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 11807
+  },
+  "style/neuro/confocal@2": {
+   "file": "style__neuro__confocal__2.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 11411
+  },
+  "style/neuro/confocal@4.1": {
+   "file": "style__neuro__confocal__4.1.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 11362
+  },
+  "style/quantum/event-horizon@0": {
+   "file": "style__quantum__event-horizon__0.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 5129
+  },
+  "style/quantum/event-horizon@2": {
+   "file": "style__quantum__event-horizon__2.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 5073
+  },
+  "style/quantum/event-horizon@4.1": {
+   "file": "style__quantum__event-horizon__4.1.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 5105
+  },
+  "style/quantum/quasar-jet@0": {
+   "file": "style__quantum__quasar-jet__0.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 6558
+  },
+  "style/quantum/quasar-jet@2": {
+   "file": "style__quantum__quasar-jet__2.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 6521
+  },
+  "style/quantum/quasar-jet@4.1": {
+   "file": "style__quantum__quasar-jet__4.1.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 6586
+  },
+  "style/quantum/supernova@0": {
+   "file": "style__quantum__supernova__0.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 7813
+  },
+  "style/quantum/supernova@2": {
+   "file": "style__quantum__supernova__2.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 5662
+  },
+  "style/quantum/supernova@4.1": {
+   "file": "style__quantum__supernova__4.1.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 6797
+  },
+  "style/quantum/pulsar@0": {
+   "file": "style__quantum__pulsar__0.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 5662
+  },
+  "style/quantum/pulsar@2": {
+   "file": "style__quantum__pulsar__2.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 6373
+  },
+  "style/quantum/pulsar@4.1": {
+   "file": "style__quantum__pulsar__4.1.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 6343
+  },
+  "style/quantum/wormhole@0": {
+   "file": "style__quantum__wormhole__0.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 6376
+  },
+  "style/quantum/wormhole@2": {
+   "file": "style__quantum__wormhole__2.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 6463
+  },
+  "style/quantum/wormhole@4.1": {
+   "file": "style__quantum__wormhole__4.1.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 6401
+  },
+  "style/quantum/nebula-genesis@0": {
+   "file": "style__quantum__nebula-genesis__0.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 8911
+  },
+  "style/quantum/nebula-genesis@2": {
+   "file": "style__quantum__nebula-genesis__2.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 7695
+  },
+  "style/quantum/nebula-genesis@4.1": {
+   "file": "style__quantum__nebula-genesis__4.1.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 8539
+  },
+  "style/quantum/gravitational-wave@0": {
+   "file": "style__quantum__gravitational-wave__0.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 10294
+  },
+  "style/quantum/gravitational-wave@2": {
+   "file": "style__quantum__gravitational-wave__2.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 11869
+  },
+  "style/quantum/gravitational-wave@4.1": {
+   "file": "style__quantum__gravitational-wave__4.1.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 12549
+  },
+  "style/quantum/wavefunction@0": {
+   "file": "style__quantum__wavefunction__0.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 3330
+  },
+  "style/quantum/wavefunction@2": {
+   "file": "style__quantum__wavefunction__2.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 3379
+  },
+  "style/quantum/wavefunction@4.1": {
+   "file": "style__quantum__wavefunction__4.1.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 3212
+  },
+  "style/quantum/double-slit@0": {
+   "file": "style__quantum__double-slit__0.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 5457
+  },
+  "style/quantum/double-slit@2": {
+   "file": "style__quantum__double-slit__2.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 5909
+  },
+  "style/quantum/double-slit@4.1": {
+   "file": "style__quantum__double-slit__4.1.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 5831
+  },
+  "style/quantum/orbitals@0": {
+   "file": "style__quantum__orbitals__0.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 4634
+  },
+  "style/quantum/orbitals@2": {
+   "file": "style__quantum__orbitals__2.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 4139
+  },
+  "style/quantum/orbitals@4.1": {
+   "file": "style__quantum__orbitals__4.1.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 3989
+  },
+  "style/quantum/quantum-foam@0": {
+   "file": "style__quantum__quantum-foam__0.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 10640
+  },
+  "style/quantum/quantum-foam@2": {
+   "file": "style__quantum__quantum-foam__2.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 10343
+  },
+  "style/quantum/quantum-foam@4.1": {
+   "file": "style__quantum__quantum-foam__4.1.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 10107
+  },
+  "style/quantum/entanglement@0": {
+   "file": "style__quantum__entanglement__0.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 3488
+  },
+  "style/quantum/entanglement@2": {
+   "file": "style__quantum__entanglement__2.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 3571
+  },
+  "style/quantum/entanglement@4.1": {
+   "file": "style__quantum__entanglement__4.1.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 3589
+  },
+  "style/quantum/feynman-paths@0": {
+   "file": "style__quantum__feynman-paths__0.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 5029
+  },
+  "style/quantum/feynman-paths@2": {
+   "file": "style__quantum__feynman-paths__2.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 5081
+  },
+  "style/quantum/feynman-paths@4.1": {
+   "file": "style__quantum__feynman-paths__4.1.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 5405
+  },
+  "style/quantum/bubble-chamber@0": {
+   "file": "style__quantum__bubble-chamber__0.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 8582
+  },
+  "style/quantum/bubble-chamber@2": {
+   "file": "style__quantum__bubble-chamber__2.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 8140
+  },
+  "style/quantum/bubble-chamber@4.1": {
+   "file": "style__quantum__bubble-chamber__4.1.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 8339
+  },
+  "style/quantum/cosmic-web@0": {
+   "file": "style__quantum__cosmic-web__0.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 10118
+  },
+  "style/quantum/cosmic-web@2": {
+   "file": "style__quantum__cosmic-web__2.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 10082
+  },
+  "style/quantum/cosmic-web@4.1": {
+   "file": "style__quantum__cosmic-web__4.1.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 10212
+  },
+  "style/quantum/galaxy-collision@0": {
+   "file": "style__quantum__galaxy-collision__0.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 5305
+  },
+  "style/quantum/galaxy-collision@2": {
+   "file": "style__quantum__galaxy-collision__2.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 5394
+  },
+  "style/quantum/galaxy-collision@4.1": {
+   "file": "style__quantum__galaxy-collision__4.1.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 5463
+  },
+  "style/quantum/solar-corona@0": {
+   "file": "style__quantum__solar-corona__0.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 6462
+  },
+  "style/quantum/solar-corona@2": {
+   "file": "style__quantum__solar-corona__2.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 6409
+  },
+  "style/quantum/solar-corona@4.1": {
+   "file": "style__quantum__solar-corona__4.1.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 6521
+  },
+  "style/quantum/tokamak@0": {
+   "file": "style__quantum__tokamak__0.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 6422
+  },
+  "style/quantum/tokamak@2": {
+   "file": "style__quantum__tokamak__2.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 6417
+  },
+  "style/quantum/tokamak@4.1": {
+   "file": "style__quantum__tokamak__4.1.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 6408
+  },
+  "style/kinetic-subdivision/kinetic-treemap@0": {
+   "file": "style__kinetic-subdivision__kinetic-treemap__0.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 7058
+  },
+  "style/kinetic-subdivision/kinetic-treemap@2": {
+   "file": "style__kinetic-subdivision__kinetic-treemap__2.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 7147
+  },
+  "style/kinetic-subdivision/kinetic-treemap@4.1": {
+   "file": "style__kinetic-subdivision__kinetic-treemap__4.1.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 7038
+  },
+  "style/kinetic-subdivision/mondrian-drift@0": {
+   "file": "style__kinetic-subdivision__mondrian-drift__0.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 5641
+  },
+  "style/kinetic-subdivision/mondrian-drift@2": {
+   "file": "style__kinetic-subdivision__mondrian-drift__2.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 5770
+  },
+  "style/kinetic-subdivision/mondrian-drift@4.1": {
+   "file": "style__kinetic-subdivision__mondrian-drift__4.1.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 5644
+  },
+  "style/kinetic-subdivision/barcode-cathedral@0": {
+   "file": "style__kinetic-subdivision__barcode-cathedral__0.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 7749
+  },
+  "style/kinetic-subdivision/barcode-cathedral@2": {
+   "file": "style__kinetic-subdivision__barcode-cathedral__2.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 7580
+  },
+  "style/kinetic-subdivision/barcode-cathedral@4.1": {
+   "file": "style__kinetic-subdivision__barcode-cathedral__4.1.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 7617
+  },
+  "style/kinetic-subdivision/scanline-fault@0": {
+   "file": "style__kinetic-subdivision__scanline-fault__0.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 5588
+  },
+  "style/kinetic-subdivision/scanline-fault@2": {
+   "file": "style__kinetic-subdivision__scanline-fault__2.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 5627
+  },
+  "style/kinetic-subdivision/scanline-fault@4.1": {
+   "file": "style__kinetic-subdivision__scanline-fault__4.1.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 5567
+  },
+  "style/kinetic-subdivision/chromatic-register@0": {
+   "file": "style__kinetic-subdivision__chromatic-register__0.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 7212
+  },
+  "style/kinetic-subdivision/chromatic-register@2": {
+   "file": "style__kinetic-subdivision__chromatic-register__2.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 7314
+  },
+  "style/kinetic-subdivision/chromatic-register@4.1": {
+   "file": "style__kinetic-subdivision__chromatic-register__4.1.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 7265
+  },
+  "style/kinetic-subdivision/monolith-cut@0": {
+   "file": "style__kinetic-subdivision__monolith-cut__0.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 6313
+  },
+  "style/kinetic-subdivision/monolith-cut@2": {
+   "file": "style__kinetic-subdivision__monolith-cut__2.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 6459
+  },
+  "style/kinetic-subdivision/monolith-cut@4.1": {
+   "file": "style__kinetic-subdivision__monolith-cut__4.1.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 6365
+  },
+  "style/kinetic-subdivision/offset-press@0": {
+   "file": "style__kinetic-subdivision__offset-press__0.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 5289
+  },
+  "style/kinetic-subdivision/offset-press@2": {
+   "file": "style__kinetic-subdivision__offset-press__2.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 5306
+  },
+  "style/kinetic-subdivision/offset-press@4.1": {
+   "file": "style__kinetic-subdivision__offset-press__4.1.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 5245
+  },
+  "style/kinetic-subdivision/signal-cascade@0": {
+   "file": "style__kinetic-subdivision__signal-cascade__0.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 5660
+  },
+  "style/kinetic-subdivision/signal-cascade@2": {
+   "file": "style__kinetic-subdivision__signal-cascade__2.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 5628
+  },
+  "style/kinetic-subdivision/signal-cascade@4.1": {
+   "file": "style__kinetic-subdivision__signal-cascade__4.1.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 5653
+  },
+  "style/kinetic-subdivision/survey-grid@0": {
+   "file": "style__kinetic-subdivision__survey-grid__0.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 7486
+  },
+  "style/kinetic-subdivision/survey-grid@2": {
+   "file": "style__kinetic-subdivision__survey-grid__2.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 7736
+  },
+  "style/kinetic-subdivision/survey-grid@4.1": {
+   "file": "style__kinetic-subdivision__survey-grid__4.1.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 7698
+  },
+  "style/kinetic-subdivision/afterimage-atlas@0": {
+   "file": "style__kinetic-subdivision__afterimage-atlas__0.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 7138
+  },
+  "style/kinetic-subdivision/afterimage-atlas@2": {
+   "file": "style__kinetic-subdivision__afterimage-atlas__2.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 7219
+  },
+  "style/kinetic-subdivision/afterimage-atlas@4.1": {
+   "file": "style__kinetic-subdivision__afterimage-atlas__4.1.png",
+   "w": 96,
+   "h": 54,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 7146
+  },
+  "finish/none": {
+   "file": "finish__none.png",
+   "w": 160,
+   "h": 90,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 12589
+  },
+  "finish/grain-vignette": {
+   "file": "finish__grain-vignette.png",
+   "w": 160,
+   "h": 90,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 23688
+  },
+  "finish/glow": {
+   "file": "finish__glow.png",
+   "w": 160,
+   "h": 90,
+   "engines": "software-gl",
+   "post": "gpu",
+   "bytes": 7609
+  },
+  "finish/chroma-depth-tilt": {
+   "file": "finish__chroma-depth-tilt.png",
+   "w": 160,
+   "h": 90,
+   "engines": "software-gl",
+   "post": "gpu",
+   "bytes": 17878
+  },
+  "finish/depth-radial": {
+   "file": "finish__depth-radial.png",
+   "w": 160,
+   "h": 90,
+   "engines": "software-gl",
+   "post": "gpu",
+   "bytes": 17429
+  },
+  "finish/depth-luma": {
+   "file": "finish__depth-luma.png",
+   "w": 160,
+   "h": 90,
+   "engines": "software-gl",
+   "post": "gpu",
+   "bytes": 18517
+  },
+  "finish/grade-levels": {
+   "file": "finish__grade-levels.png",
+   "w": 160,
+   "h": 90,
+   "engines": "software-gl",
+   "post": "gpu",
+   "bytes": 16035
+  },
+  "finish/gmap-palette": {
+   "file": "finish__gmap-palette.png",
+   "w": 160,
+   "h": 90,
+   "engines": "software-gl",
+   "post": "gpu",
+   "bytes": 19612
+  },
+  "finish/gmap-duotone": {
+   "file": "finish__gmap-duotone.png",
+   "w": 160,
+   "h": 90,
+   "engines": "software-gl",
+   "post": "gpu",
+   "bytes": 17002
+  },
+  "finish/gmap-ink": {
+   "file": "finish__gmap-ink.png",
+   "w": 160,
+   "h": 90,
+   "engines": "software-gl",
+   "post": "gpu",
+   "bytes": 15945
+  },
+  "finish/motion-blur": {
+   "file": "finish__motion-blur.png",
+   "w": 160,
+   "h": 90,
+   "engines": "cpu",
+   "post": "gpu",
+   "bytes": 10620
+  },
+  "finish/motion-blur-gl-style": {
+   "file": "finish__motion-blur-gl-style.png",
+   "w": 160,
+   "h": 90,
+   "engines": "software-gl",
+   "post": "gpu",
+   "bytes": 19129
+  },
+  "finish/everything": {
+   "file": "finish__everything.png",
+   "w": 160,
+   "h": 90,
+   "engines": "software-gl",
+   "post": "gpu",
+   "bytes": 17485
+  },
+  "finish/broadcast-safe": {
+   "file": "finish__broadcast-safe.png",
+   "w": 160,
+   "h": 90,
+   "engines": "software-gl",
+   "post": "gpu",
+   "bytes": 13122
+  },
+  "stack/three-layer-blend": {
+   "file": "stack__three-layer-blend.png",
+   "w": 160,
+   "h": 90,
+   "engines": "cpu+software-gl",
+   "post": "cpu",
+   "bytes": 21873
+  },
+  "stack/demo-project": {
+   "file": "stack__demo-project.png",
+   "w": 160,
+   "h": 90,
+   "engines": "cpu",
+   "post": "gpu",
+   "bytes": 28265
+  },
+  "aspect/16x9": {
+   "file": "aspect__16x9.png",
+   "w": 160,
+   "h": 90,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 18707
+  },
+  "aspect/9x16": {
+   "file": "aspect__9x16.png",
+   "w": 90,
+   "h": 160,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 19018
+  },
+  "aspect/1x1": {
+   "file": "aspect__1x1.png",
+   "w": 120,
+   "h": 120,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 18964
+  },
+  "aspect/4x5": {
+   "file": "aspect__4x5.png",
+   "w": 96,
+   "h": 120,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 15770
+  },
+  "aspect/4x3": {
+   "file": "aspect__4x3.png",
+   "w": 128,
+   "h": 96,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 16336
+  },
+  "aspect/21x9": {
+   "file": "aspect__21x9.png",
+   "w": 168,
+   "h": 72,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 15894
+  },
+  "space/srgb/neuro/mitosis": {
+   "file": "space__srgb__neuro__mitosis.png",
+   "w": 128,
+   "h": 72,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 12843
+  },
+  "space/srgb/lissajous": {
+   "file": "space__srgb__lissajous.png",
+   "w": 128,
+   "h": 72,
+   "engines": "cpu",
+   "post": "cpu",
+   "bytes": 12152
+  },
+  "space/p3/neuro/mitosis": {
+   "file": "space__p3__neuro__mitosis.png",
+   "w": 128,
+   "h": 72,
+   "engines": "software-gl",
+   "post": "cpu",
+   "bytes": 12959
+  },
+  "space/p3/lissajous": {
+   "file": "space__p3__lissajous.png",
+   "w": 128,
+   "h": 72,
+   "engines": "cpu",
+   "post": "cpu",
+   "bytes": 12976
+  }
+ },
+ "schema": 1,
+ "rendererClass": "swiftshader",
+ "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+ "software": true,
+ "browser": "141.0.7390.37",
+ "fonts": {
+  "sans-serif": 221.7,
+  "serif": 207.6,
+  "monospace": 269.72,
+  "\"Arial Narrow\"": 207.6,
+  "system-ui": 248.14
+ },
+ "tolerance": {
+  "channel": 6,
+  "fraction": 0.004,
+  "mean": 1.5
+ },
+ "times": [
+  0,
+  2,
+  4.1
+ ],
+ "generated": "2026-10-01T01:51:30.923Z",
+ "revision": "2bc680a",
+ "note": "Generated by tests/browser/visual.mjs --update. Goldens differ per GPU: only the swiftshader class is committed."
+}

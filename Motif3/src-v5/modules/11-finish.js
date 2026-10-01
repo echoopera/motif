@@ -72,9 +72,9 @@ void main(){
 function createFinisher() {
   let canvas, gl, ok = false, halfFloat = false, space = 'srgb';
   const prog = {}; let quad; let W = 0, H = 0; const tex = {}; const fbo = {};
-  try {
-    canvas = document.createElement('canvas'); canvas.width = 2; canvas.height = 2;
-    gl = canvas.getContext('webgl2', { premultipliedAlpha: true, preserveDrawingBuffer: true, antialias: false, alpha: true });
+  const init = () => { try {
+    if (!canvas) { canvas = document.createElement('canvas'); canvas.width = 2; canvas.height = 2; }
+    gl = gl || canvas.getContext('webgl2', { premultipliedAlpha: true, preserveDrawingBuffer: true, antialias: false, alpha: true });
     if (gl) {
       halfFloat = !!gl.getExtension('EXT_color_buffer_float');
       gl.getExtension('OES_texture_float_linear');
@@ -90,7 +90,9 @@ function createFinisher() {
       gl.enableVertexAttribArray(0); gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
       ok = true;
     }
-  } catch (e) { console.error('finish:', e); ok = false; }
+  } catch (e) { console.error('finish:', e); ok = false; } }; init();
+  // GPU reset / WEBGL_lose_context: fall back to the CPU finish while lost, then rebuild programs and targets on restore (was: stayed blank forever).
+  if (canvas) { const lose = gl && gl.getExtension('WEBGL_lose_context'); canvas.addEventListener('webglcontextlost', e => { e.preventDefault(); ok = false; setTimeout(() => { try { if (lose && gl.isContextLost()) lose.restoreContext(); } catch (err) { /* the browser restores on its own */ } }, 1500); }); canvas.addEventListener('webglcontextrestored', () => { for (const k of Object.keys(tex)) delete tex[k]; W = H = 0; init(); if (ok) setSpace(space); }); }
 
   function mkTex(w, h, float) {
     const t = gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D, t);
