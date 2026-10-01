@@ -41,6 +41,7 @@ vec3 legalize(vec3 c){
   float amp = max(max(abs(d.r), abs(d.g)), abs(d.b)); float room = min(1.1 - Y, Y + 0.1);
   float k = (amp > room && amp > 0.0) ? room / amp : 1.0; return clamp(Y + d * k, 0.0, 1.0); }
 bool illegal(vec3 c){ float Y = luma(c); float amp = max(max(abs(c.r - Y), abs(c.g - Y)), abs(c.b - Y)); return Y > 0.99 || Y + amp > 1.1 || Y - amp < -0.1; }
+/*GRADE_DECL*/
 void main(){
   vec2 p = uv; vec4 base = texture(I, p);
   vec3 c = unp(base); float a = base.a;
@@ -59,6 +60,7 @@ void main(){
   if (useG > 0.5) { vec4 g = texture(G, p); vec3 gl = g.rgb * glow * 2.2; c = 1.0 - (1.0 - c) * (1.0 - clamp(gl, 0.0, 1.0)); a = max(a, clamp(g.a * glow * 2.0, 0.0, 1.0)); }
   c = clamp((c - black) / max(0.001, white - black), 0.0, 1.0); c = pow(c, vec3(1.0 / gam));
   if (gmap > 0.0) { float l = luma(c); vec3 m = l < 0.5 ? mix(s0, s1, l * 2.0) : mix(s1, s2, (l - 0.5) * 2.0); c = mix(c, m, gmap); }
+  /*GRADE_CALL*/
   if (vig > 0.0) { float r = length((p - 0.5) * res) / (0.5 * length(res)); float k = clamp((r - 0.35) / 0.65, 0.0, 1.0) * vig * 0.7; c = mix(c, shade, k); }
   if (grain > 0.0) {
     float sc = max(1.0, min(res.x, res.y) / 720.0); vec2 q = floor(gl_FragCoord.xy / sc) + vec2(frame * 17.0, frame * 31.0);
@@ -70,7 +72,7 @@ void main(){
 }`;
 
 function createFinisher() {
-  let canvas, gl, ok = false, halfFloat = false, space = 'srgb';
+  let canvas, gl, ok = false, halfFloat = false, space = 'srgb', grader = null;
   const prog = {}; let quad; let W = 0, H = 0; const tex = {}; const fbo = {};
   try {
     canvas = document.createElement('canvas'); canvas.width = 2; canvas.height = 2;
@@ -89,6 +91,8 @@ function createFinisher() {
       quad = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, quad); gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
       gl.enableVertexAttribArray(0); gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
       ok = true;
+      // Node grade (11a-grade): compiled into this final pass; resolved at call time so module order stays free.
+      if (typeof __m_grade !== 'undefined') grader = __m_grade.createGrader({ gl, mk, draw, mkTex, blur2, FS_FINAL, size: () => [W, H] });
     }
   } catch (e) { console.error('finish:', e); ok = false; }
 
@@ -113,8 +117,8 @@ function createFinisher() {
   function draw(pg, target, uniforms, textures) {
     gl.useProgram(pg.p); gl.bindFramebuffer(gl.FRAMEBUFFER, target ? target.f : null);
     gl.viewport(0, 0, target ? target.w : W, target ? target.h : H);
-    let unit = 0; for (const [name, t] of Object.entries(textures || {})) { gl.activeTexture(gl.TEXTURE0 + unit); gl.bindTexture(gl.TEXTURE_2D, t); gl.uniform1i(pg.u[name], unit); unit++; }
-    for (const [name, v] of Object.entries(uniforms || {})) { const loc = pg.u[name]; if (loc == null) continue; if (Array.isArray(v)) (v.length === 2 ? gl.uniform2fv : gl.uniform3fv).call(gl, loc, v); else gl.uniform1f(loc, v); }
+    let unit = 0; for (const [name, t] of Object.entries(textures || {})) { if (pg.u[name] == null) continue; gl.activeTexture(gl.TEXTURE0 + unit); if (t && t.t3) gl.bindTexture(gl.TEXTURE_3D, t.t3); else gl.bindTexture(gl.TEXTURE_2D, t); gl.uniform1i(pg.u[name], unit); unit++; }
+    for (const [name, v] of Object.entries(uniforms || {})) { const loc = pg.u[name]; if (loc == null) continue; if (v instanceof Float32Array) gl.uniform4fv(loc, v); else if (Array.isArray(v)) (v.length === 2 ? gl.uniform2fv : gl.uniform3fv).call(gl, loc, v); else gl.uniform1f(loc, v); }
     gl.bindBuffer(gl.ARRAY_BUFFER, quad); gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0); gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
   }
   function upload(src) {
@@ -150,19 +154,20 @@ function createFinisher() {
       draw(prog.copy, tex.e4, { W: 1 }, { T: tex.d2.t }); blur2(tex.e4.t, tex.b4, tex.d4, 4);
       if (!useG) { /* a4 unused */ }
     }
-    draw(prog.final, null, {
+    const fu = {
       res: [W, H], glow: f.glow, chroma: f.chroma, depth: f.depth, focus: f.focus, depthMode: { tilt: 0, radial: 1, luma: 2 }[f.depthMode] || 0,
       black: f.black, white: f.white, gam: f.gamma, gmap: f.gmap, vig: f.vignette, grain: f.grain, frame: x.frame || 0,
       legal: x.legal ? 1 : 0, zebra: x.zebra ? 1 : 0, useG: useG ? 1 : 0, useD: useD ? 1 : 0,
       s0: x.stops[0], s1: x.stops[1], s2: x.stops[2], shade: x.shade,
-    }, { I: tex.in.t, G: tex.a4 ? tex.a4.t : tex.in.t, D1: tex.d2.t, D2: tex.d4.t });
+    }, ft = { I: tex.in.t, G: tex.a4 ? tex.a4.t : tex.in.t, D1: tex.d2.t, D2: tex.d4.t };
+    if (!(grader && f.grade && grader.active(f.grade) && grader.final(f.grade, fu, ft))) draw(prog.final, null, fu, ft);
     return canvas;
   }
-  return { get ok() { return ok; }, get halfFloat() { return halfFloat; }, get canvas() { return canvas; }, setSpace, get space() { return space; }, beginAccum, addAccum, loadInput, process };
+  return { get ok() { return ok; }, get halfFloat() { return halfFloat; }, get canvas() { return canvas; }, get grader() { return grader; }, setSpace, get space() { return space; }, beginAccum, addAccum, loadInput, process };
 }
 
 // Is any GPU finishing needed for these values (besides grain/vignette, which the CPU can do)?
-function needsGpu(f, out) { return f.glow > 0.001 || f.chroma > 0.001 || f.depth > 0.001 || f.black > 0.001 || f.white < 0.999 || Math.abs(f.gamma - 1) > 0.001 || f.gmap > 0.001 || f.shutter > 0 || (out && (out.broadcastSafe || out.zebra)); }
+function needsGpu(f, out) { return !!(f.grade && f.grade.on !== false && f.grade.nodes && f.grade.nodes.length) || f.glow > 0.001 || f.chroma > 0.001 || f.depth > 0.001 || f.black > 0.001 || f.white < 0.999 || Math.abs(f.gamma - 1) > 0.001 || f.gmap > 0.001 || f.shutter > 0 || (out && (out.broadcastSafe || out.zebra)); }
 
 return { createFinisher, needsGpu };
 

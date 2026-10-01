@@ -6924,6 +6924,7 @@ const __m_timeline = (() => {
 // one path grammar for every value, cyclic keyframes, audio modulation and project-level
 // mutate / randomize. Pure: no DOM.
 // Paths:  L:<layerId>:p:<key> (style)  L:<layerId>:s:<key> (layer shared)  L:<layerId>:c:<key> (composite)  F:<key> (finish)
+//         G:<nodeId>:<key> (node grade, 11a-grade; optional `grade` block, absent in v3–v5 projects)
 const { P, defaults, sanitize, mutate, randomize, ease, clamp, lerp, fract } = __m_engine_core;
 const { SHARED_SCHEMA, getStyle, defaultLook, sanitizeLook, mulberry32 } = __m_style_library;
 
@@ -6976,6 +6977,7 @@ const easeFn = { linear: ease.linear, smooth: ease.inOutCubic, in: ease.inCubic,
 let lid = 0;
 const newLayerId = () => `l${Date.now().toString(36).slice(-4)}${(lid++).toString(36)}`;
 const clone = o => JSON.parse(JSON.stringify(o));
+const GR = () => (typeof __m_grade !== 'undefined' ? __m_grade : null); // resolved at call time (module loads later)
 
 // ---------- construction ----------
 function newLayer(styleId, shared, comp) {
@@ -7013,6 +7015,7 @@ function sanitizeProject(pr, sanitizeCustom) {
     palettes: (Array.isArray(pr.palettes) ? pr.palettes : []).map(p => (sanitizeCustom ? sanitizeCustom(p) : p)).filter(Boolean).slice(0, 24),
     keys: {}, audio: null, output: { ...OUTPUT_DEFAULT, ...(pr.output || {}) },
   };
+  if (pr.grade && GR()) { const g = GR().sanitizeGrade(pr.grade); if (g) out.grade = g; }
   out.output.space = ['srgb', 'p3', 'rec709'].includes(out.output.space) ? out.output.space : 'srgb';
   out.output.broadcastSafe = !!out.output.broadcastSafe;
   out.output.fps = [24, 25, 30, 50, 60].includes(Number(out.output.fps)) ? Number(out.output.fps) : 30;
@@ -7044,11 +7047,13 @@ function layerById(pr, id) { return pr.layers.find(l => l.id === id) || null; }
 function parsePath(path) {
   const m = /^L:([^:]+):([psc]):(.+)$/.exec(path); if (m) return { kind: 'L', layer: m[1], scope: m[2], key: m[3] };
   const f = /^F:(.+)$/.exec(path); if (f) return { kind: 'F', key: f[1] };
+  const g = /^G:([^:]+):(.+)$/.exec(path); if (g) return { kind: 'G', node: g[1], key: g[2] };
   return null;
 }
 function schemaAt(pr, path) {
   const p = parsePath(path); if (!p) return null;
   if (p.kind === 'F') return FINISH_SCHEMA[p.key] || null;
+  if (p.kind === 'G') return GR() && pr.grade ? GR().schemaAt(pr.grade, p.node, p.key) : null;
   const l = layerById(pr, p.layer); if (!l) return null;
   const sc = p.scope === 'p' ? getStyle(l.styleId).params : p.scope === 's' ? SHARED_SCHEMA : COMP_SCHEMA;
   return sc[p.key] || null;
@@ -7058,17 +7063,19 @@ function bucket(obj, p) { return p.scope === 'p' ? obj.params : p.scope === 's' 
 function getBase(pr, path) {
   const p = parsePath(path); if (!p) return undefined;
   if (p.kind === 'F') return pr.finish[p.key];
+  if (p.kind === 'G') { const n = GR() && GR().nodeById(pr.grade, p.node); return n ? n.params[p.key] : undefined; }
   const l = layerById(pr, p.layer); return l ? bucket(l, p)[p.key] : undefined;
 }
 function setBase(pr, path, v) {
   const p = parsePath(path), s = schemaAt(pr, path); if (!p || !s) return pr;
   const next = clone(pr); v = sanitizeValue(v, s);
-  if (p.kind === 'F') next.finish[p.key] = v; else bucket(layerById(next, p.layer), p)[p.key] = v;
+  if (p.kind === 'F') next.finish[p.key] = v; else if (p.kind === 'G') GR().nodeById(next.grade, p.node).params[p.key] = v; else bucket(layerById(next, p.layer), p)[p.key] = v;
   return next;
 }
 function pathLabel(pr, path) {
   const p = parsePath(path), s = schemaAt(pr, path); if (!p || !s) return path;
   if (p.kind === 'F') return s.label;
+  if (p.kind === 'G') return `Grade ${pr.grade.nodes.findIndex(n => n.id === p.node) + 1} ${s.label}`;
   const idx = pr.layers.findIndex(l => l.id === p.layer);
   return `L${idx + 1} ${s.label}`;
 }
@@ -7080,6 +7087,7 @@ function allPaths(pr, numericOnly) {
     push('p', getStyle(l.styleId).params); push('s', SHARED_SCHEMA); push('c', COMP_SCHEMA);
   });
   for (const [k, s] of Object.entries(FINISH_SCHEMA)) if (k !== 'loop' && (!numericOnly || s.type === 'range' || s.type === 'int')) out.push({ path: `F:${k}`, label: s.label, group: 'Finish' });
+  if (pr.grade && GR()) out.push(...GR().paths(pr.grade, numericOnly));
   return out;
 }
 
@@ -7126,9 +7134,11 @@ function evaluate(pr, t, env) {
   const layers = pr.layers.map(l => ({ id: l.id, styleId: l.styleId, params: { ...l.params }, shared: { ...l.shared, loop: L }, comp: { ...l.comp }, visible: l.visible, pmix: null, media: l.media || null }));
   const finish = { ...pr.finish };
   const byId = new Map(layers.map(l => [l.id, l]));
+  const grade = pr.grade && GR() ? GR().evalCopy(pr.grade) : null; if (grade) finish.grade = grade;
   const apply = (path, fn) => {
     const p = parsePath(path); if (!p) return;
     if (p.kind === 'F') { finish[p.key] = fn(finish[p.key], FINISH_SCHEMA[p.key]); return; }
+    if (p.kind === 'G') { const n = grade && grade.nodes.find(x => x.id === p.node), s = n && GR().schemaFor(n.type)[p.key]; if (s) n.params[p.key] = fn(n.params[p.key], s); return; }
     const l = byId.get(p.layer); if (!l) return;
     const sc = p.scope === 'p' ? getStyle(l.styleId).params : p.scope === 's' ? SHARED_SCHEMA : COMP_SCHEMA;
     const b = bucket(l, p); if (!sc[p.key]) return; b[p.key] = fn(b[p.key], sc[p.key], l, p.key);
@@ -7824,6 +7834,7 @@ vec3 legalize(vec3 c){
   float amp = max(max(abs(d.r), abs(d.g)), abs(d.b)); float room = min(1.1 - Y, Y + 0.1);
   float k = (amp > room && amp > 0.0) ? room / amp : 1.0; return clamp(Y + d * k, 0.0, 1.0); }
 bool illegal(vec3 c){ float Y = luma(c); float amp = max(max(abs(c.r - Y), abs(c.g - Y)), abs(c.b - Y)); return Y > 0.99 || Y + amp > 1.1 || Y - amp < -0.1; }
+/*GRADE_DECL*/
 void main(){
   vec2 p = uv; vec4 base = texture(I, p);
   vec3 c = unp(base); float a = base.a;
@@ -7842,6 +7853,7 @@ void main(){
   if (useG > 0.5) { vec4 g = texture(G, p); vec3 gl = g.rgb * glow * 2.2; c = 1.0 - (1.0 - c) * (1.0 - clamp(gl, 0.0, 1.0)); a = max(a, clamp(g.a * glow * 2.0, 0.0, 1.0)); }
   c = clamp((c - black) / max(0.001, white - black), 0.0, 1.0); c = pow(c, vec3(1.0 / gam));
   if (gmap > 0.0) { float l = luma(c); vec3 m = l < 0.5 ? mix(s0, s1, l * 2.0) : mix(s1, s2, (l - 0.5) * 2.0); c = mix(c, m, gmap); }
+  /*GRADE_CALL*/
   if (vig > 0.0) { float r = length((p - 0.5) * res) / (0.5 * length(res)); float k = clamp((r - 0.35) / 0.65, 0.0, 1.0) * vig * 0.7; c = mix(c, shade, k); }
   if (grain > 0.0) {
     float sc = max(1.0, min(res.x, res.y) / 720.0); vec2 q = floor(gl_FragCoord.xy / sc) + vec2(frame * 17.0, frame * 31.0);
@@ -7853,7 +7865,7 @@ void main(){
 }`;
 
 function createFinisher() {
-  let canvas, gl, ok = false, halfFloat = false, space = 'srgb';
+  let canvas, gl, ok = false, halfFloat = false, space = 'srgb', grader = null;
   const prog = {}; let quad; let W = 0, H = 0; const tex = {}; const fbo = {};
   try {
     canvas = document.createElement('canvas'); canvas.width = 2; canvas.height = 2;
@@ -7872,6 +7884,8 @@ function createFinisher() {
       quad = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, quad); gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
       gl.enableVertexAttribArray(0); gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
       ok = true;
+      // Node grade (11a-grade): compiled into this final pass; resolved at call time so module order stays free.
+      if (typeof __m_grade !== 'undefined') grader = __m_grade.createGrader({ gl, mk, draw, mkTex, blur2, FS_FINAL, size: () => [W, H] });
     }
   } catch (e) { console.error('finish:', e); ok = false; }
 
@@ -7896,8 +7910,8 @@ function createFinisher() {
   function draw(pg, target, uniforms, textures) {
     gl.useProgram(pg.p); gl.bindFramebuffer(gl.FRAMEBUFFER, target ? target.f : null);
     gl.viewport(0, 0, target ? target.w : W, target ? target.h : H);
-    let unit = 0; for (const [name, t] of Object.entries(textures || {})) { gl.activeTexture(gl.TEXTURE0 + unit); gl.bindTexture(gl.TEXTURE_2D, t); gl.uniform1i(pg.u[name], unit); unit++; }
-    for (const [name, v] of Object.entries(uniforms || {})) { const loc = pg.u[name]; if (loc == null) continue; if (Array.isArray(v)) (v.length === 2 ? gl.uniform2fv : gl.uniform3fv).call(gl, loc, v); else gl.uniform1f(loc, v); }
+    let unit = 0; for (const [name, t] of Object.entries(textures || {})) { if (pg.u[name] == null) continue; gl.activeTexture(gl.TEXTURE0 + unit); if (t && t.t3) gl.bindTexture(gl.TEXTURE_3D, t.t3); else gl.bindTexture(gl.TEXTURE_2D, t); gl.uniform1i(pg.u[name], unit); unit++; }
+    for (const [name, v] of Object.entries(uniforms || {})) { const loc = pg.u[name]; if (loc == null) continue; if (v instanceof Float32Array) gl.uniform4fv(loc, v); else if (Array.isArray(v)) (v.length === 2 ? gl.uniform2fv : gl.uniform3fv).call(gl, loc, v); else gl.uniform1f(loc, v); }
     gl.bindBuffer(gl.ARRAY_BUFFER, quad); gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0); gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
   }
   function upload(src) {
@@ -7933,21 +7947,683 @@ function createFinisher() {
       draw(prog.copy, tex.e4, { W: 1 }, { T: tex.d2.t }); blur2(tex.e4.t, tex.b4, tex.d4, 4);
       if (!useG) { /* a4 unused */ }
     }
-    draw(prog.final, null, {
+    const fu = {
       res: [W, H], glow: f.glow, chroma: f.chroma, depth: f.depth, focus: f.focus, depthMode: { tilt: 0, radial: 1, luma: 2 }[f.depthMode] || 0,
       black: f.black, white: f.white, gam: f.gamma, gmap: f.gmap, vig: f.vignette, grain: f.grain, frame: x.frame || 0,
       legal: x.legal ? 1 : 0, zebra: x.zebra ? 1 : 0, useG: useG ? 1 : 0, useD: useD ? 1 : 0,
       s0: x.stops[0], s1: x.stops[1], s2: x.stops[2], shade: x.shade,
-    }, { I: tex.in.t, G: tex.a4 ? tex.a4.t : tex.in.t, D1: tex.d2.t, D2: tex.d4.t });
+    }, ft = { I: tex.in.t, G: tex.a4 ? tex.a4.t : tex.in.t, D1: tex.d2.t, D2: tex.d4.t };
+    if (!(grader && f.grade && grader.active(f.grade) && grader.final(f.grade, fu, ft))) draw(prog.final, null, fu, ft);
     return canvas;
   }
-  return { get ok() { return ok; }, get halfFloat() { return halfFloat; }, get canvas() { return canvas; }, setSpace, get space() { return space; }, beginAccum, addAccum, loadInput, process };
+  return { get ok() { return ok; }, get halfFloat() { return halfFloat; }, get canvas() { return canvas; }, get grader() { return grader; }, setSpace, get space() { return space; }, beginAccum, addAccum, loadInput, process };
 }
 
 // Is any GPU finishing needed for these values (besides grain/vignette, which the CPU can do)?
-function needsGpu(f, out) { return f.glow > 0.001 || f.chroma > 0.001 || f.depth > 0.001 || f.black > 0.001 || f.white < 0.999 || Math.abs(f.gamma - 1) > 0.001 || f.gmap > 0.001 || f.shutter > 0 || (out && (out.broadcastSafe || out.zebra)); }
+function needsGpu(f, out) { return !!(f.grade && f.grade.on !== false && f.grade.nodes && f.grade.nodes.length) || f.glow > 0.001 || f.chroma > 0.001 || f.depth > 0.001 || f.black > 0.001 || f.white < 0.999 || Math.abs(f.gamma - 1) > 0.001 || f.gmap > 0.001 || f.shutter > 0 || (out && (out.broadcastSafe || out.zebra)); }
 
 return { createFinisher, needsGpu };
+
+})();
+
+// ---- module: grade v1.0.0
+const __m_grade = (() => {
+// grade — the node grade: a small, versioned node graph (serial + parallel nodes, mixers) whose parameters
+// are ordinary project channels (path G:<nodeId>:<key>: keyframable, lockable, audio-mappable, saved with
+// projects and presets). Compiled to GLSL and evaluated inside the finish shader in one pass (plus a
+// quarter-res key pass per blurred qualifier). Also: strict .cube / .3dl / HALD LUT parsing, .cube export,
+// and a LUT registry. Engine-side: no DOM, no window — runs unchanged in a Worker.
+const { P, sanitize, defaults, clamp } = __m_engine_core;
+
+const VERSION = 1;
+const MAX_NODES = 12, MAX_LUT_NODES = 4, MAX_BLUR_KEYS = 3;
+const BLENDS = [
+  { v: 'normal', l: 'Normal' }, { v: 'add', l: 'Add' }, { v: 'multiply', l: 'Multiply' }, { v: 'screen', l: 'Screen' }, { v: 'overlay', l: 'Overlay' },
+  { v: 'soft', l: 'Soft light' }, { v: 'difference', l: 'Difference' }, { v: 'darken', l: 'Darken' }, { v: 'lighten', l: 'Lighten' }, { v: 'luminosity', l: 'Luminosity' },
+];
+const HUES = ['red', 'yellow', 'green', 'cyan', 'blue', 'magenta'];
+const COMMON = {
+  on: P.toggle('Enabled', true, { mutate: 0 }),
+  mix: P.range('Opacity', 0, 1, 1, 0.01, { mutate: 0 }),
+};
+const R = (label, min, max, def, step, o = {}) => P.range(label, min, max, def, step, { mutate: 0.3, ...o });
+const wheel = (k, l, lo, hi, def, ylo, yhi, ydef) => ({
+  [k + 'R']: R(`${l} red`, lo, hi, def, 0.001), [k + 'G']: R(`${l} green`, lo, hi, def, 0.001), [k + 'B']: R(`${l} blue`, lo, hi, def, 0.001),
+  [k + 'Y']: R(l, ylo, yhi, ydef, 0.001),
+});
+const curve = (k, l) => Object.fromEntries([0, 1, 2, 3, 4].map(i => [k + i, R(`${l} ${i * 25}%`, 0, 1, i / 4, 0.001, { mutate: 0.15 })]));
+const TYPES = {
+  primary: { name: 'Primaries', short: 'PRI', hint: 'Lift, gamma, gain, offset, contrast and saturation',
+    schema: { ...COMMON, ...wheel('lift', 'Lift', -0.5, 0.5, 0, -0.5, 0.5, 0), ...wheel('gamma', 'Gamma', -0.5, 0.5, 0, -1, 1, 0), ...wheel('gain', 'Gain', -0.5, 0.5, 0, 0, 4, 1), ...wheel('off', 'Offset', -0.5, 0.5, 0, -0.5, 0.5, 0),
+      contrast: R('Contrast', 0, 2, 1, 0.01), pivot: R('Pivot', 0, 1, 0.5, 0.01, { mutate: 0 }), sat: R('Saturation', 0, 2, 1, 0.01), hue: R('Hue rotate', -180, 180, 0, 1, { unit: '°', mutate: 0.15 }) } },
+  curves: { name: 'Curves', short: 'CRV', hint: 'Luma and RGB curves, five points each',
+    schema: { ...COMMON, ...curve('y', 'Luma'), ...curve('r', 'Red'), ...curve('g', 'Green'), ...curve('b', 'Blue') } },
+  huesat: { name: 'Hue curves', short: 'HUE', hint: 'Hue vs saturation and hue vs hue',
+    schema: { ...COMMON, ...Object.fromEntries(HUES.map((h, i) => ['s' + i, R(`Sat · ${h}`, 0, 2, 1, 0.01)])), ...Object.fromEntries(HUES.map((h, i) => ['h' + i, R(`Hue · ${h}`, -60, 60, 0, 1, { unit: '°', mutate: 0.15 })])) } },
+  qualifier: { name: 'HSL qualifier', short: 'QUAL', hint: 'Key a hue, saturation and luma range, then correct inside it',
+    schema: { ...COMMON, hue: R('Key hue', 0, 360, 25, 1, { unit: '°', mutate: 0 }), width: R('Hue width', 1, 360, 60, 1, { unit: '°', mutate: 0 }),
+      satLo: R('Sat low', 0, 1, 0.1, 0.01, { mutate: 0 }), satHi: R('Sat high', 0, 1, 1, 0.01, { mutate: 0 }), lumLo: R('Luma low', 0, 1, 0.05, 0.01, { mutate: 0 }), lumHi: R('Luma high', 0, 1, 1, 0.01, { mutate: 0 }),
+      soft: R('Softness', 0, 0.5, 0.08, 0.01, { mutate: 0 }), blur: R('Key blur', 0, 1, 0, 0.01, { mutate: 0 }), invert: P.toggle('Invert key', false, { mutate: 0 }),
+      qHue: R('Hue shift', -180, 180, 0, 1, { unit: '°' }), qSat: R('Saturation', 0, 2, 1, 0.01), qGain: R('Gain', 0, 2, 1, 0.01), qOff: R('Offset', -0.5, 0.5, 0, 0.001) } },
+  lut: { name: 'LUT', short: 'LUT', hint: 'Apply an imported .cube, .3dl or HALD LUT',
+    schema: { ...COMMON, interp: P.select('Interpolation', [{ v: 'tetra', l: 'Tetrahedral' }, { v: 'tri', l: 'Trilinear' }], 'tetra', { mutate: 0 }) } },
+  mixer: { name: 'Mixer', short: 'MIX', hint: 'Blend the chain over an earlier node or the grade input',
+    schema: { ...COMMON, blend: P.select('Blend', BLENDS, 'normal', { mutate: 0 }) } },
+};
+const TYPE_IDS = Object.keys(TYPES);
+const schemaFor = type => (TYPES[type] ? TYPES[type].schema : null);
+
+// ---------- model ----------
+const ID_RE = /^n[a-z0-9]{1,12}$/, LUT_ID_RE = /^lut_[a-z0-9]{8,32}$/;
+function freshId(used) { let i = used.size + 1, id; do { id = 'n' + (i++).toString(36); } while (used.has(id)); return id; }
+function newGrade() { return { v: VERSION, on: true, nodes: [] }; }
+function newNode(type, used, extra = {}) {
+  if (!TYPES[type]) throw new Error('grade: unknown node type ' + type);
+  const ids = used instanceof Set ? used : new Set((used || []).map(n => n.id));
+  const n = { id: freshId(ids), type, par: false, params: defaults(schemaFor(type)) };
+  if (type === 'mixer') n.src = 'in';
+  if (type === 'lut') n.lut = null;
+  return Object.assign(n, extra);
+}
+function sanitizeLutRef(r) {
+  if (!r || typeof r !== 'object' || !LUT_ID_RE.test(String(r.id || ''))) return null;
+  return { id: r.id, name: String(r.name || 'LUT').slice(0, 80), size: clamp(Math.round(Number(r.size) || 0), 0, 65536) };
+}
+// Additive and forward-tolerant: unknown node types and fields are dropped, unknown versions sanitize as v1.
+function sanitizeGrade(g) {
+  if (!g || typeof g !== 'object' || Array.isArray(g)) return null;
+  const out = { v: VERSION, on: g.on !== false, nodes: [] }; const ids = new Set();
+  let luts = 0;
+  for (const n of (Array.isArray(g.nodes) ? g.nodes : [])) {
+    if (out.nodes.length >= MAX_NODES) break;
+    if (!n || typeof n !== 'object' || !TYPES[n.type]) continue;
+    if (n.type === 'lut' && luts >= MAX_LUT_NODES) continue;
+    const id = typeof n.id === 'string' && ID_RE.test(n.id) && !ids.has(n.id) ? n.id : freshId(ids); ids.add(id);
+    const node = { id, type: n.type, par: !!n.par && out.nodes.length > 0 && n.type !== 'mixer', params: sanitize(n.params && typeof n.params === 'object' ? n.params : {}, schemaFor(n.type)) };
+    if (typeof n.label === 'string' && n.label.trim()) node.label = n.label.trim().slice(0, 24);
+    if (n.type === 'mixer') node.src = n.src === 'in' || out.nodes.some(m => m.id === n.src) ? n.src : 'in';
+    if (n.type === 'lut') { node.lut = sanitizeLutRef(n.lut); luts++; }
+    out.nodes.push(node);
+  }
+  return out;
+}
+function nodeById(g, id) { return g && Array.isArray(g.nodes) ? g.nodes.find(n => n.id === id) || null : null; }
+function schemaAt(g, nodeId, key) { const n = nodeById(g, nodeId); const s = n && schemaFor(n.type); return (s && s[key]) || null; }
+function active(g) { return !!(g && g.on !== false && Array.isArray(g.nodes) && g.nodes.length); }
+// Per-frame working copy (keys and audio maps write into params).
+function evalCopy(g) { return { v: g.v, on: g.on !== false, nodes: (g.nodes || []).filter(n => n && TYPES[n.type]).map(n => ({ ...n, params: sanitize(n.params, schemaFor(n.type)) })) }; }
+function nodeLabel(g, n) { const i = g.nodes.indexOf(n); return n.label || `${i + 1} ${TYPES[n.type].name}`; }
+function paths(g, numericOnly) {
+  const out = []; if (!g) return out;
+  g.nodes.forEach((n, i) => { for (const [k, s] of Object.entries(schemaFor(n.type))) if (!numericOnly || s.type === 'range' || s.type === 'int') out.push({ path: `G:${n.id}:${k}`, label: `Grade ${i + 1} ${s.label}`, group: 'Grade' }); });
+  return out;
+}
+
+// ---------- LUTs ----------
+const MAX_TEXT = 24 * 1048576, MAX_3D = 65, MAX_1D = 4096, MAX_ABS = 1e6;
+class LutError extends Error { constructor(code, message, line) { super(message); this.name = 'LutError'; this.code = code; if (line) this.line = line; } }
+const NUM_RE = /^[-+]?(\d+\.?\d*|\.\d+)([eE][-+]?\d+)?$/;
+function num(tok, line) { if (!NUM_RE.test(tok)) throw new LutError('number', `Line ${line}: “${String(tok).slice(0, 24)}” isn’t a number.`, line); const v = Number(tok); if (!Number.isFinite(v) || Math.abs(v) > MAX_ABS) throw new LutError('number', `Line ${line}: value out of range.`, line); return v; }
+// .cube (Resolve / Adobe): 1D, 3D, or 1D shaper + 3D. Red varies fastest. Strict: exact entry counts, finite numbers, keywords before data.
+function parseCube(text, name = 'LUT') {
+  if (typeof text !== 'string') throw new LutError('format', 'That file couldn’t be read as text.');
+  if (text.length > MAX_TEXT) throw new LutError('too-large', 'That LUT file is larger than 24 MB.');
+  if (/\u0000/.test(text.slice(0, 4096))) throw new LutError('format', 'That file is binary, not a text .cube LUT.');
+  let title = '', size1 = 0, size3 = 0; let min3 = [0, 0, 0], max3 = [1, 1, 1], min1 = [0, 0, 0], max1 = [1, 1, 1];
+  let vals = null, n = 0, expected = 0, dataLine = 0; const lines = text.split(/\r\n|\n|\r/);
+  for (let i = 0; i < lines.length; i++) {
+    const ln = i + 1; const raw = lines[i]; const s = raw.trim();
+    if (!s || s[0] === '#') continue;
+    if (/^[+-]?(nan|inf)/i.test(s)) throw new LutError('number', `Line ${ln}: values must be finite numbers.`, ln);
+    if (/^[A-Za-z_]/.test(s)) {
+      if (vals) throw new LutError('keyword', `Line ${ln}: keywords must come before the table.`, ln);
+      const m = /^([A-Za-z_][A-Za-z0-9_]*)\s*(.*)$/.exec(s); const key = m[1].toUpperCase(), rest = m[2].trim(); const toks = rest ? rest.split(/\s+/) : [];
+      if (key === 'TITLE') { title = rest.replace(/^"|"$/g, '').slice(0, 80); continue; }
+      if (key === 'LUT_3D_SIZE' || key === 'LUT_1D_SIZE') {
+        if (toks.length !== 1 || !/^\d+$/.test(toks[0])) throw new LutError('size', `Line ${ln}: ${key} needs one whole number.`, ln);
+        const v = Number(toks[0]);
+        if (key === 'LUT_3D_SIZE') { if (v < 2 || v > MAX_3D) throw new LutError(v > MAX_3D ? 'too-large' : 'size', `3D LUT size ${v} isn’t supported (2 to ${MAX_3D}).`, ln); size3 = v; }
+        else { if (v < 2 || v > MAX_1D) throw new LutError(v > MAX_1D ? 'too-large' : 'size', `1D LUT size ${v} isn’t supported (2 to ${MAX_1D}).`, ln); size1 = v; }
+        continue;
+      }
+      if (key === 'DOMAIN_MIN' || key === 'DOMAIN_MAX') {
+        if (toks.length !== 3) throw new LutError('domain', `Line ${ln}: ${key} needs three numbers.`, ln);
+        const v = toks.map(t => num(t, ln)); if (key === 'DOMAIN_MIN') { min3 = v; min1 = v.slice(); } else { max3 = v; max1 = v.slice(); } continue;
+      }
+      if (key === 'LUT_1D_INPUT_RANGE' || key === 'LUT_3D_INPUT_RANGE') {
+        if (toks.length !== 2) throw new LutError('domain', `Line ${ln}: ${key} needs two numbers.`, ln);
+        const [lo, hi] = toks.map(t => num(t, ln)); if (key === 'LUT_1D_INPUT_RANGE') { min1 = [lo, lo, lo]; max1 = [hi, hi, hi]; } else { min3 = [lo, lo, lo]; max3 = [hi, hi, hi]; } continue;
+      }
+      if (/^LUT_/.test(key) || /^(LUT|CUBE|VERSION|BITDEPTH|RANGE|INPUT|OUTPUT|LUT_IN|LUT_OUT)/.test(key)) continue; // tool-specific metadata (e.g. LUT_IN_VIDEO_RANGE)
+      throw new LutError('keyword', `Line ${ln}: unknown keyword “${m[1].slice(0, 24)}”. Is this a .cube file?`, ln);
+    }
+    if (!vals) {
+      if (!size1 && !size3) throw new LutError('size', 'The file has data but no LUT_3D_SIZE or LUT_1D_SIZE line.', ln);
+      expected = size1 + size3 * size3 * size3; vals = new Float32Array(expected * 3); dataLine = ln;
+    }
+    const toks = s.split(/\s+/);
+    if (toks.length !== 3) throw new LutError('row', `Line ${ln}: each row needs three numbers (found ${toks.length}).`, ln);
+    if (n >= expected) throw new LutError('count', `The table has more rows than the declared size (${expected}).`, ln);
+    vals[n * 3] = num(toks[0], ln); vals[n * 3 + 1] = num(toks[1], ln); vals[n * 3 + 2] = num(toks[2], ln); n++;
+  }
+  if (!size1 && !size3) throw new LutError('empty', 'No LUT size found. This doesn’t look like a .cube file.');
+  if (!vals || n !== expected) throw new LutError('count', `The table has ${n} rows; LUT size needs ${expected || (size1 + size3 ** 3)}.`, dataLine);
+  for (let c = 0; c < 3; c++) { if (!(max3[c] > min3[c]) || !(max1[c] > min1[c])) throw new LutError('domain', 'DOMAIN_MAX must be greater than DOMAIN_MIN on every channel.'); }
+  const lut = { name: String(name).slice(0, 80), title, size1, size3, min1, max1, min3, max3, data1: size1 ? vals.subarray(0, size1 * 3) : null, data3: size3 ? vals.subarray(size1 * 3) : null };
+  lut.id = lutId(lut); return lut;
+}
+// Autodesk .3dl: optional input mesh line (integers 0..max, uniform), then N³ integer triples, blue fastest.
+function parse3dl(text, name = 'LUT') {
+  if (typeof text !== 'string') throw new LutError('format', 'That file couldn’t be read as text.');
+  if (text.length > MAX_TEXT) throw new LutError('too-large', 'That LUT file is larger than 24 MB.');
+  const rows = []; let mesh = null;
+  const lines = text.split(/\r\n|\n|\r/);
+  for (let i = 0; i < lines.length; i++) {
+    const s = lines[i].trim(); if (!s || s[0] === '#') continue;
+    if (/^[A-Za-z]/.test(s)) { if (/^(3DMESH|Mesh|LUT8|gamma)/i.test(s)) continue; throw new LutError('keyword', `Line ${i + 1}: unexpected text in a .3dl file.`, i + 1); }
+    const toks = s.split(/\s+/);
+    if (!/^\d+$/.test(toks.join(''))) throw new LutError('number', `Line ${i + 1}: .3dl values must be whole numbers.`, i + 1);
+    if (toks.length !== 3) { if (!mesh && !rows.length && toks.length >= 2) { mesh = toks.map(Number); continue; } throw new LutError('row', `Line ${i + 1}: each row needs three numbers.`, i + 1); }
+    rows.push(toks.map(Number)); if (rows.length > MAX_3D ** 3) throw new LutError('too-large', `3D LUTs up to ${MAX_3D}³ are supported.`);
+  }
+  if (!mesh && rows.length > 1) { const k = Math.round(Math.cbrt(rows.length - 1)); if (k ** 3 === rows.length - 1 && k === 3 && rows[0][0] === 0) mesh = rows.shift(); } // 3-entry mesh line looks like a row
+  const N = mesh ? mesh.length : Math.round(Math.cbrt(rows.length));
+  if (N < 2 || N > MAX_3D) throw new LutError('size', `A ${N}-point .3dl mesh isn’t supported (2 to ${MAX_3D}).`);
+  if (mesh) { const st = mesh[1] - mesh[0]; if (mesh[0] !== 0 || mesh.some((v, i) => Math.abs(v - i * st) > Math.max(1, st * 0.02))) throw new LutError('domain', 'Only uniform .3dl input meshes are supported.'); }
+  if (rows.length !== N * N * N) throw new LutError('count', `The table has ${rows.length} rows; a ${N}-point mesh needs ${N ** 3}.`);
+  let mx = 0; for (const r of rows) mx = Math.max(mx, r[0], r[1], r[2]);
+  const depth = mx <= 1023 ? 1023 : mx <= 4095 ? 4095 : mx <= 65535 ? 65535 : 0; if (!depth) throw new LutError('number', 'Output values exceed 16 bits.');
+  const data3 = new Float32Array(N * N * N * 3);
+  for (let r = 0; r < N; r++) for (let g = 0; g < N; g++) for (let b = 0; b < N; b++) { const src = rows[(r * N + g) * N + b], d = ((b * N + g) * N + r) * 3; data3[d] = src[0] / depth; data3[d + 1] = src[1] / depth; data3[d + 2] = src[2] / depth; }
+  const lut = { name: String(name).slice(0, 80), title: '', size1: 0, size3: N, min1: [0, 0, 0], max1: [1, 1, 1], min3: [0, 0, 0], max3: [1, 1, 1], data1: null, data3 };
+  lut.id = lutId(lut); return lut;
+}
+// HALD CLUT image (decoded RGBA bytes): level L → L³×L³ pixels, cube size L², red fastest.
+function parseHald(rgba, w, h, name = 'HALD') {
+  if (w !== h) throw new LutError('size', `A HALD image is square; this one is ${w}×${h}.`);
+  const L = Math.round(Math.cbrt(w)); if (L * L * L !== w || L < 2) throw new LutError('size', `${w}×${w} isn’t a HALD size (e.g. 512×512 for level 8).`);
+  if (!rgba || !(rgba.length >= w * h * 4)) throw new LutError('format', 'That image couldn’t be decoded.');
+  const N = L * L; if (N > MAX_3D) throw new LutError('too-large', `HALD level ${L} (${N}³) is larger than ${MAX_3D}³.`);
+  const data3 = new Float32Array(N * N * N * 3);
+  for (let i = 0; i < N * N * N; i++) { data3[i * 3] = rgba[i * 4] / 255; data3[i * 3 + 1] = rgba[i * 4 + 1] / 255; data3[i * 3 + 2] = rgba[i * 4 + 2] / 255; }
+  const lut = { name: String(name).slice(0, 80), title: '', size1: 0, size3: N, min1: [0, 0, 0], max1: [1, 1, 1], min3: [0, 0, 0], max3: [1, 1, 1], data1: null, data3 };
+  lut.id = lutId(lut); return lut;
+}
+function parseLut(text, name) { return /\.3dl$/i.test(name || '') ? parse3dl(text, name) : parseCube(text, name); }
+// Content id: FNV-1a over sizes, domain and the quantized table (16-bit) — stable across re-imports of the same file.
+function lutId(l) {
+  let h1 = 0x811c9dc5 >>> 0, h2 = 0x01000193 >>> 0;
+  const mixIn = v => { h1 ^= v & 0xffff; h1 = Math.imul(h1, 16777619) >>> 0; h2 ^= (v >>> 16) ^ (h1 & 0xff); h2 = Math.imul(h2 ^ (h2 >>> 13), 0x5bd1e995) >>> 0; };
+  mixIn(l.size1); mixIn(l.size3); for (const a of [l.min1, l.max1, l.min3, l.max3]) for (const v of a) mixIn(Math.round(v * 65535));
+  for (const d of [l.data1, l.data3]) if (d) for (let i = 0; i < d.length; i++) mixIn(Math.round(d[i] * 65535) + 0x8000);
+  return 'lut_' + h1.toString(36).padStart(7, '0') + h2.toString(36).padStart(7, '0');
+}
+function identityLut(N = 33) {
+  const d = new Float32Array(N * N * N * 3); let i = 0;
+  for (let b = 0; b < N; b++) for (let g = 0; g < N; g++) for (let r = 0; r < N; r++) { d[i++] = r / (N - 1); d[i++] = g / (N - 1); d[i++] = b / (N - 1); }
+  return d;
+}
+function serializeCube(data3, N, title = 'Motif grade') {
+  if (!data3 || data3.length !== N * N * N * 3) throw new LutError('count', 'Export table has the wrong size.');
+  const out = [`TITLE "${String(title).replace(/"/g, '').slice(0, 80)}"`, '# Created by Motif 5 — node grade baked to a 3D LUT (input and output 0–1, display-referred)', `LUT_3D_SIZE ${N}`, 'DOMAIN_MIN 0.0 0.0 0.0', 'DOMAIN_MAX 1.0 1.0 1.0'];
+  const f = v => (Math.abs(v) < 5e-7 ? 0 : v).toFixed(6);
+  for (let i = 0; i < N * N * N; i++) out.push(`${f(data3[i * 3])} ${f(data3[i * 3 + 1])} ${f(data3[i * 3 + 2])}`);
+  return out.join('\n') + '\n';
+}
+// CPU reference sampler (tests, and the page's LUT preview swatch). Tetrahedral, domain-aware, shaper first.
+function sampleLut(l, rgb) {
+  let c = rgb.slice();
+  if (l.data1) { const N = l.size1; for (let k = 0; k < 3; k++) { const x = clamp((c[k] - l.min1[k]) / (l.max1[k] - l.min1[k]), 0, 1) * (N - 1); const i = Math.min(N - 2, Math.floor(x)), f = x - i; c[k] = l.data1[i * 3 + k] * (1 - f) + l.data1[(i + 1) * 3 + k] * f; } }
+  if (l.data3) {
+    const N = l.size3, p = [0, 1, 2].map(k => clamp((c[k] - l.min3[k]) / (l.max3[k] - l.min3[k]), 0, 1) * (N - 1));
+    const b = p.map(v => Math.min(N - 2, Math.floor(v))), f = p.map((v, k) => v - b[k]);
+    const at = (dr, dg, db) => { const i = (((b[2] + db) * N + (b[1] + dg)) * N + (b[0] + dr)) * 3; return [l.data3[i], l.data3[i + 1], l.data3[i + 2]]; };
+    // order the fractional parts; walk the tetrahedron from c000 to c111
+    const ax = [0, 1, 2].sort((x, y) => f[y] - f[x]); let cur = [0, 0, 0], prev = at(0, 0, 0); const out = prev.slice();
+    for (const k of ax) { cur[k] = 1; const nx = at(cur[0], cur[1], cur[2]); for (let j = 0; j < 3; j++) out[j] += f[k] * (nx[j] - prev[j]); prev = nx; }
+    c = out;
+  }
+  return c;
+}
+// Registry: LUT tables by content id. The page persists bytes; render contexts only read from here.
+const registry = new Map();
+function registerLut(l) { if (!l || !LUT_ID_RE.test(l.id)) throw new LutError('format', 'Invalid LUT.'); registry.set(l.id, l); return l.id; }
+const getLut = id => registry.get(id) || null;
+const listLuts = () => [...registry.values()].map(l => ({ id: l.id, name: l.name, size1: l.size1, size3: l.size3 }));
+
+// ---------- GLSL ----------
+const LIB = `
+precision highp sampler3D;
+const vec3 GW = vec3(0.2126, 0.7152, 0.0722);
+vec3 gRot(vec3 c, float deg){ if (deg == 0.0) return c; float a = radians(deg), s = sin(a), co = cos(a); const vec3 k = vec3(0.57735027); return c * co + cross(k, c) * s + k * dot(k, c) * (1.0 - co); }
+vec3 gHsv(vec3 c){ vec4 K = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0); vec4 p = mix(vec4(c.bg, K.wz), vec4(c.gb, K.xy), step(c.b, c.g)); vec4 q = mix(vec4(p.xyw, c.r), vec4(c.r, p.yzx), step(p.x, c.r));
+  float d = q.x - min(q.w, q.y); return vec3(abs(q.z + (q.w - q.y) / (6.0 * d + 1e-10)), d / (max(q.x, 0.0) + 1e-10), q.x); }
+vec3 gPrimary(vec3 c, vec4 lift, vec4 gam, vec4 gain, vec4 off, vec4 cps){
+  vec3 lf = lift.rgb + lift.a, gm = gam.rgb + gam.a, gn = gain.a * (1.0 + gain.rgb), of = off.rgb + off.a;
+  c = c * gn + lf * (1.0 - c);
+  c = sign(c) * pow(abs(c), exp2(-gm));
+  c += of;
+  c = (c - cps.y) * cps.x + cps.y;
+  float y = dot(c, GW); c = y + gRot(c - y, cps.w) * cps.z; return c; }
+float gCurve(float x, float y0, float y1, float y2, float y3, float y4){
+  float d0 = y1 - y0, d1 = y2 - y1, d2 = y3 - y2, d3 = y4 - y3;
+  float m0 = d0, m4 = d3, m1 = d0 * d1 <= 0.0 ? 0.0 : 0.5 * (d0 + d1), m2 = d1 * d2 <= 0.0 ? 0.0 : 0.5 * (d1 + d2), m3 = d2 * d3 <= 0.0 ? 0.0 : 0.5 * (d2 + d3);
+  float t = x * 4.0; if (t <= 0.0) return y0 + m0 * t; if (t >= 4.0) return y4 + m4 * (t - 4.0);
+  float i = min(floor(t), 3.0), f = t - i, ya, yb, ma, mb;
+  if (i < 0.5) { ya = y0; yb = y1; ma = m0; mb = m1; } else if (i < 1.5) { ya = y1; yb = y2; ma = m1; mb = m2; } else if (i < 2.5) { ya = y2; yb = y3; ma = m2; mb = m3; } else { ya = y3; yb = y4; ma = m3; mb = m4; }
+  float f2 = f * f, f3 = f2 * f; return (2.0 * f3 - 3.0 * f2 + 1.0) * ya + (f3 - 2.0 * f2 + f) * ma + (3.0 * f2 - 2.0 * f3) * yb + (f3 - f2) * mb; }
+float gCyc(float h, float v0, float v1, float v2, float v3, float v4, float v5){
+  float v[6] = float[6](v0, v1, v2, v3, v4, v5); float t = fract(h) * 6.0; int i = int(floor(t)) % 6; float f = smoothstep(0.0, 1.0, t - floor(t)); return mix(v[i], v[(i + 1) % 6], f); }
+vec3 gHueSat(vec3 c, float s0, float s1, float s2, float s3, float s4, float s5, float h0, float h1, float h2, float h3, float h4, float h5){
+  vec3 h = gHsv(c); float s = gCyc(h.x, s0, s1, s2, s3, s4, s5), dh = gCyc(h.x, h0, h1, h2, h3, h4, h5);
+  float y = dot(c, GW); return y + gRot(c - y, dh) * s; }
+float gKey(vec3 c, vec4 a, vec4 b){
+  vec3 h = gHsv(c); float soft = b.z + 1e-4; float dh = abs(fract(h.x - a.x / 360.0 + 0.5) - 0.5), hw = a.y / 720.0;
+  float kh = a.y >= 359.5 ? 1.0 : 1.0 - smoothstep(hw, hw + soft * 0.5, dh);
+  float ks = smoothstep(a.z - soft, a.z, h.y) * (1.0 - smoothstep(a.w, a.w + soft, h.y));
+  float l = dot(c, GW); float kl = smoothstep(b.x - soft, b.x, l) * (1.0 - smoothstep(b.y, b.y + soft, l));
+  float k = clamp(kh * ks * kl, 0.0, 1.0); return b.w > 0.5 ? 1.0 - k : k; }
+vec3 gQualCorr(vec3 c, vec4 q){ float y = dot(c, GW); c = y + gRot(c - y, q.x) * q.y; return c * q.z + q.w; }
+vec3 gBlend(vec3 b, vec3 t, float m){
+  if (m < 0.5) return t; if (m < 1.5) return b + t; if (m < 2.5) return b * t; if (m < 3.5) return 1.0 - (1.0 - b) * (1.0 - t);
+  if (m < 4.5) return mix(2.0 * b * t, 1.0 - 2.0 * (1.0 - b) * (1.0 - t), step(0.5, b));
+  if (m < 5.5) return mix(2.0 * b * t + b * b * (1.0 - 2.0 * t), sqrt(max(b, 0.0)) * (2.0 * t - 1.0) + 2.0 * b * (1.0 - t), step(0.5, t));
+  if (m < 6.5) return abs(b - t); if (m < 7.5) return min(b, t); if (m < 8.5) return max(b, t);
+  return b + (dot(t, GW) - dot(b, GW)); }
+vec3 gLut1(sampler2D S, vec3 c, vec3 lo, vec3 hi, float N){ vec3 x = (clamp((c - lo) / (hi - lo), 0.0, 1.0) * (N - 1.0) + 0.5) / N;
+  return vec3(texture(S, vec2(x.r, 0.5)).r, texture(S, vec2(x.g, 0.5)).g, texture(S, vec2(x.b, 0.5)).b); }
+vec3 gLut3(sampler3D L, vec3 c, vec3 lo, vec3 hi, float N, float tetra){
+  vec3 x = clamp((c - lo) / (hi - lo), 0.0, 1.0);
+  if (tetra < 0.5) return texture(L, (x * (N - 1.0) + 0.5) / N).rgb;
+  vec3 p = x * (N - 1.0), b0 = min(floor(p), vec3(N - 2.0)), f = p - b0; ivec3 i = ivec3(b0);
+  vec3 c0 = texelFetch(L, i, 0).rgb, c7 = texelFetch(L, i + ivec3(1), 0).rgb, ca, cb; vec3 r;
+  if (f.r > f.g) {
+    if (f.g > f.b) { ca = texelFetch(L, i + ivec3(1, 0, 0), 0).rgb; cb = texelFetch(L, i + ivec3(1, 1, 0), 0).rgb; r = c0 + f.r * (ca - c0) + f.g * (cb - ca) + f.b * (c7 - cb); }
+    else if (f.r > f.b) { ca = texelFetch(L, i + ivec3(1, 0, 0), 0).rgb; cb = texelFetch(L, i + ivec3(1, 0, 1), 0).rgb; r = c0 + f.r * (ca - c0) + f.b * (cb - ca) + f.g * (c7 - cb); }
+    else { ca = texelFetch(L, i + ivec3(0, 0, 1), 0).rgb; cb = texelFetch(L, i + ivec3(1, 0, 1), 0).rgb; r = c0 + f.b * (ca - c0) + f.r * (cb - ca) + f.g * (c7 - cb); }
+  } else {
+    if (f.b > f.g) { ca = texelFetch(L, i + ivec3(0, 0, 1), 0).rgb; cb = texelFetch(L, i + ivec3(0, 1, 1), 0).rgb; r = c0 + f.b * (ca - c0) + f.g * (cb - ca) + f.r * (c7 - cb); }
+    else if (f.b > f.r) { ca = texelFetch(L, i + ivec3(0, 1, 0), 0).rgb; cb = texelFetch(L, i + ivec3(0, 1, 1), 0).rgb; r = c0 + f.g * (ca - c0) + f.b * (cb - ca) + f.r * (c7 - cb); }
+    else { ca = texelFetch(L, i + ivec3(0, 1, 0), 0).rgb; cb = texelFetch(L, i + ivec3(1, 1, 0), 0).rgb; r = c0 + f.g * (ca - c0) + f.r * (cb - ca) + f.b * (c7 - cb); }
+  }
+  return r; }
+`;
+const PACK_KEYS = {}; // numeric pack order per type: every schema key; selects as option index, toggles as 0/1
+for (const [t, d] of Object.entries(TYPES)) PACK_KEYS[t] = Object.keys(d.schema);
+const LUT_EXTRA = 16; // lut node: has1, has3, N1, N3, lo1.xyz, hi1.xyz, lo3.xyz, hi3.xyz (16 floats after its params)
+
+// Plan the program: topology signature, uniform layout and texture slots. mode: 'main' | 'key' | 'lattice'.
+function plan(g, mode = 'main', stopAt = -1) {
+  const nodes = g.nodes; const blocks = []; let vec = 0; let keys = 0, luts = 0; const sig = [mode, stopAt];
+  nodes.forEach((n, i) => {
+    if (stopAt >= 0 && i > stopAt) return;
+    const nf = PACK_KEYS[n.type].length + (n.type === 'lut' ? LUT_EXTRA : 0);
+    const b = { n, i, base: vec * 4, floats: nf }; vec += Math.ceil(nf / 4);
+    if (n.type === 'qualifier' && mode === 'main' && n.params.blur > 0.001 && keys < MAX_BLUR_KEYS) b.key = keys++;
+    if (n.type === 'lut') { const l = n.lut && getLut(n.lut.id); if (l) { b.lut = l; b.slot = luts++; } }
+    if (n.type === 'mixer') b.src = n.src === 'in' ? -1 : nodes.findIndex(m => m.id === n.src);
+    blocks.push(b);
+    sig.push(`${n.type}${n.par ? 'p' : ''}${b.key != null ? 'k' + b.key : ''}${b.lut ? 'L' + (b.lut.data1 ? 1 : 0) + (b.lut.data3 ? 3 : 0) : ''}${b.src != null ? 's' + b.src : ''}`);
+  });
+  return { blocks, vec: Math.max(1, vec), keys, luts, sig: sig.join('|') };
+}
+function codegen(pl, stopKey) {
+  const f = (b, k) => { const idx = b.base + (typeof k === 'number' ? k : PACK_KEYS[b.n.type].indexOf(k)); return `GP[${idx >> 2}].${'xyzw'[idx & 3]}`; };
+  const v4 = (b, ks) => `vec4(${ks.map(k => f(b, k)).join(', ')})`;
+  let decl = `${LIB}\nuniform vec4 GP[${pl.vec}];\n`;
+  for (let k = 0; k < pl.keys; k++) decl += `uniform sampler2D GK${k};\n`;
+  for (const b of pl.blocks) if (b.lut) { if (b.lut.data1) decl += `uniform sampler2D GS${b.slot};\n`; if (b.lut.data3) decl += `uniform sampler3D GL${b.slot};\n`; }
+  let body = 'vec3 gradeAll(vec3 c0, vec2 uv){\n  vec3 cur = c0, gin = c0, gsum = c0; float gn = 1.0;\n';
+  for (const b of pl.blocks) body += `  vec3 n${b.i} = c0;\n`;
+  const flush = () => '  if (gn > 0.5) cur = gsum / gn;\n';
+  pl.blocks.forEach((b, j) => {
+    const n = b.n, par = n.par && j > 0;
+    if (!par) body += flush() + '  gin = cur; gsum = vec3(0.0); gn = 0.0;\n';
+    const x = 'gin', w = `(${f(b, 'on')} * ${f(b, 'mix')})`; let y;
+    body += `  { // node ${b.i + 1} ${n.type}\n`;
+    if (n.type === 'primary') y = `gPrimary(${x}, ${v4(b, ['liftR', 'liftG', 'liftB', 'liftY'])}, ${v4(b, ['gammaR', 'gammaG', 'gammaB', 'gammaY'])}, ${v4(b, ['gainR', 'gainG', 'gainB', 'gainY'])}, ${v4(b, ['offR', 'offG', 'offB', 'offY'])}, ${v4(b, ['contrast', 'pivot', 'sat', 'hue'])})`;
+    else if (n.type === 'curves') {
+      const cv = (ch, e) => `gCurve(${e}, ${[0, 1, 2, 3, 4].map(i => f(b, ch + i)).join(', ')})`;
+      body += `    vec3 t = vec3(${cv('y', x + '.r')}, ${cv('y', x + '.g')}, ${cv('y', x + '.b')});\n`;
+      y = `vec3(${cv('r', 't.r')}, ${cv('g', 't.g')}, ${cv('b', 't.b')})`;
+    } else if (n.type === 'huesat') y = `gHueSat(${x}, ${[0, 1, 2, 3, 4, 5].map(i => f(b, 's' + i)).join(', ')}, ${[0, 1, 2, 3, 4, 5].map(i => f(b, 'h' + i)).join(', ')})`;
+    else if (n.type === 'qualifier') {
+      const kexpr = b.key != null ? `texture(GK${b.key}, uv).r` : `gKey(${x}, ${v4(b, ['hue', 'width', 'satLo', 'satHi'])}, ${v4(b, ['lumLo', 'lumHi', 'soft', 'invert'])})`;
+      if (stopKey === b.i) { body += `    return vec3(gKey(${x}, ${v4(b, ['hue', 'width', 'satLo', 'satHi'])}, ${v4(b, ['lumLo', 'lumHi', 'soft', 'invert'])}));\n  }\n}\n`; return; }
+      body += `    float k = ${kexpr};\n`; y = `gQualCorr(${x}, ${v4(b, ['qHue', 'qSat', 'qGain', 'qOff'])})`;
+      body += `    n${b.i} = mix(${x}, ${y}, clamp(${w} * k, 0.0, 1.0));\n  }\n  gsum += n${b.i}; gn += 1.0;\n`; return;
+    } else if (n.type === 'lut') {
+      if (!b.lut) y = x; // missing table: pass-through (the page shows the missing state)
+      else {
+        const e = PACK_KEYS.lut.length, F = k => f(b, e + k), V3 = k => `vec3(${F(k)}, ${F(k + 1)}, ${F(k + 2)})`;
+        body += `    vec3 t = ${x};\n`;
+        if (b.lut.data1) body += `    t = gLut1(GS${b.slot}, t, ${V3(4)}, ${V3(7)}, ${F(2)});\n`;
+        if (b.lut.data3) body += `    t = gLut3(GL${b.slot}, t, ${V3(10)}, ${V3(13)}, ${F(3)}, ${f(b, 'interp')} < 0.5 ? 1.0 : 0.0);\n`;
+        y = 't';
+      }
+    } else if (n.type === 'mixer') {
+      const base = b.src < 0 ? 'c0' : `n${b.src}`;
+      body += `    n${b.i} = mix(${base}, gBlend(${base}, ${x}, ${f(b, 'blend')}), clamp(${w}, 0.0, 1.0));\n  }\n  gsum += n${b.i}; gn += 1.0;\n`; return;
+    }
+    body += `    n${b.i} = mix(${x}, ${y}, clamp(${w}, 0.0, 1.0));\n  }\n  gsum += n${b.i}; gn += 1.0;\n`;
+  });
+  if (stopKey == null || stopKey < 0) body += flush() + '  return cur;\n}\n';
+  return decl + body;
+}
+// Uniform values in plan order (selects → option index, toggles → 0/1, LUT meta appended).
+function pack(pl) {
+  const a = new Float32Array(pl.vec * 4);
+  for (const b of pl.blocks) {
+    const sc = schemaFor(b.n.type);
+    PACK_KEYS[b.n.type].forEach((k, j) => { const s = sc[k], v = b.n.params[k]; a[b.base + j] = s.type === 'select' ? Math.max(0, s.options.findIndex(o => o.v === v)) : s.type === 'toggle' ? (v ? 1 : 0) : Number(v) || 0; });
+    if (b.n.type === 'lut' && b.lut) {
+      const e = b.base + PACK_KEYS.lut.length, l = b.lut;
+      a.set([l.data1 ? 1 : 0, l.data3 ? 1 : 0, l.size1, l.size3, ...l.min1, ...l.max1, ...l.min3, ...l.max3], e);
+    }
+  }
+  return a;
+}
+const FS_LATTICE = `#version 300 es
+precision highp float; out vec4 o; uniform float N, black, white, gam, gmap; uniform vec3 s0, s1, s2;
+float luma(vec3 c){ return dot(c, vec3(0.2126, 0.7152, 0.0722)); }
+/*GRADE_DECL*/
+void main(){ ivec2 q = ivec2(gl_FragCoord.xy); int n = int(N); vec3 c = vec3(float(q.x % n), float(q.x / n), float(q.y)) / (N - 1.0); vec2 p = vec2(0.5);
+  c = clamp((c - black) / max(0.001, white - black), 0.0, 1.0); c = pow(c, vec3(1.0 / gam));
+  if (gmap > 0.0) { float l = luma(c); vec3 m = l < 0.5 ? mix(s0, s1, l * 2.0) : mix(s1, s2, (l - 0.5) * 2.0); c = mix(c, m, gmap); }
+  /*GRADE_CALL*/
+  o = vec4(c, 1.0); }`;
+
+// GPU side, owned by the finisher (same WebGL2 context). env: { gl, mk(fs), draw(prog, target, uniforms, textures), mkTex(w,h,float), blur2(srcT,a,b,r), FS_FINAL, size() }.
+function createGrader(env) {
+  const { gl } = env; const progs = new Map(); const lutTex = new Map(); let keyTex = []; let keySize = '';
+  const floatRT = !!gl.getExtension('EXT_color_buffer_float');
+  let lastError = null;
+  function program(key, build) {
+    let p = progs.get(key); if (p !== undefined) return p;
+    try { p = env.mk(build()); lastError = null; } catch (e) { console.error('grade:', e); lastError = String(e.message || e); p = null; }
+    progs.set(key, p); if (progs.size > 24) { const k0 = progs.keys().next().value; const old = progs.get(k0); if (old) gl.deleteProgram(old.p); progs.delete(k0); }
+    return p;
+  }
+  const inject = (src, decl, call) => src.replace('/*GRADE_DECL*/', decl).replace('/*GRADE_CALL*/', call);
+  function texFor(l) {
+    let t = lutTex.get(l.id); if (t) return t; t = {};
+    // typed-array uploads to 3D textures must not flip or premultiply (the finisher leaves premultiply on)
+    const pm = gl.getParameter(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL), fy = gl.getParameter(gl.UNPACK_FLIP_Y_WEBGL);
+    gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false); gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
+    if (l.data3) {
+      const N = l.size3; t.t3 = gl.createTexture(); gl.bindTexture(gl.TEXTURE_3D, t.t3);
+      gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1);
+      gl.texImage3D(gl.TEXTURE_3D, 0, gl.RGB16F, N, N, N, 0, gl.RGB, gl.FLOAT, l.data3);
+      for (const [p, v] of [[gl.TEXTURE_MIN_FILTER, gl.LINEAR], [gl.TEXTURE_MAG_FILTER, gl.LINEAR], [gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE], [gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE], [gl.TEXTURE_WRAP_R, gl.CLAMP_TO_EDGE]]) gl.texParameteri(gl.TEXTURE_3D, p, v);
+    }
+    if (l.data1) {
+      t.t1 = gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D, t.t1); gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB16F, l.size1, 1, 0, gl.RGB, gl.FLOAT, l.data1);
+      for (const [p, v] of [[gl.TEXTURE_MIN_FILTER, gl.LINEAR], [gl.TEXTURE_MAG_FILTER, gl.LINEAR], [gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE], [gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE]]) gl.texParameteri(gl.TEXTURE_2D, p, v);
+    }
+    gl.pixelStorei(gl.UNPACK_ALIGNMENT, 4); gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, pm); gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, fy);
+    lutTex.set(l.id, t);
+    if (lutTex.size > 8) { const k0 = lutTex.keys().next().value; const o = lutTex.get(k0); if (o.t3) gl.deleteTexture(o.t3); if (o.t1) gl.deleteTexture(o.t1); lutTex.delete(k0); }
+    return t;
+  }
+  function lutTextures(pl) {
+    const out = {};
+    for (const b of pl.blocks) if (b.lut) { const t = texFor(b.lut); if (t.t1) out['GS' + b.slot] = t.t1; if (t.t3) out['GL' + b.slot] = { t3: t.t3 }; }
+    return out;
+  }
+  function keys(n) {
+    const [W, H] = env.size(), w = Math.max(1, W >> 2), h = Math.max(1, H >> 2), sz = `${w}x${h}`;
+    if (sz !== keySize) { for (const k of keyTex) { gl.deleteTexture(k.a.t); gl.deleteFramebuffer(k.a.f); gl.deleteTexture(k.b.t); gl.deleteFramebuffer(k.b.f); } keyTex = []; keySize = sz; }
+    while (keyTex.length < n) keyTex.push({ a: env.mkTex(w, h, true), b: env.mkTex(w, h, true) });
+    return keyTex;
+  }
+  // Final pass with the grade injected. uni/txs: the finisher's FS_FINAL uniforms and textures.
+  function final(g, uni, txs) {
+    const pl = plan(g, 'main');
+    const prog = program('main|' + pl.sig, () => inject(env.FS_FINAL, codegen(pl), 'c = gradeAll(c, p);'));
+    if (!prog) return false;
+    const GP = pack(pl); const extra = { ...txs, ...lutTextures(pl) };
+    if (pl.keys) {
+      const kt = keys(pl.keys);
+      for (const b of pl.blocks) if (b.key != null) {
+        const kp = plan(g, 'key', b.i);
+        const kprog = program('key|' + kp.sig, () => inject(env.FS_FINAL, codegen(kp, b.i), 'c = gradeAll(c, p); o = vec4(c, 1.0); return;'));
+        if (!kprog) return false;
+        const kk = kt[b.key]; env.draw(kprog, kk.a, { ...uni, 'GP[0]': pack(kp) }, { ...txs, ...lutTextures(kp) });
+        const r = 0.6 + b.n.params.blur * 5.4; env.blur2(kk.a.t, kk.b, kk.a, r); env.blur2(kk.a.t, kk.b, kk.a, r * 1.6);
+        extra['GK' + b.key] = kk.a.t;
+      }
+    }
+    env.draw(prog, null, { ...uni, 'GP[0]': GP }, extra);
+    return true;
+  }
+  // Bake levels + gradient map + grade into an N³ table (red fastest). f: evaluated finish (with .grade); x: { stops }.
+  function lattice(f, x, N = 33) {
+    const g = f.grade && active(f.grade) ? f.grade : null;
+    const pl = g ? plan(g, 'lattice') : null;
+    const prog = program('lat|' + (pl ? pl.sig : 'none'), () => inject(FS_LATTICE, pl ? codegen(pl) : '', pl ? 'c = gradeAll(c, p);' : ''));
+    if (!prog) throw new Error(lastError || 'The grade shader failed to compile.');
+    const W = N * N, H = N;
+    const t = gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D, t);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+    gl.texImage2D(gl.TEXTURE_2D, 0, floatRT ? gl.RGBA32F : gl.RGBA8, W, H, 0, gl.RGBA, floatRT ? gl.FLOAT : gl.UNSIGNED_BYTE, null);
+    const fb = gl.createFramebuffer(); gl.bindFramebuffer(gl.FRAMEBUFFER, fb); gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, t, 0);
+    const tgt = { f: fb, w: W, h: H };
+    env.draw(prog, tgt, { N, black: f.black, white: f.white, gam: f.gamma, gmap: f.gmap, s0: x.stops[0], s1: x.stops[1], s2: x.stops[2], ...(pl ? { 'GP[0]': pack(pl) } : {}) }, pl ? lutTextures(pl) : {});
+    const px = floatRT ? new Float32Array(W * H * 4) : new Uint8Array(W * H * 4);
+    gl.readPixels(0, 0, W, H, gl.RGBA, floatRT ? gl.FLOAT : gl.UNSIGNED_BYTE, px);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null); gl.deleteFramebuffer(fb); gl.deleteTexture(t);
+    const out = new Float32Array(N * N * N * 3), sc = floatRT ? 1 : 1 / 255;
+    for (let i = 0; i < N * N * N; i++) { out[i * 3] = px[i * 4] * sc; out[i * 3 + 1] = px[i * 4 + 1] * sc; out[i * 3 + 2] = px[i * 4 + 2] * sc; }
+    return { data: out, precision: floatRT ? 'float32' : '8-bit' };
+  }
+  return { active, final, lattice, get error() { return lastError; }, get programs() { return progs.size; } };
+}
+
+return { VERSION, MAX_NODES, MAX_LUT_NODES, MAX_BLUR_KEYS, TYPES, TYPE_IDS, BLENDS, HUES, schemaFor, newGrade, newNode, sanitizeGrade, nodeById, schemaAt, active, evalCopy, nodeLabel, paths,
+  LutError, parseCube, parse3dl, parseHald, parseLut, serializeCube, identityLut, sampleLut, lutId, registerLut, getLut, listLuts, plan, codegen, pack, createGrader, FS_LATTICE };
+
+})();
+
+// ---- module: scopes v1.0.0
+const __m_scopes = (() => {
+// scopes — waveform (luma), RGB parade, vectorscope (graticule, 75% targets, skin-tone line) and histogram,
+// computed on the GPU from a finished frame: mip-downsample to a sample grid, scatter one point per sample
+// (gl_VertexID, no vertex buffers) into float accumulation targets with additive blending, then shade the
+// result. The only readback is the 256-bin histogram (4 KB) that feeds the numeric readout.
+// Engine-side: takes any canvas (HTMLCanvasElement or OffscreenCanvas) and any TexImageSource; no DOM.
+// Labels are returned as data for the caller to place in DOM — no text is ever drawn into the canvas.
+
+const MODES = [{ id: 'wave', l: 'Waveform' }, { id: 'parade', l: 'Parade' }, { id: 'vector', l: 'Vector' }, { id: 'hist', l: 'Histogram' }];
+const SPACES = [{ id: 'rec709', l: 'Rec.709', K: [0.2126, 0.7152, 0.0722] }, { id: 'p3', l: 'P3', K: [0.2289746, 0.6917385, 0.0792869] }];
+const VR = 0.6; // vectorscope: graticule radius = chroma magnitude 0.6 (100% red sits at 0.86 of the radius)
+const SKIN_DEG = 123; // conventional flesh-tone (I) line, degrees counter-clockwise from +Cb
+const BARS = [['R', [0.75, 0, 0]], ['Yl', [0.75, 0.75, 0]], ['G', [0, 0.75, 0]], ['Cy', [0, 0.75, 0.75]], ['B', [0, 0, 0.75]], ['Mg', [0.75, 0, 0.75]]];
+const spaceOf = id => SPACES.find(s => s.id === id) || SPACES[0];
+const modeIndex = id => Math.max(0, MODES.findIndex(m => m.id === id));
+// Vectorscope position of an RGB colour, in plot units (−1..1, +y up) for a colour interpretation.
+function vecPos(space, r, g, b) { const [kr, kg, kb] = spaceOf(space).K; const y = kr * r + kg * g + kb * b; return { x: (b - y) / (2 * (1 - kb)) / VR, y: (r - y) / (2 * (1 - kr)) / VR }; }
+function targets(space) { return BARS.map(([id, c]) => ({ id, ...vecPos(space, ...c) })); }
+// Plot rectangle in canvas pixels (GL convention: y from the bottom). Padding leaves room for DOM labels.
+function plotRect(mode, w, h, dpr = 1) {
+  const t = 8 * dpr, b = (mode === 'hist' ? 20 : 8) * dpr, l = (mode === 'hist' ? 8 : 32) * dpr, r = 8 * dpr;
+  if (mode === 'vector') { const s = Math.max(8, Math.min(w - 2 * r, h - t - b)); return { x: Math.round((w - s) / 2), y: Math.round((h - s) / 2), w: Math.round(s), h: Math.round(s) }; }
+  return { x: Math.round(l), y: Math.round(b), w: Math.max(8, Math.round(w - l - r)), h: Math.max(8, Math.round(h - t - b)) };
+}
+// Label layout for the caller's DOM overlay, in CSS pixels from the top-left.
+function labels(mode, space, cssW, cssH) {
+  const r = plotRect(mode, cssW, cssH, 1), top = v => cssH - (r.y + v * r.h), out = [];
+  if (mode === 'wave' || mode === 'parade') {
+    for (const v of [0, 25, 50, 75, 100]) out.push({ text: String(v), x: r.x - 6, y: top(v / 100), align: 'end' });
+    if (mode === 'parade') ['R', 'G', 'B'].forEach((t, i) => out.push({ text: t, x: r.x + r.w * (i + 0.5) / 3, y: top(1) + 10, align: 'mid' }));
+  } else if (mode === 'hist') {
+    for (const v of [0, 25, 50, 75, 100]) out.push({ text: String(v), x: r.x + r.w * v / 100, y: cssH - 10, align: v === 0 ? 'start' : v === 100 ? 'end' : 'mid' });
+  } else {
+    const cx = r.x + r.w / 2, cy = cssH - (r.y + r.h / 2), R = r.w / 2;
+    for (const t of targets(space)) { const d = Math.hypot(t.x, t.y) || 1, k = (d + 0.17) / d; out.push({ text: t.id, x: cx + t.x * k * R, y: cy - t.y * k * R, align: 'mid' }); }
+    const a = SKIN_DEG * Math.PI / 180; out.push({ text: 'Skin', x: cx + Math.cos(a) * 1.1 * R, y: cy - Math.sin(a) * 1.1 * R, align: 'mid' });
+  }
+  return { rect: { x: r.x, y: cssH - r.y - r.h, w: r.w, h: r.h }, labels: out };
+}
+
+const VS_QUAD = `#version 300 es
+void main(){ vec2 a = vec2(float(gl_VertexID & 1), float(gl_VertexID >> 1)) * 2.0 - 1.0; gl_Position = vec4(a, 0.0, 1.0); }`;
+const FS_DOWN = `#version 300 es
+precision highp float; uniform sampler2D T; uniform vec2 gs; out vec4 o; void main(){ o = vec4(texture(T, gl_FragCoord.xy / gs).rgb, 1.0); }`;
+// One point per sample. mode 0 luma, 1 parade (instance = channel), 2 vector, 3 histogram (instance = R,G,B,Y).
+const VS_SCATTER = `#version 300 es
+precision highp float; uniform sampler2D T; uniform ivec2 grid; uniform int mode, stride; uniform vec3 K; uniform vec2 acc; out vec4 col;
+void main(){
+  int id = gl_VertexID * stride + gl_VertexID % stride; ivec2 q = ivec2(id % grid.x, id / grid.x); vec3 c = clamp(texelFetch(T, q, 0).rgb, 0.0, 1.0); float Y = dot(c, K);
+  int ch = gl_InstanceID; vec2 pos; float u = (float(q.x) + 0.5) / float(grid.x), lv = acc.y - 1.0;
+  if (mode == 0) { pos = vec2(u, (floor(Y * lv + 0.5) + 0.5) / acc.y); col = vec4(1.0, 0.0, 0.0, 0.0); }
+  else if (mode == 1) { float v = ch == 0 ? c.r : ch == 1 ? c.g : c.b; pos = vec2((float(ch) + u) / 3.0, (floor(v * lv + 0.5) + 0.5) / acc.y); col = vec4(ch == 0 ? 1.0 : 0.0, ch == 1 ? 1.0 : 0.0, ch == 2 ? 1.0 : 0.0, 0.0); }
+  else if (mode == 2) { float cb = (c.b - Y) / (2.0 * (1.0 - K.b)), cr = (c.r - Y) / (2.0 * (1.0 - K.r)); pos = vec2(cb, cr) / ${VR.toFixed(3)} * 0.5 + 0.5; col = vec4(c, 1.0); }
+  else { float v = ch == 0 ? c.r : ch == 1 ? c.g : ch == 2 ? c.b : Y; pos = vec2((floor(v * 255.0 + 0.5) + 0.5) / 256.0, 0.5); col = vec4(ch == 0 ? 1.0 : 0.0, ch == 1 ? 1.0 : 0.0, ch == 2 ? 1.0 : 0.0, ch == 3 ? 1.0 : 0.0); }
+  gl_Position = vec4(pos * 2.0 - 1.0, 0.0, 1.0); gl_PointSize = 1.0;
+}`;
+const FS_SCATTER = `#version 300 es
+precision highp float; in vec4 col; out vec4 o; void main(){ o = col; }`;
+// Shading: graticule lines are geometry (not text); trace intensity = 1 − exp(−hits·k).
+const FS_SHOW = `#version 300 es
+precision highp float; out vec4 o;
+uniform sampler2D A; uniform int mode; uniform vec4 rect; uniform float k, dpr; uniform vec4 hmax;
+uniform vec3 bg, well, grid, gridHi, cY, cR, cG, cB, cSkin; uniform vec2 tg[6]; uniform vec2 skin;
+float ln(float d){ return 1.0 - smoothstep(0.35 * dpr, 0.85 * dpr, abs(d)); }
+void main(){
+  vec2 f = gl_FragCoord.xy; vec2 l = (f - rect.xy) / rect.zw; vec3 c = bg; ivec2 as = textureSize(A, 0);
+  bool inside = l.x >= 0.0 && l.x <= 1.0 && l.y >= 0.0 && l.y <= 1.0;
+  ivec2 t = ivec2(clamp(floor(l * vec2(as)), vec2(0.0), vec2(as) - 1.0));
+  if (mode <= 1) {
+    if (inside) c = well;
+    if (l.x >= -0.002 && l.x <= 1.002) for (int i = 0; i <= 10; i++) { float g = ln(f.y - (rect.y + float(i) * 0.1 * rect.w)); c = mix(c, (i == 0 || i == 10) ? gridHi : grid, g * ((i == 0 || i == 10) ? 0.9 : i == 5 ? 0.7 : 0.4)); }
+    if (mode == 1 && inside) { c = mix(c, gridHi, ln(f.x - (rect.x + rect.z / 3.0)) * 0.8); c = mix(c, gridHi, ln(f.x - (rect.x + rect.z * 2.0 / 3.0)) * 0.8); }
+    if (inside) { vec4 a = texelFetch(A, t, 0); vec3 e = 1.0 - exp(-a.rgb * k); c += mode == 0 ? cY * e.r : cR * e.r + cG * e.g + cB * e.b; }
+  } else if (mode == 2) {
+    vec2 q = l * 2.0 - 1.0; float r = length(q), px = 2.0 / rect.z;
+    if (r <= 1.0) c = well;
+    c = mix(c, gridHi, ln((r - 1.0) / px) * 0.9);
+    c = mix(c, grid, ln((r - 0.5) / px) * 0.35);
+    if (r <= 1.0) { c = mix(c, grid, ln(q.x / px) * 0.4); c = mix(c, grid, ln(q.y / px) * 0.4); }
+    if (r <= 1.0 && dot(q, skin) > 0.0) c = mix(c, cSkin, ln((q.x * skin.y - q.y * skin.x) / px) * 0.85);
+    for (int i = 0; i < 6; i++) { vec2 d = abs(q - tg[i]); float bx = max(d.x, d.y) - 0.055; c = mix(c, gridHi, ln(bx / px) * 0.9); }
+    if (inside && r <= 1.02) { vec4 a = texelFetch(A, t, 0); if (a.a > 0.0) { vec3 h = a.rgb / a.a; h = h / max(max(h.r, max(h.g, h.b)), 0.08); float e = 1.0 - exp(-a.a * k); c += mix(vec3(1.0), clamp(h, 0.0, 1.0), 0.75) * e; } }
+  } else {
+    if (inside) {
+      c = well;
+      for (int i = 1; i < 4; i++) c = mix(c, grid, ln(f.x - (rect.x + float(i) * 0.25 * rect.z)) * 0.4);
+      vec4 a = texelFetch(A, ivec2(t.x, 0), 0); vec4 h = a / max(hmax, vec4(1e-6));
+      c += 0.55 * (cR * step(l.y, h.r) + cG * step(l.y, h.g) + cB * step(l.y, h.b));
+      c = mix(c, cY, ln((l.y - h.a) * rect.w) * 0.9);
+    }
+    c = mix(c, gridHi, ln(f.y - rect.y) * 0.8);
+  }
+  o = vec4(clamp(c, 0.0, 1.0), 1.0);
+}`;
+
+const hex3 = h => { const s = String(h || '#000000').trim().replace('#', ''); const v = parseInt(s.length === 3 ? s.split('').map(x => x + x).join('') : s.slice(0, 6), 16) || 0; return [(v >> 16 & 255) / 255, (v >> 8 & 255) / 255, (v & 255) / 255]; };
+const DEFAULT_STYLE = { bg: '#0A0A0C', well: '#101014', grid: '#3A3A44', gridHi: '#6A6A76', cY: '#59DCFF', cR: '#FF5C5C', cG: '#4FE08A', cB: '#5C8CFF', cSkin: '#F0A23B' };
+
+function createScopes(canvas) {
+  let gl = null, reason = '';
+  try { gl = canvas.getContext('webgl2', { alpha: false, antialias: false, depth: false, stencil: false, premultipliedAlpha: false, preserveDrawingBuffer: true }); } catch (e) { gl = null; }
+  if (!gl) return { ok: false, reason: 'Scopes need WebGL2, which this browser has turned off.' };
+  const cbf = gl.getExtension('EXT_color_buffer_float'), fblend = gl.getExtension('EXT_float_blend');
+  if (!cbf) return { ok: false, reason: 'Scopes need floating-point render targets, which this GPU does not offer.' };
+  const accFmt = fblend ? gl.RGBA32F : gl.RGBA16F;
+  const mk = (vs, fs) => {
+    const sh = (t, s) => { const x = gl.createShader(t); gl.shaderSource(x, s); gl.compileShader(x); if (!gl.getShaderParameter(x, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(x)); return x; };
+    const p = gl.createProgram(); gl.attachShader(p, sh(gl.VERTEX_SHADER, vs)); gl.attachShader(p, sh(gl.FRAGMENT_SHADER, fs)); gl.linkProgram(p);
+    if (!gl.getProgramParameter(p, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(p));
+    const u = {}; const n = gl.getProgramParameter(p, gl.ACTIVE_UNIFORMS); for (let i = 0; i < n; i++) { const nm = gl.getActiveUniform(p, i).name; u[nm] = gl.getUniformLocation(p, nm); }
+    return { p, u };
+  };
+  let P;
+  try { P = { down: mk(VS_QUAD, FS_DOWN), scatter: mk(VS_SCATTER, FS_SCATTER), show: mk(VS_QUAD, FS_SHOW) }; }
+  catch (e) { return { ok: false, reason: 'The scope shaders failed to compile: ' + (e.message || e) }; }
+  const vao = gl.createVertexArray(); gl.bindVertexArray(vao);
+  const tex = (w, h, fmt, type, filter) => {
+    const t = gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D, t);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, filter); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    if (w) gl.texStorage2D(gl.TEXTURE_2D, 1, fmt, w, h);
+    return t;
+  };
+  const target = (w, h, fmt) => { const t = tex(w, h, fmt, 0, gl.NEAREST); const f = gl.createFramebuffer(); gl.bindFramebuffer(gl.FRAMEBUFFER, f); gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, t, 0); return { t, f, w, h }; };
+  const free = r => { if (r) { gl.deleteTexture(r.t); gl.deleteFramebuffer(r.f); } };
+  const src = gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D, src);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+  let grid = null, acc = null, accKey = '', hist = target(256, 1, accFmt);
+  let style = { ...DEFAULT_STYLE }; let last = null; const histBuf = new Float32Array(256 * 4);
+  let lastMode = 'wave', lastSpace = 'rec709';
+
+  function setStyle(s) { style = { ...style, ...s }; }
+  // src: canvas / ImageBitmap / video. opt: { mode, space, exact }. Returns { ms, grid:[w,h], samples, stats }.
+  function update(source, opt = {}) {
+    const t0 = performance.now();
+    const mode = MODES.some(m => m.id === opt.mode) ? opt.mode : 'wave', space = spaceOf(opt.space).id; lastMode = mode; lastSpace = space;
+    const sw = source.width || source.videoWidth || 0, sh = source.height || source.videoHeight || 0; if (!sw || !sh) return null;
+    const cap = opt.exact ? 1024 : 320; const gw = Math.max(16, Math.min(sw, cap)), gh = Math.max(9, Math.round(gw * sh / sw));
+    // upload: interpret the frame in the chosen space (P3 keeps P3-encoded values; Rec.709 converts to sRGB primaries)
+    gl.bindTexture(gl.TEXTURE_2D, src);
+    try { if ('unpackColorSpace' in gl) gl.unpackColorSpace = space === 'p3' ? 'display-p3' : 'srgb'; } catch (e) { /* unsupported */ }
+    gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false); gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, gl.RGBA, gl.UNSIGNED_BYTE, source); gl.generateMipmap(gl.TEXTURE_2D);
+    if (!grid || grid.w !== gw || grid.h !== gh) { free(grid); grid = target(gw, gh, gl.RGBA8); }
+    gl.disable(gl.BLEND); gl.bindFramebuffer(gl.FRAMEBUFFER, grid.f); gl.viewport(0, 0, gw, gh); gl.useProgram(P.down.p);
+    gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, src); gl.uniform1i(P.down.u.T, 0); gl.uniform2f(P.down.u.gs, gw, gh); gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+    // accumulate
+    const aw = mode === 'vector' ? 256 : mode === 'hist' ? 256 : gw, ah = mode === 'vector' ? 256 : mode === 'hist' ? 1 : 256, key = `${mode}|${aw}x${ah}`;
+    if (key !== accKey) { if (mode !== 'hist') { free(acc); acc = target(aw, ah, accFmt); } accKey = key; }
+    const N = gw * gh; gl.useProgram(P.scatter.p); gl.bindTexture(gl.TEXTURE_2D, grid.t); gl.uniform1i(P.scatter.u.T, 0); gl.uniform2i(P.scatter.u.grid, gw, gh);
+    gl.uniform3fv(P.scatter.u.K, spaceOf(space).K); gl.enable(gl.BLEND); gl.blendFunc(gl.ONE, gl.ONE); gl.blendEquation(gl.FUNC_ADD); gl.clearColor(0, 0, 0, 0);
+    const scatter = (r, m, inst, stride) => { gl.bindFramebuffer(gl.FRAMEBUFFER, r.f); gl.viewport(0, 0, r.w, r.h); gl.clear(gl.COLOR_BUFFER_BIT); gl.uniform1i(P.scatter.u.mode, m); gl.uniform1i(P.scatter.u.stride, stride); gl.uniform2f(P.scatter.u.acc, r.w, r.h); gl.drawArraysInstanced(gl.POINTS, 0, Math.floor(N / stride), inst); };
+    if (mode !== 'hist') scatter(acc, modeIndex(mode), mode === 'parade' ? 3 : 1, 1);
+    // The histogram feeds the readout in every mode; outside histogram mode every 4th sample is enough for the numbers.
+    const hs = mode === 'hist' ? 1 : 4; scatter(hist, 3, 4, hs);
+    gl.disable(gl.BLEND);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, hist.f); gl.readPixels(0, 0, 256, 1, gl.RGBA, gl.FLOAT, histBuf);
+    const stats = statsOf(histBuf, Math.floor(N / hs));
+    last = { mode, space, gw, gh, N, stats };
+    show();
+    return { ms: performance.now() - t0, grid: [gw, gh], samples: N, stats, acc: fblend ? 'float32' : 'float16' };
+  }
+  function show() {
+    if (!last) return;
+    const { mode, space, gw, gh, N, stats } = last, W = canvas.width, H = canvas.height, dpr = Math.max(1, W / Math.max(1, (canvas.clientWidth || W)));
+    const r = plotRect(mode, W, H, dpr);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null); gl.viewport(0, 0, W, H); gl.useProgram(P.show.p); gl.disable(gl.BLEND);
+    gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, mode === 'hist' ? hist.t : acc.t); gl.uniform1i(P.show.u.A, 0);
+    const u = P.show.u; gl.uniform1i(u.mode, modeIndex(mode)); gl.uniform4f(u.rect, r.x, r.y, r.w, r.h); gl.uniform1f(u.dpr, dpr);
+    // brightness: a column spread evenly over every level reads ~45%; a tight trace saturates
+    const k = mode === 'wave' ? 256 / gh * 0.6 : mode === 'parade' ? 256 / (3 * gh) * 0.6 * 3 : mode === 'vector' ? 65536 / N * 0.35 : 1;
+    gl.uniform1f(u.k, k);
+    const mx = Math.max(stats.max[0], stats.max[1], stats.max[2], 1); gl.uniform4f(u.hmax, mx, mx, mx, Math.max(stats.max[3], 1));
+    for (const n of ['bg', 'well', 'grid', 'gridHi', 'cY', 'cR', 'cG', 'cB', 'cSkin']) if (u[n]) gl.uniform3fv(u[n], hex3(style[n]));
+    if (u['tg[0]']) gl.uniform2fv(u['tg[0]'], new Float32Array(targets(space).flatMap(t => [t.x, t.y])));
+    const a = SKIN_DEG * Math.PI / 180; if (u.skin) gl.uniform2f(u.skin, Math.cos(a), Math.sin(a));
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+  }
+  // Test/automation hook: the raw accumulation (small textures only).
+  function read(kind = 'acc') {
+    const r = kind === 'hist' ? hist : acc; if (!r) return null;
+    const out = new Float32Array(r.w * r.h * 4); gl.bindFramebuffer(gl.FRAMEBUFFER, r.f); gl.readPixels(0, 0, r.w, r.h, gl.RGBA, gl.FLOAT, out); gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+    return { w: r.w, h: r.h, data: out };
+  }
+  function destroy() { free(grid); free(acc); free(hist); gl.deleteTexture(src); for (const p of Object.values(P)) gl.deleteProgram(p.p); const lose = gl.getExtension('WEBGL_lose_context'); if (lose) lose.loseContext(); }
+  return { ok: true, reason, accFormat: fblend ? 'float32' : 'float16', update, show, read, setStyle, destroy, get last() { return last; }, get mode() { return lastMode; }, get space() { return lastSpace; }, get lost() { return gl.isContextLost(); } };
+}
+// Readout numbers from the 256-bin histogram (R, G, B, Y per bin).
+function statsOf(h, N) {
+  const max = [0, 0, 0, 0], tot = [0, 0, 0, 0]; for (let i = 0; i < 256; i++) for (let c = 0; c < 4; c++) { const v = h[i * 4 + c]; tot[c] += v; if (v > max[c]) max[c] = v; }
+  const n = tot[3] || N || 1, pct = q => { let s = 0; for (let i = 0; i < 256; i++) { s += h[i * 4 + 3]; if (s >= q * n) return i / 255; } return 1; };
+  const lo = Math.max(h[0], h[1], h[2]) / n, hi = Math.max(h[255 * 4], h[255 * 4 + 1], h[255 * 4 + 2]) / n;
+  let mean = 0; for (let i = 0; i < 256; i++) mean += h[i * 4 + 3] * i / 255; mean /= n;
+  return { samples: n, max, low: pct(0.005), high: pct(0.995), median: pct(0.5), mean, clipLow: lo, clipHigh: hi };
+}
+
+return { MODES, SPACES, VR, SKIN_DEG, targets, vecPos, plotRect, labels, statsOf, createScopes, DEFAULT_STYLE };
 
 })();
 
@@ -9142,8 +9818,8 @@ const { createGpuEngine, GPU_STYLES } = __m_gpu_engine;
 const { createPipeline, createStage, renderThumb, renderProjectThumb, exportSize, frameCount, aspectRatio } = __m_renderer;
 const X = __m_exporter;
 
-// Extension seam: feature modules (20-*.js ...) call __m_shell.use({ id, name, icon, panel(host, api), tick(t, api) })
-// before boot. Each becomes an inspector tab + panel. `api` is the narrow surface a page may touch.
+// Extension seam: feature modules (20-*.js ...) call __m_shell.use({ id, name, icon, panel(host, api), tick(t, api, info), init(host, api), commands(api) })
+// before boot. Each becomes an inspector tab + panel (+ ⌘K entries). `api` is the narrow surface a page may touch.
 const extensions = [];
 function use(ext) { if (!ext || !ext.id || typeof ext.panel !== 'function') throw new Error('shell.use: { id, name, panel } required'); if (extensions.some(e => e.id === ext.id)) throw new Error('shell.use: duplicate page ' + ext.id); extensions.push(ext); }
 
@@ -9436,6 +10112,7 @@ function boot() {
     $('perf').textContent = `${rate}${stage.frameMs().toFixed(1)} ms${info && info.samples > 1 ? ` · ${info.samples}× blur` : ''}${eng}`;
     $('perf').title = `Main-thread render submission time. ${stage.playing && cadence.fps ? `Recent frame interval: ${cadence.meanMs.toFixed(1)} ms average, ${cadence.p95Ms.toFixed(1)} ms at the 95th percentile. ` : ''}The Shaders indicator shows internal preview resolution; exports use full resolution.`;
     $('lane').style.setProperty('--ph', u.toFixed(4));
+    for (const x of extensions) if (x.tick) { try { x.tick(t, extApi, info); } catch (e) { console.error(e); } }
     if (evolveOpen && now - lastEvo > 90) { lastEvo = now; drawChildren(t); }
     updateAnimatedRows(t);
     if (tab === 'audio') updateMeters(t);
@@ -9640,12 +10317,12 @@ function boot() {
   function keyState(path) { const ks = project.keys[path]; if (!ks || !ks.length) return 'none'; return T.keyIndexAt(ks, uNow()) >= 0 ? 'on' : 'anim'; }
   const isMapped = path => !!(project.audio && project.audio.maps.some(m => m.path === path));
   function shownValue(path) { if (!project.keys[path]) return T.getBase(project, path); const ev = T.evaluate(project, stage.time, null); return valueFromEval(ev, path); }
-  function valueFromEval(ev, path) { const p = T.parsePath(path); if (!p) return undefined; if (p.kind === 'F') return ev.finish[p.key]; const l = ev.layers.find(x => x.id === p.layer); if (!l) return undefined; return (p.scope === 'p' ? l.params : p.scope === 's' ? l.shared : l.comp)[p.key]; }
+  function valueFromEval(ev, path) { const p = T.parsePath(path); if (!p) return undefined; if (p.kind === 'F') return ev.finish[p.key]; if (p.kind === 'G') { const n = ev.finish.grade && ev.finish.grade.nodes.find(x => x.id === p.node); return n ? n.params[p.key] : undefined; } const l = ev.layers.find(x => x.id === p.layer); if (!l) return undefined; return (p.scope === 'p' ? l.params : p.scope === 's' ? l.shared : l.comp)[p.key]; }
   const rid = path => 'r_' + path.replace(/[^a-z0-9]/gi, '_');
   function rowHtml(path, opts = {}) {
     const s = T.schemaAt(project, path); if (!s) return '';
     const v = shownValue(path), id = rid(path), ks = keyState(path), locked = locks.has(path), mapped = isMapped(path);
-    const lockable = /^L:[^:]+:[ps]:/.test(path) && s.type !== 'text' && (s.mutate ?? 1) !== 0;
+    const lockable = /^(L:[^:]+:[ps]:|G:)/.test(path) && s.type !== 'text' && (s.mutate ?? 1) !== 0;
     const lock = lockable ? `<button class="ib lock" data-lock="${path}" aria-pressed="${locked}" aria-label="Lock ${s.label}" title="Lock from Mutate, Evolve and Randomize">${LOCK_SVG}</button>` : '<span></span>';
     const key = opts.nokey ? '<span></span>' : `<button class="ib kb" data-key="${path}" data-state="${ks}" aria-label="${ks === 'on' ? 'Remove key' : 'Add key'} for ${s.label}" title="${ks === 'none' ? 'Key this value at the playhead' : ks === 'on' ? 'Remove the key at the playhead' : 'Add a key at the playhead'}">${KEY_SVG}</button>`;
     const cls = `row${s.type === 'toggle' ? ' toggle' : ''}${locked ? ' locked' : ''}${mapped ? ' mapped' : ''}`;
@@ -9741,11 +10418,16 @@ function boot() {
     get project() { return project; }, commit: (next, msg) => commit(next, msg), live: next => live(next), toast: m => toast(m),
     stage, pipeline, T, C, K, A, media, $, get tab() { return tab; }, setTab: t => setTab(t), clone,
     X, get aspect() { return aspect; }, get hasAudio() { return !!player.buffer; }, exportCtx: () => exportCtx(), queue: __m_render_queue.getQueue(), downloads: () => getDownloads(), gpuStatus: () => K.gpuStatus(),
+    // Inspector building blocks so pages look and behave like the core panels (scrub labels, keys, locks, filled sliders).
+    rowHtml: (path, o) => rowHtml(path, o), group: (id, title, body, extra) => group(id, title, body, extra), openGroups, locks, toggleKey: p => toggleKey(p),
+    keyState: p => keyState(p), shownValue: p => shownValue(p), uNow: () => uNow(), paintRanges: r => paintRanges(r), refreshRows: () => refreshRowsOnly(), esc, store, reduce,
+    get history() { return { cursor, size: history.length }; },
   };
   extensions.forEach(ext => {
     const b = document.createElement('button'); b.setAttribute('role', 'tab'); b.dataset.tab = ext.id; b.setAttribute('aria-selected', 'false'); b.setAttribute('aria-controls', 'panel-' + ext.id);
     b.innerHTML = `${ext.icon || '<svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/></svg>'}<span>${ext.name}</span>`; $('tabs').appendChild(b);
     const sec = document.createElement('section'); sec.setAttribute('role', 'tabpanel'); sec.id = 'panel-' + ext.id; sec.dataset.panel = ext.id; sec.hidden = true; $('insp').appendChild(sec);
+    bindRows(sec); if (ext.init) { try { ext.init(sec, extApi); } catch (e) { console.error(e); } }
   });
   function renderPanel() { const ext = extensions.find(e => e.id === tab); if (ext) { try { ext.panel($('panel-' + ext.id), extApi); } catch (e) { console.error(e); $('panel-' + ext.id).textContent = 'This page failed to load.'; } paintRanges($('insp')); return; } if (tab === 'layer') renderLayerPanel(); else if (tab === 'colour') renderColourPanel(); else if (tab === 'finish') renderFinishPanel(); else if (tab === 'audio') renderAudioPanel(); else if (tab === 'looks') renderLooks(); else if (tab === 'kits') renderKitsPanel(); paintRanges($('insp')); }
 
@@ -10679,7 +11361,8 @@ function boot() {
     out.push(c('guides', 'Toggle safe-area guides', 'G', toggleGuides));
     out.push(c('aud', audOn ? 'Turn hover preview off' : 'Turn hover preview on', '', () => $('audBtn').click(), 'audition'));
     ASPECTS.forEach((a, i) => out.push(c('asp-' + a.id, `Aspect ratio ${a.label}`, String(i + 1), () => setAspect(a.id), 'format size')));
-    PAGE_NAMES.forEach(([t, n]) => out.push(c('page-' + t, `Open ${n}`, '', () => { showInsp(); setTab(t); }, 'inspector page')));
+    [...PAGE_NAMES, ...extensions.map(x => [x.id, x.name])].forEach(([t, n]) => out.push(c('page-' + t, `Open ${n}`, '', () => { showInsp(); setTab(t); }, 'inspector page')));
+    for (const x of extensions) if (x.commands) { try { for (const m of x.commands(extApi)) out.push(c(m.id, m.label, m.kbd || '', () => { showInsp(); m.run(); }, m.kw || '')); } catch (e) { console.error(e); } }
     [['dense', 'dense'], ['grid', 'thumbnails'], ['list', 'list']].forEach(([v, n]) => out.push(c('view-' + v, `Library view: ${n}`, '', () => setLibView(v), 'density')));
     [['auto', 'Auto'], ['high', 'Full'], ['draft', 'Half'], ['quarter', 'Quarter']].forEach(([v, n]) => out.push(c('q-' + v, `Preview quality: ${n}`, '', () => { $('quality').value = v; stage.setQuality(v); toast(`Preview ${n}`); }, 'resolution performance')));
     out.push(c('cache-toggle', stage.cacheOn ? 'Render cache: turn off' : 'Render cache: turn on', '', () => toggleCache(), 'performance scrub loop'));
@@ -10967,6 +11650,633 @@ function boot() {
 }
 
 return { boot, use };
+
+})();
+
+// ---- module: colour-page v1.0.0
+const __m_colour_page = (() => {
+// colour-page — the Grade page (DaVinci-style colour page in the inspector): GPU scopes strip, node graph editor
+// (keyboard-complete), colour wheels / curves / hue curves / qualifier / LUT / mixer inspectors built from the
+// shell's own rows (scrub labels, keys, locks), A/B bypass, and a LUT slot with .cube / .3dl / HALD import and
+// .cube export. UI only: every change goes through the shell's commit()/live(); rendering is the finisher's.
+const G = __m_grade, S = __m_scopes;
+const { clamp, mulberry32, mutate } = __m_engine_core;
+
+const ICON = '<svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/><path d="M12 3v3M21 12h-3M12 21v-3M3 12h3"/></svg>';
+const PREFS = 'motif5-grade-ui';
+const NODE_W = 72, NODE_H = 40, COL_GAP = 24, ROW_GAP = 8, PAD = 8, IO_W = 32;
+const st = { sel: 'levels', mode: 'wave', space: 'rec709', curveCh: 'y', hueCh: 's', lut: null, menu: false, lastScope: 0, liveMs: 0, scopeKey: '', exact: false, stats: null, lastMs: 0 };
+let api = null, scopes = null, els = null, ro = null, pendingInvalidate = false;
+try { const p = JSON.parse(localStorage.getItem(PREFS) || 'null'); if (p) { if (S.MODES.some(m => m.id === p.mode)) st.mode = p.mode; if (S.SPACES.some(s => s.id === p.space)) st.space = p.space; } } catch (e) { /* per-viewer convenience only */ }
+const savePrefs = () => { try { localStorage.setItem(PREFS, JSON.stringify({ mode: st.mode, space: st.space })); } catch (e) { /* per-viewer convenience only */ } };
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const fmt2 = v => (v >= 0 ? '+' : '−') + Math.abs(v).toFixed(2);
+
+// ---------- styles (tokens only, 8px grid) ----------
+const STYLE = `
+/* The shell's tab bar is a fixed 6-column grid; let extension pages add columns instead of wrapping over the inspector. */
+.tabs:has(> [data-tab=grade]){grid-template-columns:none;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr)}
+#panel-grade .gr-scopes{padding:var(--space-2) var(--space-3) var(--space-3);background:var(--surface-0);border-bottom:var(--hairline) solid var(--gap);display:flex;flex-direction:column;gap:var(--space-2)}
+#panel-grade .gr-bar{display:flex;gap:var(--space-2);align-items:center;justify-content:space-between;flex-wrap:wrap}
+#panel-grade .gr-bar .seg button{min-width:0;padding:0 var(--space-2)}
+#panel-grade .seg button[disabled]{opacity:.4;cursor:not-allowed;background:transparent;color:var(--text-muted)}
+#panel-grade .gr-scope{position:relative;margin:0;height:176px;border:var(--hairline) solid var(--line);border-radius:var(--radius-s);overflow:hidden;background:var(--stage)}
+#panel-grade .gr-scope canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+#panel-grade .gr-lbls{position:absolute;inset:0;pointer-events:none}
+#panel-grade .gr-lbls span{position:absolute;font:500 var(--text-xs)/16px var(--font-mono);color:var(--text-muted);white-space:nowrap;text-shadow:0 0 4px var(--stage),0 0 2px var(--stage)}
+#panel-grade .gr-msg{position:absolute;inset:0;margin:0;display:grid;place-items:center;padding:var(--space-4);text-align:center;font-size:var(--text-sm);line-height:20px;color:var(--text-muted)}
+#panel-grade .gr-readout{display:flex;flex-wrap:wrap;gap:0 var(--space-2);margin:0;min-height:16px}
+#panel-grade .gr-readout b{color:var(--text);font-weight:500}
+#panel-grade .gr-graph{position:relative;overflow-x:auto;overflow-y:hidden;background:var(--surface-0);border:var(--hairline) solid var(--line);border-radius:var(--radius-s);outline-offset:-2px}
+#panel-grade .gr-graph[data-bypass="true"] .gr-net{opacity:.5}
+#panel-grade .gr-net{position:relative}
+#panel-grade .gr-wires{position:absolute;left:0;top:0;pointer-events:none;overflow:visible}
+#panel-grade .gr-wires path{fill:none;stroke:var(--line-hover);stroke-width:1.5}
+#panel-grade .gr-wires path.mx{stroke:var(--data-dim);stroke-dasharray:4 4}
+#panel-grade .gr-wires circle{fill:var(--line-hover)}
+#panel-grade .gr-io{position:absolute;width:${IO_W}px;height:24px;display:grid;place-items:center;font:600 var(--text-xs)/16px var(--font-mono);color:var(--text-dim);border:var(--hairline) dashed var(--line-strong);border-radius:var(--radius-s)}
+#panel-grade .gr-node{position:absolute;width:${NODE_W}px;height:${NODE_H}px;display:grid;grid-template-columns:auto 1fr;grid-template-rows:16px 16px;align-content:center;column-gap:var(--space-1);padding:0 var(--space-2);border:var(--hairline) solid var(--line-strong);border-radius:var(--radius-m);background:var(--surface-2);color:var(--text);text-align:left;cursor:pointer;font:600 var(--text-xs)/16px var(--font-mono);transition:border-color var(--dur-fast),background var(--dur-fast)}
+#panel-grade .gr-node:hover{background:var(--surface-3);border-color:var(--line-hover)}
+#panel-grade .gr-node b{grid-row:1/3;align-self:center;font-weight:600;color:var(--text-dim)}
+#panel-grade .gr-node span{color:var(--text-strong)}
+#panel-grade .gr-node small{font:500 var(--text-xs)/16px var(--font-mono);color:var(--text-dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#panel-grade .gr-node[aria-current="true"]{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent);background:var(--accent-soft)}
+#panel-grade .gr-node[data-fixed="true"]{border-style:dashed}
+#panel-grade .gr-node[data-off="true"] span,#panel-grade .gr-node[data-off="true"] small{text-decoration:line-through;opacity:.6}
+#panel-grade .gr-node[data-warn="true"] small{color:var(--danger)}
+#panel-grade .gr-node i{position:absolute;right:4px;top:4px;width:4px;height:4px;border-radius:50%;background:var(--accent)}
+#panel-grade .gr-tools{display:flex;flex-wrap:wrap;gap:var(--space-2);position:relative}
+#panel-grade .gr-menu{position:absolute;z-index:5;top:calc(100% + var(--space-1));left:0;min-width:240px;margin:0;padding:var(--space-1);list-style:none;background:var(--surface-2);border:var(--hairline) solid var(--line-strong);border-radius:var(--radius-l);box-shadow:var(--shadow)}
+#panel-grade .gr-menu li{display:grid;gap:0;padding:var(--space-1) var(--space-2);border-radius:var(--radius-s);cursor:pointer;min-height:var(--target)}
+#panel-grade .gr-menu li b{font-weight:600;color:var(--text-strong);font-size:var(--text-sm)}
+#panel-grade .gr-menu li small{color:var(--text-muted);font-size:var(--text-xs);line-height:16px}
+#panel-grade .gr-menu li:hover,#panel-grade .gr-menu li:focus{background:var(--surface-3);outline:none}
+#panel-grade .gr-menu li:focus-visible{box-shadow:inset 0 0 0 var(--focus-w) var(--focus)}
+#panel-grade .gr-hint{margin:0;font-size:var(--text-xs);line-height:16px;color:var(--text-dim)}
+#panel-grade .gr-hint kbd{font:500 var(--text-xs)/16px var(--font-mono);color:var(--text-muted)}
+#panel-grade .gr-empty{display:flex;flex-direction:column;gap:var(--space-2);padding:var(--space-3);border:var(--hairline) dashed var(--line-strong);border-radius:var(--radius-s)}
+#panel-grade .gr-empty p{margin:0;font-size:var(--text-sm);line-height:20px;color:var(--text-muted)}
+#panel-grade .gr-alert{padding:var(--space-2) var(--space-3);border:var(--hairline) solid var(--danger);border-radius:var(--radius-s);background:var(--surface-0);color:var(--text);font-size:var(--text-sm);line-height:20px;margin:0}
+#panel-grade .gr-alert b{color:var(--danger)}
+#panel-grade .gr-ok{margin:0;font-size:var(--text-xs);line-height:16px;color:var(--text-muted)}
+#panel-grade .gr-wheels{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:var(--space-2);padding:var(--space-1) 0 var(--space-2)}
+#panel-grade .gr-wheel{display:flex;flex-direction:column;align-items:center;gap:var(--space-1);min-width:0}
+#panel-grade .gr-wheel .lbl{display:flex;align-items:center;gap:var(--space-1)}
+#panel-grade .gr-pad{position:relative;width:100%;max-width:80px;aspect-ratio:1;border-radius:50%;border:var(--hairline) solid var(--line-strong);touch-action:none;cursor:crosshair}
+#panel-grade .gr-pad::before{content:"";position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle,var(--surface-1) 0 22%,transparent 70%)}
+#panel-grade .gr-pad::after{content:"";position:absolute;left:50%;top:50%;width:4px;height:4px;margin:-2px;border-radius:50%;background:var(--text-dim)}
+#panel-grade .gr-pad i{position:absolute;z-index:1;width:12px;height:12px;margin:-6px 0 0 -6px;border-radius:50%;background:var(--text-strong);box-shadow:0 0 0 2px var(--surface-1);pointer-events:none}
+#panel-grade .gr-pad:focus-visible{outline:var(--focus-w) solid var(--focus);outline-offset:2px}
+#panel-grade .gr-wheel output{font:400 var(--text-xs)/16px var(--font-mono);color:var(--text-muted);white-space:nowrap}
+#panel-grade .gr-wheel .kb{width:var(--ib);height:var(--ib)}
+#panel-grade .gr-curve{position:relative;height:160px;margin:var(--space-1) 0;border:var(--hairline) solid var(--line-strong);border-radius:var(--radius-s);background:linear-gradient(var(--line) 0 0) 0 25%/100% 1px no-repeat,linear-gradient(var(--line) 0 0) 0 50%/100% 1px no-repeat,linear-gradient(var(--line) 0 0) 0 75%/100% 1px no-repeat,linear-gradient(90deg,var(--line) 0 0) 25% 0/1px 100% no-repeat,linear-gradient(90deg,var(--line) 0 0) 50% 0/1px 100% no-repeat,linear-gradient(90deg,var(--line) 0 0) 75% 0/1px 100% no-repeat,var(--surface-0);touch-action:none}
+#panel-grade .gr-curve svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+#panel-grade .gr-curve path{fill:none;stroke-width:2;vector-effect:non-scaling-stroke}
+#panel-grade .gr-curve path.ref{stroke:var(--line-strong);stroke-width:1;stroke-dasharray:3 3}
+#panel-grade .gr-pt{position:absolute;width:12px;height:12px;margin:-6px 0 0 -6px;padding:0;border-radius:50%;border:2px solid var(--surface-1);background:var(--text-strong);cursor:ns-resize}
+#panel-grade .gr-pt::after{content:"";position:absolute;inset:-6px}
+#panel-grade .gr-pt:focus-visible{outline:var(--focus-w) solid var(--focus);outline-offset:2px}
+#panel-grade .gr-huebar{height:8px;border-radius:var(--radius-s);margin:var(--space-1) 0}
+#panel-grade .gr-band{position:relative;height:16px;margin:var(--space-1) 0 var(--space-2);border-radius:var(--radius-s);overflow:hidden}
+#panel-grade .gr-band i{position:absolute;top:0;bottom:0;background:var(--scrim)}
+#panel-grade .gr-band b{position:absolute;top:0;bottom:0;border:var(--hairline) solid var(--text-strong);border-radius:var(--radius-s)}
+#panel-grade .gr-lutinfo{display:grid;grid-template-columns:auto 1fr;gap:0 var(--space-3);margin:0;font-size:var(--text-xs);line-height:16px}
+#panel-grade .gr-lutinfo dt{color:var(--text-dim)}#panel-grade .gr-lutinfo dd{margin:0;color:var(--text);font-family:var(--font-mono)}
+#panel-grade .gr-vis{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+`;
+function ensureCss() { if (typeof document === 'undefined' || document.getElementById('grade-css')) return; const s = document.createElement('style'); s.id = 'grade-css'; s.textContent = STYLE; document.head.appendChild(s); }
+
+// ---------- LUT persistence (IndexedDB, per browser; the project stores only { id, name, size }) ----------
+const lutDb = (() => {
+  let dbP = null;
+  const open = () => dbP || (dbP = new Promise(res => { try { if (typeof indexedDB === 'undefined') return res(null); const r = indexedDB.open('motif5-luts', 1); r.onupgradeneeded = () => r.result.createObjectStore('luts', { keyPath: 'id' }); r.onsuccess = () => res(r.result); r.onerror = () => res(null); } catch (e) { res(null); } }));
+  const tx = async (mode, fn) => { const d = await open(); if (!d) return null; return new Promise(res => { try { const t = d.transaction('luts', mode); const q = fn(t.objectStore('luts')); t.oncomplete = () => res(q ? q.result : true); t.onerror = () => res(null); t.onabort = () => res(null); } catch (e) { res(null); } }); };
+  const plain = l => ({ id: l.id, name: l.name, title: l.title, size1: l.size1, size3: l.size3, min1: l.min1.slice(), max1: l.max1.slice(), min3: l.min3.slice(), max3: l.max3.slice(), data1: l.data1 ? l.data1.slice() : null, data3: l.data3 ? l.data3.slice() : null, added: Date.now() });
+  const tried = new Set();
+  return {
+    put: l => tx('readwrite', s => s.put(plain(l))),
+    async ensure(id) { if (!id || G.getLut(id) || tried.has(id)) return false; tried.add(id); const r = await tx('readonly', s => s.get(id)); if (r && r.id === id && (r.data1 || r.data3)) { G.registerLut(r); return true; } return false; },
+    async prune(keep) { const all = await tx('readonly', s => s.getAll()); if (!all || all.length <= 24) return; const old = all.filter(r => !keep.has(r.id)).sort((a, b) => a.added - b.added).slice(0, all.length - 24); for (const r of old) await tx('readwrite', s => s.delete(r.id)); },
+  };
+})();
+function usedLuts(pr) { return pr && pr.grade ? pr.grade.nodes.filter(n => n.type === 'lut' && n.lut).map(n => n.lut.id) : []; }
+async function restoreLuts(pr) {
+  let any = false; for (const id of usedLuts(pr)) if (await lutDb.ensure(id)) any = true;
+  if (any) { if (api) { api.stage.invalidate(); if (api.tab === 'grade') render(); } else pendingInvalidate = true; }
+}
+
+// ---------- model helpers ----------
+const proj = () => api.project;
+const grade = () => proj().grade || null;
+const nodes = () => (grade() ? grade().nodes : []);
+const nodeIdx = id => nodes().findIndex(n => n.id === id);
+const selNode = () => (st.sel === 'levels' ? null : G.nodeById(grade(), st.sel));
+const applyOn = (pr, path, v) => (pr.keys[path] ? api.T.setKey(pr, path, api.uNow(), v) : api.T.setBase(pr, path, v));
+function edit(fn, msg) { const next = api.clone(proj()); if (!next.grade) next.grade = G.newGrade(); const r = fn(next.grade, next); api.commit(next, msg); return r; }
+function addNode(type, after = st.sel, extra = {}) {
+  if (nodes().length >= G.MAX_NODES) { api.toast(`A grade holds up to ${G.MAX_NODES} nodes`); return null; }
+  if (type === 'lut' && nodes().filter(n => n.type === 'lut').length >= G.MAX_LUT_NODES) { api.toast(`Up to ${G.MAX_LUT_NODES} LUT nodes per grade`); return null; }
+  let id = null;
+  edit((g) => { const n = G.newNode(type, g.nodes, extra); const i = after === 'levels' ? 0 : Math.max(0, g.nodes.findIndex(x => x.id === after) + 1) || g.nodes.length; g.nodes.splice(after == null ? g.nodes.length : i, 0, n); id = n.id; st.sel = id; if (!g.on && g.nodes.length === 1) g.on = true; }, `Added ${G.TYPES[type].name}`);
+  return id;
+}
+function removeNode(id) {
+  const i = nodeIdx(id); if (i < 0) return;
+  const label = G.nodeLabel(grade(), nodes()[i]);
+  edit(g => { g.nodes.splice(i, 1); }, `Removed ${label} · ${navigator.platform && /Mac/.test(navigator.platform) ? '⌘Z' : 'Ctrl Z'} to undo`);
+  const ns = nodes(); st.sel = ns.length ? ns[Math.min(i, ns.length - 1)].id : 'levels';
+}
+function moveNode(id, d) {
+  const i = nodeIdx(id), j = i + d; if (i < 0 || j < 0 || j >= nodes().length) return;
+  edit(g => { const [n] = g.nodes.splice(i, 1); g.nodes.splice(j, 0, n); }, d < 0 ? 'Node moved earlier' : 'Node moved later');
+}
+function resetNode(id) {
+  const n = G.nodeById(grade(), id); if (!n) return;
+  const next = api.clone(proj()); const m = G.nodeById(next.grade, id); m.params = { ...__m_engine_core.defaults(G.schemaFor(m.type)) };
+  for (const k of Object.keys(next.keys)) if (k.startsWith(`G:${id}:`)) delete next.keys[k];
+  api.commit(next, `${G.TYPES[n.type].name} reset`);
+}
+function resetAll() {
+  if (!nodes().length) return;
+  const next = api.clone(proj()); for (const n of next.grade.nodes) n.params = { ...__m_engine_core.defaults(G.schemaFor(n.type)) };
+  for (const k of Object.keys(next.keys)) if (k.startsWith('G:')) delete next.keys[k];
+  api.commit(next, 'Grade reset · node structure kept');
+}
+function vary() {
+  if (!nodes().length) { api.toast('Add a node to vary'); return; }
+  const next = api.clone(proj()); const rng = mulberry32((Date.now() ^ 0x5bd1e995) >>> 0); let changed = 0;
+  for (const n of next.grade.nodes) {
+    const lk = new Set(); for (const p of api.locks) if (p.startsWith(`G:${n.id}:`)) lk.add(p.split(':')[2]); for (const p of Object.keys(next.keys)) if (p.startsWith(`G:${n.id}:`)) lk.add(p.split(':')[2]);
+    const r = mutate(n.params, G.schemaFor(n.type), 0.35, lk, rng); n.params = r.values; changed += r.changed.length;
+  }
+  api.commit(next, changed ? `Varied ${changed} grade values · locked and keyed values kept` : 'Everything is locked or keyed');
+}
+function setBypass(off) { if (!nodes().length) return; edit(g => { g.on = !off; }, off ? 'B · grade bypassed' : 'A · grade on'); }
+function togglePar(id) { const i = nodeIdx(id); if (i <= 0) { api.toast('The first node runs in series'); return; } const n = nodes()[i]; if (n.type === 'mixer') { api.toast('A mixer always runs in series'); return; } edit(g => { g.nodes[i].par = !g.nodes[i].par; }, n.par ? 'Node runs in series' : 'Node runs in parallel with the one before'); }
+function toggleOn(id) { const n = G.nodeById(grade(), id); if (!n) return; const path = `G:${id}:on`; const next = applyOn(proj(), path, !n.params.on); api.commit(next, n.params.on ? 'Node disabled' : 'Node enabled'); }
+
+// ---------- graph layout ----------
+function columns() {
+  const cols = [[{ id: 'levels' }]];
+  nodes().forEach((n, i) => { if (n.par && i > 0) cols[cols.length - 1].push(n); else cols.push([n]); });
+  return cols;
+}
+function layout() {
+  const cols = columns(), mixers = nodes().some(n => n.type === 'mixer'), top = PAD + (mixers ? 16 : 0);
+  const rows = Math.max(...cols.map(c => c.length)), H = top + rows * NODE_H + (rows - 1) * ROW_GAP + PAD;
+  const pos = new Map(); const x0 = PAD + IO_W + COL_GAP;
+  cols.forEach((c, ci) => c.forEach((n, ri) => { const cy = top + (rows * NODE_H + (rows - 1) * ROW_GAP) / 2 - (c.length * NODE_H + (c.length - 1) * ROW_GAP) / 2; pos.set(n.id, { x: x0 + ci * (NODE_W + COL_GAP), y: cy + ri * (NODE_H + ROW_GAP), col: ci, row: ri }); }));
+  const W = x0 + cols.length * (NODE_W + COL_GAP) + IO_W + PAD;
+  return { cols, pos, W, H, top, mid: top + (rows * NODE_H + (rows - 1) * ROW_GAP) / 2 };
+}
+function graphHtml() {
+  const L = layout(), g = grade(), wires = [], ns = nodes();
+  const mid = L.mid, inX = PAD + IO_W, outX = L.W - PAD - IO_W;
+  let prevOut = { x: inX, y: mid };
+  L.cols.forEach((c, ci) => {
+    const xIn = PAD + IO_W + COL_GAP + ci * (NODE_W + COL_GAP), xOut = xIn + NODE_W;
+    const jIn = { x: xIn - COL_GAP / 2, y: mid }, jOut = { x: xOut + COL_GAP / 2, y: mid };
+    wires.push(`M${prevOut.x} ${prevOut.y}H${c.length > 1 ? jIn.x : xIn}`);
+    for (const n of c) { const p = L.pos.get(n.id), y = p.y + NODE_H / 2; if (c.length > 1) { wires.push(`M${jIn.x} ${mid}C${jIn.x + 6} ${mid} ${jIn.x + 6} ${y} ${xIn} ${y}`); wires.push(`M${xOut} ${y}C${jOut.x - 6} ${y} ${jOut.x - 6} ${mid} ${jOut.x} ${mid}`); } }
+    prevOut = c.length > 1 ? jOut : { x: xOut, y: mid };
+  });
+  wires.push(`M${prevOut.x} ${prevOut.y}H${outX}`);
+  const mx = ns.filter(n => n.type === 'mixer').map(n => { const p = L.pos.get(n.id), s = n.src === 'in' ? { x: PAD + IO_W / 2, y: mid - 12 } : (() => { const q = L.pos.get(n.src); return q ? { x: q.x + NODE_W / 2, y: q.y } : null; })(); if (!s) return ''; const ty = p.y, tx = p.x + NODE_W / 2, top = PAD + 2; return `<path class="mx" d="M${s.x} ${s.y}C${s.x} ${top} ${tx} ${top} ${tx} ${ty}"/>`; }).join('');
+  const dots = L.cols.filter(c => c.length > 1).map(c => { const p = L.pos.get(c[0].id); return `<circle cx="${p.x + NODE_W + COL_GAP / 2}" cy="${mid}" r="3"/>`; }).join('');
+  const nodeBtn = (n, i) => {
+    const p = L.pos.get(n.id), fixed = n.id === 'levels', t = fixed ? null : G.TYPES[n.type];
+    const f = proj().finish, levelsMod = fixed && (f.black > 0.001 || f.white < 0.999 || Math.abs(f.gamma - 1) > 0.001 || f.gmap > 0.001);
+    const off = !fixed && !n.params.on, warn = !fixed && n.type === 'lut' && !(n.lut && G.getLut(n.lut.id));
+    const keyed = Object.keys(proj().keys).some(k => k.startsWith(fixed ? 'F:' : `G:${n.id}:`) && (!fixed || /^F:(black|white|gamma|gmap)$/.test(k)));
+    const sub = fixed ? 'Finish' : off ? 'off' : n.type === 'lut' ? (n.lut ? n.lut.name : 'empty') : n.type === 'mixer' ? (n.src === 'in' ? 'over IN' : `over ${nodeIdx(n.src) + 1}`) : `${n.par ? '∥ ' : ''}${Math.round(n.params.mix * 100)}%`;
+    const label = fixed ? 'Levels from Finish, node 0' : `Node ${i + 1}, ${t.name}${n.par ? ', parallel' : ''}${off ? ', disabled' : ''}${warn ? ', LUT missing' : ''}`;
+    return `<button type="button" class="gr-node" data-node="${n.id}" data-fk="node:${n.id}" tabindex="${st.sel === n.id ? 0 : -1}" aria-current="${st.sel === n.id}" aria-label="${esc(label)}" data-off="${off}" data-warn="${warn}" data-fixed="${fixed}" style="left:${p.x}px;top:${p.y}px" title="${esc(fixed ? 'Black point, white point, gamma and gradient map from the Finish page' : t.hint)}"><b>${fixed ? 0 : i + 1}</b><span>${fixed ? 'LEV' : t.short}</span><small>${esc(sub)}</small>${keyed || levelsMod ? '<i aria-hidden="true"></i>' : ''}</button>`;
+  };
+  return `<div class="gr-graph" id="grGraph" role="group" aria-label="Node graph, ${ns.length} node${ns.length === 1 ? '' : 's'} after Levels" aria-describedby="grGraphHint" data-bypass="${!!(g && !g.on)}">
+    <div class="gr-net" style="width:${L.W}px;height:${L.H}px">
+      <svg class="gr-wires" width="${L.W}" height="${L.H}" viewBox="0 0 ${L.W} ${L.H}" aria-hidden="true"><path d="${wires.join('')}"/>${mx}${dots}</svg>
+      <span class="gr-io" style="left:${PAD}px;top:${mid - 12}px" aria-hidden="true">IN</span>
+      ${nodeBtn({ id: 'levels' }, -1)}${ns.map(nodeBtn).join('')}
+      <span class="gr-io" style="left:${outX}px;top:${mid - 12}px" aria-hidden="true">OUT</span>
+    </div></div>`;
+}
+function menuHtml() {
+  return `<ul class="gr-menu" id="grMenu" role="menu" aria-label="Add node">${G.TYPE_IDS.map((t, i) => `<li role="menuitem" tabindex="${i ? -1 : 0}" data-add="${t}"><b>${G.TYPES[t].name}</b><small>${G.TYPES[t].hint}</small></li>`).join('')}</ul>`;
+}
+
+// ---------- wheels ----------
+// Puck (x, y) in the unit disc ↔ zero-luma RGB offsets along Rec.709 Cb / Cr, oriented like the vectorscope.
+const U = [0, -0.1873, 1.8556], V = [1.5748, -0.4681, 0], KW = [0.2126, 0.7152, 0.0722];
+const WHEELS = [{ k: 'lift', l: 'Lift', a: 0.25 }, { k: 'gamma', l: 'Gamma', a: 0.25 }, { k: 'gain', l: 'Gain', a: 0.25 }, { k: 'off', l: 'Offset', a: 0.25 }];
+const wheelPaths = (id, k) => ['R', 'G', 'B'].map(c => `G:${id}:${k}${c}`);
+function wheelXY(rgb, a) { const s = a / 1.8556, y0 = KW[0] * rgb[0] + KW[1] * rgb[1] + KW[2] * rgb[2]; return { x: clamp(((rgb[2] - y0) / 1.8556) / s, -1.2, 1.2), y: clamp(((rgb[0] - y0) / 1.5748) / s, -1.2, 1.2), y0 }; }
+function xyRgb(x, y, a, y0 = 0) { const s = a / 1.8556; return [0, 1, 2].map(i => +(y0 + (x * U[i] + y * V[i]) * s).toFixed(4)); }
+function wheelGradient() {
+  const stops = S.targets('rec709').map(t => ({ a: ((90 - Math.atan2(t.y, t.x) * 180 / Math.PI) % 360 + 360) % 360, id: t.id })).sort((p, q) => p.a - q.a);
+  const hue = { R: 25, Yl: 100, G: 145, Cy: 200, B: 265, Mg: 330 };
+  const list = stops.map(s => `oklch(0.62 0.13 ${hue[s.id]}) ${s.a.toFixed(1)}deg`); const f = stops[0];
+  return `conic-gradient(from 0deg, ${list.join(', ')}, oklch(0.62 0.13 ${hue[f.id]}) ${(f.a + 360).toFixed(1)}deg)`;
+}
+function wheelHtml(n, w) {
+  const ps = wheelPaths(n.id, w.k), rgb = ps.map(p => api.shownValue(p)), xy = wheelXY(rgb, w.a);
+  const ks = ps.map(p => api.keyState(p)), kst = ks.every(x => x === 'on') ? 'on' : ks.some(x => x !== 'none') ? 'anim' : 'none';
+  const vt = `Red ${fmt2(rgb[0])}, green ${fmt2(rgb[1])}, blue ${fmt2(rgb[2])}`;
+  return `<div class="gr-wheel"><div class="lbl">${w.l}<button class="ib kb" data-grkey="${ps.join(',')}" data-state="${kst}" aria-label="Key ${w.l} colour balance" title="Key this wheel at the playhead"><svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M8 1.8 14.2 8 8 14.2 1.8 8Z" fill="currentColor" fill-opacity=".18" stroke="currentColor" stroke-width="1.5"/></svg></button></div>
+    <div class="gr-pad" role="slider" tabindex="0" data-wheel="${w.k}" data-fk="wheel:${n.id}:${w.k}" aria-label="${w.l} colour balance" aria-valuetext="${vt}" aria-describedby="grWheelHint" style="background:${wheelGradient()}"><i style="left:${(50 + xy.x * 50).toFixed(2)}%;top:${(50 - xy.y * 50).toFixed(2)}%"></i></div>
+    <output aria-hidden="true">${rgb.map(v => (v * 100).toFixed(0)).join(' ')}</output></div>`;
+}
+function setWheel(pr, id, k, x, y) {
+  const w = WHEELS.find(q => q.k === k), ps = wheelPaths(id, k); const r = Math.hypot(x, y); if (r > 1) { x /= r; y /= r; }
+  const cur = ps.map(p => api.T.getBase(pr, p)), y0 = KW[0] * cur[0] + KW[1] * cur[1] + KW[2] * cur[2];
+  const rgb = xyRgb(x, y, w.a, Math.abs(x) + Math.abs(y) < 1e-6 ? 0 : y0); ps.forEach((p, i) => { pr = applyOn(pr, p, rgb[i]); }); return pr;
+}
+function paintWheel(el, pr) {
+  const n = selNode(); if (!n) return; const w = WHEELS.find(q => q.k === el.dataset.wheel), ps = wheelPaths(n.id, w.k), rgb = ps.map(p => api.T.getBase(pr, p)), xy = wheelXY(rgb, w.a);
+  el.firstElementChild.style.left = (50 + xy.x * 50).toFixed(2) + '%'; el.firstElementChild.style.top = (50 - xy.y * 50).toFixed(2) + '%';
+  el.setAttribute('aria-valuetext', `Red ${fmt2(rgb[0])}, green ${fmt2(rgb[1])}, blue ${fmt2(rgb[2])}`);
+  const out = el.nextElementSibling; if (out) out.textContent = rgb.map(v => (v * 100).toFixed(0)).join(' ');
+}
+
+// ---------- curves (same maths as gCurve in the shader) ----------
+function curveAt(x, y) {
+  const d = [y[1] - y[0], y[2] - y[1], y[3] - y[2], y[4] - y[3]];
+  const m = [d[0], d[0] * d[1] <= 0 ? 0 : (d[0] + d[1]) / 2, d[1] * d[2] <= 0 ? 0 : (d[1] + d[2]) / 2, d[2] * d[3] <= 0 ? 0 : (d[2] + d[3]) / 2, d[3]];
+  const t = x * 4; if (t <= 0) return y[0] + m[0] * t; if (t >= 4) return y[4] + m[4] * (t - 4);
+  const i = Math.min(3, Math.floor(t)), f = t - i, f2 = f * f, f3 = f2 * f;
+  return (2 * f3 - 3 * f2 + 1) * y[i] + (f3 - 2 * f2 + f) * m[i] + (3 * f2 - 2 * f3) * y[i + 1] + (f3 - f2) * m[i + 1];
+}
+const cyc = (h, v) => { const t = ((h % 1) + 1) % 1 * 6, i = Math.floor(t) % 6, f = t - Math.floor(t), s = f * f * (3 - 2 * f); return v[i] + (v[(i + 1) % 6] - v[i]) * s; };
+const CURVE_CH = [{ id: 'y', l: 'Luma', c: 'var(--text-strong)' }, { id: 'r', l: 'Red', c: 'var(--danger)' }, { id: 'g', l: 'Green', c: 'var(--ok)' }, { id: 'b', l: 'Blue', c: 'var(--clip)' }];
+// Generic point editor: xs (0..1), paths, value range lo..hi, eval(x, values) → value for the drawn line.
+function editorHtml(kind, xs, paths, lo, hi, evalFn, color, bg, names) {
+  const vals = paths.map(p => api.shownValue(p)), yy = v => (1 - (v - lo) / (hi - lo)) * 100;
+  let d = ''; for (let i = 0; i <= 96; i++) { const x = i / 96, v = clamp(evalFn(x, vals), lo - (hi - lo) * 0.1, hi + (hi - lo) * 0.1); d += `${i ? 'L' : 'M'}${(x * 100).toFixed(2)} ${yy(v).toFixed(2)}`; }
+  const ref = kind === 'curve' ? 'M0 100L100 0' : `M0 ${yy((lo + hi) / 2)}L100 ${yy((lo + hi) / 2)}`;
+  return `<div class="gr-curve" data-editor="${kind}"${bg ? ` style="background:${bg}"` : ''}><svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><path class="ref" d="${ref}"/><path d="${d}" style="stroke:${color}"/></svg>
+    ${paths.map((p, i) => `<button type="button" class="gr-pt" role="slider" data-pt="${p}" data-lo="${lo}" data-hi="${hi}" data-fk="pt:${p}" aria-label="${esc(names[i])}" aria-valuemin="${lo}" aria-valuemax="${hi}" aria-valuenow="${vals[i].toFixed(3)}" aria-valuetext="${esc(names[i])} ${vals[i].toFixed(2)}" style="left:${(xs[i] * 100).toFixed(2)}%;top:${yy(vals[i]).toFixed(2)}%"></button>`).join('')}</div>`;
+}
+
+// ---------- inspectors ----------
+const R = (path, o) => api.rowHtml(path, o);
+function commonRows(n) { return R(`G:${n.id}:on`) + R(`G:${n.id}:mix`); }
+function nodeTools(n) {
+  const i = nodeIdx(n.id);
+  return `<div class="btnrow"><button class="btn sm" data-gr="par" aria-pressed="${!!n.par}"${i === 0 || n.type === 'mixer' ? ' disabled' : ''} title="Run in parallel with the node before (P)">Parallel</button><button class="btn sm" data-gr="left"${i <= 0 ? ' disabled' : ''} aria-label="Move node earlier" title="Alt ←">← Earlier</button><button class="btn sm" data-gr="right"${i >= nodes().length - 1 ? ' disabled' : ''} aria-label="Move node later" title="Alt →">Later →</button><button class="btn sm" data-gr="reset-node">Reset node</button><button class="btn sm" data-gr="del" title="Delete">Delete</button></div>`;
+}
+function inspectorHtml() {
+  if (st.sel === 'levels') {
+    const F = k => R(`F:${k}`);
+    return api.group('gr-node', 'Node 0 · Levels', `<p class="info">The Finish page's grade controls. They run before the node graph and travel with it into an exported .cube.</p>${F('black')}${F('white')}${F('gamma')}${F('gmap')}${F('gmapMode')}`);
+  }
+  const n = selNode(); if (!n) { st.sel = 'levels'; return inspectorHtml(); }
+  const t = G.TYPES[n.type], i = nodeIdx(n.id), P = k => R(`G:${n.id}:${k}`);
+  let body = '';
+  if (n.type === 'primary') {
+    body = `<div class="gr-wheels">${WHEELS.map(w => wheelHtml(n, w)).join('')}</div><p class="gr-hint" id="grWheelHint">Drag a wheel or use arrow keys (Shift ×5, Alt fine). Delete re-centres. Master values below.</p>
+      ${P('liftY')}${P('gammaY')}${P('gainY')}${P('offY')}${P('contrast')}${P('pivot')}${P('sat')}${P('hue')}`
+      + api.group('gr-ch', 'Channels', ['lift', 'gamma', 'gain', 'off'].map(k => P(k + 'R') + P(k + 'G') + P(k + 'B')).join(''));
+  } else if (n.type === 'curves') {
+    const ch = CURVE_CH.find(c => c.id === st.curveCh) || CURVE_CH[0], ps = [0, 1, 2, 3, 4].map(k => `G:${n.id}:${ch.id}${k}`);
+    body = `<div class="seg" role="radiogroup" aria-label="Curve channel">${CURVE_CH.map(c => `<button role="radio" data-gr="curve-ch" data-v="${c.id}" aria-checked="${c.id === ch.id}" tabindex="${c.id === ch.id ? 0 : -1}">${c.l}</button>`).join('')}</div>
+      ${editorHtml('curve', [0, 0.25, 0.5, 0.75, 1], ps, 0, 1, (x, v) => curveAt(x, v), ch.c, '', [0, 25, 50, 75, 100].map(p => `${ch.l} curve at ${p}%`))}
+      <p class="gr-hint">Drag points or focus one and use ↑ ↓ (Shift ×5). The luma curve applies to all channels first.</p>` + api.group('gr-pts', `${ch.l} points`, ps.map(p => R(p)).join(''));
+  } else if (n.type === 'huesat') {
+    const sat = st.hueCh === 's', ks = [0, 1, 2, 3, 4, 5].map(k => `G:${n.id}:${sat ? 's' : 'h'}${k}`);
+    // knots sit at the centre of each sixth (x = k/6 + 1/12), so the band starts at hue −30°
+    const hueBg = `linear-gradient(90deg,${[0, 30, 90, 150, 210, 270, 330, 360].map(h => `hsl(${h - 30} 60% 45% / .22) ${(h / 3.6).toFixed(1)}%`).join(',')}),var(--surface-0)`;
+    body = `<div class="seg" role="radiogroup" aria-label="Hue curve">${[['s', 'Hue vs sat'], ['h', 'Hue vs hue']].map(([v, l]) => `<button role="radio" data-gr="hue-ch" data-v="${v}" aria-checked="${v === st.hueCh}" tabindex="${v === st.hueCh ? 0 : -1}">${l}</button>`).join('')}</div>
+      ${editorHtml('hue', [0, 1, 2, 3, 4, 5].map(k => k / 6 + 1 / 12), ks, sat ? 0 : -60, sat ? 2 : 60, (x, v) => cyc(x - 1 / 12, v), 'var(--accent)', hueBg, G.HUES.map(h => `${sat ? 'Saturation' : 'Hue shift'} for ${h}`))}
+      <p class="gr-hint">Six hue points: red, yellow, green, cyan, blue, magenta. Greys are never affected.</p>` + api.group('gr-pts', sat ? 'Saturation points' : 'Hue points', ks.map(p => R(p)).join(''));
+  } else if (n.type === 'qualifier') {
+    const p = n.params, c = (p.hue % 360) / 3.6, w = Math.min(100, p.width / 3.6), a = c - w / 2, b = c + w / 2;
+    // selected hue range (may wrap) outlined; the rest of the band dimmed
+    const sel = w >= 100 ? [[0, 100]] : a < 0 ? [[0, b], [100 + a, 100]] : b > 100 ? [[0, b - 100], [a, 100]] : [[a, b]];
+    const dim = []; let x = 0; for (const [l, r] of sel.sort((u, v) => u[0] - v[0])) { if (l > x) dim.push([x, l]); x = Math.max(x, r); } if (x < 100) dim.push([x, 100]);
+    const seg = (r, cls) => `<${cls} style="left:${r[0].toFixed(2)}%;width:${(r[1] - r[0]).toFixed(2)}%"></${cls}>`;
+    body = `<div class="subhead"><span>Key</span></div><div class="gr-band" aria-hidden="true" style="background:linear-gradient(90deg,${[0, 60, 120, 180, 240, 300, 360].map(h => `hsl(${h} 70% 50%) ${(h / 3.6).toFixed(1)}%`).join(',')})">${dim.map(r => seg(r, 'i')).join('')}${sel.map(r => seg(r, 'b')).join('')}</div>
+      ${P('hue')}${P('width')}${P('satLo')}${P('satHi')}${P('lumLo')}${P('lumHi')}${P('soft')}${P('blur')}${P('invert')}
+      ${p.blur > 0.001 && nodes().filter(x => x.type === 'qualifier' && x.params.blur > 0.001).indexOf(n) >= G.MAX_BLUR_KEYS ? `<p class="note warn">Only the first ${G.MAX_BLUR_KEYS} qualifiers get a blurred key; this one stays sharp.</p>` : ''}
+      <div class="subhead"><span>Inside the key</span></div>${P('qHue')}${P('qSat')}${P('qGain')}${P('qOff')}`;
+  } else if (n.type === 'lut') {
+    const l = n.lut && G.getLut(n.lut.id), list = G.listLuts();
+    body = `${n.lut && !l ? `<p class="gr-alert" role="alert"><b>LUT missing.</b> ${esc(n.lut.name)} isn't stored in this browser. Import it again to apply it; until then this node passes the image through.</p>` : ''}
+      ${!n.lut ? '<div class="gr-empty"><p>This node has no LUT yet. Import a .cube, .3dl or HALD .png into it.</p></div>' : ''}
+      ${l ? `<dl class="gr-lutinfo"><dt>File</dt><dd>${esc(l.name)}</dd>${l.title ? `<dt>Title</dt><dd>${esc(l.title)}</dd>` : ''}<dt>Table</dt><dd>${[l.size1 ? `1D ${l.size1}` : '', l.size3 ? `3D ${l.size3}³` : ''].filter(Boolean).join(' + ')}</dd><dt>Domain</dt><dd>${l.min3.map(v => +v.toFixed(3)).join(' ')} → ${l.max3.map(v => +v.toFixed(3)).join(' ')}</dd></dl>` : ''}
+      <div class="row"><label for="grLutPick">Table</label><span></span><span></span><span></span><select id="grLutPick" data-gr="lut-pick"><option value="">${list.length ? 'Choose an imported LUT' : 'No LUTs imported yet'}</option>${list.map(x => `<option value="${x.id}"${n.lut && n.lut.id === x.id ? ' selected' : ''}>${esc(x.name)} · ${x.size3 ? x.size3 + '³' : x.size1}</option>`).join('')}</select></div>
+      <div class="btnrow"><button class="btn sm" data-gr="import">Import into this node…</button></div>${P('interp')}`;
+  } else if (n.type === 'mixer') {
+    const opts = [{ v: 'in', l: 'Grade input (IN)' }, ...nodes().slice(0, i).map((m, j) => ({ v: m.id, l: `Node ${j + 1} · ${G.TYPES[m.type].name}` }))];
+    body = `<div class="row"><label for="grMixSrc">Base</label><span></span><span></span><span></span><select id="grMixSrc" data-gr="mix-src">${opts.map(o => `<option value="${o.v}"${o.v === n.src ? ' selected' : ''}>${esc(o.l)}</option>`).join('')}</select></div>${P('blend')}
+      <p class="info">Blends the chain so far over the base. Normal at 50% opacity is a half-strength grade.</p>`;
+  }
+  return api.group('gr-node', `Node ${i + 1} · ${t.name}`, `${commonRows(n)}${body}${nodeTools(n)}`);
+}
+function lutSlotHtml() {
+  const m = st.lut;
+  const state = !m ? `<p class="gr-ok">Import a .cube (1D, 3D or shaper + 3D), .3dl or HALD .png. Files stay in this browser. Export bakes Levels and every node into a 33³ .cube.</p>`
+    : m.kind === 'loading' ? `<p class="gr-ok" role="status">Reading ${esc(m.name)}…</p>`
+    : m.kind === 'error' ? `<p class="gr-alert" role="alert"><b>Couldn’t use ${esc(m.name)}.</b> ${esc(m.text)}</p>`
+    : `<p class="gr-ok" role="status">${esc(m.text)}</p>`;
+  return api.group('gr-lut', 'LUT', `${state}<div class="btnrow"><button class="btn sm" data-gr="import">${m && m.kind === 'error' ? 'Choose another file…' : 'Import LUT…'}</button><button class="btn sm" data-gr="export"${api.pipeline.finisher.ok ? '' : ' disabled title="Export needs WebGL2"'}>Export .cube</button></div>`);
+}
+function headHtml() {
+  const g = grade(), ns = nodes(), on = !!(g && g.on), keyed = Object.keys(proj().keys).filter(k => k.startsWith('G:')).length;
+  const status = !ns.length ? 'No nodes yet. Levels from Finish runs first; add nodes after it.' : !on ? '<b>B · bypassed.</b> The stage, scopes and exports show the image without the node grade. Press B to compare.' : `${ns.length} node${ns.length > 1 ? 's' : ''}${keyed ? ` · ${keyed} keyed value${keyed > 1 ? 's' : ''}` : ''}${ns.some(n => n.type === 'lut' && n.lut && !G.getLut(n.lut.id)) ? ' · <b>a LUT is missing</b>' : ''} · B compares`;
+  const gl = api.pipeline.finisher.ok ? (api.pipeline.finisher.grader && api.pipeline.finisher.grader.error ? `<p class="gr-alert" role="alert"><b>The grade shader failed.</b> The stage shows the ungraded image. ${esc(api.pipeline.finisher.grader.error.slice(0, 160))}</p>` : '') : '<p class="gr-alert" role="alert"><b>WebGL2 is unavailable.</b> You can build the graph, but it only renders where WebGL2 is on.</p>';
+  return `<div class="panel-head"><div class="ph-row"><div><div class="lbl">Whole frame · after Finish</div><h1>Grade</h1></div>
+    <div class="seg" role="radiogroup" aria-label="Compare graded and ungraded">${[['a', 'A · Grade', on], ['b', 'B · Bypass', !on && ns.length]].map(([v, l, c]) => `<button role="radio" data-gr="ab" data-v="${v}" aria-checked="${!!c}" tabindex="${c || (v === 'a' && !ns.length) ? 0 : -1}"${ns.length ? '' : ' disabled'}>${l}</button>`).join('')}</div></div>
+    <p>${status}</p></div>${gl}`;
+}
+function graphGroupHtml() {
+  const empty = !nodes().length ? `<div class="gr-empty"><p>Start with Primaries for balance and contrast, or bring in a LUT.</p><div class="btnrow"><button class="btn sm accent" data-gr="add-primary">+ Primaries</button><button class="btn sm" data-gr="import">Import LUT…</button></div></div>` : '';
+  return api.group('gr-graph', 'Nodes', `${graphHtml()}
+    <div class="gr-tools"><button class="btn sm" id="grAdd" data-gr="menu" aria-haspopup="menu" aria-expanded="${st.menu}" aria-controls="grMenu">+ Add node</button><button class="btn sm" data-gr="vary" title="Vary unlocked, unkeyed grade values"${nodes().length ? '' : ' disabled'}>Vary</button><button class="btn sm" data-gr="reset-all"${nodes().length ? '' : ' disabled'}>Reset all</button>${st.menu ? menuHtml() : ''}</div>
+    <p class="gr-hint" id="grGraphHint"><kbd>←</kbd><kbd>→</kbd> move · <kbd>↑</kbd><kbd>↓</kbd> parallel · <kbd>Enter</kbd> edit · <kbd>N</kbd> add · <kbd>Del</kbd> remove · <kbd>D</kbd> disable · <kbd>P</kbd> parallel · <kbd>Alt</kbd>+arrows reorder</p>${empty}`, nodes().length ? ` <span class="count">${nodes().length}</span>` : '');
+}
+
+// ---------- scopes ----------
+function buildScopes(host) {
+  const wrap = document.createElement('div'); wrap.className = 'gr-scopes';
+  wrap.innerHTML = `<div class="gr-bar"><div class="seg" role="radiogroup" aria-label="Scope" id="grMode">${S.MODES.map(m => `<button role="radio" data-gr="mode" data-v="${m.id}">${m.l}</button>`).join('')}</div>
+    <div class="seg" role="radiogroup" aria-label="Interpret colour as" id="grSpace">${S.SPACES.map(s => `<button role="radio" data-gr="space" data-v="${s.id}" aria-label="${s.l}" title="Measure in ${s.l} (luma weights and gamut)">${s.id === 'p3' ? 'P3' : '709'}</button>`).join('')}</div></div>
+    <figure class="gr-scope" role="img" aria-describedby="grReadout"><canvas></canvas><div class="gr-lbls" aria-hidden="true"></div><p class="gr-msg" hidden></p></figure>
+    <p class="readout gr-readout" id="grReadout"></p>`;
+  host.appendChild(wrap);
+  const canvas = wrap.querySelector('canvas'), fig = wrap.querySelector('figure');
+  els = { wrap, canvas, fig, lbls: wrap.querySelector('.gr-lbls'), msg: wrap.querySelector('.gr-msg'), readout: wrap.querySelector('#grReadout') };
+  scopes = S.createScopes(canvas);
+  if (scopes.ok) {
+    const cs = getComputedStyle(document.documentElement), tok = n => cs.getPropertyValue(n).trim();
+    scopes.setStyle({ bg: tok('--stage') || undefined, well: tok('--surface-0') || undefined, grid: tok('--line-strong') || undefined, gridHi: tok('--line-hover') || undefined, cY: tok('--data') || undefined, cSkin: tok('--accent') || undefined });
+  } else { els.msg.hidden = false; els.msg.textContent = scopes.reason; }
+  ro = new ResizeObserver(() => sizeScope()); ro.observe(fig);
+}
+function sizeScope() {
+  if (!els) return; const r = els.fig.getBoundingClientRect(); if (!r.width) return;
+  const d = Math.min(2, (typeof devicePixelRatio === 'number' && devicePixelRatio) || 1), w = Math.round(r.width * d), h = Math.round(r.height * d);
+  if (els.canvas.width !== w || els.canvas.height !== h) { els.canvas.width = w; els.canvas.height = h; st.scopeKey = ''; if (scopes && scopes.ok && scopes.last) { scopes.show(); placeLabels(); } }
+}
+function placeLabels() {
+  const r = els.fig.getBoundingClientRect(), key = `${st.mode}|${st.space}|${Math.round(r.width)}x${Math.round(r.height)}`; if (key === st.scopeKey) return; st.scopeKey = key;
+  const L = S.labels(st.mode, st.space, r.width, r.height);
+  els.lbls.innerHTML = L.labels.map(l => `<span style="left:${l.x.toFixed(1)}px;top:${l.y.toFixed(1)}px;transform:translate(${l.align === 'end' ? '-100%' : l.align === 'start' ? '0' : '-50%'},-50%)">${esc(l.text)}</span>`).join('');
+  const m = S.MODES.find(x => x.id === st.mode);
+  els.fig.setAttribute('aria-label', `${m.l} scope, ${S.SPACES.find(s => s.id === st.space).l} interpretation`);
+}
+function syncScopeUi() {
+  if (!els) return;
+  els.wrap.querySelectorAll('[data-gr=mode]').forEach(b => { b.setAttribute('aria-checked', b.dataset.v === st.mode); b.tabIndex = b.dataset.v === st.mode ? 0 : -1; });
+  els.wrap.querySelectorAll('[data-gr=space]').forEach(b => { b.setAttribute('aria-checked', b.dataset.v === st.space); b.tabIndex = b.dataset.v === st.space ? 0 : -1; });
+}
+const pct = v => `${Math.round(v * 100)}%`;
+function runScope(exact) {
+  if (!scopes || !scopes.ok || !api) return null;
+  if (scopes.lost) { els.msg.hidden = false; els.msg.textContent = 'The GPU reset the scopes. They come back when you reopen this page.'; return null; }
+  const c = api.stage.canvas; if (!c || !c.width) return null;
+  sizeScope();
+  let r; try { r = scopes.update(c, { mode: st.mode, space: st.space, exact }); } catch (e) { console.error(e); els.msg.hidden = false; els.msg.textContent = 'Scopes could not read this frame.'; return null; }
+  if (!r) { els.msg.hidden = false; els.msg.textContent = 'Waiting for the first frame.'; return null; }
+  els.msg.hidden = true; placeLabels(); st.stats = r.stats; st.lastMs = r.ms; st.exact = exact;
+  const s = r.stats;
+  els.readout.innerHTML = `<span>Luma <b>${pct(s.low)}–${pct(s.high)}</b></span><span>median <b>${pct(s.median)}</b></span><span>clip <b>${(s.clipLow * 100).toFixed(1)}%</b> low · <b>${(s.clipHigh * 100).toFixed(1)}%</b> high</span><span title="Sample grid">${r.grid[0]}×${r.grid[1]}${exact ? '' : ' · live'}</span>`;
+  return r;
+}
+
+// ---------- render ----------
+function render() {
+  if (!api || !els) return;
+  const host = els.host; const ae = document.activeElement, fk = ae && host.contains(ae) ? (ae.dataset && ae.dataset.fk) || (ae.id ? '#' + ae.id : null) : null;
+  els.head.innerHTML = headHtml();
+  els.dyn.innerHTML = graphGroupHtml() + inspectorHtml() + lutSlotHtml();
+  api.paintRanges(host);
+  const sel = host.querySelector(`.gr-node[data-node="${st.sel}"]`); if (sel && sel.scrollIntoView) { const g = host.querySelector('#grGraph'); if (g) { const l = sel.offsetLeft, r = l + NODE_W; if (l < g.scrollLeft || r > g.scrollLeft + g.clientWidth) g.scrollLeft = Math.max(0, l - 40); } }
+  if (fk) { const el = fk[0] === '#' ? host.querySelector(fk) : host.querySelector(`[data-fk="${CSS.escape ? CSS.escape(fk) : fk}"]`); if (el) el.focus({ preventScroll: true }); }
+  if (st.menu) { const first = host.querySelector('#grMenu [role=menuitem]'); if (first && !(fk && fk.startsWith('menu'))) first.focus(); }
+}
+function focusNode(id) { st.sel = id; render(); const b = els.host.querySelector(`.gr-node[data-node="${id}"]`); if (b) b.focus({ preventScroll: false }); }
+
+// ---------- LUT import / export ----------
+const MAX_FILE = 24 * 1048576;
+async function importFile(file, intoNode) {
+  st.lut = { kind: 'loading', name: file.name }; render();
+  try {
+    if (file.size > MAX_FILE) throw new G.LutError('too-large', `It is ${(file.size / 1048576).toFixed(1)} MB; LUT files up to 24 MB are supported.`);
+    let lut;
+    if (/\.png$/i.test(file.name) || /^image\//.test(file.type)) {
+      let bmp; try { bmp = await createImageBitmap(file, { colorSpaceConversion: 'none', premultiplyAlpha: 'none' }); } catch (e) { throw new G.LutError('format', 'The image couldn’t be decoded.'); }
+      if (bmp.width > 4096 || bmp.height > 4096) throw new G.LutError('too-large', 'HALD images up to 4096 px are supported.');
+      const c = new OffscreenCanvas(bmp.width, bmp.height), x = c.getContext('2d', { willReadFrequently: true }); x.drawImage(bmp, 0, 0);
+      lut = G.parseHald(x.getImageData(0, 0, bmp.width, bmp.height).data, bmp.width, bmp.height, file.name);
+    } else if (/\.(cube|3dl|txt)$/i.test(file.name) || !file.name.includes('.')) lut = G.parseLut(await file.text(), file.name);
+    else throw new G.LutError('format', 'Use a .cube, .3dl or HALD .png file.');
+    return useLut(lut, intoNode);
+  } catch (e) {
+    st.lut = { kind: 'error', name: file.name, text: e && e.name === 'LutError' ? e.message : 'The file could not be read.' }; if (!(e && e.name === 'LutError')) console.error(e);
+    render(); const b = els.host.querySelector('details[data-g="gr-lut"] [data-gr=import]'); if (b) b.focus(); return null;
+  }
+}
+function useLut(lut, intoNode) {
+  G.registerLut(lut); lutDb.put(lut).then(() => lutDb.prune(new Set(usedLuts(proj()))));
+  const ref = { id: lut.id, name: lut.name, size: lut.size3 || lut.size1 }, target = intoNode && G.nodeById(grade(), intoNode);
+  const dims = [lut.size1 ? `1D ${lut.size1}` : '', lut.size3 ? `3D ${lut.size3}³` : ''].filter(Boolean).join(' + ');
+  if (target && target.type === 'lut') { edit(g => { G.nodeById(g, intoNode).lut = ref; }, `${lut.name} in node ${nodeIdx(intoNode) + 1}`); st.sel = intoNode; }
+  else { const id = addNode('lut', nodes().length ? nodes()[nodes().length - 1].id : 'levels', { lut: ref }); if (!id) { st.lut = { kind: 'error', name: lut.name, text: `This grade already has ${G.MAX_LUT_NODES} LUT nodes or ${G.MAX_NODES} nodes.` }; render(); return null; } }
+  st.lut = { kind: 'ok', text: `${lut.name} · ${dims} · in node ${nodeIdx(st.sel) + 1}` }; render();
+  return lut.id;
+}
+function bake(N = 33) {
+  const gr = api.pipeline.finisher.grader; if (!gr) throw new Error('Export needs WebGL2.');
+  const pr = proj(), ev = api.T.evaluate(pr, api.stage.time, null);
+  const l0 = ev.layers.find(l => l.visible) || ev.layers[0];
+  const pal = api.C.resolvePalette(l0.shared.palette, l0.shared.invert, pr.palettes, l0.pmix && l0.pmix.to, l0.pmix && l0.pmix.t);
+  const stops = api.C.gradientStops(pal, ev.finish.gmapMode).map(api.C.hexToRgb01);
+  return gr.lattice(ev.finish, { stops }, N);
+}
+function exportCube(N = 33) {
+  const r = bake(N); const t = (api.stage.time).toFixed(2);
+  return { text: G.serializeCube(r.data, N, `Motif grade @ ${t} s`), precision: r.precision, N };
+}
+function downloadCube() {
+  try {
+    const r = exportCube(33), name = `motif-grade-33.cube`;
+    const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([r.text], { type: 'text/plain' })); a.download = name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+    st.lut = { kind: 'ok', text: `Exported ${name} · 33³ = 35,937 entries · ${r.precision} · at ${api.stage.time.toFixed(2)} s` }; render();
+  } catch (e) { console.error(e); st.lut = { kind: 'error', name: 'the export', text: e.message || String(e) }; render(); }
+}
+function pickFile(intoNode) {
+  const inp = document.createElement('input'); inp.type = 'file'; inp.accept = '.cube,.3dl,.png,image/png';
+  inp.addEventListener('change', () => { const f = inp.files && inp.files[0]; if (f) importFile(f, intoNode); }); inp.click();
+}
+
+// ---------- events ----------
+function onClick(e) {
+  const t = e.target.closest('[data-gr],[data-node],[data-add],[data-grkey]'); if (!t || !els.host.contains(t)) return;
+  if (t.dataset.node) { st.sel = t.dataset.node; st.menu = false; render(); const b = els.host.querySelector(`.gr-node[data-node="${st.sel}"]`); if (b) b.focus(); return; }
+  if (t.dataset.add) { st.menu = false; addNode(t.dataset.add); focusNode(st.sel); return; }
+  if (t.dataset.grkey) { toggleKeys(t.dataset.grkey.split(',')); return; }
+  const a = t.dataset.gr, n = selNode();
+  if (a === 'mode' || a === 'space') { st[a] = t.dataset.v; savePrefs(); syncScopeUi(); st.scopeKey = ''; runScope(!api.stage.playing); return; }
+  if (a === 'ab') { setBypass(t.dataset.v === 'b'); return; }
+  if (a === 'menu') { st.menu = !st.menu; render(); if (!st.menu) els.host.querySelector('#grAdd').focus(); return; }
+  if (a === 'add-primary') { addNode('primary'); focusNode(st.sel); return; }
+  if (a === 'vary') return vary();
+  if (a === 'reset-all') return resetAll();
+  if (a === 'import') return pickFile(n && n.type === 'lut' ? n.id : null);
+  if (a === 'export') return downloadCube();
+  if (a === 'curve-ch') { st.curveCh = t.dataset.v; render(); return; }
+  if (a === 'hue-ch') { st.hueCh = t.dataset.v; render(); return; }
+  if (!n) return;
+  if (a === 'par') return togglePar(n.id);
+  if (a === 'left' || a === 'right') { moveNode(n.id, a === 'left' ? -1 : 1); return; }
+  if (a === 'reset-node') return resetNode(n.id);
+  if (a === 'del') { removeNode(n.id); focusNode(st.sel); }
+}
+function toggleKeys(paths) {
+  let pr = proj(); const u = api.uNow(); const allOn = paths.every(p => pr.keys[p] && api.T.keyIndexAt(pr.keys[p], u) >= 0);
+  for (const p of paths) { if (allOn) pr = api.T.removeKey(pr, p, api.T.keyIndexAt(pr.keys[p], u)); else pr = api.T.setKey(pr, p, u, api.shownValue(p)); }
+  api.commit(pr, allOn ? 'Wheel key removed' : 'Wheel keyed at the playhead');
+}
+function onChange(e) {
+  const t = e.target; const n = selNode();
+  if (t.dataset.gr === 'lut-pick' && n) { const l = G.getLut(t.value); edit(g => { G.nodeById(g, n.id).lut = l ? { id: l.id, name: l.name, size: l.size3 || l.size1 } : null; }, l ? `${l.name} in node ${nodeIdx(n.id) + 1}` : 'LUT cleared'); return; }
+  if (t.dataset.gr === 'mix-src' && n) { edit(g => { G.nodeById(g, n.id).src = t.value; }, 'Mixer base changed'); }
+}
+function radioKeys(e) {
+  const g = e.target.closest('[role=radiogroup]'); if (!g || !/^Arrow(Left|Right|Up|Down)$/.test(e.key)) return false;
+  const bs = [...g.querySelectorAll('[role=radio]:not([disabled])')]; const i = bs.indexOf(e.target); if (i < 0) return false;
+  const nb = bs[(i + (e.key === 'ArrowRight' || e.key === 'ArrowDown' ? 1 : -1) + bs.length) % bs.length];
+  e.preventDefault(); e.stopPropagation(); nb.click(); const fk = nb.dataset.gr, v = nb.dataset.v; const again = els.host.querySelector(`[data-gr="${fk}"][data-v="${v}"]`); if (again) again.focus(); return true;
+}
+function graphKeys(e) {
+  const b = e.target.closest('.gr-node'); if (!b) return false;
+  const L = layout(), id = b.dataset.node, p = L.pos.get(id); const k = e.key; let handled = true;
+  const ordered = ['levels', ...nodes().map(n => n.id)];
+  if ((k === 'ArrowRight' || k === 'ArrowLeft') && e.altKey) { if (id !== 'levels') moveNode(id, k === 'ArrowRight' ? 1 : -1); focusNode(id); }
+  else if (k === 'ArrowRight' || k === 'ArrowLeft') { const c = L.cols[p.col + (k === 'ArrowRight' ? 1 : -1)]; if (c) focusNode(c[Math.min(p.row, c.length - 1)].id); }
+  else if (k === 'ArrowUp' || k === 'ArrowDown') { const c = L.cols[p.col], q = c[p.row + (k === 'ArrowDown' ? 1 : -1)]; if (q) focusNode(q.id); }
+  else if (k === 'Home' || k === 'End') focusNode(k === 'Home' ? ordered[0] : ordered[ordered.length - 1]);
+  else if (k === 'Enter' || k === 'F2') { st.sel = id; render(); const first = els.host.querySelector('details[data-g="gr-node"]'); if (first) { first.open = true; api.openGroups['gr-node'] = true; const f = first.querySelector('.rows input, .rows select, .rows [tabindex="0"], .rows button'); if (f) f.focus(); } }
+  else if ((k === 'Delete' || k === 'Backspace') && id !== 'levels') { removeNode(id); focusNode(st.sel); }
+  else if (k === 'n' || k === 'N' || k === '+' || k === 'Insert') { st.sel = id; st.menu = true; render(); }
+  else if ((k === 'd' || k === 'D') && id !== 'levels') { toggleOn(id); focusNode(id); }
+  else if ((k === 'p' || k === 'P') && id !== 'levels') { togglePar(id); focusNode(id); }
+  else handled = false;
+  if (handled) { e.preventDefault(); e.stopPropagation(); }
+  return handled;
+}
+function menuKeys(e) {
+  const li = e.target.closest('#grMenu [role=menuitem]'); if (!li) return false;
+  const items = [...els.host.querySelectorAll('#grMenu [role=menuitem]')], i = items.indexOf(li);
+  if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { const n = items[(i + (e.key === 'ArrowDown' ? 1 : -1) + items.length) % items.length]; items.forEach(x => { x.tabIndex = -1; }); n.tabIndex = 0; n.focus(); }
+  else if (e.key === 'Home' || e.key === 'End') items[e.key === 'Home' ? 0 : items.length - 1].focus();
+  else if (e.key === 'Enter' || e.key === ' ') { st.menu = false; addNode(li.dataset.add); focusNode(st.sel); }
+  else if (e.key === 'Escape' || e.key === 'Tab') { st.menu = false; render(); els.host.querySelector('#grAdd').focus(); if (e.key === 'Tab') return true; }
+  else return false;
+  e.preventDefault(); e.stopPropagation(); return true;
+}
+function padKeys(e) {
+  const el = e.target.closest('.gr-pad'); if (!el) return false; const n = selNode(); if (!n) return false;
+  const d = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, 1], ArrowDown: [0, -1] }[e.key];
+  const k = el.dataset.wheel, w = WHEELS.find(q => q.k === k), ps = wheelPaths(n.id, k), cur = wheelXY(ps.map(p => api.shownValue(p)), w.a);
+  if (d) { const s = e.shiftKey ? 0.1 : e.altKey ? 0.005 : 0.02; api.commit(setWheel(proj(), n.id, k, cur.x + d[0] * s, cur.y + d[1] * s)); }
+  else if (e.key === 'Delete' || e.key === 'Backspace' || e.key === '0' || e.key === 'Home') { let pr = proj(); ps.forEach(p => { pr = applyOn(pr, p, 0); }); api.commit(pr, `${w.l} balance re-centred`); }
+  else return false;
+  e.preventDefault(); e.stopPropagation(); return true;
+}
+function ptKeys(e) {
+  const el = e.target.closest('.gr-pt'); if (!el) return false;
+  const lo = +el.dataset.lo, hi = +el.dataset.hi, path = el.dataset.pt, s = api.T.schemaAt(proj(), path); const v = api.shownValue(path);
+  const st0 = (hi - lo) / 100 * (e.shiftKey ? 5 : e.altKey ? 0.2 : 1);
+  if (e.key === 'ArrowUp' || e.key === 'ArrowDown') api.commit(applyOn(proj(), path, clamp(+(v + (e.key === 'ArrowUp' ? st0 : -st0)).toFixed(4), lo, hi)));
+  else if (e.key === 'Home' || e.key === 'Delete' || e.key === 'Backspace') api.commit(applyOn(proj(), path, s.def), `${s.label} reset`);
+  else return false;
+  e.preventDefault(); e.stopPropagation(); return true;
+}
+function onKey(e) {
+  if (e.metaKey || e.ctrlKey) return;
+  if (menuKeys(e) || graphKeys(e) || padKeys(e) || ptKeys(e) || radioKeys(e)) return;
+  if (e.key === 'Escape' && st.menu) { st.menu = false; render(); els.host.querySelector('#grAdd').focus(); e.stopPropagation(); }
+}
+// Pointer: wheels (absolute position, Shift = fine relative) and curve points (vertical drag).
+let drag = null;
+function onDown(e) {
+  if (e.button !== 0) return; const n = selNode();
+  const pad = e.target.closest('.gr-pad'), pt = e.target.closest('.gr-pt');
+  if (pad && n) { pad.setPointerCapture(e.pointerId); drag = { kind: 'wheel', el: pad, id: e.pointerId, n: n.id, k: pad.dataset.wheel }; padMove(e); pad.focus({ preventScroll: true }); e.preventDefault(); }
+  else if (pt) { pt.setPointerCapture(e.pointerId); drag = { kind: 'pt', el: pt, id: e.pointerId, box: pt.parentElement.getBoundingClientRect(), y0: e.clientY, v0: api.shownValue(pt.dataset.pt) }; pt.focus({ preventScroll: true }); e.preventDefault(); }
+}
+function padMove(e) {
+  const r = drag.el.getBoundingClientRect(); const x = ((e.clientX - r.left) / r.width) * 2 - 1, y = 1 - ((e.clientY - r.top) / r.height) * 2;
+  let fx = x, fy = y; if (e.shiftKey && drag.last) { fx = drag.last.x + (x - drag.raw.x) * 0.2; fy = drag.last.y + (y - drag.raw.y) * 0.2; }
+  drag.raw = { x, y }; drag.last = { x: fx, y: fy };
+  const pr = setWheel(proj(), drag.n, drag.k, fx, fy); api.live(pr); paintWheel(drag.el, pr);
+}
+function onMove(e) {
+  if (!drag || e.pointerId !== drag.id) return;
+  if (drag.kind === 'wheel') return padMove(e);
+  const el = drag.el, lo = +el.dataset.lo, hi = +el.dataset.hi, f = e.shiftKey ? 0.2 : 1;
+  const v = clamp(drag.v0 - ((e.clientY - drag.y0) / drag.box.height) * (hi - lo) * f, lo, hi); drag.moved = true;
+  const pr = applyOn(proj(), el.dataset.pt, +v.toFixed(4)); api.live(pr); el.style.top = ((1 - (v - lo) / (hi - lo)) * 100).toFixed(2) + '%'; el.setAttribute('aria-valuenow', v.toFixed(3));
+}
+function onUp(e) { if (!drag || e.pointerId !== drag.id) return; const d = drag; drag = null; if (d.kind === 'wheel' || d.moved) api.commit(proj()); }
+function onDbl(e) { const pad = e.target.closest('.gr-pad'), n = selNode(); if (pad && n) { let pr = proj(); wheelPaths(n.id, pad.dataset.wheel).forEach(p => { pr = applyOn(pr, p, 0); }); api.commit(pr, 'Balance re-centred'); } }
+
+// ---------- page ----------
+function init(host, a) {
+  api = a; ensureCss();
+  for (const [g, open] of [['gr-graph', true], ['gr-node', true], ['gr-lut', true], ['gr-ch', false], ['gr-pts', false]]) if (!(g in a.openGroups)) a.openGroups[g] = open;
+  restoreLuts(a.project);
+  // B toggles the A/B compare while the Grade page is open (outside text fields).
+  document.addEventListener('keydown', e => {
+    if (!api || api.tab !== 'grade' || e.metaKey || e.ctrlKey || e.altKey) return;
+    const tg = e.target, tag = tg.tagName; if ((tag === 'INPUT' && ['text', 'search', 'number'].includes(tg.type)) || tag === 'TEXTAREA' || tag === 'SELECT' || document.querySelector('dialog[open]')) return;
+    if (e.key === 'b' || e.key === 'B') { e.preventDefault(); if (nodes().length) setBypass(grade().on); else api.toast('Add a node to compare'); }
+  });
+}
+function panel(host, a) {
+  api = a; ensureCss();
+  if (!host._grade) {
+    host._grade = true; host.innerHTML = '';
+    const head = document.createElement('div'); host.appendChild(head);
+    buildScopes(host);
+    const dyn = document.createElement('div'); host.appendChild(dyn);
+    els.host = host; els.head = head; els.dyn = dyn;
+    host.addEventListener('click', onClick); host.addEventListener('change', onChange); host.addEventListener('keydown', onKey);
+    host.addEventListener('pointerdown', onDown); host.addEventListener('pointermove', onMove); host.addEventListener('pointerup', onUp); host.addEventListener('pointercancel', onUp); host.addEventListener('dblclick', onDbl);
+    host.addEventListener('focusout', e => { const m = host.querySelector('#grMenu'), to = e.relatedTarget; if (st.menu && m && to && !m.contains(to) && host.contains(to) && to.id !== 'grAdd') { st.menu = false; render(); } });
+  }
+  if (st.sel !== 'levels' && !selNode()) st.sel = nodes().length ? nodes()[0].id : 'levels';
+  if (pendingInvalidate) { pendingInvalidate = false; a.stage.invalidate(); }
+  if (usedLuts(proj()).some(id => !G.getLut(id))) restoreLuts(proj());
+  render(); syncScopeUi(); st.scopeKey = ''; requestAnimationFrame(() => runScope(!a.stage.playing));
+}
+// Scopes follow the stage. Playing: live grid at ≤10 Hz (1 Hz with reduced motion), and never more than ~25% of the
+// time on a slow GPU (interval ≥ 4× the last update). Paused / scrubbing: a live update now, the exact grid once the
+// frame has settled for 160 ms.
+let exactTimer = 0;
+function tick(t, a) {
+  api = a; if (pendingInvalidate) { pendingInvalidate = false; a.stage.invalidate(); }
+  if (a.tab !== 'grade' || !scopes || !scopes.ok) return;
+  const now = performance.now(), playing = a.stage.playing;
+  clearTimeout(exactTimer);
+  if (now - st.lastScope < Math.max(playing ? (a.reduce ? 1000 : 100) : 0, st.liveMs * 4)) { if (!playing) exactTimer = setTimeout(() => runScope(true), 160); return; }
+  st.lastScope = now; const r = runScope(false); if (r) st.liveMs = r.ms;
+  if (!playing) exactTimer = setTimeout(() => runScope(true), 160);
+}
+function commands(a) {
+  const go = fn => () => { a.setTab('grade'); fn(); };
+  return [
+    { id: 'grade-bypass', label: grade() && !grade().on ? 'Grade: turn the node grade back on (A)' : 'Grade: bypass the node grade (B)', kbd: 'B', run: go(() => setBypass(!!(grade() && grade().on))), kw: 'compare a/b colour' },
+    ...G.TYPE_IDS.map(t => ({ id: 'grade-add-' + t, label: `Grade: add ${G.TYPES[t].name} node`, run: go(() => { addNode(t); render(); }), kw: 'colour node ' + G.TYPES[t].hint })),
+    { id: 'grade-import', label: 'Grade: import LUT…', run: go(() => pickFile(null)), kw: 'cube 3dl hald colour' },
+    { id: 'grade-export', label: 'Grade: export .cube (33³)', run: go(downloadCube), kw: 'lut bake colour' },
+    ...S.MODES.map(m => ({ id: 'scope-' + m.id, label: `Scopes: ${m.l}`, run: go(() => { st.mode = m.id; savePrefs(); syncScopeUi(); st.scopeKey = ''; runScope(!a.stage.playing); }), kw: 'scope colour' })),
+  ];
+}
+if (typeof __m_shell !== 'undefined') __m_shell.use({ id: 'grade', name: 'Grade', icon: ICON, init, panel, tick, commands });
+
+// Test / automation surface.
+return { st, get scopes() { return scopes; }, runScope, exportCube, bake, useLut, importFile, addNode, vary, render, curveAt };
 
 })();
 
