@@ -10,6 +10,16 @@ const int IT_WOFF[10] = int[10](0, 4, 9, 15, 22, 28, 32, 39, 49, 54);
 const int IT_WLEN[10] = int[10](4, 5, 6, 7, 6, 4, 7, 10, 5, 4);
 
 
+
+// ---- cheap arithmetic hashing and value noise (seeded by u_seed). Used instead of the prelude PCG / simplex in hot paths. ----
+float itH(vec2 p) { vec3 p3 = fract(vec3(p.xyx) * 0.1031 + vec3(u_seed * 0.0173, 0.0, 0.0)); p3 += dot(p3, p3.yzx + 33.33); return fract((p3.x + p3.y) * p3.z); }
+float itH1(float x) { return itH(vec2(x, 7.31)); }
+vec2 itH2(vec2 p) { return vec2(itH(p), itH(p + vec2(17.17, 5.43))); }
+float itV(vec2 p) {
+  vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f);
+  return mix(mix(itH(i), itH(i + vec2(1.0, 0.0)), f.x), mix(itH(i + vec2(0.0, 1.0)), itH(i + vec2(1.0, 1.0)), f.x), f.y) * 2.0 - 1.0;
+}
+
 int itLen(int w) { return IT_WLEN[clamp(w, 0, 9)]; }
 int itCh(int w, int i) { w = clamp(w, 0, 9); int n = IT_WLEN[w]; return IT_WCH[IT_WOFF[w] + ((i % n) + n) % n]; }
 // A pseudo-random letter drawn from the chosen word, so every scrap speaks the same language.
@@ -46,9 +56,9 @@ float itGlyphLine(int ch, vec2 g, float px, float wd) {
 }
 
 // ---- static noise, paper, print ----
-float itN(vec2 x) { return snoise(vec3(x + M_seedOff(), 3.7)); }
-float itFbm(vec2 x) { return 0.55 * itN(x) + 0.28 * itN(x * 2.03 + 5.1) + 0.14 * itN(x * 4.1 + 9.7); }
-float itPaper(vec2 uv) { return 0.5 * itN(uv * 190.0) + 0.3 * itN(uv * 52.0 + 3.0) + 0.2 * itN(uv * 8.0 + 1.0); }
+float itN(vec2 x) { return itV(x + vec2(fract(u_seed * 0.618) * 91.0, fract(u_seed * 0.324) * 91.0)); }
+float itFbm(vec2 x) { return 0.62 * itN(x) + 0.38 * itN(x * 2.7 + 5.1); }
+float itPaper(vec2 uv) { return 0.6 * (itH(floor(uv * 520.0)) * 2.0 - 1.0) + 0.4 * itN(uv * 14.0); }
 // Torn-edge displacement for a signed distance.
 float itTear(vec2 x) { return itFbm(x) * 0.7 + 0.3 * itN(x * 9.0); }
 vec3 itMul(vec3 base, vec3 pig, float a) { return base * mix(vec3(1.0), pig, sat(a)); }
@@ -65,18 +75,20 @@ float itLum(vec3 c) { return dot(c, vec3(0.2126, 0.7152, 0.0722)); }
 
 // Paint splatter: blob with a ragged edge, a drip and flying droplets. Returns coverage.
 float itSplat(vec2 p, vec2 c, float r, float sd) {
-  vec2 d = p - c; float L = length(d); float a = atan(d.y, d.x);
+  vec2 d = p - c; float L = length(d);
+  if (L > r * 6.0) return 0.0;
+  float a = atan(d.y, d.x);
   float edge = r * (1.0 + 0.32 * snoise(vec3(cos(a) * 1.4 + sd, sin(a) * 1.4 + sd * 0.7, sd)) + 0.18 * sin(a * 7.0 + sd * 5.0));
   float core = 1.0 - smoothstep(edge - aa() * 1.5, edge + aa() * 1.5, L);
   float ang = sd * 2.3;
   vec2 dir = vec2(cos(ang), sin(ang));
-  float drip = 1.0 - smoothstep(r * 0.05, r * 0.05 + aa() * 1.5, sdSeg(p, c, c + dir * r * (2.2 + 2.0 * h11(sd))));
+  float drip = 1.0 - smoothstep(r * 0.05, r * 0.05 + aa() * 1.5, sdSeg(p, c, c + dir * r * (2.2 + 2.0 * itH1(sd))));
   float dr = 0.0;
   for (int i = 0; i < 6; i++) {
     float fi = float(i);
-    float an = sd * 7.0 + fi * 1.13 + h11(sd + fi) * 1.4;
-    float di = r * (1.3 + 2.4 * h11(sd * 3.1 + fi));
-    float rr = r * (0.05 + 0.15 * h11(sd * 5.3 + fi));
+    float an = sd * 7.0 + fi * 1.13 + itH1(sd + fi) * 1.4;
+    float di = r * (1.3 + 2.4 * itH1(sd * 3.1 + fi));
+    float rr = r * (0.05 + 0.15 * itH1(sd * 5.3 + fi));
     dr = max(dr, 1.0 - smoothstep(rr - aa(), rr + aa(), length(p - c - vec2(cos(an), sin(an)) * di)));
   }
   return max(max(core, dr), drip);
@@ -89,10 +101,10 @@ void itKD(vec2 p, vec2 ext, int depth, float stopP, float wob, float k, float sd
   for (int i = 0; i < 10; i++) {
     if (i >= depth) break;
     vec2 sz = hi - lo;
-    float h0 = h21(vec2(id, 11.0 + sd));
+    float h0 = itH(vec2(id, 11.0 + sd));
     if (i > 1 && h0 < stopP) break;
-    float h1 = h21(vec2(id + 3.1, 17.0 + sd));
-    float h2 = h21(vec2(id + 7.7, 23.0 + sd));
+    float h1 = itH(vec2(id + 3.1, 17.0 + sd));
+    float h2 = itH(vec2(id + 7.7, 23.0 + sd));
     bool splitX = sz.x * (0.65 + 0.7 * h1) > sz.y;
     float r = 0.27 + 0.46 * h2 + wob * 0.13 * lsin(k, h1);
     if (splitX) { float s = lo.x + sz.x * r; if (p.x < s) { hi.x = s; id = id * 2.0; } else { lo.x = s; id = id * 2.0 + 1.0; } }
@@ -103,8 +115,8 @@ void itKD(vec2 p, vec2 ext, int depth, float stopP, float wob, float k, float sd
 float itNext(float slot, float n) { float r = safeCycles(n); return r < 1.0 ? 0.0 : mod(slot + 1.0, r); }
 vec3 itStijlFill(float id, float empty, float slot, float nslot, float tfr, float sd) {
   vec3 cur, nxt;
-  float hc = h21(vec2(id, 41.0 + sd + slot * 7.13));
-  float hn = h21(vec2(id, 41.0 + sd + nslot * 7.13));
+  float hc = itH(vec2(id, 41.0 + sd + slot * 7.13));
+  float hn = itH(vec2(id, 41.0 + sd + nslot * 7.13));
   // palette pick
   for (int j = 0; j < 2; j++) {
     float h = j == 0 ? hc : hn; vec3 c;

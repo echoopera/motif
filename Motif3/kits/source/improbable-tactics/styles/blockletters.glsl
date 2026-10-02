@@ -5,7 +5,7 @@ vec3 fieldAt(vec2 p, vec2 ext, float slot, float nslot, float fr, out float e) {
   itKD(p, ext, p_depth, p_stop, p_drift, 1.0, 0.0, lo, hi, id);
   vec3 f = itStijlFill(id, p_empty, slot, nslot, fr, 0.0);
   e = min(min(p.x - lo.x, hi.x - p.x), min(p.y - lo.y, hi.y - p.y));
-  float lw = 0.014 * (0.6 + 0.9 * h21(vec2(id, 66.0)));
+  float lw = 0.014 * (0.6 + 0.9 * itH(vec2(id, 66.0)));
   return mix(f, u_ink, 1.0 - smoothstep(lw * 0.5 - aa(), lw * 0.5 + aa(), e));
 }
 
@@ -36,7 +36,7 @@ vec4 motif(vec2 uv, vec2 fc) {
     if (ix < 0.0 || ix >= float(n)) continue;
     vec2 l = vec2(fract(g.x), g.y);
     int ch = itCh(p_word, int(ix) + r * 2);
-    float h = h21(vec2(ix, float(r) + 3.0));
+    float h = itH(vec2(ix, float(r) + 3.0));
     l.y -= 0.06 * p_bounce * lsin(1.0, h) + 0.0;
     if (h < p_turn) l = vec2(l.y, 1.0 - l.x);
     float gap = p_gap;

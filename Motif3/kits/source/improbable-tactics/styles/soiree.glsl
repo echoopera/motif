@@ -6,7 +6,7 @@ vec4 motif(vec2 uv, vec2 fc) {
   vec2 lo, hi; float id;
   itKD(uv, ext, p_depth, p_stop, p_drift, float(p_cycles), 0.0, lo, hi, id);
   vec2 sz = hi - lo, ctr = (lo + hi) * 0.5, q = uv - ctr;
-  float h0 = h21(vec2(id, 5.0 + sd)), h1 = h21(vec2(id, 6.0 + sd)), h2 = h21(vec2(id, 7.0 + sd)), h3 = h21(vec2(id, 8.0 + sd)), h4 = h21(vec2(id, 9.0 + sd)), h5 = h21(vec2(id, 10.0 + sd));
+  float h0 = itH(vec2(id, 5.0 + sd)), h1 = itH(vec2(id, 6.0 + sd)), h2 = itH(vec2(id, 7.0 + sd)), h3 = itH(vec2(id, 8.0 + sd)), h4 = itH(vec2(id, 9.0 + sd)), h5 = itH(vec2(id, 10.0 + sd));
   float m = p_margin * min(sz.x, sz.y);
   vec2 inner = max(sz * 0.5 - m, vec2(0.004));
   bool inv = h2 < p_negative;

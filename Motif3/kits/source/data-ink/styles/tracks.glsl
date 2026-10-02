@@ -26,7 +26,7 @@ vec4 motif(vec2 uv, vec2 fc) {
     float dx = lo.x + pw * float(i) / float(p_units);
     col = dxInk(col, u_ink, dxHair(abs(uv.x - dx), 0.0006) * step(lo.y - 0.02, uv.y) * step(uv.y, hi.y + 0.01) * (mod(float(i), 5.0) < 0.5 ? 0.3 : 0.14));
     float vv = p_from + float(i) * p_step;
-    if (i % 2 == 0) col = dxInk(col, u_ink, dxNum(uv, vec2(dx - 0.0085 * dxNumW(vv) * 0.9, lo.y - 0.04), 0.014, vv, 0.8) * 0.85);
+    if (i % 2 == 0 && uv.y < lo.y) col = dxInk(col, u_ink, dxNum(uv, vec2(dx - 0.0085 * dxNumW(vv) * 0.9, lo.y - 0.04), 0.014, vv, 0.8) * 0.85);
   }
   // tracks
   float rh = ph / rows;
@@ -41,10 +41,10 @@ vec4 motif(vec2 uv, vec2 fc) {
     vec3 tc = accent(fr);
     for (int e = 0; e < 7; e++) {
       float fe = float(e);
-      float st = (fe + (h21(vec2(fr, fe + 3.0)) - 0.5) * p_overlap * 1.6 + 0.4) / 7.4;
-      float dur = (0.35 + 0.8 * h21(vec2(fr, fe + 11.0))) * p_length * (0.45 + V(r) * 1.1) / 7.0;
+      float st = (fe + (itH(vec2(fr, fe + 3.0)) - 0.5) * p_overlap * 1.6 + 0.4) / 7.4;
+      float dur = (0.35 + 0.8 * itH(vec2(fr, fe + 11.0))) * p_length * (0.45 + V(r) * 1.1) / 7.0;
       float x0 = st, x1 = st + dur;
-      float bh = rh * 0.34 * (0.7 + 0.5 * h21(vec2(fr, fe + 20.0)));
+      float bh = rh * 0.34 * (0.7 + 0.5 * itH(vec2(fr, fe + 20.0)));
       float dd = fract(cur - st + 1.0);
       float lit = 1.0 - smoothstep(p_trail, p_trail + 0.1, dd);
       float inB = (1.0 - smoothstep(-aa(), aa(), sdBox(vec2((xs - 0.5 * (x0 + x1)) * pw, uv.y - yc), vec2(0.5 * (x1 - x0) * pw, bh))));

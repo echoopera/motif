@@ -14,7 +14,7 @@ vec4 motif(vec2 uv, vec2 fc) {
   for (int i = 0; i < 28; i++) {
     if (i >= p_count) break;
     float fi = float(i);
-    vec2 h = h22(vec2(fi, 3.0)), h2 = h22(vec2(fi, 9.0)), h3 = h22(vec2(fi, 15.0));
+    vec2 h = itH2(vec2(fi, 3.0)), h2 = itH2(vec2(fi, 9.0)), h3 = itH2(vec2(fi, 15.0));
     int o = h.x < p_floor ? 0 : (h.y < 0.5 ? 1 : 2);
     vec2 e1 = o == 0 ? EX : (o == 1 ? EX : EZ);
     vec2 e2 = o == 0 ? EZ : EY;

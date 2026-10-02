@@ -7,6 +7,16 @@ const int DX_OFF[40] = int[40](0,5,9,14,19,24,30,35,39,46,51,57,63,69,74,79,86,9
 const int DX_LEN[40] = int[40](5,4,5,5,5,6,5,4,7,5,6,6,6,5,5,7,5,4,5,5,7,4,3,5,6,8,6,4,4,6,3,4,3,3,3,3,3,3,3,3);
 
 
+
+// ---- cheap arithmetic hashing and value noise (seeded by u_seed). Used instead of the prelude PCG / simplex in hot paths. ----
+float itH(vec2 p) { vec3 p3 = fract(vec3(p.xyx) * 0.1031 + vec3(u_seed * 0.0173, 0.0, 0.0)); p3 += dot(p3, p3.yzx + 33.33); return fract((p3.x + p3.y) * p3.z); }
+float itH1(float x) { return itH(vec2(x, 7.31)); }
+vec2 itH2(vec2 p) { return vec2(itH(p), itH(p + vec2(17.17, 5.43))); }
+float itV(vec2 p) {
+  vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f);
+  return mix(mix(itH(i), itH(i + vec2(1.0, 0.0)), f.x), mix(itH(i + vec2(0.0, 1.0)), itH(i + vec2(1.0, 1.0)), f.x), f.y) * 2.0 - 1.0;
+}
+
 float itBit(int ch, int x, int y) {
   if (ch < 0 || ch > 35 || x < 0 || x > 4 || y < 0 || y > 4) return 0.0;
   return float((IT_FONT[ch] >> uint(24 - (y * 5 + x))) & 1u);
@@ -25,9 +35,9 @@ float itGlyph(int ch, vec2 g, float px, float rnd, float wt) {
   float e = max(px * 0.75, 0.015);
   return smoothstep(th - e, th + e, f);
 }
-float itN(vec2 x) { return snoise(vec3(x + M_seedOff(), 3.7)); }
-float itFbm(vec2 x) { return 0.55 * itN(x) + 0.28 * itN(x * 2.03 + 5.1) + 0.14 * itN(x * 4.1 + 9.7); }
-float itPaper(vec2 uv) { return 0.5 * itN(uv * 190.0) + 0.3 * itN(uv * 52.0 + 3.0) + 0.2 * itN(uv * 8.0 + 1.0); }
+float itN(vec2 x) { return itV(x + vec2(fract(u_seed * 0.618) * 91.0, fract(u_seed * 0.324) * 91.0)); }
+float itFbm(vec2 x) { return 0.62 * itN(x) + 0.38 * itN(x * 2.7 + 5.1); }
+float itPaper(vec2 uv) { return 0.6 * (itH(floor(uv * 520.0)) * 2.0 - 1.0) + 0.4 * itN(uv * 14.0); }
 float itLum(vec3 c) { return dot(c, vec3(0.2126, 0.7152, 0.0722)); }
 
 // ---- text: height h in uv units, baseline-left origin o. Advance is 0.9 heights; glyph box is 0.8 wide. ----
@@ -88,19 +98,19 @@ float dxData(float i, float x, int mode, float sway, float width) {
   if (mode == 0) {
     for (int j = 0; j < 3; j++) {
       float fj = float(j);
-      float c = h21(vec2(i, fj + 1.0)) + 0.04 * sway * lsin(1.0, h21(vec2(i, fj + 4.0)));
-      float w = (0.05 + 0.11 * h21(vec2(i, fj + 7.0))) * width;
-      float a = 0.25 + 0.75 * h21(vec2(i, fj + 13.0));
+      float c = itH(vec2(i, fj + 1.0)) + 0.04 * sway * lsin(1.0, itH(vec2(i, fj + 4.0)));
+      float w = (0.05 + 0.11 * itH(vec2(i, fj + 7.0))) * width;
+      float a = 0.25 + 0.75 * itH(vec2(i, fj + 13.0));
       float d = abs(fract(x - c + 0.5) - 0.5);
       s += a * exp(-d * d / (w * w));
     }
   } else if (mode == 1) {
-    float f1 = 1.0 + floor(h21(vec2(i, 2.0)) * 3.0), f2 = 2.0 + floor(h21(vec2(i, 3.0)) * 4.0);
-    s = 0.45 + 0.28 * sin(TAU * (f1 * x + h21(vec2(i, 5.0)) + sway * 0.25 * lsin(1.0, i * 0.37))) + 0.17 * sin(TAU * (f2 * x + h21(vec2(i, 6.0))));
+    float f1 = 1.0 + floor(itH(vec2(i, 2.0)) * 3.0), f2 = 2.0 + floor(itH(vec2(i, 3.0)) * 4.0);
+    s = 0.45 + 0.28 * sin(TAU * (f1 * x + itH(vec2(i, 5.0)) + sway * 0.25 * lsin(1.0, i * 0.37))) + 0.17 * sin(TAU * (f2 * x + itH(vec2(i, 6.0))));
   } else {
-    float tr = (h21(vec2(i, 9.0)) - 0.35) * 1.4;
+    float tr = (itH(vec2(i, 9.0)) - 0.35) * 1.4;
     float xx = fract(x);
-    s = 0.35 + tr * (xx - 0.5) + 0.22 * sin(TAU * (2.0 * x + h21(vec2(i, 11.0)))) * (0.5 + 0.5 * sway) + 0.1 * sin(TAU * (5.0 * x + h21(vec2(i, 12.0))));
+    s = 0.35 + tr * (xx - 0.5) + 0.22 * sin(TAU * (2.0 * x + itH(vec2(i, 11.0)))) * (0.5 + 0.5 * sway) + 0.1 * sin(TAU * (5.0 * x + itH(vec2(i, 12.0))));
     s *= 1.0 - 0.0;
   }
   return max(s, 0.0);

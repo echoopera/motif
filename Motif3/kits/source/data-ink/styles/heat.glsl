@@ -26,8 +26,8 @@ vec4 motif(vec2 uv, vec2 fc) {
     float fr = float(r);
     float rowF = fract(ry);
     float h = min(rh * 0.74, 0.03);
-    float s0 = p_stagger * 0.62 * h21(vec2(fr, 3.0));
-    float len = 0.28 + 0.62 * h21(vec2(fr, 4.0));
+    float s0 = p_stagger * 0.62 * itH(vec2(fr, 3.0));
+    float len = 0.28 + 0.62 * itH(vec2(fr, 4.0));
     float v = V(r);
     // label and leader
     float lw = dxNameW(p_names, r) * h;

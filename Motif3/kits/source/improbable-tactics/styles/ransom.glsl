@@ -3,38 +3,38 @@
 
 // Evaluates one scrap at point p. Returns coverage; paper colour, letter coverage and z come back through outs.
 float scrapAt(vec2 id, vec2 p, float cs, float S, out vec3 paper, out float glyph, out float hz, out vec3 inkc) {
-  hz = h21(id + 91.0 + S);
-  vec2 hv = h22(id + 7.0 + S);
+  hz = itH(id + 91.0 + S);
+  vec2 hv = itH2(id + 7.0 + S);
   vec2 ctr = (id + 0.5 + (hv - 0.5) * 0.42 * p_chaos) * cs;
-  ctr += 0.012 * cs * p_spin * lc(1.0, h21(id + 3.0 + S)) * 3.0;
-  float ang = (h21(id + 13.0 + S) - 0.5) * 1.3 * p_chaos + p_spin * 0.08 * lsin(1.0, hz);
-  vec2 hs = vec2(0.8 + 0.28 * h21(id + 21.0 + S), 0.8 + 0.3 * h21(id + 22.0 + S));
-  float sc = 0.82 + 0.3 * h21(id + 5.0 + S);
+  ctr += 0.012 * cs * p_spin * lc(1.0, itH(id + 3.0 + S)) * 3.0;
+  float ang = (itH(id + 13.0 + S) - 0.5) * 1.3 * p_chaos + p_spin * 0.08 * lsin(1.0, hz);
+  vec2 hs = vec2(0.8 + 0.28 * itH(id + 21.0 + S), 0.8 + 0.3 * itH(id + 22.0 + S));
+  float sc = 0.82 + 0.3 * itH(id + 5.0 + S);
   vec2 l = rot(-ang) * (p - ctr);
   vec2 hb = 0.5 * cs * sc * hs;
   float t = itTear(l * 26.0 / cs + id * 7.3) * 0.022 * cs * (0.5 + p_chaos);
   float d = sdBox(l, hb) + t;
   float cov = 1.0 - smoothstep(-aa(), aa(), d);
-  float kind = h21(id + 31.0 + S);
+  float kind = itH(id + 31.0 + S);
   vec3 cream = mix(u_bg, vec3(1.0), 0.35);
   paper = kind < 0.22 ? cream : kind < 0.38 ? u_ink : kind < 0.54 ? u_a0 : kind < 0.68 ? u_a1 : kind < 0.82 ? u_a2 : cream;
-  inkc = itLum(paper) < 0.12 ? u_bg : (kind > 0.38 && kind < 0.54 && h21(id + 2.0) > 0.5 ? u_bg : u_ink);
+  inkc = itLum(paper) < 0.12 ? u_bg : (kind > 0.38 && kind < 0.54 && itH(id + 2.0) > 0.5 ? u_bg : u_ink);
   if (kind >= 0.82 && cov > 0.0) {
-    float ht = itHalf(l, 0.35 + 0.4 * h21(id + 4.0), 0.4 + h21(id) * 1.2, 0.012 * cs * 14.0 * (0.7 + p_halftone));
+    float ht = itHalf(l, 0.35 + 0.4 * itH(id + 4.0), 0.4 + itH(id) * 1.2, 0.012 * cs * 14.0 * (0.7 + p_halftone));
     paper = mix(cream, mix(u_a1, u_ink, 0.2), ht * step(0.0, p_halftone + 0.2));
   }
   paper *= 1.0 + 0.05 * p_paper * itPaper(l / cs * 0.7 + id);
   // the letter
   glyph = 0.0;
   if (cov > 0.0) {
-    float hsel = h21(id + 55.0 + S);
-    int ch = hsel < 0.5 ? itCh(p_word, int(id.x) + int(id.y) * 3) : itPick(p_word, h21(id + 77.0 + S));
+    float hsel = itH(id + 55.0 + S);
+    int ch = hsel < 0.5 ? itCh(p_word, int(id.x) + int(id.y) * 3) : itPick(p_word, itH(id + 77.0 + S));
     float hh = 2.0 * hb.y * 0.72;
-    float shear = (h21(id + 61.0) - 0.5) * 0.5 * p_chaos;
+    float shear = (itH(id + 61.0) - 0.5) * 0.5 * p_chaos;
     vec2 gl = l; gl.x -= shear * gl.y;
-    vec2 box = vec2(hh * (0.78 + 0.35 * h21(id + 62.0)), hh);
-    float rnd = h21(id + 63.0) < 0.5 ? 0.0 : 1.0;
-    glyph = itGlyph(ch, gl / box + 0.5, 5.0 * aa() / hh, rnd, 0.6 * (h21(id + 64.0) - 0.4)) * cov;
+    vec2 box = vec2(hh * (0.78 + 0.35 * itH(id + 62.0)), hh);
+    float rnd = itH(id + 63.0) < 0.5 ? 0.0 : 1.0;
+    glyph = itGlyph(ch, gl / box + 0.5, 5.0 * aa() / hh, rnd, 0.6 * (itH(id + 64.0) - 0.4)) * cov;
   }
   return cov;
 }

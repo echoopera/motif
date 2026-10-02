@@ -22,7 +22,7 @@ vec4 motif(vec2 uv, vec2 fc) {
     float rays = float(p_rays);
     float fr = fract(th * rays / TAU + 0.5);
     float ri = floor(th * rays / TAU + 0.5);
-    float len = Rmax * (1.12 + 0.75 * h21(vec2(ri, 7.0)));
+    float len = Rmax * (1.12 + 0.75 * itH(vec2(ri, 7.0)));
     float ray = (1.0 - smoothstep(0.02, 0.05, abs(fr - 0.5))) * step(Rmax * 1.04, r) * (1.0 - smoothstep(len - 0.02, len, r));
     col = mix(col, mix(u_a2, negBg, 0.35), ray * neg * step(1.0, rays));
     if (p_stars) {

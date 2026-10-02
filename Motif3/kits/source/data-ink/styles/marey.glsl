@@ -7,8 +7,8 @@ float gapAt(int i) { return 0.3 + V(i) * 1.2; }
 float trainY(int k, float tt, float yTop, float yBot, float sumG, out float slope, out float W) {
   float fk = float(k);
   bool down = (k % 2) == 0;
-  float T0 = h21(vec2(fk, 1.0));
-  float dur = (0.22 + 0.42 * h21(vec2(fk, 3.0))) * p_pace;
+  float T0 = itH(vec2(fk, 1.0));
+  float dur = (0.22 + 0.42 * itH(vec2(fk, 3.0))) * p_pace;
   float dw = p_dwell * 0.014;
   float x = fract(tt - T0);
   float cumG = 0.0; slope = 0.0; W = 1.0;
@@ -59,8 +59,10 @@ vec4 motif(vec2 uv, vec2 fc) {
     col = dxInk(col, u_ink, dxHair(abs(uv.y - ys), 0.0012) * step(lo.x - 0.01, uv.x) * step(uv.x, hi.x + 0.01) * 0.55);
     float h = 0.017;
     float nw = dxNameW(p_names, i) * h;
-    col = dxInk(col, u_ink, dxName(uv, vec2(lo.x - 0.02 - nw, ys - h * 0.5), h, p_names, i, 0.8));
-    col = dxInk(col, u_ink, dxName(uv, vec2(hi.x + 0.02, ys - h * 0.5), h, p_names, i, 0.8) * 0.8);
+    if (abs(uv.y - ys) < 0.02) {
+      col = dxInk(col, u_ink, dxName(uv, vec2(lo.x - 0.02 - nw, ys - h * 0.5), h, p_names, i, 0.8));
+      col = dxInk(col, u_ink, dxName(uv, vec2(hi.x + 0.02, ys - h * 0.5), h, p_names, i, 0.8) * 0.8);
+    }
     if (i < p_stations - 1) cumG += gapAt(i);
   }
   float cur = fract(float(p_sweep) * u_p);
@@ -68,7 +70,7 @@ vec4 motif(vec2 uv, vec2 fc) {
   float tt = (uv.x - lo.x) / pw;
   float hl = tslot(float(p_trains));
   if (inX && inY) {
-    for (int k = 0; k < 28; k++) {
+    for (int k = 0; k < 24; k++) {
       if (k >= p_trains) break;
     int kk = k;
       float slope, W;
@@ -76,16 +78,16 @@ vec4 motif(vec2 uv, vec2 fc) {
       if (y < -8.0) continue;
       float s = slope / pw * 1.0;
       float d = abs(uv.y - y) / sqrt(1.0 + s * s * 0.0 + (slope / pw) * (slope / pw));
-      float wgt = 0.0013 + 0.0011 * h21(vec2(float(kk), 5.0));
+      float wgt = 0.0013 + 0.0011 * itH(vec2(float(kk), 5.0));
       bool sel = float(kk) == mod(hl, float(p_trains));
       float dd = fract(cur - tt + 1.0);
       float lit = 1.0 - 0.78 * smoothstep(p_trail, p_trail + 0.12, dd);
       float cv = dxHair(d, wgt * (sel ? 1.8 : 1.0));
       col = dxInk(col, sel ? u_a0 : u_ink, cv * (0.4 + 0.55 * lit));
-      // pinned dot at the cursor
+      // pinned dot at the cursor, extrapolated along this leg
       if (abs(uv.x - cxp) < 0.014) {
-        float sl2, W2; float yc = trainY(kk, cur, yTopS, yBotS, sumG, sl2, W2);
-        if (yc > -8.0) col = dxInk(col, sel ? u_a0 : u_a1, dxDot(uv, vec2(cxp, yc), 0.0045));
+        float yc = y + slope * (cur - tt);
+        col = dxInk(col, sel ? u_a0 : u_a1, dxDot(uv, vec2(cxp, yc), 0.0045));
       }
     }
   }
@@ -94,6 +96,7 @@ vec4 motif(vec2 uv, vec2 fc) {
   for (int i = 0; i <= 24; i++) {
     if (i > p_hours) break;
     if (i % 3 != 0) continue;
+    if (abs(uv.y - (hi.y + 0.03)) > 0.02 && abs(uv.y - (lo.y - 0.033)) > 0.02) continue;
     float hx = lo.x + pw * float(i) / hrs;
     float hv = float(p_t0 + i);
     col = dxInk(col, u_ink, dxNum(uv, vec2(hx - 0.0085 * dxNumW(hv), hi.y + 0.022), 0.015, mod(hv, 24.0), 0.8) * 0.85);

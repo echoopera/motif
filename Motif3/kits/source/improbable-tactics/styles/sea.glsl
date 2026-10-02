@@ -3,9 +3,16 @@
 float swell(vec2 p) {
   vec2 q = vec2(p.x * 0.8 + p.y * 0.35, p.y * 1.3 - p.x * 0.2) * p_scale * 1.6;
   float k = float(p_cycles);
-  float a = lfbm(q, 5, k, 0.7);
-  float r = lridge(q * 1.3 + a * 0.9, 5, k, 0.9);
-  return 0.5 + a * 0.5 + r * 0.55 * (0.4 + p_chop);
+  float v = 0.0, amp = 0.5;
+  vec2 w = vec2(itV(q * 1.3), itV(q * 1.3 + 7.1)) * (0.5 + p_chop);
+  for (int o = 0; o < 4; o++) {
+    float fo = float(o);
+    vec2 dir = vec2(cos(fo * 1.9 + 0.4), sin(fo * 1.9 + 0.4));
+    float ph = dot(q + w * 1.4, dir) * (3.2 + 2.8 * fo) + k * TAU * u_p * (o % 2 == 0 ? 1.0 : -1.0) + fo * 1.7;
+    v += amp * (1.0 - abs(sin(ph)));
+    amp *= 0.62;
+  }
+  return 0.15 + v * 0.95;
 }
 vec3 water(vec2 p, out float lum) {
   float s = swell(p);
@@ -41,7 +48,7 @@ vec4 motif(vec2 uv, vec2 fc) {
   if (p_window) {
     vec2 wc = lc0 + vec2(LW * 0.55, LH * 0.38), wh = vec2(LW * 0.55, LH * 0.27);
     float wm = 1.0 - smoothstep(-aa(), aa(), sdBox(uv - wc, wh));
-    float wl; vec3 wcol = water(uv + vec2(0.1, 0.05), wl);
+    float wl = lum;
     vec3 tint = c_tint();
     float ht = itHalf(uv, 1.0 - sat(wl * 1.5), 0.6, 0.007);
     vec3 red = tint * (0.45 + 0.9 * sat(wl * 1.4));
@@ -61,7 +68,7 @@ vec4 motif(vec2 uv, vec2 fc) {
     if (s >= p_labels) break;
     float fs = float(s);
     float sy = hy - 0.065 - fs * 0.052;
-    float sw = (0.2 + 0.28 * h21(vec2(fs, 5.0))) * ext.x * 0.5;
+    float sw = (0.2 + 0.28 * itH(vec2(fs, 5.0))) * ext.x * 0.5;
     float sh = 0.04;
     vec2 sc = vec2(rx + 0.03 + sw * 0.5, sy);
     float bm = 1.0 - smoothstep(-aa(), aa(), sdBox(uv - sc, vec2(sw * 0.5, sh * 0.5)));
@@ -80,7 +87,7 @@ vec4 motif(vec2 uv, vec2 fc) {
     float cw2 = wd / float(n);
     float ix = floor((op.x + wd * 0.5) / cw2);
     if (ix >= 0.0 && ix < float(n)) {
-      float hv = h21(vec2(ix, 91.0));
+      float hv = itH(vec2(ix, 91.0));
       float ch = ext.y * (0.16 + 0.12 * hv);
       vec2 gl = vec2(fract((op.x + wd * 0.5) / cw2), (op.y + 0.5 * ch + 0.03 * (hv - 0.5)) / ch);
       float lv = itGlyphLine(itCh(p_word, int(ix)), gl, 5.0 * aa() / ch, 0.08);

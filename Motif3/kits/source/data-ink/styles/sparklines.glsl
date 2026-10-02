@@ -26,8 +26,8 @@ vec4 motif(vec2 uv, vec2 fc) {
   if (sx >= 0.0 && sx <= 1.0 && q.y > pad + hh * 0.28 && q.y < pad + hh * 0.68) col = mix(col, dxGrey(0.12), 0.6);
   // the line, sampled for min / max
   float mn = 9.0, mx = -9.0, mnx = 0.0, mxx = 0.0;
-  for (int i = 0; i <= 28; i++) {
-    float xx = float(i) / 28.0; float v = series(r, xx);
+  for (int i = 0; i <= 14; i++) {
+    float xx = float(i) / 14.0; float v = series(r, xx);
     if (v < mn) { mn = v; mnx = xx; }
     if (v > mx) { mx = v; mxx = xx; }
   }

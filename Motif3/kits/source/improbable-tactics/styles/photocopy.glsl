@@ -1,6 +1,7 @@
 // Photocopy Type — "print is not dead". Giant mismatched letters pushed through a tired copier: ragged edges, toner
 // dropout, a second misregistered pass in blue, micro-text columns, a barcode, creases, and flung paint.
 float typeCov(vec2 p, float rowOff, int rowIdx, float hgt) {
+  if (abs(p.y - rowOff) > hgt * 1.5) return 0.0;
   int n = itLen(p_word);
   float W = M_asp().x * 0.94 * p_size;
   float cw = W / float(n);
@@ -11,16 +12,16 @@ float typeCov(vec2 p, float rowOff, int rowIdx, float hgt) {
     int ix = ix0 + k;
     if (ix < 0 || ix >= n) continue;
     float fi = float(ix) + float(rowIdx) * 11.0;
-    vec2 hv = h22(vec2(fi, 4.0));
+    vec2 hv = itH2(vec2(fi, 4.0));
     float sx = 0.8 + 0.5 * hv.x * p_scatter + 0.2 * (1.0 - p_scatter);
     float sy = 0.65 + 0.9 * hv.y * p_scatter + 0.35 * (1.0 - p_scatter);
-    float ang = (h21(vec2(fi, 8.0)) - 0.5) * 0.22 * p_scatter + 0.02 * p_jitter * lsin(1.0, hv.x);
-    vec2 c = vec2(x0 + (float(ix) + 0.5) * cw, rowOff + (h21(vec2(fi, 9.0)) - 0.5) * 0.12 * p_scatter * hgt);
+    float ang = (itH(vec2(fi, 8.0)) - 0.5) * 0.22 * p_scatter + 0.02 * p_jitter * lsin(1.0, hv.x);
+    vec2 c = vec2(x0 + (float(ix) + 0.5) * cw, rowOff + (itH(vec2(fi, 9.0)) - 0.5) * 0.12 * p_scatter * hgt);
     c.y += 0.012 * p_jitter * lsin(1.0, hv.y);
     vec2 l = rot(-ang) * (p - c);
     vec2 box = vec2(cw * 0.96 * sx, hgt * sy);
     int ch = itCh(p_word, ix + rowIdx * 2);
-    float rnd = h21(vec2(fi, 12.0)) < p_round ? 1.0 : 0.0;
+    float rnd = itH(vec2(fi, 12.0)) < p_round ? 1.0 : 0.0;
     cov = max(cov, itGlyph(ch, l / box + 0.5, 5.0 * aa() / box.y, rnd, p_bold));
   }
   return cov;
@@ -38,7 +39,7 @@ vec4 motif(vec2 uv, vec2 fc) {
   // micro-text columns
   for (int b = 0; b < 4; b++) {
     float fb = float(b);
-    vec2 hc = h22(vec2(fb, 71.0)), hs = h22(vec2(fb, 72.0));
+    vec2 hc = itH2(vec2(fb, 71.0)), hs = itH2(vec2(fb, 72.0));
     vec2 bc = (hc - 0.5) * ext * vec2(0.95, 0.85);
     vec2 hb = vec2(0.07 + 0.14 * hs.x, 0.05 + 0.13 * hs.y);
     if (fb >= p_micro * 4.0 + 0.001) break;
@@ -47,9 +48,9 @@ vec4 motif(vec2 uv, vec2 fc) {
     float ts = 0.0105;
     vec2 gp = vec2(d.x / (ts * 0.85), (2.0 * hb.y - d.y) / (ts * 1.5));
     vec2 gi = floor(gp), gf = fract(gp);
-    float len = (0.5 + 0.5 * h21(vec2(gi.y, fb + 5.0))) * 2.0 * hb.x / (ts * 0.85);
+    float len = (0.5 + 0.5 * itH(vec2(gi.y, fb + 5.0))) * 2.0 * hb.x / (ts * 0.85);
     if (gi.x > len) continue;
-    float hh = h21(gi + fb * 31.0);
+    float hh = itH(gi + fb * 31.0);
     if (hh < 0.14) continue;
     float cov = itGlyph(itAny(hh * 7.0), vec2(gf.x, 1.0 - gf.y) * vec2(1.25, 1.2) - vec2(0.0, 0.0), 5.0 * aa() / (ts * 1.2), 0.5, 0.2);
     col = mix(col, u_ink * 1.0, cov * 0.78);
@@ -60,7 +61,7 @@ vec4 motif(vec2 uv, vec2 fc) {
     vec2 d = uv - bo;
     if (d.x > 0.0 && d.x < bs.x && d.y > 0.0 && d.y < bs.y) {
       float i = floor(d.x / 0.0042);
-      float on = step(0.42, h21(vec2(i, 77.0)));
+      float on = step(0.42, itH(vec2(i, 77.0)));
       col = mix(col, u_ink, on * 0.9);
     }
   }
@@ -68,9 +69,9 @@ vec4 motif(vec2 uv, vec2 fc) {
   for (int j = 0; j < 8; j++) {
     if (j >= p_splat) break;
     float fj = float(j);
-    vec2 hc = h22(vec2(fj, 101.0));
+    vec2 hc = itH2(vec2(fj, 101.0));
     vec2 c = (hc - 0.5) * ext * vec2(0.85, 0.8);
-    float r = 0.022 + 0.07 * h21(vec2(fj, 102.0));
+    float r = 0.022 + 0.07 * itH(vec2(fj, 102.0));
     r *= 1.0 + 0.1 * p_jitter * lsin(1.0, hc.x);
     float cov = itSplat(uv, c, r, fj * 3.13 + 1.0);
     vec3 pig = accent(fj);

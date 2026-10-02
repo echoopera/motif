@@ -5,15 +5,15 @@ float warpY(float y) { return p_log > 0.01 ? log(1.0 + y * p_log * 24.0) / log(1
 
 float fcurve(int i, float x) {
   float fi = float(i);
-  float amp = p_level * (0.18 + 0.82 * pow(h21(vec2(fi, 2.0)), 0.6)) * (0.6 + 0.8 * V(i % 8));
-  float tau = (0.12 + 0.5 * h21(vec2(fi, 3.0))) * (0.5 + p_spread);
+  float amp = p_level * (0.18 + 0.82 * pow(itH(vec2(fi, 2.0)), 0.6)) * (0.6 + 0.8 * V(i % 8));
+  float tau = (0.12 + 0.5 * itH(vec2(fi, 3.0))) * (0.5 + p_spread);
   float y;
   if (p_family == FAMILY_SATURATING) y = 1.0 - exp(-x / tau);
   else if (p_family == FAMILY_PEAKED) y = (x / tau) * exp(1.0 - x / tau);
-  else y = pow(x, 0.6 + p_curve * 2.4 * (0.5 + h21(vec2(fi, 4.0))));
+  else y = pow(x, 0.6 + p_curve * 2.4 * (0.5 + itH(vec2(fi, 4.0))));
   y *= amp;
-  y += p_noise * 0.012 * snoise(vec3(x * 14.0, fi * 3.7, 0.5)) * x;
-  y += 0.012 * lsin(1.0, h21(vec2(fi, 6.0))) * sin(x * 9.0 + fi) * p_noise;
+  y += p_noise * 0.012 * itV(vec2(x * 14.0, fi * 3.7)) * x;
+  y += 0.012 * lsin(1.0, itH(vec2(fi, 6.0))) * sin(x * 9.0 + fi) * p_noise;
   return max(y, 0.0);
 }
 
@@ -49,8 +49,8 @@ vec4 motif(vec2 uv, vec2 fc) {
   for (int i = 0; i <= 5; i++) {
     float v = float(i) * 20.0;
     float gy = warpY(float(i) / 5.0);
-    col = dxInk(col, u_ink, dxNum(q, vec2(-0.012 - 0.0105 * dxNumW(v), lo.y + gy * ph - 0.006), 0.012, v, 0.8) * 0.85);
-    col = dxInk(col, u_ink, dxNum(q, vec2(lo.x + float(i) / 5.0 * pw - 0.005 * dxNumW(v), lo.y - 0.026), 0.012, float(i) * 20.0, 0.8) * 0.85);
+    if (q.x < 0.0 || q.y < lo.y) col = dxInk(col, u_ink, dxNum(q, vec2(-0.012 - 0.0105 * dxNumW(v), lo.y + gy * ph - 0.006), 0.012, v, 0.8) * 0.85);
+    if (q.y < lo.y) col = dxInk(col, u_ink, dxNum(q, vec2(lo.x + float(i) / 5.0 * pw - 0.005 * dxNumW(v), lo.y - 0.026), 0.012, float(i) * 20.0, 0.8) * 0.85);
   }
   col = dxInk(col, u_ink, dxName(q, vec2(0.0, hi.y + 0.016), 0.02, p_names, pi + 3, 0.8) * 0.95);
   // curves
@@ -69,22 +69,18 @@ vec4 motif(vec2 uv, vec2 fc) {
     float slope = (yw2 - yw) / 0.01 * ph / pw;
     float d = abs(dy) / sqrt(1.0 + slope * slope);
     float on = step(x, xh) * step(0.0, x);
-    float hot = h21(vec2(float(ci), 17.0)) < 0.18 ? 1.0 : 0.0;
+    float hot = itH(vec2(float(ci), 17.0)) < 0.18 ? 1.0 : 0.0;
     col = dxInk(col, hot > 0.5 ? u_a0 : u_ink, dxHair(d, hot > 0.5 ? 0.0021 : 0.0013) * on * (hot > 0.5 ? 0.95 : 0.8));
-    // data points along the curve
-    float pt = 0.0;
-    for (int j = 1; j <= 12; j++) {
-      float xj = float(j) / 12.0;
-      if (xj > xh) break;
-      if (abs(xj - x) < 0.03) pt = max(pt, dxDot(vec2(x * pw, s.y * ph), vec2(xj * pw, warpY(sat(fcurve(ci, xj))) * ph), 0.0022));
+    // data point nearest this pixel, and the head tag
+    float xj = floor(x * 12.0 + 0.5) / 12.0;
+    if (xj <= xh && xj > 0.0 && abs(xj - x) < 0.03) {
+      col = dxInk(col, u_ink, dxDot(vec2(x * pw, s.y * ph), vec2(xj * pw, warpY(sat(fcurve(ci, xj))) * ph), 0.0022) * p_points);
     }
-    col = dxInk(col, u_ink, pt * p_points);
-    // head tag
-    float yh = fcurve(ci, xh);
-    vec2 hp = vec2(xh * pw, warpY(sat(yh)) * ph);
-    if (abs(s.x * pw - hp.x) < 0.07) {
+    if (abs(s.x - xh) * pw < 0.07) {
+      float yh = fcurve(ci, xh);
+      vec2 hp = vec2(xh * pw, warpY(sat(yh)) * ph);
       col = dxInk(col, hot > 0.5 ? u_a0 : u_ink, dxDot(vec2(s.x * pw, s.y * ph), hp, 0.0036));
-      if (p_tags) col = dxInk(col, u_ink, dxNum(vec2(s.x * pw, s.y * ph), hp + vec2(0.007, -0.004), 0.0105, sat(yv) * 100.0, 0.8) * 0.9);
+      if (p_tags) col = dxInk(col, u_ink, dxNum(vec2(s.x * pw, s.y * ph), hp + vec2(0.007, -0.004), 0.0105, sat(yh) * 100.0, 0.8) * 0.9);
     }
   }
   return vec4(col, 1.0);

@@ -28,7 +28,7 @@ vec4 motif(vec2 uv, vec2 fc) {
     fill = pick(rot(-radians(p_angle)) * ctr, sz, fill);
     col = fill == u_bg ? paper : fill;
     float e = min(min(p.x - lo.x, hi.x - p.x), min(p.y - lo.y, hi.y - p.y));
-    float lw = p_line * (0.55 + 0.9 * h21(vec2(id, 66.0)));
+    float lw = p_line * (0.55 + 0.9 * itH(vec2(id, 66.0)));
     col = mix(col, u_ink, 1.0 - smoothstep(lw * 0.5 - aa(), lw * 0.5 + aa(), e));
     // a hairline of shadow inside a coloured field gives it body
     col *= 1.0 - 0.06 * smoothstep(0.03, 0.0, e) * step(0.001, lw);
@@ -41,28 +41,28 @@ vec4 motif(vec2 uv, vec2 fc) {
     float k = float(p_speed);
     vec3 gray = mix(u_bg, u_ink, 0.25);
     if (my == 0 && mx != 0) {
-      float dir = h21(vec2(cid.y, 3.0)) < 0.5 ? 1.0 : -1.0;
+      float dir = itH(vec2(cid.y, 3.0)) < 0.5 ? 1.0 : -1.0;
       float sx = g.x - dir * k * u_p;
       float bi = floor(sx);
-      float h = h21(vec2(bi, cid.y + slot * 5.0));
+      float h = itH(vec2(bi, cid.y + slot * 5.0));
       vec3 c = h < 0.5 ? u_a1 : h < 0.68 ? u_a0 : h < 0.82 ? u_a2 : h < 0.92 ? gray : paper;
       vec2 bc = vec2((bi + 0.5 - 0.37 * N) / N, (cid.y + 0.5 - 0.37 * N) / N);
       c = pick(rot(-radians(p_angle)) * bc, vec2(1.0 / N), c);
       float cov = 1.0 - smoothstep(-aa(), aa(), sdBox(vec2(fract(sx) - 0.5, f.y - 0.5) / N, vec2(0.44, 0.40) / N));
       col = mix(col, c, cov);
     } else if (mx == 0 && my != 0) {
-      float dir = h21(vec2(cid.x, 4.0)) < 0.5 ? 1.0 : -1.0;
+      float dir = itH(vec2(cid.x, 4.0)) < 0.5 ? 1.0 : -1.0;
       float sy = g.y - dir * k * u_p;
       float bi = floor(sy);
-      float h = h21(vec2(cid.x + slot * 5.0, bi + 9.0));
+      float h = itH(vec2(cid.x + slot * 5.0, bi + 9.0));
       vec3 c = h < 0.5 ? u_a1 : h < 0.68 ? u_a0 : h < 0.82 ? u_a2 : h < 0.92 ? gray : paper;
       vec2 bc = vec2((cid.x + 0.5 - 0.37 * N) / N, (bi + 0.5 - 0.37 * N) / N);
       c = pick(rot(-radians(p_angle)) * bc, vec2(1.0 / N), c);
       float cov = 1.0 - smoothstep(-aa(), aa(), sdBox(vec2(f.x - 0.5, fract(sy) - 0.5) / N, vec2(0.40, 0.44) / N));
       col = mix(col, c, cov);
     } else if (mx == 0 && my == 0) {
-      float h = h21(cid + 2.0 + slot);
-      vec3 c1 = accent(floor(h * 9.0)), c2 = h21(cid + 8.0) < 0.5 ? paper : u_a0;
+      float h = itH(cid + 2.0 + slot);
+      vec3 c1 = accent(floor(h * 9.0)), c2 = itH(cid + 8.0) < 0.5 ? paper : u_a0;
       vec2 d = (f - 0.5) / N;
       float o = 1.0 - smoothstep(-aa(), aa(), sdBox(d, vec2(0.46) / N));
       float i1 = 1.0 - smoothstep(-aa(), aa(), sdBox(d, vec2(0.26 + 0.1 * p_nest) / N));
@@ -70,14 +70,14 @@ vec4 motif(vec2 uv, vec2 fc) {
     } else {
       // the 2x2 plots between streets: sometimes a nested square
       vec2 blk = floor(vec2(cid.x - float(mx - 1), cid.y - float(my - 1)) / 3.0);
-      float hb = h21(blk + 21.0 + slot);
+      float hb = itH(blk + 21.0 + slot);
       if (hb < p_nest) {
         vec2 u = (vec2(float(mx - 1), float(my - 1)) + f) / 2.0;
         vec2 d = u - 0.5;
-        vec3 c1 = accent(floor(hb * 3.0 / max(p_nest, 1e-3) + h21(blk) * 3.0));
+        vec3 c1 = accent(floor(hb * 3.0 / max(p_nest, 1e-3) + itH(blk) * 3.0));
         float o = 1.0 - smoothstep(-0.01, 0.01, max(abs(d.x), abs(d.y)) - 0.42);
         float i1 = 1.0 - smoothstep(-0.01, 0.01, max(abs(d.x), abs(d.y)) - 0.22);
-        col = mix(col, mix(c1, h21(blk + 5.0) < 0.5 ? paper : gray, i1), o);
+        col = mix(col, mix(c1, itH(blk + 5.0) < 0.5 ? paper : gray, i1), o);
       }
     }
   }

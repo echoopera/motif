@@ -32,24 +32,27 @@ vec4 motif(vec2 uv, vec2 fc) {
   // labels: a dot on the series, its name, and the weight you set
   if (p_labels) {
     float lh = 0.024;
+    int li = -1; float lux = 0.0;
     for (int i = 0; i < 8; i++) {
       if (i >= p_layers) break;
-      float fi = float(i);
-      float c = fract(0.1 + fi * 0.618034) + 0.04 * p_sway * lsin(1.0, h21(vec2(fi, 4.0)));
+      float c = fract(0.1 + float(i) * 0.618034) + 0.04 * p_sway * lsin(1.0, itH(vec2(float(i), 4.0)));
       float ux = clamp((fract(c + float(p_scroll) * u_p) - 0.5) * A.x, -0.4 * A.x, 0.22 * A.x);
       float W = (dxNameW(p_names, i) + 2.9) * lh;
-      if (uv.x < ux - 0.012 || uv.x > ux + 0.02 + W) continue;
+      if (uv.x > ux - 0.012 && uv.x < ux + 0.02 + W) { li = i; lux = ux; }
+    }
+    if (li >= 0) {
+      float fi = float(li);
+      float c = fract(0.1 + fi * 0.618034) + 0.04 * p_sway * lsin(1.0, itH(vec2(fi, 4.0)));
       float tt = 0.0; float Tj[8];
       for (int j = 0; j < 8; j++) { Tj[j] = 0.0; if (j >= p_layers) continue; Tj[j] = dxData(float(j), c, p_pattern, p_sway, p_smooth) * (0.12 + V(j)) * p_height * 0.17; tt += Tj[j]; }
       float yy = -0.5 * tt + p_wiggle * 0.1 * sin(TAU * (c * 2.0 + 0.2));
-      for (int j = 0; j < 8; j++) { if (j >= i) break; yy += Tj[j]; }
-      yy += 0.5 * Tj[i];
-      vec2 o = vec2(ux + 0.016, yy - lh * 0.5);
-      float tx = dxName(uv, o, lh, p_names, i, 0.8);
-      tx = max(tx, dxNum(uv, o + vec2((dxNameW(p_names, i) + 0.6) * lh, 0.0), lh, V(i) * 100.0, 0.8));
-      col = mix(col, u_bg * 1.04, 0.0);
+      for (int j = 0; j < 8; j++) { if (j >= li) break; yy += Tj[j]; }
+      yy += 0.5 * Tj[li];
+      vec2 o = vec2(lux + 0.016, yy - lh * 0.5);
+      float tx = dxName(uv, o, lh, p_names, li, 0.8);
+      tx = max(tx, dxNum(uv, o + vec2((dxNameW(p_names, li) + 0.6) * lh, 0.0), lh, V(li) * 100.0, 0.8));
       col = dxInk(col, u_ink, tx);
-      col = dxInk(col, u_ink, dxDot(uv, vec2(ux, yy), 0.0055));
+      col = dxInk(col, u_ink, dxDot(uv, vec2(lux, yy), 0.0055));
     }
   }
   // time axis
@@ -60,7 +63,7 @@ vec4 motif(vec2 uv, vec2 fc) {
       float tx = (float(i) / 4.0 - 0.5) * (A.x - 0.12);
       col = dxInk(col, u_ink, dxHair(abs(uv.x - tx), 0.0012) * step(ay - 0.012, uv.y) * step(uv.y, ay) * 0.9);
       float yr = p_from + float(i) * p_span / 4.0;
-      col = dxInk(col, u_ink, dxNum(uv, vec2(tx - 0.018 * dxNumW(yr) * 0.5 * 1.0, ay - 0.032), 0.02, yr, 0.8) * 0.9);
+      if (abs(uv.y - (ay - 0.022)) < 0.02) col = dxInk(col, u_ink, dxNum(uv, vec2(tx - 0.018 * dxNumW(yr) * 0.5 * 1.0, ay - 0.032), 0.02, yr, 0.8) * 0.9);
     }
   }
   return vec4(col, 1.0);

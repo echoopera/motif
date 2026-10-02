@@ -8,13 +8,13 @@ vec4 motif(vec2 uv, vec2 fc) {
   vec2 x = w * dens, n = floor(x), f = fract(x);
   float d1 = 9.0, d2 = 9.0; vec2 site = vec2(0.0), sid = vec2(0.0);
   for (int j = -1; j <= 1; j++) for (int i = -1; i <= 1; i++) {
-    vec2 g = vec2(float(i), float(j)), cid = n + g; vec2 h = h22(cid);
+    vec2 g = vec2(float(i), float(j)), cid = n + g; vec2 h = itH2(cid);
     vec2 o = 0.5 + 0.9 * (h - 0.5) + p_drift * 0.5 * lc(1.0, h.x) * (0.4 + 0.6 * h.y);
     float d = length(g + o - f);
     if (d < d1) { d2 = d1; d1 = d; site = (cid + o) / dens; sid = cid; } else if (d < d2) d2 = d;
   }
   float e = (d2 - d1) * 0.5 / dens;
-  vec2 hv = h22(sid + 3.0), hs = h22(sid + 11.0);
+  vec2 hv = itH2(sid + 3.0), hs = itH2(sid + 11.0);
   float th = (hv.x - 0.5) * p_twist * 3.0 + 0.2 * p_twist * lsin(1.0, hv.y);
   float zm = 1.0 + (hs.x - 0.5) * p_magnify;
   vec2 off = (hv - 0.5) * p_scatter * 0.8 + p_drift * 0.04 * lc(1.0, hs.y);
@@ -23,9 +23,9 @@ vec4 motif(vec2 uv, vec2 fc) {
   vec2 q = site + rot(th) * rel + off;
   vec3 img = srcAt(q);
   float l = itLum(img);
-  float mode = h21(sid + 19.0);
+  float mode = itH(sid + 19.0);
   vec3 col = img;
-  vec3 acc = accent(floor(h21(sid + 23.0) * 30.0));
+  vec3 acc = accent(floor(itH(sid + 23.0) * 30.0));
   vec3 paper = mix(u_bg, vec3(1.0), 0.3);
   if (mode < p_duo) {
     col = mix(u_ink, acc, smoothstep(0.02, 0.6, l));
@@ -35,10 +35,10 @@ vec4 motif(vec2 uv, vec2 fc) {
     float ht = itHalf(rot(hv.x * 2.0) * (uv - site), tone, 0.0, 0.011);
     col = mix(paper, mix(u_ink, acc, step(0.5, hs.x)), ht);
   } else if (mode < p_duo + p_half + p_type) {
-    int ch = itPick(p_word, h21(sid + 29.0));
+    int ch = itPick(p_word, itH(sid + 29.0));
     float hh = 0.9 / dens * 1.5;
     vec2 gl = rot(th * 0.5) * (uv - site);
-    float cov = itGlyph(ch, gl / vec2(hh * 0.8, hh) + 0.5, 5.0 * aa() / hh, h21(sid + 31.0) < 0.5 ? 0.0 : 1.0, 0.4);
+    float cov = itGlyph(ch, gl / vec2(hh * 0.8, hh) + 0.5, 5.0 * aa() / hh, itH(sid + 31.0) < 0.5 ? 0.0 : 1.0, 0.4);
     vec3 bgc = itLum(acc) < 0.12 ? paper : acc;
     col = mix(bgc, itLum(bgc) < 0.25 ? u_bg : u_ink, cov);
   }

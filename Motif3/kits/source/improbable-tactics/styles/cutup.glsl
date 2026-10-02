@@ -3,7 +3,7 @@
 vec3 srcAt(vec2 q) { vec4 s = m_sourceUV(q); return mix(itProc(q), s.rgb + u_bg * (1.0 - s.a), u_sourceOn); }
 
 vec2 srcCell(vec2 ij, vec2 n, float s) {
-  vec2 h = h22(ij + s * 17.3 + 1.7);
+  vec2 h = itH2(ij + s * 17.3 + 1.7);
   return vec2(floor(h.x * n.x), floor(h.y * n.y));
 }
 
@@ -21,13 +21,13 @@ vec4 motif(vec2 uv, vec2 fc) {
   sc = mix(ij, sc, p_shuffle);
   vec2 c = ((ij + 0.5) / n - 0.5) * ext;
   vec2 off = (sc - ij) / n * ext;
-  vec2 hv = h22(ij + 5.0);
+  vec2 hv = itH2(ij + 5.0);
   float ang = (hv.x - 0.5) * p_tilt * 0.9 + 0.03 * p_tilt * lsin(1.0, hv.y);
   vec2 rel = rot(ang) * (uv - c);
   if (hv.y < p_mirror * 0.5) rel.x = -rel.x;
   vec2 q = c + rel + off + p_drift * 0.02 * lc(1.0, hv.x) * (0.5 + hv.y);
   vec3 col = srcAt(q);
-  float tintm = h21(ij + 9.0);
+  float tintm = itH(ij + 9.0);
   if (tintm < p_tint) col = itMul(col, mix(vec3(1.0), accent(floor(tintm / max(p_tint, 1e-3) * 3.0)) * 1.25, 0.9), 1.0);
   if (tintm > 1.0 - p_inkMix) col = mix(u_ink, mix(u_bg, accent(floor(tintm * 9.0)), 0.3), smoothstep(0.1, 0.7, itLum(col)));
   // cut lines

@@ -803,7 +803,7 @@
           "type": "int",
           "label": "Trains",
           "min": 4,
-          "max": 28,
+          "max": 24,
           "def": 16,
           "group": "Data",
           "hint": "The highlighted train steps through them. Limiter-capped."

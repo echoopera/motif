@@ -2,12 +2,12 @@
 // breathes, edged in uneven dark lines, with the odd half-sun rising from a cell wall.
 vec4 motif(vec2 uv, vec2 fc) {
   vec2 ext = M_asp() * 1.06;
-  vec2 wob = p_wobble * vec2(0.011 * itN(uv * 5.0) + 0.006 * ln2(uv * 4.0, 1.0, 0.6), 0.011 * itN(uv * 5.0 + 7.0) + 0.006 * ln2(uv * 4.0 + 9.0, 1.0, 0.6));
+  vec2 wob = p_wobble * vec2(0.011 * itN(uv * 5.0) + 0.006 * sin(TAU * u_p + uv.y * 9.0), 0.011 * itN(uv * 5.0 + 7.0) + 0.006 * sin(TAU * u_p + uv.x * 9.0 + 1.7));
   vec2 w = uv + wob;
   vec2 lo, hi; float id;
   itKD(w, ext, p_depth, p_stop, p_drift, float(p_cycles), 0.0, lo, hi, id);
   vec2 sz = hi - lo, ctr = (lo + hi) * 0.5;
-  float h0 = h21(vec2(id, 5.0)), h1 = h21(vec2(id, 6.0)), h2 = h21(vec2(id, 7.0)), h3 = h21(vec2(id, 8.0));
+  float h0 = itH(vec2(id, 5.0)), h1 = itH(vec2(id, 6.0)), h2 = itH(vec2(id, 7.0)), h3 = itH(vec2(id, 8.0));
   vec3 base = h0 < 0.30 ? u_a1 : h0 < 0.50 ? u_a0 : h0 < 0.68 ? u_a2 : h0 < 0.82 ? mix(u_a1, u_bg, 0.45) : h0 < 0.92 ? u_bg : mix(u_ink, u_a1, 0.3);
   vec3 col = base * (1.0 + 0.08 * itPaper(uv * 1.3));
   // dot screen, aligned to the cell
