@@ -70,20 +70,21 @@ vec4 motif(vec2 uv, vec2 fc) {
   if (inX && inY) {
     for (int k = 0; k < 28; k++) {
       if (k >= p_trains) break;
+    int kk = k;
       float slope, W;
-      float y = trainY(k, tt, yTopS, yBotS, sumG, slope, W);
+      float y = trainY(kk, tt, yTopS, yBotS, sumG, slope, W);
       if (y < -8.0) continue;
       float s = slope / pw * 1.0;
       float d = abs(uv.y - y) / sqrt(1.0 + s * s * 0.0 + (slope / pw) * (slope / pw));
-      float wgt = 0.0013 + 0.0011 * h21(vec2(float(k), 5.0));
-      bool sel = float(k) == mod(hl, float(p_trains));
+      float wgt = 0.0013 + 0.0011 * h21(vec2(float(kk), 5.0));
+      bool sel = float(kk) == mod(hl, float(p_trains));
       float dd = fract(cur - tt + 1.0);
       float lit = 1.0 - 0.78 * smoothstep(p_trail, p_trail + 0.12, dd);
       float cv = dxHair(d, wgt * (sel ? 1.8 : 1.0));
       col = dxInk(col, sel ? u_a0 : u_ink, cv * (0.4 + 0.55 * lit));
       // pinned dot at the cursor
       if (abs(uv.x - cxp) < 0.014) {
-        float sl2, W2; float yc = trainY(k, cur, yTopS, yBotS, sumG, sl2, W2);
+        float sl2, W2; float yc = trainY(kk, cur, yTopS, yBotS, sumG, sl2, W2);
         if (yc > -8.0) col = dxInk(col, sel ? u_a0 : u_a1, dxDot(uv, vec2(cxp, yc), 0.0045));
       }
     }

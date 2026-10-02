@@ -58,13 +58,14 @@ vec4 motif(vec2 uv, vec2 fc) {
   int E = 0;
   for (int i = 0; i < 8; i++) {
     if (i >= p_nodes) break;
-    int j = (i + 1) % p_nodes;
-    edge(uv, node(i), node(j), float(i) + 1.0, i, col);
-    if (h21(vec2(float(i), 21.0)) < p_chords) edge(uv, node(i), node((i + 2) % p_nodes), float(i) + 31.0, i + 3, col);
-    if (h21(vec2(float(i), 22.0)) < p_legs) {
-      vec2 n0 = node(i); vec2 dir = normalize(n0 + vec2(0.001));
-      vec2 far = n0 + dir * (0.4 + 0.2 * h21(vec2(float(i), 23.0)));
-      edge(uv, n0, far, float(i) + 61.0, i + 5, col);
+    int ii = i;
+    int j = (ii + 1) % p_nodes;
+    edge(uv, node(ii), node(j), float(ii) + 1.0, ii, col);
+    if (h21(vec2(float(ii), 21.0)) < p_chords) edge(uv, node(ii), node((ii + 2) % p_nodes), float(ii) + 31.0, ii + 3, col);
+    if (h21(vec2(float(ii), 22.0)) < p_legs) {
+      vec2 n0 = node(ii); vec2 dir = normalize(n0 + vec2(0.001));
+      vec2 far = n0 + dir * (0.4 + 0.2 * h21(vec2(float(ii), 23.0)));
+      edge(uv, n0, far, float(ii) + 61.0, ii + 5, col);
     }
   }
   for (int i = 0; i < 8; i++) {
