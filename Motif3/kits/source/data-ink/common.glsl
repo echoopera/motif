@@ -1,4 +1,4 @@
-// Data Ink — shared helpers. A tiny bitmap type system (letters + digits) so shaders can print the numbers they draw,
+// DataInk — shared helpers. A tiny bitmap type system (letters + digits) so shaders can print the numbers they draw,
 // a looped data generator, hairlines, sequential ramps. Time only enters through u_p with integer frequencies.
 
 const uint IT_FONT[36] = uint[36](15269425u,32045630u,16269839u,32032318u,33061407u,33061392u,16272943u,18415153u,32641183u,7408204u,18444881u,17318431u,18732593u,18667121u,15255086u,32045584u,15255151u,32045649u,16267326u,32641156u,18400814u,18400580u,18405233u,18157905u,18157700u,32575775u,15324974u,4591758u,15243551u,31504446u,19496002u,33060926u,15235630u,32575752u,15252014u,15252526u);

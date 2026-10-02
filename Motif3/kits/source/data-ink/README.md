@@ -1,4 +1,4 @@
-# Data Ink — Motif kit 0.1.0
+# DataInk — Motif kit 0.1.0
 
 Information graphics in the spirit of Edward Tufte, as playable shaders (`motif-kit@1`, SDK 1.2). Eight styles, six palettes. The dataset *is* the parameter panel: eight value sliders per style (plus a pattern generator and a seed), and the shaders print the numbers they draw with a built-in 5×5 bitmap type system. Type a value, keyframe it, map it to audio, or hit Randomize for a new dataset. Every loop closes exactly.
 

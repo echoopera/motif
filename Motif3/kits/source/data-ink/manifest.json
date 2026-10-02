@@ -1,7 +1,7 @@
 {
   "format": "motif-kit@1",
   "id": "data-ink",
-  "name": "Data Ink",
+  "name": "DataInk",
   "version": "0.1.0",
   "author": "Echo Opera",
   "description": "Information graphics as playable shaders: streams, heat ledgers, flow maps, timetables, curve plates, sparklines and diagrams. Every dataset is a set of sliders you can type, keyframe, randomize or map to audio, and the shaders print the numbers they draw.",
