@@ -19,7 +19,7 @@ vec4 motif(vec2 uv, vec2 fc) {
   vec3 col = u_bg * (1.0 + 0.035 * itPaper(uv));
   float f = fract(u_p);
   float head1 = sat(f / 0.45), head2 = sat((f - 0.5) / 0.42);
-  float fade = 1.0 - smoothstep(0.92, 1.0, f);
+  float fade = 1.0 - smoothstep(0.9, 0.98, f);
   vec2 sepv = vec2(0.0, -(0.05 + p_sep * 0.05));
   // advance
   float bestA = 9.0, sA = 0.0, wA = 0.0;
@@ -64,7 +64,7 @@ vec4 motif(vec2 uv, vec2 fc) {
       float ya = mix(cy1, cy0, sat(-tempAt(i) / 30.0)), yb = mix(cy1, cy0, sat(-tempAt(i + 1) / 30.0));
       vec2 a = vec2(wpA(i).x, ya), b = vec2(wpA(i + 1).x, yb);
       float seg = float(7 - i) / 7.0;
-      bestT = min(bestT, sdSeg(uv, a, b) + (1.0 - step(seg - 1.0 / 7.0, head2)) * 1.0);
+      bestT = min(bestT, sdSeg(uv, a, b) + max(1.0 - step(seg - 1.0 / 7.0, head2), 1.0 - step(0.002, head2)) * 1.0);
     }
     col = dxInk(col, u_ink, dxHair(bestT, 0.0022) * fade * 0.9);
   }
