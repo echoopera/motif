@@ -1,0 +1,1914 @@
+{
+  "format": "motif-kit@1",
+  "id": "improbable-tactics",
+  "name": "Improbable Tactics",
+  "version": "0.1.0",
+  "author": "Echo Opera",
+  "description": "Dada, De Stijl, deconstruction and collage as playable shaders: cut-up type, torn paper, neo-plastic grids, axonometric planes, photocopy grunge and bauhaus circles. Drop an image on the media styles to cut, paste and neo-plasticise it.",
+  "license": "All rights reserved",
+  "accent": "#D9261C",
+  "common": "common.glsl",
+  "palettes": [
+    {
+      "id": "stijl",
+      "name": "De Stijl Primaries",
+      "bg": "#F0E9D6",
+      "ink": "#141414",
+      "a": [
+        "#D9261C",
+        "#F4C400",
+        "#1E40A4"
+      ]
+    },
+    {
+      "id": "newsprint",
+      "name": "Dada Newsprint",
+      "bg": "#E6DFCB",
+      "ink": "#14110F",
+      "a": [
+        "#CF2A1C",
+        "#2B31C8",
+        "#EBCB1A"
+      ]
+    },
+    {
+      "id": "carson",
+      "name": "Photocopy Blue",
+      "bg": "#F2F1EB",
+      "ink": "#0F0F10",
+      "a": [
+        "#2C22F2",
+        "#FFE500",
+        "#FF4A1F"
+      ]
+    },
+    {
+      "id": "sea",
+      "name": "Rough Sea",
+      "bg": "#0A1E2B",
+      "ink": "#F4F0E4",
+      "a": [
+        "#EA2228",
+        "#CDC51E",
+        "#2E9FBF"
+      ]
+    },
+    {
+      "id": "kandinsky",
+      "name": "Circles",
+      "bg": "#ECE5D1",
+      "ink": "#141211",
+      "a": [
+        "#B52F37",
+        "#5C9E8F",
+        "#D2B36B"
+      ]
+    },
+    {
+      "id": "semper",
+      "name": "Semper Plate",
+      "bg": "#E8E0CC",
+      "ink": "#2A201B",
+      "a": [
+        "#8C3A31",
+        "#4E8089",
+        "#C99D6E"
+      ]
+    },
+    {
+      "id": "klee",
+      "name": "Klee Quilt",
+      "bg": "#B65C3E",
+      "ink": "#2A1A14",
+      "a": [
+        "#E8B08A",
+        "#7B9BA1",
+        "#D9693F"
+      ]
+    }
+  ],
+  "styles": [
+    {
+      "flash": true,
+      "tags": [
+        "dada",
+        "collage",
+        "type",
+        "cut-out",
+        "hausmann"
+      ],
+      "id": "ransom-poem",
+      "name": "Ransom Poem",
+      "group": "Dada",
+      "palette": "newsprint",
+      "blurb": "Letters cut from a hundred sources, pasted at angles. Shake the bag with Reshuffle; Randomize deals a new poem.",
+      "passes": [
+        {
+          "src": "styles/ransom.glsl"
+        }
+      ],
+      "params": {
+        "word": {
+          "type": "select",
+          "label": "Word",
+          "options": [
+            {
+              "v": "dada",
+              "l": "DADA"
+            },
+            {
+              "v": "stijl",
+              "l": "STIJL"
+            },
+            {
+              "v": "carson",
+              "l": "CARSON"
+            },
+            {
+              "v": "collage",
+              "l": "COLLAGE"
+            },
+            {
+              "v": "chance",
+              "l": "CHANCE"
+            },
+            {
+              "v": "merz",
+              "l": "MERZ"
+            },
+            {
+              "v": "tactics",
+              "l": "TACTICS"
+            },
+            {
+              "v": "improbable",
+              "l": "IMPROBABLE"
+            },
+            {
+              "v": "print",
+              "l": "PRINT"
+            },
+            {
+              "v": "play",
+              "l": "PLAY"
+            }
+          ],
+          "def": "dada",
+          "hint": "The vocabulary the scraps draw from."
+        },
+        "cols": {
+          "type": "int",
+          "label": "Letters across",
+          "min": 3,
+          "max": 10,
+          "def": 5,
+          "group": "Layout"
+        },
+        "scale": {
+          "type": "range",
+          "label": "Scrap size",
+          "min": 0.7,
+          "max": 1.5,
+          "def": 0.95,
+          "step": 0.004,
+          "group": "Layout"
+        },
+        "chaos": {
+          "type": "range",
+          "label": "Chaos",
+          "min": 0,
+          "max": 1,
+          "def": 0.6,
+          "step": 0.005,
+          "group": "Layout",
+          "hint": "Jitter, tilt and mixed-up letters."
+        },
+        "shuffle": {
+          "type": "int",
+          "label": "Reshuffles / loop",
+          "min": 0,
+          "max": 8,
+          "def": 0,
+          "group": "Motion",
+          "hint": "0 holds still. Capped by the photosensitive limiter.",
+          "mutate": 0.4
+        },
+        "spin": {
+          "type": "range",
+          "label": "Wobble",
+          "min": 0,
+          "max": 1,
+          "def": 0.5,
+          "step": 0.005,
+          "group": "Motion"
+        },
+        "shadow": {
+          "type": "range",
+          "label": "Shadow",
+          "min": 0,
+          "max": 1,
+          "def": 0.7,
+          "step": 0.005,
+          "group": "Paper"
+        },
+        "halftone": {
+          "type": "range",
+          "label": "Halftone scraps",
+          "min": 0,
+          "max": 1,
+          "def": 0.5,
+          "step": 0.005,
+          "group": "Paper"
+        },
+        "paper": {
+          "type": "range",
+          "label": "Paper grain",
+          "min": 0,
+          "max": 1,
+          "def": 0.7,
+          "step": 0.005,
+          "group": "Paper"
+        }
+      }
+    },
+    {
+      "flash": true,
+      "tags": [
+        "dada",
+        "type",
+        "grid",
+        "van doesburg",
+        "schwitters"
+      ],
+      "id": "soiree",
+      "name": "Soirée Programme",
+      "group": "Dada",
+      "palette": "newsprint",
+      "blurb": "A Cabaret Voltaire handbill: a breathing partition where every cell holds a letter fitted, turned, negativeed or replaced by a bar, a ball, a row of question marks.",
+      "passes": [
+        {
+          "src": "styles/soiree.glsl"
+        }
+      ],
+      "params": {
+        "word": {
+          "type": "select",
+          "label": "Word",
+          "options": [
+            {
+              "v": "dada",
+              "l": "DADA"
+            },
+            {
+              "v": "stijl",
+              "l": "STIJL"
+            },
+            {
+              "v": "carson",
+              "l": "CARSON"
+            },
+            {
+              "v": "collage",
+              "l": "COLLAGE"
+            },
+            {
+              "v": "chance",
+              "l": "CHANCE"
+            },
+            {
+              "v": "merz",
+              "l": "MERZ"
+            },
+            {
+              "v": "tactics",
+              "l": "TACTICS"
+            },
+            {
+              "v": "improbable",
+              "l": "IMPROBABLE"
+            },
+            {
+              "v": "print",
+              "l": "PRINT"
+            },
+            {
+              "v": "play",
+              "l": "PLAY"
+            }
+          ],
+          "def": "dada"
+        },
+        "depth": {
+          "type": "int",
+          "label": "Subdivisions",
+          "min": 3,
+          "max": 8,
+          "def": 6,
+          "group": "Layout"
+        },
+        "stop": {
+          "type": "range",
+          "label": "Big cells",
+          "min": 0,
+          "max": 0.6,
+          "def": 0.15,
+          "step": 0.003,
+          "group": "Layout",
+          "hint": "Chance a cell stops dividing early."
+        },
+        "margin": {
+          "type": "range",
+          "label": "Margin",
+          "min": 0,
+          "max": 0.3,
+          "def": 0.08,
+          "step": 0.002,
+          "group": "Layout"
+        },
+        "drift": {
+          "type": "range",
+          "label": "Breathing",
+          "min": 0,
+          "max": 1,
+          "def": 0.4,
+          "step": 0.005,
+          "group": "Motion"
+        },
+        "cycles": {
+          "type": "int",
+          "label": "Breaths / loop",
+          "min": 1,
+          "max": 3,
+          "def": 1,
+          "group": "Motion"
+        },
+        "recolor": {
+          "type": "int",
+          "label": "Re-sets / loop",
+          "min": 0,
+          "max": 8,
+          "def": 0,
+          "group": "Motion",
+          "hint": "Redeals letters and colours. 0 holds still. Limiter-capped.",
+          "mutate": 0.4
+        },
+        "turn": {
+          "type": "range",
+          "label": "Turned letters",
+          "min": 0,
+          "max": 1,
+          "def": 0.5,
+          "step": 0.005,
+          "group": "Type"
+        },
+        "stretch": {
+          "type": "range",
+          "label": "Stretch to fit",
+          "min": 0,
+          "max": 1,
+          "def": 0.8,
+          "step": 0.005,
+          "group": "Type",
+          "hint": "0 keeps letter proportions, 1 fills the cell."
+        },
+        "round": {
+          "type": "range",
+          "label": "Rounded",
+          "min": 0,
+          "max": 1,
+          "def": 0.3,
+          "step": 0.005,
+          "group": "Type"
+        },
+        "bold": {
+          "type": "range",
+          "label": "Weight",
+          "min": -1,
+          "max": 1,
+          "def": 0.3,
+          "step": 0.01,
+          "group": "Type"
+        },
+        "negative": {
+          "type": "range",
+          "label": "Inverted cells",
+          "min": 0,
+          "max": 1,
+          "def": 0.25,
+          "step": 0.005,
+          "group": "Colour"
+        },
+        "accent": {
+          "type": "range",
+          "label": "Accent cells",
+          "min": 0,
+          "max": 1,
+          "def": 0.35,
+          "step": 0.005,
+          "group": "Colour"
+        },
+        "ornament": {
+          "type": "range",
+          "label": "Ornaments",
+          "min": 0,
+          "max": 0.8,
+          "def": 0.3,
+          "step": 0.004,
+          "group": "Colour",
+          "hint": "Bars, balls, dot rows and hatching instead of letters."
+        },
+        "rules": {
+          "type": "toggle",
+          "label": "Rules",
+          "def": true,
+          "group": "Colour"
+        }
+      }
+    },
+    {
+      "flash": true,
+      "tags": [
+        "dada",
+        "cut-up",
+        "media",
+        "image",
+        "video",
+        "strips"
+      ],
+      "id": "cut-up",
+      "name": "Tzara's Bag",
+      "group": "Dada",
+      "palette": "newsprint",
+      "blurb": "Cut the picture into strips or tiles and pull them from the bag: every tile re-reads another part of the source and slides there. Attach a photo or clip.",
+      "inputs": [
+        {
+          "id": "source",
+          "type": "media",
+          "label": "Source",
+          "fit": "fill",
+          "hint": "Photo or clip to cut up. Without one, a procedural scene plays."
+        }
+      ],
+      "passes": [
+        {
+          "src": "styles/cutup.glsl"
+        }
+      ],
+      "params": {
+        "cols": {
+          "type": "int",
+          "label": "Columns",
+          "min": 1,
+          "max": 16,
+          "def": 7,
+          "group": "Cuts"
+        },
+        "rows": {
+          "type": "int",
+          "label": "Rows",
+          "min": 1,
+          "max": 12,
+          "def": 1,
+          "group": "Cuts"
+        },
+        "jag": {
+          "type": "range",
+          "label": "Torn cuts",
+          "min": 0,
+          "max": 1,
+          "def": 0.5,
+          "step": 0.005,
+          "group": "Cuts"
+        },
+        "gap": {
+          "type": "range",
+          "label": "Paper rim",
+          "min": 0,
+          "max": 1,
+          "def": 0.5,
+          "step": 0.005,
+          "group": "Cuts"
+        },
+        "cuts": {
+          "type": "int",
+          "label": "Pulls / loop",
+          "min": 1,
+          "max": 12,
+          "def": 4,
+          "group": "Motion",
+          "hint": "How often tiles swap places. Limiter-capped."
+        },
+        "shuffle": {
+          "type": "range",
+          "label": "Shuffle",
+          "min": 0,
+          "max": 1,
+          "def": 1,
+          "step": 0.005,
+          "group": "Motion"
+        },
+        "drift": {
+          "type": "range",
+          "label": "Drift",
+          "min": 0,
+          "max": 1,
+          "def": 0.3,
+          "step": 0.005,
+          "group": "Motion"
+        },
+        "tilt": {
+          "type": "range",
+          "label": "Tilt",
+          "min": 0,
+          "max": 1,
+          "def": 0.3,
+          "step": 0.005,
+          "group": "Tiles"
+        },
+        "mirror": {
+          "type": "range",
+          "label": "Mirrored",
+          "min": 0,
+          "max": 1,
+          "def": 0.2,
+          "step": 0.005,
+          "group": "Tiles"
+        },
+        "tint": {
+          "type": "range",
+          "label": "Colour tint",
+          "min": 0,
+          "max": 1,
+          "def": 0.25,
+          "step": 0.005,
+          "group": "Tiles"
+        },
+        "inkMix": {
+          "type": "range",
+          "label": "Duotone",
+          "min": 0,
+          "max": 0.5,
+          "def": 0.1,
+          "step": 0.003,
+          "group": "Tiles"
+        },
+        "shadow": {
+          "type": "range",
+          "label": "Shadow",
+          "min": 0,
+          "max": 1,
+          "def": 0.6,
+          "step": 0.005,
+          "group": "Tiles"
+        }
+      }
+    },
+    {
+      "flash": false,
+      "tags": [
+        "collage",
+        "hoch",
+        "media",
+        "image",
+        "video",
+        "shards"
+      ],
+      "id": "photomontage",
+      "name": "Photomontage",
+      "group": "Collage",
+      "palette": "newsprint",
+      "blurb": "Höch-style: the image is cut into ragged shards, each re-pasted with its own tilt, zoom and flip, then duotoned, halftoned or swapped for a lettered scrap.",
+      "inputs": [
+        {
+          "id": "source",
+          "type": "media",
+          "label": "Source",
+          "fit": "fill",
+          "hint": "Photo or clip to cut and paste. Without one, a procedural scene plays."
+        }
+      ],
+      "passes": [
+        {
+          "src": "styles/montage.glsl"
+        }
+      ],
+      "params": {
+        "word": {
+          "type": "select",
+          "label": "Word",
+          "options": [
+            {
+              "v": "dada",
+              "l": "DADA"
+            },
+            {
+              "v": "stijl",
+              "l": "STIJL"
+            },
+            {
+              "v": "carson",
+              "l": "CARSON"
+            },
+            {
+              "v": "collage",
+              "l": "COLLAGE"
+            },
+            {
+              "v": "chance",
+              "l": "CHANCE"
+            },
+            {
+              "v": "merz",
+              "l": "MERZ"
+            },
+            {
+              "v": "tactics",
+              "l": "TACTICS"
+            },
+            {
+              "v": "improbable",
+              "l": "IMPROBABLE"
+            },
+            {
+              "v": "print",
+              "l": "PRINT"
+            },
+            {
+              "v": "play",
+              "l": "PLAY"
+            }
+          ],
+          "def": "collage",
+          "hint": "Letters used on the lettered scraps."
+        },
+        "cells": {
+          "type": "range",
+          "label": "Shard density",
+          "min": 2,
+          "max": 14,
+          "def": 6,
+          "step": 0.06,
+          "group": "Shards",
+          "hint": "Shards per short side of the frame."
+        },
+        "rag": {
+          "type": "range",
+          "label": "Ragged edges",
+          "min": 0,
+          "max": 1,
+          "def": 0.5,
+          "step": 0.005,
+          "group": "Shards"
+        },
+        "scatter": {
+          "type": "range",
+          "label": "Scatter",
+          "min": 0,
+          "max": 1,
+          "def": 0.5,
+          "step": 0.005,
+          "group": "Paste"
+        },
+        "twist": {
+          "type": "range",
+          "label": "Tilt",
+          "min": 0,
+          "max": 1,
+          "def": 0.5,
+          "step": 0.005,
+          "group": "Paste"
+        },
+        "magnify": {
+          "type": "range",
+          "label": "Zoom variety",
+          "min": 0,
+          "max": 1,
+          "def": 0.4,
+          "step": 0.005,
+          "group": "Paste"
+        },
+        "flip": {
+          "type": "range",
+          "label": "Mirrored",
+          "min": 0,
+          "max": 1,
+          "def": 0.3,
+          "step": 0.005,
+          "group": "Paste"
+        },
+        "drift": {
+          "type": "range",
+          "label": "Drift",
+          "min": 0,
+          "max": 1,
+          "def": 0.5,
+          "step": 0.005,
+          "group": "Motion"
+        },
+        "duo": {
+          "type": "range",
+          "label": "Duotone",
+          "min": 0,
+          "max": 0.5,
+          "def": 0.2,
+          "step": 0.003,
+          "group": "Treatment"
+        },
+        "half": {
+          "type": "range",
+          "label": "Halftone",
+          "min": 0,
+          "max": 0.4,
+          "def": 0.15,
+          "step": 0.002,
+          "group": "Treatment"
+        },
+        "type": {
+          "type": "range",
+          "label": "Lettered scraps",
+          "min": 0,
+          "max": 0.3,
+          "def": 0.08,
+          "step": 0.002,
+          "group": "Treatment"
+        },
+        "rim": {
+          "type": "range",
+          "label": "Paper rim",
+          "min": 0,
+          "max": 1,
+          "def": 0.6,
+          "step": 0.005,
+          "group": "Glue"
+        },
+        "shadow": {
+          "type": "range",
+          "label": "Shadow",
+          "min": 0,
+          "max": 1,
+          "def": 0.6,
+          "step": 0.005,
+          "group": "Glue"
+        }
+      }
+    },
+    {
+      "flash": false,
+      "tags": [
+        "collage",
+        "carson",
+        "ocean",
+        "type",
+        "waves"
+      ],
+      "id": "rough-sea",
+      "name": "Rough Sea",
+      "group": "Collage",
+      "palette": "sea",
+      "blurb": "'A design isn't finished until somebody is using it.' A boiling looped ocean under cut paper: torn black corner, giant letter, red halftone window, rules, label strips, outline lettering.",
+      "passes": [
+        {
+          "src": "styles/sea.glsl"
+        }
+      ],
+      "params": {
+        "word": {
+          "type": "select",
+          "label": "Word",
+          "options": [
+            {
+              "v": "dada",
+              "l": "DADA"
+            },
+            {
+              "v": "stijl",
+              "l": "STIJL"
+            },
+            {
+              "v": "carson",
+              "l": "CARSON"
+            },
+            {
+              "v": "collage",
+              "l": "COLLAGE"
+            },
+            {
+              "v": "chance",
+              "l": "CHANCE"
+            },
+            {
+              "v": "merz",
+              "l": "MERZ"
+            },
+            {
+              "v": "tactics",
+              "l": "TACTICS"
+            },
+            {
+              "v": "improbable",
+              "l": "IMPROBABLE"
+            },
+            {
+              "v": "print",
+              "l": "PRINT"
+            },
+            {
+              "v": "play",
+              "l": "PLAY"
+            }
+          ],
+          "def": "tactics"
+        },
+        "letter": {
+          "type": "int",
+          "label": "Giant letter",
+          "min": 0,
+          "max": 9,
+          "def": 0,
+          "group": "Paper",
+          "hint": "Which letter of the word is cut out large."
+        },
+        "torn": {
+          "type": "range",
+          "label": "Torn corner",
+          "min": 0,
+          "max": 1,
+          "def": 0.6,
+          "step": 0.005,
+          "group": "Paper"
+        },
+        "window": {
+          "type": "toggle",
+          "label": "Red window",
+          "def": true,
+          "group": "Paper"
+        },
+        "tint": {
+          "type": "color",
+          "label": "Window colour",
+          "def": "#EA2228",
+          "group": "Paper"
+        },
+        "labels": {
+          "type": "int",
+          "label": "Label strips",
+          "min": 0,
+          "max": 6,
+          "def": 3,
+          "group": "Paper"
+        },
+        "outline": {
+          "type": "toggle",
+          "label": "Outline word",
+          "def": true,
+          "group": "Paper"
+        },
+        "tilt": {
+          "type": "range",
+          "label": "Tilt",
+          "min": 0,
+          "max": 1,
+          "def": 0.5,
+          "step": 0.005,
+          "group": "Paper"
+        },
+        "scale": {
+          "type": "range",
+          "label": "Wave scale",
+          "min": 0.4,
+          "max": 3,
+          "def": 1.4,
+          "step": 0.01,
+          "group": "Water"
+        },
+        "chop": {
+          "type": "range",
+          "label": "Chop",
+          "min": 0,
+          "max": 1,
+          "def": 0.6,
+          "step": 0.005,
+          "group": "Water"
+        },
+        "foam": {
+          "type": "range",
+          "label": "Foam",
+          "min": 0,
+          "max": 1,
+          "def": 0.5,
+          "step": 0.005,
+          "group": "Water"
+        },
+        "cycles": {
+          "type": "int",
+          "label": "Swells / loop",
+          "min": 1,
+          "max": 3,
+          "def": 1,
+          "group": "Water"
+        }
+      }
+    },
+    {
+      "flash": true,
+      "tags": [
+        "de stijl",
+        "mondrian",
+        "grid",
+        "media",
+        "image",
+        "boogie-woogie"
+      ],
+      "id": "neo-plastic",
+      "name": "Neo-Plastic",
+      "group": "De Stijl",
+      "palette": "stijl",
+      "blurb": "Asymmetric balance: a breathing partition with heavy rules and primary fields, or a Boogie-Woogie street grid of travelling blocks. Attach an image and every field snaps to its nearest palette colour.",
+      "inputs": [
+        {
+          "id": "source",
+          "type": "media",
+          "label": "Source",
+          "fit": "fill",
+          "hint": "Photo or clip to neo-plasticise. Without one, the colours are dealt by chance."
+        }
+      ],
+      "passes": [
+        {
+          "src": "styles/neoplastic.glsl"
+        }
+      ],
+      "params": {
+        "mode": {
+          "type": "select",
+          "label": "Composition",
+          "options": [
+            {
+              "v": "composition",
+              "l": "Composition"
+            },
+            {
+              "v": "boogie",
+              "l": "Boogie-Woogie"
+            }
+          ],
+          "def": "composition"
+        },
+        "depth": {
+          "type": "int",
+          "label": "Subdivisions",
+          "min": 2,
+          "max": 8,
+          "def": 5,
+          "group": "Layout",
+          "show": {
+            "param": "mode",
+            "is": "composition"
+          }
+        },
+        "stop": {
+          "type": "range",
+          "label": "Big fields",
+          "min": 0,
+          "max": 0.7,
+          "def": 0.3,
+          "step": 0.003,
+          "group": "Layout",
+          "show": {
+            "param": "mode",
+            "is": "composition"
+          }
+        },
+        "bleed": {
+          "type": "toggle",
+          "label": "Bleed off edge",
+          "def": true,
+          "group": "Layout",
+          "hint": "Hide the outer frame lines.",
+          "show": {
+            "param": "mode",
+            "is": "composition"
+          }
+        },
+        "cells": {
+          "type": "int",
+          "label": "Grid cells",
+          "min": 6,
+          "max": 24,
+          "def": 12,
+          "group": "Layout",
+          "show": {
+            "param": "mode",
+            "is": "boogie"
+          }
+        },
+        "speed": {
+          "type": "int",
+          "label": "Blocks / loop",
+          "min": 1,
+          "max": 6,
+          "def": 2,
+          "group": "Motion",
+          "show": {
+            "param": "mode",
+            "is": "boogie"
+          }
+        },
+        "nest": {
+          "type": "range",
+          "label": "Nested squares",
+          "min": 0,
+          "max": 1,
+          "def": 0.5,
+          "step": 0.005,
+          "group": "Layout",
+          "show": {
+            "param": "mode",
+            "is": "boogie"
+          }
+        },
+        "angle": {
+          "type": "range",
+          "label": "Angle",
+          "min": -45,
+          "max": 45,
+          "def": 0,
+          "step": 0.5,
+          "group": "Layout",
+          "hint": "45° gives Van Doesburg's counter-composition."
+        },
+        "line": {
+          "type": "range",
+          "label": "Rule weight",
+          "min": 0.004,
+          "max": 0.04,
+          "def": 0.016,
+          "step": 0.001,
+          "group": "Look",
+          "show": {
+            "param": "mode",
+            "is": "composition"
+          }
+        },
+        "empty": {
+          "type": "range",
+          "label": "Empty white",
+          "min": 0,
+          "max": 1,
+          "def": 0.55,
+          "step": 0.005,
+          "group": "Look"
+        },
+        "drift": {
+          "type": "range",
+          "label": "Breathing",
+          "min": 0,
+          "max": 1,
+          "def": 0.5,
+          "step": 0.005,
+          "group": "Motion",
+          "show": {
+            "param": "mode",
+            "is": "composition"
+          }
+        },
+        "cycles": {
+          "type": "int",
+          "label": "Breaths / loop",
+          "min": 1,
+          "max": 3,
+          "def": 1,
+          "group": "Motion",
+          "show": {
+            "param": "mode",
+            "is": "composition"
+          }
+        },
+        "recolor": {
+          "type": "int",
+          "label": "Re-colours / loop",
+          "min": 0,
+          "max": 6,
+          "def": 0,
+          "group": "Motion",
+          "hint": "Fields cross-fade to new colours. 0 holds still. Limiter-capped.",
+          "mutate": 0.4
+        },
+        "photo": {
+          "type": "range",
+          "label": "Photo snap",
+          "min": 0,
+          "max": 1,
+          "def": 1,
+          "step": 0.005,
+          "group": "Look",
+          "hint": "How much the attached image decides each field's colour."
+        }
+      }
+    },
+    {
+      "flash": false,
+      "tags": [
+        "de stijl",
+        "van doesburg",
+        "axonometric",
+        "planes",
+        "3d"
+      ],
+      "id": "counter-construction",
+      "name": "Counter-Constructions",
+      "group": "De Stijl",
+      "palette": "stijl",
+      "blurb": "Floating floors and walls in axonometric projection. Planes slide along their own axes, cast shadows on those beneath, and carry a dark edge-slab.",
+      "passes": [
+        {
+          "src": "styles/constructions.glsl"
+        }
+      ],
+      "params": {
+        "count": {
+          "type": "int",
+          "label": "Planes",
+          "min": 3,
+          "max": 28,
+          "def": 12,
+          "group": "Planes"
+        },
+        "size": {
+          "type": "range",
+          "label": "Size",
+          "min": 0.2,
+          "max": 1.2,
+          "def": 0.6,
+          "step": 0.005,
+          "group": "Planes"
+        },
+        "spread": {
+          "type": "range",
+          "label": "Spread",
+          "min": 0.3,
+          "max": 1.5,
+          "def": 0.9,
+          "step": 0.006,
+          "group": "Planes"
+        },
+        "floor": {
+          "type": "range",
+          "label": "Floors vs walls",
+          "min": 0,
+          "max": 1,
+          "def": 0.35,
+          "step": 0.005,
+          "group": "Planes",
+          "hint": "Higher = more horizontal planes."
+        },
+        "thick": {
+          "type": "range",
+          "label": "Slab depth",
+          "min": 0,
+          "max": 1,
+          "def": 0.5,
+          "step": 0.005,
+          "group": "Look"
+        },
+        "shadow": {
+          "type": "range",
+          "label": "Shadow",
+          "min": 0,
+          "max": 1,
+          "def": 0.6,
+          "step": 0.005,
+          "group": "Look"
+        },
+        "neutral": {
+          "type": "range",
+          "label": "White & grey",
+          "min": 0,
+          "max": 1,
+          "def": 0.35,
+          "step": 0.005,
+          "group": "Look",
+          "hint": "Share of planes that are not primary colours."
+        },
+        "outline": {
+          "type": "toggle",
+          "label": "Draughting line",
+          "def": true,
+          "group": "Look"
+        },
+        "drift": {
+          "type": "range",
+          "label": "Slide",
+          "min": 0,
+          "max": 1,
+          "def": 0.5,
+          "step": 0.005,
+          "group": "Motion"
+        },
+        "cycles": {
+          "type": "int",
+          "label": "Slides / loop",
+          "min": 1,
+          "max": 3,
+          "def": 1,
+          "group": "Motion"
+        }
+      }
+    },
+    {
+      "flash": true,
+      "tags": [
+        "de stijl",
+        "type",
+        "blocks",
+        "van doesburg",
+        "alphabet"
+      ],
+      "id": "block-letters",
+      "name": "Block Letters",
+      "group": "De Stijl",
+      "palette": "stijl",
+      "blurb": "Van Doesburg's square alphabet set on a breathing grid of colour fields, with a rolling red disc. Letters turn on their side and bounce; soften them with Rounded.",
+      "passes": [
+        {
+          "src": "styles/blockletters.glsl"
+        }
+      ],
+      "params": {
+        "word": {
+          "type": "select",
+          "label": "Word",
+          "options": [
+            {
+              "v": "dada",
+              "l": "DADA"
+            },
+            {
+              "v": "stijl",
+              "l": "STIJL"
+            },
+            {
+              "v": "carson",
+              "l": "CARSON"
+            },
+            {
+              "v": "collage",
+              "l": "COLLAGE"
+            },
+            {
+              "v": "chance",
+              "l": "CHANCE"
+            },
+            {
+              "v": "merz",
+              "l": "MERZ"
+            },
+            {
+              "v": "tactics",
+              "l": "TACTICS"
+            },
+            {
+              "v": "improbable",
+              "l": "IMPROBABLE"
+            },
+            {
+              "v": "print",
+              "l": "PRINT"
+            },
+            {
+              "v": "play",
+              "l": "PLAY"
+            }
+          ],
+          "def": "stijl"
+        },
+        "lines": {
+          "type": "int",
+          "label": "Lines",
+          "min": 1,
+          "max": 3,
+          "def": 1,
+          "group": "Type"
+        },
+        "round": {
+          "type": "range",
+          "label": "Rounded",
+          "min": 0,
+          "max": 1,
+          "def": 0,
+          "step": 0.005,
+          "group": "Type",
+          "hint": "0 = pure square blocks."
+        },
+        "gap": {
+          "type": "range",
+          "label": "Letter gap",
+          "min": 0,
+          "max": 0.4,
+          "def": 0.08,
+          "step": 0.002,
+          "group": "Type"
+        },
+        "turn": {
+          "type": "range",
+          "label": "Turned letters",
+          "min": 0,
+          "max": 1,
+          "def": 0.25,
+          "step": 0.005,
+          "group": "Type"
+        },
+        "lift": {
+          "type": "range",
+          "label": "Position",
+          "min": -1,
+          "max": 1,
+          "def": -0.3,
+          "step": 0.01,
+          "group": "Type"
+        },
+        "bounce": {
+          "type": "range",
+          "label": "Bounce",
+          "min": 0,
+          "max": 1,
+          "def": 0.4,
+          "step": 0.005,
+          "group": "Motion"
+        },
+        "drift": {
+          "type": "range",
+          "label": "Breathing",
+          "min": 0,
+          "max": 1,
+          "def": 0.4,
+          "step": 0.005,
+          "group": "Motion"
+        },
+        "recolor": {
+          "type": "int",
+          "label": "Re-colours / loop",
+          "min": 0,
+          "max": 6,
+          "def": 0,
+          "group": "Motion",
+          "hint": "Fields cross-fade to new colours. 0 holds still. Limiter-capped.",
+          "mutate": 0.4
+        },
+        "depth": {
+          "type": "int",
+          "label": "Subdivisions",
+          "min": 2,
+          "max": 8,
+          "def": 4,
+          "group": "Grid"
+        },
+        "stop": {
+          "type": "range",
+          "label": "Big fields",
+          "min": 0,
+          "max": 0.7,
+          "def": 0.3,
+          "step": 0.003,
+          "group": "Grid"
+        },
+        "empty": {
+          "type": "range",
+          "label": "Empty white",
+          "min": 0,
+          "max": 1,
+          "def": 0.55,
+          "step": 0.005,
+          "group": "Grid"
+        },
+        "disc": {
+          "type": "range",
+          "label": "Disc",
+          "min": 0,
+          "max": 1,
+          "def": 0.5,
+          "step": 0.005,
+          "group": "Grid"
+        }
+      }
+    },
+    {
+      "flash": false,
+      "tags": [
+        "deconstruction",
+        "carson",
+        "grunge",
+        "type",
+        "splatter",
+        "print"
+      ],
+      "id": "photocopy",
+      "name": "Photocopy Type",
+      "group": "Deconstruction",
+      "palette": "carson",
+      "blurb": "'Print is not dead.' Giant mismatched letters through a tired copier: ragged edges, toner dropout, a misregistered blue pass, micro-text columns, barcode, creases and flung paint.",
+      "passes": [
+        {
+          "src": "styles/photocopy.glsl"
+        }
+      ],
+      "params": {
+        "word": {
+          "type": "select",
+          "label": "Word",
+          "options": [
+            {
+              "v": "dada",
+              "l": "DADA"
+            },
+            {
+              "v": "stijl",
+              "l": "STIJL"
+            },
+            {
+              "v": "carson",
+              "l": "CARSON"
+            },
+            {
+              "v": "collage",
+              "l": "COLLAGE"
+            },
+            {
+              "v": "chance",
+              "l": "CHANCE"
+            },
+            {
+              "v": "merz",
+              "l": "MERZ"
+            },
+            {
+              "v": "tactics",
+              "l": "TACTICS"
+            },
+            {
+              "v": "improbable",
+              "l": "IMPROBABLE"
+            },
+            {
+              "v": "print",
+              "l": "PRINT"
+            },
+            {
+              "v": "play",
+              "l": "PLAY"
+            }
+          ],
+          "def": "carson"
+        },
+        "lines": {
+          "type": "int",
+          "label": "Lines",
+          "min": 1,
+          "max": 2,
+          "def": 1,
+          "group": "Type"
+        },
+        "size": {
+          "type": "range",
+          "label": "Size",
+          "min": 0.5,
+          "max": 1.3,
+          "def": 0.85,
+          "step": 0.004,
+          "group": "Type"
+        },
+        "scatter": {
+          "type": "range",
+          "label": "Scatter",
+          "min": 0,
+          "max": 1,
+          "def": 0.6,
+          "step": 0.005,
+          "group": "Type",
+          "hint": "Per-letter size, tilt and baseline."
+        },
+        "bold": {
+          "type": "range",
+          "label": "Weight",
+          "min": -1,
+          "max": 1,
+          "def": 0.3,
+          "step": 0.01,
+          "group": "Type"
+        },
+        "round": {
+          "type": "range",
+          "label": "Rounded",
+          "min": 0,
+          "max": 1,
+          "def": 0.6,
+          "step": 0.005,
+          "group": "Type"
+        },
+        "grit": {
+          "type": "range",
+          "label": "Toner grit",
+          "min": 0,
+          "max": 1,
+          "def": 0.35,
+          "step": 0.005,
+          "group": "Print"
+        },
+        "misreg": {
+          "type": "range",
+          "label": "Misregistration",
+          "min": 0,
+          "max": 1,
+          "def": 0.4,
+          "step": 0.005,
+          "group": "Print"
+        },
+        "creases": {
+          "type": "toggle",
+          "label": "Creases",
+          "def": true,
+          "group": "Print"
+        },
+        "splat": {
+          "type": "int",
+          "label": "Splatters",
+          "min": 0,
+          "max": 8,
+          "def": 3,
+          "group": "Ephemera"
+        },
+        "micro": {
+          "type": "range",
+          "label": "Micro-text",
+          "min": 0,
+          "max": 1,
+          "def": 0.6,
+          "step": 0.005,
+          "group": "Ephemera"
+        },
+        "barcode": {
+          "type": "toggle",
+          "label": "Barcode",
+          "def": true,
+          "group": "Ephemera"
+        },
+        "jitter": {
+          "type": "range",
+          "label": "Jitter",
+          "min": 0,
+          "max": 1,
+          "def": 0.5,
+          "step": 0.005,
+          "group": "Motion"
+        }
+      }
+    },
+    {
+      "flash": false,
+      "tags": [
+        "kandinsky",
+        "bauhaus",
+        "circles",
+        "abstract"
+      ],
+      "id": "circles",
+      "name": "Circles in a Circle",
+      "group": "Bauhaus & Ornament",
+      "palette": "kandinsky",
+      "blurb": "Translucent pigment discs mixed subtractively on warm paper, needle lines, two diagonal bands, all held inside one heavy ring.",
+      "passes": [
+        {
+          "src": "styles/circles.glsl"
+        }
+      ],
+      "params": {
+        "size": {
+          "type": "range",
+          "label": "Ring size",
+          "min": 0.6,
+          "max": 1.2,
+          "def": 1,
+          "step": 0.003,
+          "group": "Form"
+        },
+        "ring": {
+          "type": "range",
+          "label": "Ring weight",
+          "min": 0.01,
+          "max": 0.07,
+          "def": 0.035,
+          "step": 0.001,
+          "group": "Form"
+        },
+        "bands": {
+          "type": "toggle",
+          "label": "Diagonal bands",
+          "def": true,
+          "group": "Form"
+        },
+        "count": {
+          "type": "int",
+          "label": "Discs",
+          "min": 6,
+          "max": 36,
+          "def": 20,
+          "group": "Discs"
+        },
+        "spread": {
+          "type": "range",
+          "label": "Spread",
+          "min": 0.3,
+          "max": 1,
+          "def": 0.8,
+          "step": 0.003,
+          "group": "Discs"
+        },
+        "alpha": {
+          "type": "range",
+          "label": "Transparency",
+          "min": 0.3,
+          "max": 1,
+          "def": 0.75,
+          "step": 0.003,
+          "group": "Discs",
+          "hint": "Higher = denser pigment."
+        },
+        "outline": {
+          "type": "range",
+          "label": "Outlined",
+          "min": 0,
+          "max": 1,
+          "def": 0.5,
+          "step": 0.005,
+          "group": "Discs"
+        },
+        "dots": {
+          "type": "range",
+          "label": "Black dots",
+          "min": 0,
+          "max": 1,
+          "def": 0.5,
+          "step": 0.005,
+          "group": "Discs"
+        },
+        "lines": {
+          "type": "int",
+          "label": "Needle lines",
+          "min": 0,
+          "max": 24,
+          "def": 9,
+          "group": "Lines"
+        },
+        "orbit": {
+          "type": "range",
+          "label": "Orbit",
+          "min": 0,
+          "max": 1,
+          "def": 0.6,
+          "step": 0.005,
+          "group": "Motion"
+        },
+        "cycles": {
+          "type": "int",
+          "label": "Orbits / loop",
+          "min": 1,
+          "max": 3,
+          "def": 1,
+          "group": "Motion"
+        },
+        "grain": {
+          "type": "range",
+          "label": "Canvas grain",
+          "min": 0,
+          "max": 1,
+          "def": 0.5,
+          "step": 0.005,
+          "group": "Look"
+        }
+      }
+    },
+    {
+      "flash": false,
+      "tags": [
+        "semper",
+        "ornament",
+        "rosette",
+        "pattern",
+        "negative"
+      ],
+      "id": "rosette",
+      "name": "Rosette Split",
+      "group": "Bauhaus & Ornament",
+      "palette": "semper",
+      "blurb": "An ornament plate cut in two: scalloped bands turning about a centre, with a wedge printed as a negative on teal with sunburst rays and stars.",
+      "passes": [
+        {
+          "src": "styles/rosette.glsl"
+        }
+      ],
+      "params": {
+        "origin": {
+          "type": "point",
+          "label": "Centre",
+          "min": -0.5,
+          "max": 0.5,
+          "def": [
+            0,
+            0
+          ],
+          "group": "Form"
+        },
+        "size": {
+          "type": "range",
+          "label": "Size",
+          "min": 0.5,
+          "max": 1.6,
+          "def": 1,
+          "step": 0.006,
+          "group": "Form"
+        },
+        "rings": {
+          "type": "int",
+          "label": "Bands",
+          "min": 3,
+          "max": 14,
+          "def": 10,
+          "group": "Form"
+        },
+        "scal": {
+          "type": "int",
+          "label": "Scallops",
+          "min": 4,
+          "max": 48,
+          "def": 18,
+          "group": "Form"
+        },
+        "spin": {
+          "type": "int",
+          "label": "Turn / loop",
+          "min": -3,
+          "max": 3,
+          "def": 1,
+          "group": "Motion",
+          "hint": "Scallop periods each band turns per loop. Integer, so it closes."
+        },
+        "split": {
+          "type": "toggle",
+          "label": "Negative wedge",
+          "def": true,
+          "group": "Wedge"
+        },
+        "wedge": {
+          "type": "range",
+          "label": "Wedge width",
+          "min": 15,
+          "max": 90,
+          "def": 48,
+          "step": 0.4,
+          "group": "Wedge",
+          "show": {
+            "param": "split",
+            "is": true
+          }
+        },
+        "dir": {
+          "type": "range",
+          "label": "Wedge direction",
+          "min": -180,
+          "max": 180,
+          "def": 0,
+          "step": 2,
+          "group": "Wedge",
+          "show": {
+            "param": "split",
+            "is": true
+          }
+        },
+        "rays": {
+          "type": "int",
+          "label": "Rays",
+          "min": 0,
+          "max": 90,
+          "def": 48,
+          "group": "Wedge",
+          "show": {
+            "param": "split",
+            "is": true
+          }
+        },
+        "stars": {
+          "type": "toggle",
+          "label": "Stars",
+          "def": true,
+          "group": "Wedge",
+          "show": {
+            "param": "split",
+            "is": true
+          }
+        }
+      }
+    },
+    {
+      "flash": false,
+      "tags": [
+        "klee",
+        "mosaic",
+        "dots",
+        "grid",
+        "painting"
+      ],
+      "id": "dot-quilt",
+      "name": "Dot Quilt",
+      "group": "Bauhaus & Ornament",
+      "palette": "klee",
+      "blurb": "Klee's mosaic: a wobbling partition of warm and cool cells, each stippled with its own breathing dot screen, uneven dark edges, and the odd half-sun.",
+      "passes": [
+        {
+          "src": "styles/quilt.glsl"
+        }
+      ],
+      "params": {
+        "depth": {
+          "type": "int",
+          "label": "Subdivisions",
+          "min": 3,
+          "max": 8,
+          "def": 6,
+          "group": "Layout"
+        },
+        "stop": {
+          "type": "range",
+          "label": "Big cells",
+          "min": 0,
+          "max": 0.7,
+          "def": 0.2,
+          "step": 0.003,
+          "group": "Layout"
+        },
+        "wobble": {
+          "type": "range",
+          "label": "Hand wobble",
+          "min": 0,
+          "max": 1,
+          "def": 0.5,
+          "step": 0.005,
+          "group": "Layout"
+        },
+        "line": {
+          "type": "range",
+          "label": "Edge weight",
+          "min": 0.004,
+          "max": 0.03,
+          "def": 0.012,
+          "step": 0.001,
+          "group": "Look"
+        },
+        "dot": {
+          "type": "range",
+          "label": "Dot size",
+          "min": 0.008,
+          "max": 0.05,
+          "def": 0.022,
+          "step": 0.001,
+          "group": "Look",
+          "log": true
+        },
+        "dotty": {
+          "type": "range",
+          "label": "Dotted cells",
+          "min": 0,
+          "max": 1,
+          "def": 0.7,
+          "step": 0.005,
+          "group": "Look"
+        },
+        "suns": {
+          "type": "range",
+          "label": "Half-suns",
+          "min": 0,
+          "max": 0.6,
+          "def": 0.2,
+          "step": 0.003,
+          "group": "Look"
+        },
+        "drift": {
+          "type": "range",
+          "label": "Breathing",
+          "min": 0,
+          "max": 1,
+          "def": 0.4,
+          "step": 0.005,
+          "group": "Motion"
+        },
+        "cycles": {
+          "type": "int",
+          "label": "Breaths / loop",
+          "min": 1,
+          "max": 3,
+          "def": 1,
+          "group": "Motion"
+        }
+      }
+    }
+  ]
+}
