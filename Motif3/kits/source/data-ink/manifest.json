@@ -1,0 +1,1788 @@
+{
+  "format": "motif-kit@1",
+  "id": "data-ink",
+  "name": "Data Ink",
+  "version": "0.1.0",
+  "author": "Echo Opera",
+  "description": "Information graphics as playable shaders: streams, heat ledgers, flow maps, timetables, curve plates, sparklines and diagrams. Every dataset is a set of sliders you can type, keyframe, randomize or map to audio, and the shaders print the numbers they draw.",
+  "license": "All rights reserved",
+  "accent": "#B8532E",
+  "common": "common.glsl",
+  "palettes": [
+    {
+      "id": "plate",
+      "name": "Warm Plate",
+      "bg": "#FAF6EA",
+      "ink": "#1A1A1A",
+      "a": [
+        "#B8532E",
+        "#3F6E9A",
+        "#D8B27A"
+      ]
+    },
+    {
+      "id": "ledger",
+      "name": "Blue Ledger",
+      "bg": "#FBFAF5",
+      "ink": "#151515",
+      "a": [
+        "#1D3E7A",
+        "#5C8CC4",
+        "#CFE0F0"
+      ]
+    },
+    {
+      "id": "timetable",
+      "name": "Timetable",
+      "bg": "#F7F4EC",
+      "ink": "#121212",
+      "a": [
+        "#C23B22",
+        "#3D6AA5",
+        "#8A8576"
+      ]
+    },
+    {
+      "id": "campaign",
+      "name": "Campaign Map",
+      "bg": "#EEE2C6",
+      "ink": "#151515",
+      "a": [
+        "#D9AE80",
+        "#151515",
+        "#9C5A3C"
+      ]
+    },
+    {
+      "id": "photons",
+      "name": "Silver Photons",
+      "bg": "#FBFBF8",
+      "ink": "#1F2228",
+      "a": [
+        "#C0392B",
+        "#2E4A7D",
+        "#8E959C"
+      ]
+    },
+    {
+      "id": "night",
+      "name": "Night Plate",
+      "bg": "#0F1316",
+      "ink": "#EDE8DA",
+      "a": [
+        "#E89B5A",
+        "#6FA8DC",
+        "#E5D27A"
+      ]
+    }
+  ],
+  "styles": [
+    {
+      "id": "stream",
+      "name": "Stream",
+      "group": "Time & Flow",
+      "palette": "plate",
+      "tags": [
+        "stream",
+        "stacked",
+        "timeline",
+        "flow"
+      ],
+      "blurb": "A symmetric stacked flow. Each series is a looped curve weighted by your slider, labelled with its name and the value you set; the stack scrolls whole frames per loop.",
+      "passes": [
+        {
+          "src": "styles/stream.glsl"
+        }
+      ],
+      "params": {
+        "pattern": {
+          "type": "select",
+          "label": "Pattern",
+          "options": [
+            {
+              "v": "peaks",
+              "l": "Peaks"
+            },
+            {
+              "v": "waves",
+              "l": "Seasonal waves"
+            },
+            {
+              "v": "trend",
+              "l": "Trend + swings"
+            }
+          ],
+          "def": "peaks",
+          "group": "Data",
+          "hint": "How each series is generated. Your sliders scale it."
+        },
+        "layers": {
+          "type": "int",
+          "label": "Series",
+          "min": 3,
+          "max": 8,
+          "def": 7,
+          "group": "Data"
+        },
+        "v1": {
+          "type": "range",
+          "label": "Series 1",
+          "min": 0,
+          "max": 1,
+          "def": 0.9,
+          "step": 0.005,
+          "group": "Data values",
+          "hint": "Type a value, or keyframe it. The shader prints it.",
+          "mutate": 1
+        },
+        "v2": {
+          "type": "range",
+          "label": "Series 2",
+          "min": 0,
+          "max": 1,
+          "def": 0.6,
+          "step": 0.005,
+          "group": "Data values",
+          "mutate": 1
+        },
+        "v3": {
+          "type": "range",
+          "label": "Series 3",
+          "min": 0,
+          "max": 1,
+          "def": 0.8,
+          "step": 0.005,
+          "group": "Data values",
+          "mutate": 1
+        },
+        "v4": {
+          "type": "range",
+          "label": "Series 4",
+          "min": 0,
+          "max": 1,
+          "def": 0.5,
+          "step": 0.005,
+          "group": "Data values",
+          "mutate": 1
+        },
+        "v5": {
+          "type": "range",
+          "label": "Series 5",
+          "min": 0,
+          "max": 1,
+          "def": 0.7,
+          "step": 0.005,
+          "group": "Data values",
+          "mutate": 1
+        },
+        "v6": {
+          "type": "range",
+          "label": "Series 6",
+          "min": 0,
+          "max": 1,
+          "def": 0.4,
+          "step": 0.005,
+          "group": "Data values",
+          "mutate": 1
+        },
+        "v7": {
+          "type": "range",
+          "label": "Series 7",
+          "min": 0,
+          "max": 1,
+          "def": 0.6,
+          "step": 0.005,
+          "group": "Data values",
+          "mutate": 1
+        },
+        "v8": {
+          "type": "range",
+          "label": "Series 8",
+          "min": 0,
+          "max": 1,
+          "def": 0.3,
+          "step": 0.005,
+          "group": "Data values",
+          "mutate": 1
+        },
+        "names": {
+          "type": "select",
+          "label": "Labels",
+          "options": [
+            {
+              "v": "cities",
+              "l": "Cities"
+            },
+            {
+              "v": "stations",
+              "l": "Stations"
+            },
+            {
+              "v": "greek",
+              "l": "Greek"
+            },
+            {
+              "v": "metals",
+              "l": "Metals"
+            },
+            {
+              "v": "months",
+              "l": "Months"
+            }
+          ],
+          "def": "cities",
+          "group": "Data"
+        },
+        "height": {
+          "type": "range",
+          "label": "Height",
+          "min": 0.5,
+          "max": 2,
+          "def": 1.45,
+          "step": 0.007,
+          "group": "Shape"
+        },
+        "smooth": {
+          "type": "range",
+          "label": "Peak width",
+          "min": 0.4,
+          "max": 2,
+          "def": 1,
+          "step": 0.008,
+          "group": "Shape"
+        },
+        "wiggle": {
+          "type": "range",
+          "label": "Baseline wiggle",
+          "min": 0,
+          "max": 1,
+          "def": 0.4,
+          "step": 0.005,
+          "group": "Shape"
+        },
+        "edge": {
+          "type": "range",
+          "label": "Paper edges",
+          "min": 0,
+          "max": 1,
+          "def": 0.7,
+          "step": 0.005,
+          "group": "Shape"
+        },
+        "scroll": {
+          "type": "int",
+          "label": "Scroll / loop",
+          "min": -2,
+          "max": 2,
+          "def": 1,
+          "group": "Motion",
+          "hint": "Whole frames per loop; 0 holds still."
+        },
+        "sway": {
+          "type": "range",
+          "label": "Sway",
+          "min": 0,
+          "max": 1,
+          "def": 0.5,
+          "step": 0.005,
+          "group": "Motion"
+        },
+        "labels": {
+          "type": "toggle",
+          "label": "Labels",
+          "def": true,
+          "group": "Axes"
+        },
+        "ticks": {
+          "type": "toggle",
+          "label": "Time axis",
+          "def": true,
+          "group": "Axes"
+        },
+        "from": {
+          "type": "range",
+          "label": "Axis from",
+          "min": 1800,
+          "max": 2030,
+          "def": 1990,
+          "step": 1,
+          "group": "Axes"
+        },
+        "span": {
+          "type": "range",
+          "label": "Axis span",
+          "min": 4,
+          "max": 80,
+          "def": 24,
+          "step": 1,
+          "group": "Axes"
+        }
+      },
+      "flash": false
+    },
+    {
+      "id": "heat-ledger",
+      "name": "Heat Ledger",
+      "group": "Time & Flow",
+      "palette": "ledger",
+      "tags": [
+        "heat",
+        "ranking",
+        "timeline",
+        "media",
+        "image"
+      ],
+      "inputs": [
+        {
+          "id": "source",
+          "type": "media",
+          "label": "Data image",
+          "fit": "fill",
+          "hint": "Optional: its brightness becomes the data."
+        }
+      ],
+      "blurb": "Rows of tenure, one cell per step, shaded from your values. A cursor sweeps the years and the right-hand figures read the value under it. Attach an image and its brightness becomes the data.",
+      "passes": [
+        {
+          "src": "styles/heat.glsl"
+        }
+      ],
+      "params": {
+        "pattern": {
+          "type": "select",
+          "label": "Pattern",
+          "options": [
+            {
+              "v": "peaks",
+              "l": "Peaks"
+            },
+            {
+              "v": "waves",
+              "l": "Seasonal waves"
+            },
+            {
+              "v": "trend",
+              "l": "Trend + swings"
+            }
+          ],
+          "def": "peaks",
+          "group": "Data",
+          "hint": "How each series is generated. Your sliders scale it."
+        },
+        "rows": {
+          "type": "int",
+          "label": "Rows",
+          "min": 6,
+          "max": 25,
+          "def": 16,
+          "group": "Data"
+        },
+        "cols": {
+          "type": "int",
+          "label": "Time steps",
+          "min": 20,
+          "max": 120,
+          "def": 60,
+          "group": "Data"
+        },
+        "v1": {
+          "type": "range",
+          "label": "Row group 1",
+          "min": 0,
+          "max": 1,
+          "def": 0.9,
+          "step": 0.005,
+          "group": "Data values",
+          "hint": "Type a value, or keyframe it. The shader prints it.",
+          "mutate": 1
+        },
+        "v2": {
+          "type": "range",
+          "label": "Row group 2",
+          "min": 0,
+          "max": 1,
+          "def": 0.55,
+          "step": 0.005,
+          "group": "Data values",
+          "mutate": 1
+        },
+        "v3": {
+          "type": "range",
+          "label": "Row group 3",
+          "min": 0,
+          "max": 1,
+          "def": 0.8,
+          "step": 0.005,
+          "group": "Data values",
+          "mutate": 1
+        },
+        "v4": {
+          "type": "range",
+          "label": "Row group 4",
+          "min": 0,
+          "max": 1,
+          "def": 0.4,
+          "step": 0.005,
+          "group": "Data values",
+          "mutate": 1
+        },
+        "v5": {
+          "type": "range",
+          "label": "Row group 5",
+          "min": 0,
+          "max": 1,
+          "def": 0.7,
+          "step": 0.005,
+          "group": "Data values",
+          "mutate": 1
+        },
+        "v6": {
+          "type": "range",
+          "label": "Row group 6",
+          "min": 0,
+          "max": 1,
+          "def": 0.5,
+          "step": 0.005,
+          "group": "Data values",
+          "mutate": 1
+        },
+        "v7": {
+          "type": "range",
+          "label": "Row group 7",
+          "min": 0,
+          "max": 1,
+          "def": 0.85,
+          "step": 0.005,
+          "group": "Data values",
+          "mutate": 1
+        },
+        "v8": {
+          "type": "range",
+          "label": "Row group 8",
+          "min": 0,
+          "max": 1,
+          "def": 0.3,
+          "step": 0.005,
+          "group": "Data values",
+          "mutate": 1
+        },
+        "names": {
+          "type": "select",
+          "label": "Labels",
+          "options": [
+            {
+              "v": "cities",
+              "l": "Cities"
+            },
+            {
+              "v": "stations",
+              "l": "Stations"
+            },
+            {
+              "v": "greek",
+              "l": "Greek"
+            },
+            {
+              "v": "metals",
+              "l": "Metals"
+            },
+            {
+              "v": "months",
+              "l": "Months"
+            }
+          ],
+          "def": "cities",
+          "group": "Data"
+        },
+        "gain": {
+          "type": "range",
+          "label": "Gain",
+          "min": 0.5,
+          "max": 2.5,
+          "def": 1.6,
+          "step": 0.01,
+          "group": "Shape"
+        },
+        "stagger": {
+          "type": "range",
+          "label": "Stagger",
+          "min": 0,
+          "max": 1,
+          "def": 0.6,
+          "step": 0.005,
+          "group": "Shape"
+        },
+        "sway": {
+          "type": "range",
+          "label": "Sway",
+          "min": 0,
+          "max": 1,
+          "def": 0.5,
+          "step": 0.005,
+          "group": "Shape"
+        },
+        "sweep": {
+          "type": "int",
+          "label": "Sweeps / loop",
+          "min": 0,
+          "max": 3,
+          "def": 1,
+          "group": "Motion"
+        },
+        "trail": {
+          "type": "range",
+          "label": "Lit trail",
+          "min": 0.1,
+          "max": 0.9,
+          "def": 0.45,
+          "step": 0.004,
+          "group": "Motion"
+        },
+        "from": {
+          "type": "range",
+          "label": "Axis from",
+          "min": 1800,
+          "max": 2030,
+          "def": 1973,
+          "step": 1,
+          "group": "Axes"
+        },
+        "span": {
+          "type": "range",
+          "label": "Axis span",
+          "min": 5,
+          "max": 80,
+          "def": 40,
+          "step": 1,
+          "group": "Axes"
+        },
+        "photo": {
+          "type": "range",
+          "label": "Image as data",
+          "min": 0,
+          "max": 1,
+          "def": 1,
+          "step": 0.005,
+          "group": "Image",
+          "hint": "With an image attached, how much brightness replaces the generated data."
+        }
+      },
+      "flash": false
+    },
+    {
+      "id": "flow-map",
+      "name": "Flow Map",
+      "group": "Time & Flow",
+      "palette": "campaign",
+      "tags": [
+        "minard",
+        "flow",
+        "map",
+        "temperature"
+      ],
+      "blurb": "A band whose width is the data. The tan advance narrows with your eight waypoint values; the black retreat returns thinner by the loss you pick; a temperature chart prints the cold at each stop.",
+      "passes": [
+        {
+          "src": "styles/flowmap.glsl"
+        }
+      ],
+      "params": {
+        "v1": {
+          "type": "range",
+          "label": "Waypoint 1",
+          "min": 0,
+          "max": 1,
+          "def": 0.95,
+          "step": 0.005,
+          "group": "Data values",
+          "hint": "Type a value, or keyframe it. The shader prints it.",
+          "mutate": 1
+        },
+        "v2": {
+          "type": "range",
+          "label": "Waypoint 2",
+          "min": 0,
+          "max": 1,
+          "def": 0.88,
+          "step": 0.005,
+          "group": "Data values",
+          "mutate": 1
+        },
+        "v3": {
+          "type": "range",
+          "label": "Waypoint 3",
+          "min": 0,
+          "max": 1,
+          "def": 0.78,
+          "step": 0.005,
+          "group": "Data values",
+          "mutate": 1
+        },
+        "v4": {
+          "type": "range",
+          "label": "Waypoint 4",
+          "min": 0,
+          "max": 1,
+          "def": 0.7,
+          "step": 0.005,
+          "group": "Data values",
+          "mutate": 1
+        },
+        "v5": {
+          "type": "range",
+          "label": "Waypoint 5",
+          "min": 0,
+          "max": 1,
+          "def": 0.55,
+          "step": 0.005,
+          "group": "Data values",
+          "mutate": 1
+        },
+        "v6": {
+          "type": "range",
+          "label": "Waypoint 6",
+          "min": 0,
+          "max": 1,
+          "def": 0.45,
+          "step": 0.005,
+          "group": "Data values",
+          "mutate": 1
+        },
+        "v7": {
+          "type": "range",
+          "label": "Waypoint 7",
+          "min": 0,
+          "max": 1,
+          "def": 0.38,
+          "step": 0.005,
+          "group": "Data values",
+          "mutate": 1
+        },
+        "v8": {
+          "type": "range",
+          "label": "Waypoint 8",
+          "min": 0,
+          "max": 1,
+          "def": 0.3,
+          "step": 0.005,
+          "group": "Data values",
+          "mutate": 1
+        },
+        "names": {
+          "type": "select",
+          "label": "Labels",
+          "options": [
+            {
+              "v": "cities",
+              "l": "Cities"
+            },
+            {
+              "v": "stations",
+              "l": "Stations"
+            },
+            {
+              "v": "greek",
+              "l": "Greek"
+            },
+            {
+              "v": "metals",
+              "l": "Metals"
+            },
+            {
+              "v": "months",
+              "l": "Months"
+            }
+          ],
+          "def": "cities",
+          "group": "Data"
+        },
+        "scale": {
+          "type": "range",
+          "label": "Band scale",
+          "min": 0.5,
+          "max": 1.5,
+          "def": 1,
+          "step": 0.005,
+          "group": "Shape"
+        },
+        "loss": {
+          "type": "range",
+          "label": "Loss on return",
+          "min": 0,
+          "max": 1,
+          "def": 0.7,
+          "step": 0.005,
+          "group": "Shape"
+        },
+        "sep": {
+          "type": "range",
+          "label": "Return offset",
+          "min": 0,
+          "max": 1,
+          "def": 0.5,
+          "step": 0.005,
+          "group": "Shape"
+        },
+        "wander": {
+          "type": "range",
+          "label": "Route wander",
+          "min": 0,
+          "max": 1,
+          "def": 0.5,
+          "step": 0.005,
+          "group": "Shape"
+        },
+        "cold": {
+          "type": "range",
+          "label": "Cold",
+          "min": 0,
+          "max": 1.5,
+          "def": 1,
+          "step": 0.007,
+          "group": "Chart"
+        }
+      },
+      "flash": false
+    },
+    {
+      "id": "marey-grid",
+      "name": "Marey Grid",
+      "group": "Grids & Plates",
+      "palette": "timetable",
+      "tags": [
+        "marey",
+        "timetable",
+        "trains",
+        "grid"
+      ],
+      "flash": true,
+      "blurb": "A timetable as a graphic: stations sit at the distances you set, trains run as diagonals with dwell flats at each stop, and a cursor sweeps the day pinning every train it crosses.",
+      "passes": [
+        {
+          "src": "styles/marey.glsl"
+        }
+      ],
+      "params": {
+        "names": {
+          "type": "select",
+          "label": "Labels",
+          "options": [
+            {
+              "v": "cities",
+              "l": "Cities"
+            },
+            {
+              "v": "stations",
+              "l": "Stations"
+            },
+            {
+              "v": "greek",
+              "l": "Greek"
+            },
+            {
+              "v": "metals",
+              "l": "Metals"
+            },
+            {
+              "v": "months",
+              "l": "Months"
+            }
+          ],
+          "def": "stations",
+          "group": "Data"
+        },
+        "stations": {
+          "type": "int",
+          "label": "Stations",
+          "min": 3,
+          "max": 10,
+          "def": 7,
+          "group": "Data"
+        },
+        "trains": {
+          "type": "int",
+          "label": "Trains",
+          "min": 4,
+          "max": 28,
+          "def": 16,
+          "group": "Data",
+          "hint": "The highlighted train steps through them. Limiter-capped."
+        },
+        "v1": {
+          "type": "range",
+          "label": "Gap 1",
+          "min": 0,
+          "max": 1,
+          "def": 0.5,
+          "step": 0.005,
+          "group": "Data values",
+          "hint": "Type a value, or keyframe it. The shader prints it.",
+          "mutate": 1
+        },
+        "v2": {
+          "type": "range",
+          "label": "Gap 2",
+          "min": 0,
+          "max": 1,
+          "def": 0.8,
+          "step": 0.005,
+          "group": "Data values",
+          "mutate": 1
+        },
+        "v3": {
+          "type": "range",
+          "label": "Gap 3",
+          "min": 0,
+          "max": 1,
+          "def": 0.4,
+          "step": 0.005,
+          "group": "Data values",
+          "mutate": 1
+        },
+        "v4": {
+          "type": "range",
+          "label": "Gap 4",
+          "min": 0,
+          "max": 1,
+          "def": 0.9,
+          "step": 0.005,
+          "group": "Data values",
+          "mutate": 1
+        },
+        "v5": {
+          "type": "range",
+          "label": "Gap 5",
+          "min": 0,
+          "max": 1,
+          "def": 0.6,
+          "step": 0.005,
+          "group": "Data values",
+          "mutate": 1
+        },
+        "v6": {
+          "type": "range",
+          "label": "Gap 6",
+          "min": 0,
+          "max": 1,
+          "def": 0.7,
+          "step": 0.005,
+          "group": "Data values",
+          "mutate": 1
+        },
+        "v7": {
+          "type": "range",
+          "label": "Gap 7",
+          "min": 0,
+          "max": 1,
+          "def": 0.3,
+          "step": 0.005,
+          "group": "Data values",
+          "mutate": 1
+        },
+        "v8": {
+          "type": "range",
+          "label": "Gap 8",
+          "min": 0,
+          "max": 1,
+          "def": 0.5,
+          "step": 0.005,
+          "group": "Data values",
+          "mutate": 1
+        },
+        "pace": {
+          "type": "range",
+          "label": "Pace",
+          "min": 0.4,
+          "max": 2,
+          "def": 1,
+          "step": 0.008,
+          "group": "Shape"
+        },
+        "dwell": {
+          "type": "range",
+          "label": "Dwell",
+          "min": 0,
+          "max": 1,
+          "def": 0.4,
+          "step": 0.005,
+          "group": "Shape"
+        },
+        "hours": {
+          "type": "int",
+          "label": "Hours",
+          "min": 6,
+          "max": 24,
+          "def": 18,
+          "group": "Axes"
+        },
+        "t0": {
+          "type": "int",
+          "label": "Start hour",
+          "min": 0,
+          "max": 23,
+          "def": 6,
+          "group": "Axes"
+        },
+        "grid": {
+          "type": "range",
+          "label": "Grid strength",
+          "min": 0,
+          "max": 2,
+          "def": 1,
+          "step": 0.01,
+          "group": "Axes"
+        },
+        "sweep": {
+          "type": "int",
+          "label": "Sweeps / loop",
+          "min": 1,
+          "max": 3,
+          "def": 1,
+          "group": "Motion"
+        },
+        "trail": {
+          "type": "range",
+          "label": "Lit trail",
+          "min": 0.1,
+          "max": 0.9,
+          "def": 0.4,
+          "step": 0.004,
+          "group": "Motion"
+        }
+      }
+    },
+    {
+      "id": "curve-plate",
+      "name": "Curve Plate",
+      "group": "Grids & Plates",
+      "palette": "timetable",
+      "tags": [
+        "curves",
+        "graph paper",
+        "measurements",
+        "dense"
+      ],
+      "blurb": "A family of measured curves on fine graph paper, each tagged with the number at its head. Four dials generate the family; the curves draw on and the tags climb.",
+      "passes": [
+        {
+          "src": "styles/curves.glsl"
+        }
+      ],
+      "params": {
+        "family": {
+          "type": "select",
+          "label": "Family",
+          "options": [
+            {
+              "v": "saturating",
+              "l": "Saturating"
+            },
+            {
+              "v": "peaked",
+              "l": "Peaked"
+            },
+            {
+              "v": "power",
+              "l": "Power law"
+            }
+          ],
+          "def": "saturating",
+          "group": "Data"
+        },
+        "panels": {
+          "type": "int",
+          "label": "Panels",
+          "min": 1,
+          "max": 2,
+          "def": 2,
+          "group": "Data"
+        },
+        "count": {
+          "type": "int",
+          "label": "Curves",
+          "min": 4,
+          "max": 24,
+          "def": 14,
+          "group": "Data"
+        },
+        "v1": {
+          "type": "range",
+          "label": "Curve 1",
+          "min": 0,
+          "max": 1,
+          "def": 0.9,
+          "step": 0.005,
+          "group": "Data values",
+          "hint": "Type a value, or keyframe it. The shader prints it.",
+          "mutate": 1
+        },
+        "v2": {
+          "type": "range",
+          "label": "Curve 2",
+          "min": 0,
+          "max": 1,
+          "def": 0.5,
+          "step": 0.005,
+          "group": "Data values",
+          "mutate": 1
+        },
+        "v3": {
+          "type": "range",
+          "label": "Curve 3",
+          "min": 0,
+          "max": 1,
+          "def": 0.8,
+          "step": 0.005,
+          "group": "Data values",
+          "mutate": 1
+        },
+        "v4": {
+          "type": "range",
+          "label": "Curve 4",
+          "min": 0,
+          "max": 1,
+          "def": 0.6,
+          "step": 0.005,
+          "group": "Data values",
+          "mutate": 1
+        },
+        "v5": {
+          "type": "range",
+          "label": "Curve 5",
+          "min": 0,
+          "max": 1,
+          "def": 0.7,
+          "step": 0.005,
+          "group": "Data values",
+          "mutate": 1
+        },
+        "v6": {
+          "type": "range",
+          "label": "Curve 6",
+          "min": 0,
+          "max": 1,
+          "def": 0.4,
+          "step": 0.005,
+          "group": "Data values",
+          "mutate": 1
+        },
+        "v7": {
+          "type": "range",
+          "label": "Curve 7",
+          "min": 0,
+          "max": 1,
+          "def": 0.85,
+          "step": 0.005,
+          "group": "Data values",
+          "mutate": 1
+        },
+        "v8": {
+          "type": "range",
+          "label": "Curve 8",
+          "min": 0,
+          "max": 1,
+          "def": 0.55,
+          "step": 0.005,
+          "group": "Data values",
+          "mutate": 1
+        },
+        "names": {
+          "type": "select",
+          "label": "Labels",
+          "options": [
+            {
+              "v": "cities",
+              "l": "Cities"
+            },
+            {
+              "v": "stations",
+              "l": "Stations"
+            },
+            {
+              "v": "greek",
+              "l": "Greek"
+            },
+            {
+              "v": "metals",
+              "l": "Metals"
+            },
+            {
+              "v": "months",
+              "l": "Months"
+            }
+          ],
+          "def": "metals",
+          "group": "Data"
+        },
+        "level": {
+          "type": "range",
+          "label": "Level",
+          "min": 0.4,
+          "max": 1.4,
+          "def": 1,
+          "step": 0.005,
+          "group": "Shape"
+        },
+        "spread": {
+          "type": "range",
+          "label": "Spread",
+          "min": 0,
+          "max": 1.5,
+          "def": 0.6,
+          "step": 0.007,
+          "group": "Shape"
+        },
+        "curve": {
+          "type": "range",
+          "label": "Curvature",
+          "min": 0,
+          "max": 1,
+          "def": 0.5,
+          "step": 0.005,
+          "group": "Shape"
+        },
+        "noise": {
+          "type": "range",
+          "label": "Measurement noise",
+          "min": 0,
+          "max": 1,
+          "def": 0.3,
+          "step": 0.005,
+          "group": "Shape"
+        },
+        "log": {
+          "type": "range",
+          "label": "Log axis",
+          "min": 0,
+          "max": 1,
+          "def": 0,
+          "step": 0.005,
+          "group": "Axes"
+        },
+        "points": {
+          "type": "range",
+          "label": "Data points",
+          "min": 0,
+          "max": 1,
+          "def": 0.8,
+          "step": 0.005,
+          "group": "Axes"
+        },
+        "tags": {
+          "type": "toggle",
+          "label": "Head tags",
+          "def": true,
+          "group": "Axes"
+        }
+      },
+      "flash": false
+    },
+    {
+      "id": "parallel-tracks",
+      "name": "Parallel Tracks",
+      "group": "Grids & Plates",
+      "palette": "timetable",
+      "tags": [
+        "timeline",
+        "tracks",
+        "chronology",
+        "events"
+      ],
+      "blurb": "A multi-track chronology: events per row, a sun-curve riding above, dated verticals, a playhead that lights the events it crosses and prints their lengths.",
+      "passes": [
+        {
+          "src": "styles/tracks.glsl"
+        }
+      ],
+      "params": {
+        "names": {
+          "type": "select",
+          "label": "Labels",
+          "options": [
+            {
+              "v": "cities",
+              "l": "Cities"
+            },
+            {
+              "v": "stations",
+              "l": "Stations"
+            },
+            {
+              "v": "greek",
+              "l": "Greek"
+            },
+            {
+              "v": "metals",
+              "l": "Metals"
+            },
+            {
+              "v": "months",
+              "l": "Months"
+            }
+          ],
+          "def": "stations",
+          "group": "Data"
+        },
+        "tracks": {
+          "type": "int",
+          "label": "Tracks",
+          "min": 3,
+          "max": 12,
+          "def": 8,
+          "group": "Data"
+        },
+        "v1": {
+          "type": "range",
+          "label": "Track tempo 1",
+          "min": 0,
+          "max": 1,
+          "def": 0.8,
+          "step": 0.005,
+          "group": "Data values",
+          "hint": "Type a value, or keyframe it. The shader prints it.",
+          "mutate": 1
+        },
+        "v2": {
+          "type": "range",
+          "label": "Track tempo 2",
+          "min": 0,
+          "max": 1,
+          "def": 0.5,
+          "step": 0.005,
+          "group": "Data values",
+          "mutate": 1
+        },
+        "v3": {
+          "type": "range",
+          "label": "Track tempo 3",
+          "min": 0,
+          "max": 1,
+          "def": 0.9,
+          "step": 0.005,
+          "group": "Data values",
+          "mutate": 1
+        },
+        "v4": {
+          "type": "range",
+          "label": "Track tempo 4",
+          "min": 0,
+          "max": 1,
+          "def": 0.4,
+          "step": 0.005,
+          "group": "Data values",
+          "mutate": 1
+        },
+        "v5": {
+          "type": "range",
+          "label": "Track tempo 5",
+          "min": 0,
+          "max": 1,
+          "def": 0.7,
+          "step": 0.005,
+          "group": "Data values",
+          "mutate": 1
+        },
+        "v6": {
+          "type": "range",
+          "label": "Track tempo 6",
+          "min": 0,
+          "max": 1,
+          "def": 0.6,
+          "step": 0.005,
+          "group": "Data values",
+          "mutate": 1
+        },
+        "v7": {
+          "type": "range",
+          "label": "Track tempo 7",
+          "min": 0,
+          "max": 1,
+          "def": 0.35,
+          "step": 0.005,
+          "group": "Data values",
+          "mutate": 1
+        },
+        "v8": {
+          "type": "range",
+          "label": "Track tempo 8",
+          "min": 0,
+          "max": 1,
+          "def": 0.75,
+          "step": 0.005,
+          "group": "Data values",
+          "mutate": 1
+        },
+        "overlap": {
+          "type": "range",
+          "label": "Overlap",
+          "min": 0,
+          "max": 1,
+          "def": 0.5,
+          "step": 0.005,
+          "group": "Shape"
+        },
+        "length": {
+          "type": "range",
+          "label": "Event length",
+          "min": 0.3,
+          "max": 2,
+          "def": 1,
+          "step": 0.009,
+          "group": "Shape"
+        },
+        "waves": {
+          "type": "int",
+          "label": "Sun waves",
+          "min": 1,
+          "max": 6,
+          "def": 2,
+          "group": "Shape"
+        },
+        "amp": {
+          "type": "range",
+          "label": "Sun height",
+          "min": 0,
+          "max": 1,
+          "def": 0.8,
+          "step": 0.005,
+          "group": "Shape"
+        },
+        "units": {
+          "type": "int",
+          "label": "Date lines",
+          "min": 5,
+          "max": 24,
+          "def": 12,
+          "group": "Axes"
+        },
+        "from": {
+          "type": "range",
+          "label": "Axis from",
+          "min": 1800,
+          "max": 2030,
+          "def": 1900,
+          "step": 1,
+          "group": "Axes"
+        },
+        "step": {
+          "type": "range",
+          "label": "Axis step",
+          "min": 1,
+          "max": 50,
+          "def": 5,
+          "step": 1,
+          "group": "Axes"
+        },
+        "sweep": {
+          "type": "int",
+          "label": "Sweeps / loop",
+          "min": 1,
+          "max": 3,
+          "def": 1,
+          "group": "Motion"
+        },
+        "trail": {
+          "type": "range",
+          "label": "Lit trail",
+          "min": 0.1,
+          "max": 0.9,
+          "def": 0.35,
+          "step": 0.004,
+          "group": "Motion"
+        }
+      },
+      "flash": false
+    },
+    {
+      "id": "sparkline-table",
+      "name": "Sparkline Table",
+      "group": "Small Multiples",
+      "palette": "timetable",
+      "tags": [
+        "sparklines",
+        "small multiples",
+        "table"
+      ],
+      "blurb": "Small multiples: a grey range band, a blue minimum, a red maximum and the live end value. A window slides through each series and your eight sliders set each row's level.",
+      "passes": [
+        {
+          "src": "styles/sparklines.glsl"
+        }
+      ],
+      "params": {
+        "pattern": {
+          "type": "select",
+          "label": "Pattern",
+          "options": [
+            {
+              "v": "peaks",
+              "l": "Peaks"
+            },
+            {
+              "v": "waves",
+              "l": "Seasonal waves"
+            },
+            {
+              "v": "trend",
+              "l": "Trend + swings"
+            }
+          ],
+          "def": "peaks",
+          "group": "Data",
+          "hint": "How each series is generated. Your sliders scale it."
+        },
+        "rows": {
+          "type": "int",
+          "label": "Rows",
+          "min": 3,
+          "max": 10,
+          "def": 6,
+          "group": "Data"
+        },
+        "cols": {
+          "type": "int",
+          "label": "Columns",
+          "min": 1,
+          "max": 3,
+          "def": 2,
+          "group": "Data"
+        },
+        "v1": {
+          "type": "range",
+          "label": "Row 1",
+          "min": 0,
+          "max": 1,
+          "def": 0.8,
+          "step": 0.005,
+          "group": "Data values",
+          "hint": "Type a value, or keyframe it. The shader prints it.",
+          "mutate": 1
+        },
+        "v2": {
+          "type": "range",
+          "label": "Row 2",
+          "min": 0,
+          "max": 1,
+          "def": 0.5,
+          "step": 0.005,
+          "group": "Data values",
+          "mutate": 1
+        },
+        "v3": {
+          "type": "range",
+          "label": "Row 3",
+          "min": 0,
+          "max": 1,
+          "def": 0.9,
+          "step": 0.005,
+          "group": "Data values",
+          "mutate": 1
+        },
+        "v4": {
+          "type": "range",
+          "label": "Row 4",
+          "min": 0,
+          "max": 1,
+          "def": 0.4,
+          "step": 0.005,
+          "group": "Data values",
+          "mutate": 1
+        },
+        "v5": {
+          "type": "range",
+          "label": "Row 5",
+          "min": 0,
+          "max": 1,
+          "def": 0.65,
+          "step": 0.005,
+          "group": "Data values",
+          "mutate": 1
+        },
+        "v6": {
+          "type": "range",
+          "label": "Row 6",
+          "min": 0,
+          "max": 1,
+          "def": 0.55,
+          "step": 0.005,
+          "group": "Data values",
+          "mutate": 1
+        },
+        "v7": {
+          "type": "range",
+          "label": "Row 7",
+          "min": 0,
+          "max": 1,
+          "def": 0.85,
+          "step": 0.005,
+          "group": "Data values",
+          "mutate": 1
+        },
+        "v8": {
+          "type": "range",
+          "label": "Row 8",
+          "min": 0,
+          "max": 1,
+          "def": 0.35,
+          "step": 0.005,
+          "group": "Data values",
+          "mutate": 1
+        },
+        "names": {
+          "type": "select",
+          "label": "Labels",
+          "options": [
+            {
+              "v": "cities",
+              "l": "Cities"
+            },
+            {
+              "v": "stations",
+              "l": "Stations"
+            },
+            {
+              "v": "greek",
+              "l": "Greek"
+            },
+            {
+              "v": "metals",
+              "l": "Metals"
+            },
+            {
+              "v": "months",
+              "l": "Months"
+            }
+          ],
+          "def": "months",
+          "group": "Data"
+        },
+        "window": {
+          "type": "range",
+          "label": "Window",
+          "min": 0.2,
+          "max": 1,
+          "def": 0.6,
+          "step": 0.004,
+          "group": "Shape"
+        },
+        "gain": {
+          "type": "range",
+          "label": "Gain",
+          "min": 0.5,
+          "max": 1.5,
+          "def": 1,
+          "step": 0.005,
+          "group": "Shape"
+        },
+        "sway": {
+          "type": "range",
+          "label": "Sway",
+          "min": 0,
+          "max": 1,
+          "def": 0.5,
+          "step": 0.005,
+          "group": "Shape"
+        },
+        "slide": {
+          "type": "int",
+          "label": "Slides / loop",
+          "min": 0,
+          "max": 3,
+          "def": 1,
+          "group": "Motion"
+        }
+      },
+      "flash": false
+    },
+    {
+      "id": "possible-photons",
+      "name": "Possible Photons",
+      "group": "Diagrams",
+      "palette": "photons",
+      "tags": [
+        "feynman",
+        "diagram",
+        "lines",
+        "physics"
+      ],
+      "blurb": "A diagram assembled from your coupling values: vertices on a loose ring, straight fermion lines with arrows, wavy photons whose amplitude is a slider, pulses riding every edge.",
+      "passes": [
+        {
+          "src": "styles/feynman.glsl"
+        }
+      ],
+      "params": {
+        "nodes": {
+          "type": "int",
+          "label": "Vertices",
+          "min": 3,
+          "max": 8,
+          "def": 6,
+          "group": "Graph"
+        },
+        "size": {
+          "type": "range",
+          "label": "Size",
+          "min": 0.4,
+          "max": 1.2,
+          "def": 0.65,
+          "step": 0.004,
+          "group": "Graph"
+        },
+        "chords": {
+          "type": "range",
+          "label": "Cross lines",
+          "min": 0,
+          "max": 1,
+          "def": 0.4,
+          "step": 0.005,
+          "group": "Graph"
+        },
+        "legs": {
+          "type": "range",
+          "label": "External legs",
+          "min": 0,
+          "max": 1,
+          "def": 0.5,
+          "step": 0.005,
+          "group": "Graph"
+        },
+        "loops": {
+          "type": "range",
+          "label": "Bubbles",
+          "min": 0,
+          "max": 1,
+          "def": 0.25,
+          "step": 0.005,
+          "group": "Graph"
+        },
+        "v1": {
+          "type": "range",
+          "label": "Coupling 1",
+          "min": 0,
+          "max": 1,
+          "def": 0.7,
+          "step": 0.005,
+          "group": "Data values",
+          "hint": "Type a value, or keyframe it. The shader prints it.",
+          "mutate": 1
+        },
+        "v2": {
+          "type": "range",
+          "label": "Coupling 2",
+          "min": 0,
+          "max": 1,
+          "def": 0.4,
+          "step": 0.005,
+          "group": "Data values",
+          "mutate": 1
+        },
+        "v3": {
+          "type": "range",
+          "label": "Coupling 3",
+          "min": 0,
+          "max": 1,
+          "def": 0.9,
+          "step": 0.005,
+          "group": "Data values",
+          "mutate": 1
+        },
+        "v4": {
+          "type": "range",
+          "label": "Coupling 4",
+          "min": 0,
+          "max": 1,
+          "def": 0.55,
+          "step": 0.005,
+          "group": "Data values",
+          "mutate": 1
+        },
+        "v5": {
+          "type": "range",
+          "label": "Coupling 5",
+          "min": 0,
+          "max": 1,
+          "def": 0.3,
+          "step": 0.005,
+          "group": "Data values",
+          "mutate": 1
+        },
+        "v6": {
+          "type": "range",
+          "label": "Coupling 6",
+          "min": 0,
+          "max": 1,
+          "def": 0.8,
+          "step": 0.005,
+          "group": "Data values",
+          "mutate": 1
+        },
+        "v7": {
+          "type": "range",
+          "label": "Coupling 7",
+          "min": 0,
+          "max": 1,
+          "def": 0.5,
+          "step": 0.005,
+          "group": "Data values",
+          "mutate": 1
+        },
+        "v8": {
+          "type": "range",
+          "label": "Coupling 8",
+          "min": 0,
+          "max": 1,
+          "def": 0.65,
+          "step": 0.005,
+          "group": "Data values",
+          "mutate": 1
+        },
+        "photons": {
+          "type": "range",
+          "label": "Photon share",
+          "min": 0,
+          "max": 1,
+          "def": 0.55,
+          "step": 0.005,
+          "group": "Lines"
+        },
+        "amp": {
+          "type": "range",
+          "label": "Wave amplitude",
+          "min": 0,
+          "max": 2,
+          "def": 1,
+          "step": 0.01,
+          "group": "Lines"
+        },
+        "freq": {
+          "type": "range",
+          "label": "Wave frequency",
+          "min": 0.3,
+          "max": 2,
+          "def": 1,
+          "step": 0.009,
+          "group": "Lines"
+        },
+        "wave": {
+          "type": "int",
+          "label": "Waves / loop",
+          "min": 1,
+          "max": 4,
+          "def": 2,
+          "group": "Motion"
+        },
+        "sway": {
+          "type": "range",
+          "label": "Sway",
+          "min": 0,
+          "max": 1,
+          "def": 0.5,
+          "step": 0.005,
+          "group": "Motion"
+        }
+      },
+      "flash": false
+    }
+  ]
+}
