@@ -1,0 +1,224 @@
+{
+  "kit": "cellular-cosmos",
+  "style": "spore-drift",
+  "phase": 0.37,
+  "size": [
+    120,
+    213
+  ],
+  "note": "effect = max mean-abs 8-bit change vs the default frame over min/max (or every option)",
+  "rows": [
+    {
+      "key": "count",
+      "label": "Colony count",
+      "type": "int",
+      "def": 36,
+      "vals": [
+        8,
+        36
+      ],
+      "diffs": [
+        34.75,
+        0
+      ],
+      "effect": 34.75
+    },
+    {
+      "key": "membrane",
+      "label": "Membrane width",
+      "type": "range",
+      "def": 0.006,
+      "vals": [
+        0.003,
+        0.035
+      ],
+      "diffs": [
+        12.93,
+        59.57
+      ],
+      "effect": 59.57
+    },
+    {
+      "key": "translucency",
+      "label": "Translucency",
+      "type": "range",
+      "def": 0.5,
+      "vals": [
+        0,
+        0.7
+      ],
+      "diffs": [
+        1.25,
+        0.53
+      ],
+      "effect": 1.25
+    },
+    {
+      "key": "organelles",
+      "label": "Organelle density",
+      "type": "range",
+      "def": 0.25,
+      "vals": [
+        0.1,
+        1
+      ],
+      "diffs": [
+        0,
+        0
+      ],
+      "effect": 0
+    },
+    {
+      "key": "filaments",
+      "label": "Filament count",
+      "type": "int",
+      "def": 12,
+      "vals": [
+        8,
+        48
+      ],
+      "diffs": [
+        0,
+        0
+      ],
+      "effect": 0
+    },
+    {
+      "key": "divAmp",
+      "label": "Division amplitude",
+      "type": "range",
+      "def": 0.15,
+      "vals": [
+        0,
+        0.4
+      ],
+      "diffs": [
+        19.23,
+        18.1
+      ],
+      "effect": 19.23
+    },
+    {
+      "key": "migrate",
+      "label": "Migration radius",
+      "type": "range",
+      "def": 0.07,
+      "vals": [
+        0,
+        0.25
+      ],
+      "diffs": [
+        31.7,
+        0
+      ],
+      "effect": 31.7
+    },
+    {
+      "key": "cycles",
+      "label": "Lifecycles per loop",
+      "type": "int",
+      "def": 1,
+      "vals": [
+        1,
+        3
+      ],
+      "diffs": [
+        0,
+        25.58
+      ],
+      "effect": 25.58
+    },
+    {
+      "key": "exposure",
+      "label": "Exposure",
+      "type": "range",
+      "def": 1,
+      "vals": [
+        0.4,
+        2.4
+      ],
+      "diffs": [
+        31.93,
+        43.25
+      ],
+      "effect": 43.25
+    },
+    {
+      "key": "bloom",
+      "label": "Bloom",
+      "type": "range",
+      "def": 0.45,
+      "vals": [
+        0,
+        1.6
+      ],
+      "diffs": [
+        4.81,
+        9.58
+      ],
+      "effect": 9.58
+    },
+    {
+      "key": "bloomRadius",
+      "label": "Bloom radius",
+      "type": "range",
+      "def": 1,
+      "vals": [
+        0.4,
+        2.2
+      ],
+      "diffs": [
+        1.71,
+        1.68
+      ],
+      "effect": 1.71
+    },
+    {
+      "key": "lensCA",
+      "label": "Edge fringe",
+      "type": "range",
+      "def": 0.12,
+      "vals": [
+        0,
+        0.5
+      ],
+      "diffs": [
+        1.2,
+        3.64
+      ],
+      "effect": 3.64
+    },
+    {
+      "key": "vignette",
+      "label": "Vignette",
+      "type": "range",
+      "def": 0.38,
+      "vals": [
+        0,
+        0.8
+      ],
+      "diffs": [
+        2.7,
+        3.6
+      ],
+      "effect": 3.6
+    },
+    {
+      "key": "quality",
+      "label": "Quality",
+      "type": "select",
+      "def": "balanced",
+      "vals": [
+        "live",
+        "balanced",
+        "export"
+      ],
+      "diffs": [
+        0,
+        0,
+        0
+      ],
+      "effect": 0
+    }
+  ]
+}

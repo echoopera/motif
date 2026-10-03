@@ -49,12 +49,12 @@ vec3 cellBody(vec2 l, float F1, float F2, Site S, float species, float th, float
   vec3 body = k_mix(u_a2 * 0.55, mem * 0.55, pow(inside, 0.7));
   col += body * (1.0 - p_translucency * 0.85) * (0.30 + 0.5 * inside);
   col += mem * 0.10 * p_translucency * inside;
+  float dirA = (S.id > 0.5) ? 1.0 : -1.0;
   // radial organs: whole-number filament count in angle, advected by a whole harmonic of theta
   float nf = float(p_filaments) * (species > 0.5 ? 0.6 : 1.0);
-  float dirA = (S.id > 0.5) ? 1.0 : -1.0;
   float fl = 0.5 + 0.5 * sin(ang * floor(nf) + 1.2 * sin(r * 26.0 + dirA * th) + dirA * th * 2.0 + S.ph);
   float fil = mix(0.30, pow(fl, species > 0.5 ? 6.0 : 10.0), calm);          // sweeping rays calm down on very short loops
-  float organsOn = (6 == 3 || 6 == 4 || 6 == 5) ? 0.0 : 1.0;
+  float organsOn = 1.0;
   float span = smoothstep(0.02, 0.14, r / cs) * (1.0 - smoothstep(0.35, 0.95, r / max(F1 + 0.5 * (F2 - F1), 1e-3)));
   col += mem * 0.9 * fil * span * inside * organsOn * (6 == 6 ? 1.9 : 1.0);
   // coral colony: scalloped rim and polyp tips
@@ -89,9 +89,6 @@ vec4 scene_main(vec2 uv, vec2 fc, int variant) {
   float cs = cellSize();
   float px = k_px();
   float speciesMix = p_species;
-  if (variant == 1) speciesMix = 0.0;
-  if (variant == 2) speciesMix = 1.0;
-  if (variant == 4) speciesMix = 0.15;
   if (variant == 4) cs *= 0.6;
   if (variant == 6) cs *= 1.35;
   if (variant == 7) cs *= 1.15;

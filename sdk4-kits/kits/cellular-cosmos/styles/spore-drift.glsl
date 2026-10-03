@@ -49,14 +49,7 @@ vec3 cellBody(vec2 l, float F1, float F2, Site S, float species, float th, float
   vec3 body = k_mix(u_a2 * 0.55, mem * 0.55, pow(inside, 0.7));
   col += body * (1.0 - p_translucency * 0.85) * (0.30 + 0.5 * inside);
   col += mem * 0.10 * p_translucency * inside;
-  // radial organs: whole-number filament count in angle, advected by a whole harmonic of theta
-  float nf = float(p_filaments) * (species > 0.5 ? 0.6 : 1.0);
   float dirA = (S.id > 0.5) ? 1.0 : -1.0;
-  float fl = 0.5 + 0.5 * sin(ang * floor(nf) + 1.2 * sin(r * 26.0 + dirA * th) + dirA * th * 2.0 + S.ph);
-  float fil = mix(0.30, pow(fl, species > 0.5 ? 6.0 : 10.0), calm);          // sweeping rays calm down on very short loops
-  float organsOn = (4 == 3 || 4 == 4 || 4 == 5) ? 0.0 : 1.0;
-  float span = smoothstep(0.02, 0.14, r / cs) * (1.0 - smoothstep(0.35, 0.95, r / max(F1 + 0.5 * (F2 - F1), 1e-3)));
-  col += mem * 0.9 * fil * span * inside * organsOn * (4 == 6 ? 1.9 : 1.0);
   // coral colony: scalloped rim and polyp tips
   if (species > 0.5) {
     float sc = 0.5 + 0.5 * cos(ang * 9.0 + S.ph);
@@ -65,19 +58,6 @@ vec3 cellBody(vec2 l, float F1, float F2, Site S, float species, float th, float
     float tip = pow(sc, 8.0) * exp(-pow((r - 0.36 * cs) / (0.03 * cs + 0.002), 2.0));
     col += mix(coral, u_ink, 0.5) * tip * 1.6 * inside;
   }
-  // organelles: seeded points circling the nucleus (closed orbits)
-  float od = 0.0;
-  for (int k = 0; k < 7; k++) {
-    if (float(k) >= p_organelles * 7.0) break;
-    if (k_q() == 0 && k >= 3) break;                                        // live: fewer organelle points
-    float fk = float(k);
-    float rk = (0.07 + 0.19 * h11(fk * 3.7 + S.id * 50.0)) * cs;
-    float ak = TAU * h11(fk * 5.1 + S.id * 70.0) + dirA * th * (1.0 + mod(fk, 2.0));
-    vec2 P = rk * vec2(cos(ak), sin(ak));
-    float d = length(l - P);
-    od += exp(-d * d / (pow(0.018 * cs + 0.001, 2.0))) * (0.6 + 0.8 * h11(fk + S.id * 11.0));
-  }
-  col += mix(mem, u_ink, 0.55) * od * 1.5 * inside * organsOn;
   // nucleus: warm, controlled
   col += (u_ink * 0.6 + mem * 0.7) * 1.8 * exp(-r * r / pow(0.055 * cs + 0.002, 2.0)) * (0.55 + 0.45 * inside);
   col += mem * 0.15 * exp(-r / (0.2 * cs));
@@ -88,10 +68,7 @@ vec4 scene_main(vec2 uv, vec2 fc, int variant) {
   float th = k_theta();
   float cs = cellSize();
   float px = k_px();
-  float speciesMix = p_species;
-  if (variant == 1) speciesMix = 0.0;
-  if (variant == 2) speciesMix = 1.0;
-  if (variant == 4) speciesMix = 0.15;
+  float speciesMix = 0.15;
   if (variant == 4) cs *= 0.6;
   if (variant == 6) cs *= 1.35;
   if (variant == 7) cs *= 1.15;
