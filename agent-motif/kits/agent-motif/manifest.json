@@ -1,0 +1,1587 @@
+{
+  "format": "motif-kit@1",
+  "id": "agent-motif",
+  "name": "AgentMotif",
+  "version": "1.0.0",
+  "author": "AgentMotif",
+  "license": "MIT",
+  "accent": "#7C5CFF",
+  "description": "Showcase kit built by AgentMotif: material, nature, cosmic and media looks on a shared physically based lens stack.",
+  "common": "common.glsl",
+  "palettes": [
+    {
+      "id": "silk",
+      "name": "Silk",
+      "bg": "#06050B",
+      "ink": "#F6F0FF",
+      "a": [
+        "#8B6CFF",
+        "#FF5A8E",
+        "#38E0C8"
+      ]
+    },
+    {
+      "id": "chrome",
+      "name": "Chrome",
+      "bg": "#07080A",
+      "ink": "#F2F4F8",
+      "a": [
+        "#9FB8FF",
+        "#FF8A4C",
+        "#5CF0FF"
+      ]
+    },
+    {
+      "id": "lagoon",
+      "name": "Lagoon",
+      "bg": "#011219",
+      "ink": "#E8FFFB",
+      "a": [
+        "#1FC7E0",
+        "#A3E635",
+        "#0B6E99"
+      ]
+    },
+    {
+      "id": "nebula",
+      "name": "Nebula",
+      "bg": "#020109",
+      "ink": "#FFF4E8",
+      "a": [
+        "#FF4F7B",
+        "#6B5CFF",
+        "#FFB547"
+      ]
+    },
+    {
+      "id": "gallery",
+      "name": "Gallery",
+      "bg": "#1C1813",
+      "ink": "#F3EBDD",
+      "a": [
+        "#E0773A",
+        "#3B6FD8",
+        "#E6B53A"
+      ]
+    },
+    {
+      "id": "glass",
+      "name": "Glass",
+      "bg": "#0A0B12",
+      "ink": "#FFFFFF",
+      "a": [
+        "#8B5CF6",
+        "#06B6D4",
+        "#F472B6"
+      ]
+    },
+    {
+      "id": "trail",
+      "name": "Trail",
+      "bg": "#F7FAFB",
+      "ink": "#1A1F1B",
+      "a": [
+        "#A3B03A",
+        "#A9C8E8",
+        "#8A8C80"
+      ]
+    }
+  ],
+  "styles": [
+    {
+      "id": "silk-aurora",
+      "name": "Silk Aurora",
+      "group": "Materials",
+      "palette": "silk",
+      "tags": [
+        "silk",
+        "fabric",
+        "iridescent",
+        "domain warp",
+        "luxury",
+        "abstract"
+      ],
+      "blurb": "Warped drapes shaded as real silk, foil or velvet, with thin-film sheen and pulsing aurora veins.",
+      "flash": false,
+      "passes": [
+        {
+          "src": "styles/scenes/silk.glsl",
+          "scale": 0.5
+        },
+        {
+          "src": "styles/post/bloom-prep.glsl",
+          "scale": 0.125
+        },
+        {
+          "src": "styles/post/finish.glsl"
+        }
+      ],
+      "params": {
+        "flow": {
+          "type": "int",
+          "label": "Flow cycles / loop",
+          "min": 1,
+          "max": 4,
+          "def": 1,
+          "group": "Motion",
+          "hint": "Integer, so the loop closes exactly."
+        },
+        "drift": {
+          "type": "range",
+          "label": "Drift",
+          "min": 0.05,
+          "max": 1.5,
+          "def": 0.45,
+          "step": 0.01,
+          "log": true,
+          "group": "Motion",
+          "hint": "How far the warp travels each loop."
+        },
+        "lightTurns": {
+          "type": "int",
+          "label": "Light orbits / loop",
+          "min": 0,
+          "max": 3,
+          "def": 1,
+          "group": "Motion"
+        },
+        "mat": {
+          "type": "select",
+          "label": "Material",
+          "options": [
+            {
+              "v": "silk",
+              "l": "Silk"
+            },
+            {
+              "v": "foil",
+              "l": "Holo foil"
+            },
+            {
+              "v": "velvet",
+              "l": "Velvet"
+            }
+          ],
+          "def": "silk",
+          "hint": "Changes the BRDF: satin, anodised foil or velvet sheen."
+        },
+        "scale": {
+          "type": "range",
+          "label": "Scale",
+          "min": 0.4,
+          "max": 4,
+          "def": 0.6,
+          "step": 0.01,
+          "group": "Form"
+        },
+        "stretch": {
+          "type": "range",
+          "label": "Drape stretch",
+          "min": 0.5,
+          "max": 4,
+          "def": 2.6,
+          "step": 0.01,
+          "group": "Form",
+          "hint": "Anisotropy: long drapes vs. crumpled cloth."
+        },
+        "angle": {
+          "type": "range",
+          "label": "Drape angle",
+          "min": -90,
+          "max": 90,
+          "def": -28,
+          "step": 1,
+          "unit": "°",
+          "group": "Form"
+        },
+        "warp": {
+          "type": "range",
+          "label": "Fold warp",
+          "min": 0,
+          "max": 6,
+          "def": 2.4,
+          "step": 0.01,
+          "group": "Form"
+        },
+        "relief": {
+          "type": "range",
+          "label": "Relief",
+          "min": 0.1,
+          "max": 4,
+          "def": 1,
+          "step": 0.01,
+          "group": "Form"
+        },
+        "spec": {
+          "type": "range",
+          "label": "Specular",
+          "min": 0,
+          "max": 3,
+          "def": 1.2,
+          "step": 0.01,
+          "group": "Material"
+        },
+        "irid": {
+          "type": "range",
+          "label": "Iridescence",
+          "min": 0,
+          "max": 1,
+          "def": 0.55,
+          "step": 0.01,
+          "group": "Material",
+          "hint": "Thin-film interference on the highlights."
+        },
+        "veins": {
+          "type": "range",
+          "label": "Aurora veins",
+          "min": 0,
+          "max": 2,
+          "def": 0.6,
+          "step": 0.01,
+          "group": "Material",
+          "hint": "Emissive iso-lines that pulse along the folds."
+        },
+        "exposure": {
+          "type": "range",
+          "label": "Exposure",
+          "min": -3,
+          "max": 3,
+          "def": 0.2,
+          "step": 0.05,
+          "unit": "EV",
+          "group": "Lens",
+          "hint": "Scene exposure in stops, before tone mapping.",
+          "mutate": 0.3
+        },
+        "tonemap": {
+          "type": "select",
+          "label": "Tone map",
+          "options": [
+            {
+              "v": "agx",
+              "l": "AgX"
+            },
+            {
+              "v": "punchy",
+              "l": "AgX Punchy"
+            },
+            {
+              "v": "neutral",
+              "l": "PBR Neutral"
+            },
+            {
+              "v": "aces",
+              "l": "ACES"
+            }
+          ],
+          "def": "agx",
+          "group": "Lens",
+          "hint": "AgX rolls highlights off without hue skew; Neutral keeps brand colours.",
+          "mutate": 0
+        },
+        "bloom": {
+          "type": "range",
+          "label": "Bloom",
+          "min": 0,
+          "max": 2,
+          "def": 0.7,
+          "step": 0.01,
+          "group": "Lens"
+        },
+        "threshold": {
+          "type": "range",
+          "label": "Bloom threshold",
+          "min": 0,
+          "max": 4,
+          "def": 0.9,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "HDR level where glow starts (soft knee).",
+          "show": {
+            "param": "bloom",
+            "gt": 0
+          }
+        },
+        "halation": {
+          "type": "range",
+          "label": "Halation",
+          "min": 0,
+          "max": 1,
+          "def": 0.12,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Film emulsion: highlights bleed warm red."
+        },
+        "streak": {
+          "type": "range",
+          "label": "Anamorphic",
+          "min": 0,
+          "max": 1.5,
+          "def": 0,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Horizontal lens streaks from highlights."
+        },
+        "ca": {
+          "type": "range",
+          "label": "Chromatic aberration",
+          "min": 0,
+          "max": 1,
+          "def": 0.2,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "7-tap spectral lateral CA toward the frame edges."
+        },
+        "distort": {
+          "type": "range",
+          "label": "Lens distortion",
+          "min": -1,
+          "max": 1,
+          "def": 0,
+          "step": 0.01,
+          "group": "Lens"
+        },
+        "vignette": {
+          "type": "range",
+          "label": "Vignette",
+          "min": 0,
+          "max": 1,
+          "def": 0.45,
+          "step": 0.01,
+          "group": "Lens"
+        },
+        "grain": {
+          "type": "range",
+          "label": "Film grain",
+          "min": 0,
+          "max": 1,
+          "def": 0.35,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Luma-weighted, 24 fps, loops exactly."
+        }
+      }
+    },
+    {
+      "id": "liquid-chrome",
+      "name": "Liquid Chrome",
+      "group": "Materials",
+      "palette": "chrome",
+      "tags": [
+        "chrome",
+        "metal",
+        "metaballs",
+        "raymarch",
+        "3d",
+        "liquid"
+      ],
+      "blurb": "Raymarched liquid-metal metaballs lit by a procedural photo studio, with mirror floor and anodised film.",
+      "flash": false,
+      "passes": [
+        {
+          "src": "styles/scenes/chrome.glsl",
+          "scale": 0.66
+        },
+        {
+          "src": "styles/post/bloom-prep.glsl",
+          "scale": 0.125
+        },
+        {
+          "src": "styles/post/finish.glsl"
+        }
+      ],
+      "params": {
+        "count": {
+          "type": "int",
+          "label": "Blobs",
+          "min": 2,
+          "max": 8,
+          "def": 5,
+          "group": "Form"
+        },
+        "size": {
+          "type": "range",
+          "label": "Blob size",
+          "min": 0.4,
+          "max": 1.8,
+          "def": 1,
+          "step": 0.01,
+          "group": "Form"
+        },
+        "blend": {
+          "type": "range",
+          "label": "Merge",
+          "min": 0.05,
+          "max": 2,
+          "def": 1,
+          "step": 0.01,
+          "group": "Form",
+          "hint": "Smooth-union radius: how gooey the merge is."
+        },
+        "spread": {
+          "type": "range",
+          "label": "Spread",
+          "min": 0.3,
+          "max": 1.6,
+          "def": 1,
+          "step": 0.01,
+          "group": "Form"
+        },
+        "ripple": {
+          "type": "range",
+          "label": "Surface ripple",
+          "min": 0,
+          "max": 3,
+          "def": 0.8,
+          "step": 0.01,
+          "group": "Form"
+        },
+        "orbits": {
+          "type": "int",
+          "label": "Orbits / loop",
+          "min": 1,
+          "max": 3,
+          "def": 1,
+          "group": "Motion"
+        },
+        "spin": {
+          "type": "int",
+          "label": "Studio turns / loop",
+          "min": 0,
+          "max": 3,
+          "def": 1,
+          "group": "Motion",
+          "hint": "Rotates the lights so reflections sweep across the surface."
+        },
+        "camTurns": {
+          "type": "int",
+          "label": "Camera orbits / loop",
+          "min": 0,
+          "max": 2,
+          "def": 0,
+          "group": "Motion"
+        },
+        "rough": {
+          "type": "range",
+          "label": "Roughness",
+          "min": 0,
+          "max": 0.8,
+          "def": 0.06,
+          "step": 0.005,
+          "group": "Material"
+        },
+        "tint": {
+          "type": "color",
+          "label": "Metal tint",
+          "def": "#F2D9B8",
+          "group": "Material",
+          "hint": "Gold, copper, titanium…"
+        },
+        "tintMix": {
+          "type": "range",
+          "label": "Tint amount",
+          "min": 0,
+          "max": 1,
+          "def": 0,
+          "step": 0.01,
+          "group": "Material"
+        },
+        "film": {
+          "type": "range",
+          "label": "Anodised film",
+          "min": 0,
+          "max": 1,
+          "def": 0,
+          "step": 0.01,
+          "group": "Material",
+          "hint": "Thin-film interference like heat-tinted titanium."
+        },
+        "floor": {
+          "type": "range",
+          "label": "Floor reflection",
+          "min": 0,
+          "max": 2,
+          "def": 1,
+          "step": 0.01,
+          "group": "Material"
+        },
+        "steps": {
+          "type": "int",
+          "label": "Quality (steps)",
+          "min": 24,
+          "max": 160,
+          "def": 72,
+          "group": "Quality",
+          "mutate": 0,
+          "hint": "Raymarch steps. Lower for live performance."
+        },
+        "exposure": {
+          "type": "range",
+          "label": "Exposure",
+          "min": -3,
+          "max": 3,
+          "def": 0,
+          "step": 0.05,
+          "unit": "EV",
+          "group": "Lens",
+          "hint": "Scene exposure in stops, before tone mapping.",
+          "mutate": 0.3
+        },
+        "tonemap": {
+          "type": "select",
+          "label": "Tone map",
+          "options": [
+            {
+              "v": "agx",
+              "l": "AgX"
+            },
+            {
+              "v": "punchy",
+              "l": "AgX Punchy"
+            },
+            {
+              "v": "neutral",
+              "l": "PBR Neutral"
+            },
+            {
+              "v": "aces",
+              "l": "ACES"
+            }
+          ],
+          "def": "agx",
+          "group": "Lens",
+          "hint": "AgX rolls highlights off without hue skew; Neutral keeps brand colours.",
+          "mutate": 0
+        },
+        "bloom": {
+          "type": "range",
+          "label": "Bloom",
+          "min": 0,
+          "max": 2,
+          "def": 0.5,
+          "step": 0.01,
+          "group": "Lens"
+        },
+        "threshold": {
+          "type": "range",
+          "label": "Bloom threshold",
+          "min": 0,
+          "max": 4,
+          "def": 1.4,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "HDR level where glow starts (soft knee).",
+          "show": {
+            "param": "bloom",
+            "gt": 0
+          }
+        },
+        "halation": {
+          "type": "range",
+          "label": "Halation",
+          "min": 0,
+          "max": 1,
+          "def": 0.1,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Film emulsion: highlights bleed warm red."
+        },
+        "streak": {
+          "type": "range",
+          "label": "Anamorphic",
+          "min": 0,
+          "max": 1.5,
+          "def": 0.06,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Horizontal lens streaks from highlights."
+        },
+        "ca": {
+          "type": "range",
+          "label": "Chromatic aberration",
+          "min": 0,
+          "max": 1,
+          "def": 0.15,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "7-tap spectral lateral CA toward the frame edges."
+        },
+        "distort": {
+          "type": "range",
+          "label": "Lens distortion",
+          "min": -1,
+          "max": 1,
+          "def": 0,
+          "step": 0.01,
+          "group": "Lens"
+        },
+        "vignette": {
+          "type": "range",
+          "label": "Vignette",
+          "min": 0,
+          "max": 1,
+          "def": 0.5,
+          "step": 0.01,
+          "group": "Lens"
+        },
+        "grain": {
+          "type": "range",
+          "label": "Film grain",
+          "min": 0,
+          "max": 1,
+          "def": 0.25,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Luma-weighted, 24 fps, loops exactly."
+        }
+      }
+    },
+    {
+      "id": "caustic-light",
+      "name": "Caustic Light",
+      "group": "Nature",
+      "palette": "lagoon",
+      "tags": [
+        "water",
+        "caustics",
+        "underwater",
+        "god rays",
+        "light",
+        "nature"
+      ],
+      "blurb": "Shallow-sea caustics with spectral dispersion, depth absorption, god rays and drifting motes.",
+      "flash": false,
+      "passes": [
+        {
+          "src": "styles/scenes/caustics.glsl",
+          "scale": 0.75
+        },
+        {
+          "src": "styles/post/bloom-prep.glsl",
+          "scale": 0.125
+        },
+        {
+          "src": "styles/post/finish.glsl"
+        }
+      ],
+      "params": {
+        "scale": {
+          "type": "range",
+          "label": "Caustic scale",
+          "min": 0.3,
+          "max": 3,
+          "def": 1,
+          "step": 0.01,
+          "group": "Water"
+        },
+        "detail": {
+          "type": "int",
+          "label": "Detail",
+          "min": 2,
+          "max": 6,
+          "def": 4,
+          "group": "Water",
+          "mutate": 0.3
+        },
+        "sharp": {
+          "type": "range",
+          "label": "Sharpness",
+          "min": 2,
+          "max": 14,
+          "def": 8,
+          "step": 0.1,
+          "group": "Water"
+        },
+        "intensity": {
+          "type": "range",
+          "label": "Intensity",
+          "min": 0,
+          "max": 3,
+          "def": 1.2,
+          "step": 0.01,
+          "group": "Water"
+        },
+        "dispersion": {
+          "type": "range",
+          "label": "Dispersion",
+          "min": 0,
+          "max": 2,
+          "def": 0.8,
+          "step": 0.01,
+          "group": "Water",
+          "hint": "Each wavelength focuses at a slightly different depth."
+        },
+        "murk": {
+          "type": "range",
+          "label": "Murk",
+          "min": 0,
+          "max": 2,
+          "def": 0.6,
+          "step": 0.01,
+          "group": "Water"
+        },
+        "tilt": {
+          "type": "range",
+          "label": "View tilt",
+          "min": 0,
+          "max": 1,
+          "def": 0.4,
+          "step": 0.01,
+          "group": "Camera"
+        },
+        "rays": {
+          "type": "range",
+          "label": "God rays",
+          "min": 0,
+          "max": 2,
+          "def": 0.8,
+          "step": 0.01,
+          "group": "Light"
+        },
+        "rayDensity": {
+          "type": "range",
+          "label": "Ray density",
+          "min": 0.3,
+          "max": 3,
+          "def": 1,
+          "step": 0.01,
+          "group": "Light"
+        },
+        "sun": {
+          "type": "range",
+          "label": "Sun position",
+          "min": -1,
+          "max": 1,
+          "def": 0.2,
+          "step": 0.01,
+          "group": "Light"
+        },
+        "motes": {
+          "type": "range",
+          "label": "Motes",
+          "min": 0,
+          "max": 2,
+          "def": 0.6,
+          "step": 0.01,
+          "group": "Light"
+        },
+        "flow": {
+          "type": "int",
+          "label": "Cycles / loop",
+          "min": 1,
+          "max": 4,
+          "def": 1,
+          "group": "Motion"
+        },
+        "exposure": {
+          "type": "range",
+          "label": "Exposure",
+          "min": -3,
+          "max": 3,
+          "def": 0.1,
+          "step": 0.05,
+          "unit": "EV",
+          "group": "Lens",
+          "hint": "Scene exposure in stops, before tone mapping.",
+          "mutate": 0.3
+        },
+        "tonemap": {
+          "type": "select",
+          "label": "Tone map",
+          "options": [
+            {
+              "v": "agx",
+              "l": "AgX"
+            },
+            {
+              "v": "punchy",
+              "l": "AgX Punchy"
+            },
+            {
+              "v": "neutral",
+              "l": "PBR Neutral"
+            },
+            {
+              "v": "aces",
+              "l": "ACES"
+            }
+          ],
+          "def": "punchy",
+          "group": "Lens",
+          "hint": "AgX rolls highlights off without hue skew; Neutral keeps brand colours.",
+          "mutate": 0
+        },
+        "bloom": {
+          "type": "range",
+          "label": "Bloom",
+          "min": 0,
+          "max": 2,
+          "def": 0.35,
+          "step": 0.01,
+          "group": "Lens"
+        },
+        "threshold": {
+          "type": "range",
+          "label": "Bloom threshold",
+          "min": 0,
+          "max": 4,
+          "def": 1.4,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "HDR level where glow starts (soft knee).",
+          "show": {
+            "param": "bloom",
+            "gt": 0
+          }
+        },
+        "halation": {
+          "type": "range",
+          "label": "Halation",
+          "min": 0,
+          "max": 1,
+          "def": 0.05,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Film emulsion: highlights bleed warm red."
+        },
+        "streak": {
+          "type": "range",
+          "label": "Anamorphic",
+          "min": 0,
+          "max": 1.5,
+          "def": 0,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Horizontal lens streaks from highlights."
+        },
+        "ca": {
+          "type": "range",
+          "label": "Chromatic aberration",
+          "min": 0,
+          "max": 1,
+          "def": 0.3,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "7-tap spectral lateral CA toward the frame edges."
+        },
+        "distort": {
+          "type": "range",
+          "label": "Lens distortion",
+          "min": -1,
+          "max": 1,
+          "def": 0,
+          "step": 0.01,
+          "group": "Lens"
+        },
+        "vignette": {
+          "type": "range",
+          "label": "Vignette",
+          "min": 0,
+          "max": 1,
+          "def": 0.55,
+          "step": 0.01,
+          "group": "Lens"
+        },
+        "grain": {
+          "type": "range",
+          "label": "Film grain",
+          "min": 0,
+          "max": 1,
+          "def": 0.3,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Luma-weighted, 24 fps, loops exactly."
+        }
+      }
+    },
+    {
+      "id": "nebula-drift",
+      "name": "Nebula Drift",
+      "group": "Cosmic",
+      "palette": "nebula",
+      "tags": [
+        "nebula",
+        "space",
+        "volumetric",
+        "raymarch",
+        "stars",
+        "cosmic"
+      ],
+      "blurb": "Volumetric emission nebula with an embedded star, forward scattering and a deep star field.",
+      "flash": false,
+      "passes": [
+        {
+          "src": "styles/scenes/nebula.glsl",
+          "scale": 0.5
+        },
+        {
+          "src": "styles/post/bloom-prep.glsl",
+          "scale": 0.125
+        },
+        {
+          "src": "styles/post/finish.glsl"
+        }
+      ],
+      "params": {
+        "scale": {
+          "type": "range",
+          "label": "Cloud scale",
+          "min": 0.4,
+          "max": 3,
+          "def": 1,
+          "step": 0.01,
+          "group": "Gas"
+        },
+        "fill": {
+          "type": "range",
+          "label": "Density",
+          "min": 0,
+          "max": 1,
+          "def": 0.55,
+          "step": 0.01,
+          "group": "Gas"
+        },
+        "turb": {
+          "type": "range",
+          "label": "Turbulence drift",
+          "min": 0.05,
+          "max": 2,
+          "def": 0.6,
+          "step": 0.01,
+          "log": true,
+          "group": "Gas"
+        },
+        "glow": {
+          "type": "range",
+          "label": "Emission",
+          "min": 0,
+          "max": 3,
+          "def": 1,
+          "step": 0.01,
+          "group": "Gas"
+        },
+        "absorb": {
+          "type": "range",
+          "label": "Dust absorption",
+          "min": 0.1,
+          "max": 3,
+          "def": 1,
+          "step": 0.01,
+          "group": "Gas"
+        },
+        "core": {
+          "type": "range",
+          "label": "Core star",
+          "min": 0,
+          "max": 2,
+          "def": 1,
+          "step": 0.01,
+          "group": "Gas"
+        },
+        "flow": {
+          "type": "int",
+          "label": "Cycles / loop",
+          "min": 1,
+          "max": 3,
+          "def": 1,
+          "group": "Motion"
+        },
+        "camTurns": {
+          "type": "int",
+          "label": "Camera orbits / loop",
+          "min": 0,
+          "max": 2,
+          "def": 0,
+          "group": "Motion"
+        },
+        "steps": {
+          "type": "int",
+          "label": "Quality (steps)",
+          "min": 16,
+          "max": 128,
+          "def": 56,
+          "group": "Quality",
+          "mutate": 0
+        },
+        "exposure": {
+          "type": "range",
+          "label": "Exposure",
+          "min": -3,
+          "max": 3,
+          "def": 0,
+          "step": 0.05,
+          "unit": "EV",
+          "group": "Lens",
+          "hint": "Scene exposure in stops, before tone mapping.",
+          "mutate": 0.3
+        },
+        "tonemap": {
+          "type": "select",
+          "label": "Tone map",
+          "options": [
+            {
+              "v": "agx",
+              "l": "AgX"
+            },
+            {
+              "v": "punchy",
+              "l": "AgX Punchy"
+            },
+            {
+              "v": "neutral",
+              "l": "PBR Neutral"
+            },
+            {
+              "v": "aces",
+              "l": "ACES"
+            }
+          ],
+          "def": "agx",
+          "group": "Lens",
+          "hint": "AgX rolls highlights off without hue skew; Neutral keeps brand colours.",
+          "mutate": 0
+        },
+        "bloom": {
+          "type": "range",
+          "label": "Bloom",
+          "min": 0,
+          "max": 2,
+          "def": 0.9,
+          "step": 0.01,
+          "group": "Lens"
+        },
+        "threshold": {
+          "type": "range",
+          "label": "Bloom threshold",
+          "min": 0,
+          "max": 4,
+          "def": 0.7,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "HDR level where glow starts (soft knee).",
+          "show": {
+            "param": "bloom",
+            "gt": 0
+          }
+        },
+        "halation": {
+          "type": "range",
+          "label": "Halation",
+          "min": 0,
+          "max": 1,
+          "def": 0.2,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Film emulsion: highlights bleed warm red."
+        },
+        "streak": {
+          "type": "range",
+          "label": "Anamorphic",
+          "min": 0,
+          "max": 1.5,
+          "def": 0.25,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Horizontal lens streaks from highlights."
+        },
+        "ca": {
+          "type": "range",
+          "label": "Chromatic aberration",
+          "min": 0,
+          "max": 1,
+          "def": 0.2,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "7-tap spectral lateral CA toward the frame edges."
+        },
+        "distort": {
+          "type": "range",
+          "label": "Lens distortion",
+          "min": -1,
+          "max": 1,
+          "def": 0,
+          "step": 0.01,
+          "group": "Lens"
+        },
+        "vignette": {
+          "type": "range",
+          "label": "Vignette",
+          "min": 0,
+          "max": 1,
+          "def": 0.6,
+          "step": 0.01,
+          "group": "Lens"
+        },
+        "grain": {
+          "type": "range",
+          "label": "Film grain",
+          "min": 0,
+          "max": 1,
+          "def": 0.3,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Luma-weighted, 24 fps, loops exactly."
+        }
+      }
+    },
+    {
+      "id": "painterly",
+      "name": "Painterly",
+      "group": "Media",
+      "palette": "gallery",
+      "tags": [
+        "paint",
+        "media",
+        "image",
+        "video",
+        "kuwahara",
+        "illustration"
+      ],
+      "blurb": "Turns any photo or clip into living gouache: Kuwahara patches, structure-aligned strokes, paper tooth, boil.",
+      "flash": false,
+      "inputs": [
+        {
+          "id": "source",
+          "type": "media",
+          "label": "Source",
+          "fit": "fill",
+          "hint": "Photo or clip to paint. Without one, a landscape plays."
+        }
+      ],
+      "passes": [
+        {
+          "src": "styles/scenes/paint-source.glsl",
+          "scale": 0.5
+        },
+        {
+          "src": "styles/scenes/paint.glsl"
+        }
+      ],
+      "params": {
+        "brush": {
+          "type": "range",
+          "label": "Brush size",
+          "min": 1,
+          "max": 12,
+          "def": 4,
+          "step": 0.1,
+          "group": "Paint"
+        },
+        "texture": {
+          "type": "range",
+          "label": "Bristle & tooth",
+          "min": 0,
+          "max": 2,
+          "def": 1,
+          "step": 0.01,
+          "group": "Paint"
+        },
+        "edges": {
+          "type": "range",
+          "label": "Pigment edges",
+          "min": 0,
+          "max": 2,
+          "def": 0.8,
+          "step": 0.01,
+          "group": "Paint"
+        },
+        "harmony": {
+          "type": "range",
+          "label": "Palette harmony",
+          "min": 0,
+          "max": 1,
+          "def": 0.25,
+          "step": 0.01,
+          "group": "Colour",
+          "hint": "Pulls hues toward the palette; 0 keeps the photo's colour."
+        },
+        "boil": {
+          "type": "range",
+          "label": "Boil",
+          "min": 0,
+          "max": 2,
+          "def": 0.6,
+          "step": 0.01,
+          "group": "Motion",
+          "hint": "Hand-made jitter on twos, like painted animation."
+        },
+        "exposure": {
+          "type": "range",
+          "label": "Exposure",
+          "min": -2,
+          "max": 2,
+          "def": 0,
+          "step": 0.05,
+          "unit": "EV",
+          "group": "Colour"
+        }
+      }
+    },
+    {
+      "id": "liquid-glass",
+      "name": "Liquid Glass",
+      "group": "Media",
+      "palette": "glass",
+      "tags": [
+        "glass",
+        "refraction",
+        "dispersion",
+        "ui",
+        "media",
+        "liquid"
+      ],
+      "blurb": "Merging glass lozenges that refract your media with spectral dispersion, bevel highlights and frost.",
+      "flash": false,
+      "inputs": [
+        {
+          "id": "source",
+          "type": "media",
+          "label": "Source",
+          "fit": "fill",
+          "hint": "Photo or clip to paint. Without one, a landscape plays."
+        }
+      ],
+      "passes": [
+        {
+          "src": "styles/scenes/glass-backdrop.glsl"
+        },
+        {
+          "src": "styles/scenes/glass.glsl"
+        }
+      ],
+      "params": {
+        "backdrop": {
+          "type": "select",
+          "label": "Backdrop",
+          "options": [
+            {
+              "v": "mesh",
+              "l": "Mesh gradient"
+            },
+            {
+              "v": "stripes",
+              "l": "Stripes"
+            },
+            {
+              "v": "grid",
+              "l": "Grid"
+            }
+          ],
+          "def": "stripes",
+          "hint": "Used when no media is attached."
+        },
+        "shape": {
+          "type": "select",
+          "label": "Shape",
+          "options": [
+            {
+              "v": "tiles",
+              "l": "Tiles"
+            },
+            {
+              "v": "pills",
+              "l": "Pills"
+            },
+            {
+              "v": "drops",
+              "l": "Drops"
+            }
+          ],
+          "def": "pills",
+          "group": "Form"
+        },
+        "count": {
+          "type": "int",
+          "label": "Pieces",
+          "min": 1,
+          "max": 7,
+          "def": 4,
+          "group": "Form"
+        },
+        "size": {
+          "type": "range",
+          "label": "Size",
+          "min": 0.4,
+          "max": 2,
+          "def": 1,
+          "step": 0.01,
+          "group": "Form"
+        },
+        "merge": {
+          "type": "range",
+          "label": "Merge",
+          "min": 0,
+          "max": 2,
+          "def": 0.8,
+          "step": 0.01,
+          "group": "Form",
+          "hint": "Pieces fuse like liquid when they meet."
+        },
+        "wander": {
+          "type": "range",
+          "label": "Wander",
+          "min": 0,
+          "max": 2,
+          "def": 1,
+          "step": 0.01,
+          "group": "Motion"
+        },
+        "orbits": {
+          "type": "int",
+          "label": "Orbits / loop",
+          "min": 1,
+          "max": 3,
+          "def": 1,
+          "group": "Motion"
+        },
+        "lightTurns": {
+          "type": "int",
+          "label": "Light orbits / loop",
+          "min": 0,
+          "max": 3,
+          "def": 1,
+          "group": "Motion"
+        },
+        "bevel": {
+          "type": "range",
+          "label": "Bevel",
+          "min": 0.2,
+          "max": 3,
+          "def": 1,
+          "step": 0.01,
+          "group": "Optics"
+        },
+        "refract": {
+          "type": "range",
+          "label": "Refraction",
+          "min": 0,
+          "max": 2,
+          "def": 1.3,
+          "step": 0.01,
+          "group": "Optics"
+        },
+        "dispersion": {
+          "type": "range",
+          "label": "Dispersion",
+          "min": 0,
+          "max": 2,
+          "def": 0.7,
+          "step": 0.01,
+          "group": "Optics"
+        },
+        "frost": {
+          "type": "range",
+          "label": "Frost",
+          "min": 0,
+          "max": 1,
+          "def": 0,
+          "step": 0.01,
+          "group": "Optics",
+          "hint": "Disc blur through the glass (32 taps × 7 wavelengths: costly)."
+        },
+        "shine": {
+          "type": "range",
+          "label": "Shine",
+          "min": 0,
+          "max": 2,
+          "def": 1,
+          "step": 0.01,
+          "group": "Optics"
+        },
+        "shadow": {
+          "type": "range",
+          "label": "Shadow",
+          "min": 0,
+          "max": 2,
+          "def": 1,
+          "step": 0.01,
+          "group": "Optics"
+        },
+        "tint": {
+          "type": "color",
+          "label": "Glass tint",
+          "def": "#BFD4FF",
+          "group": "Optics"
+        },
+        "tintMix": {
+          "type": "range",
+          "label": "Tint amount",
+          "min": 0,
+          "max": 1,
+          "def": 0.15,
+          "step": 0.01,
+          "group": "Optics"
+        }
+      }
+    },
+    {
+      "id": "light-tunnel",
+      "name": "Light Tunnel",
+      "group": "Media",
+      "palette": "trail",
+      "tags": [
+        "tunnel",
+        "speed",
+        "zoom",
+        "transition",
+        "media",
+        "streaks"
+      ],
+      "blurb": "Shatters any image into converging speed streaks around a vanishing point, with rushing light and zoom blur.",
+      "flash": false,
+      "inputs": [
+        {
+          "id": "source",
+          "type": "media",
+          "label": "Source",
+          "fit": "fill",
+          "hint": "Photo or clip to stretch. Without one, a trail scene plays."
+        }
+      ],
+      "passes": [
+        {
+          "src": "styles/scenes/tunnel-source.glsl",
+          "scale": 0.5
+        },
+        {
+          "src": "styles/scenes/tunnel.glsl"
+        }
+      ],
+      "params": {
+        "center": {
+          "type": "point",
+          "label": "Vanishing point",
+          "min": -0.5,
+          "max": 0.5,
+          "def": [
+            -0.1575,
+            -0.195
+          ],
+          "group": "Tunnel",
+          "hint": "Where every streak converges."
+        },
+        "radius": {
+          "type": "range",
+          "label": "Stretch radius",
+          "min": 0.03,
+          "max": 0.8,
+          "def": 0.42,
+          "step": 0.005,
+          "log": true,
+          "group": "Tunnel",
+          "hint": "Inside stays sharp; beyond, the image smears into streaks."
+        },
+        "jag": {
+          "type": "range",
+          "label": "Jagged front",
+          "min": 0,
+          "max": 1.5,
+          "def": 1.14,
+          "step": 0.01,
+          "group": "Tunnel"
+        },
+        "jagFreq": {
+          "type": "range",
+          "label": "Front detail",
+          "min": 0.5,
+          "max": 6,
+          "def": 2.59,
+          "step": 0.01,
+          "group": "Tunnel"
+        },
+        "squash": {
+          "type": "range",
+          "label": "Streak length",
+          "min": 0,
+          "max": 0.6,
+          "def": 0,
+          "step": 0.005,
+          "group": "Tunnel",
+          "hint": "0 = infinite streaks; higher keeps some of the outer image."
+        },
+        "breathe": {
+          "type": "range",
+          "label": "Breathe",
+          "min": 0,
+          "max": 1,
+          "def": 0.11,
+          "step": 0.01,
+          "group": "Motion",
+          "hint": "The stretch front travels in and out once per loop."
+        },
+        "rush": {
+          "type": "int",
+          "label": "Light rushes / loop",
+          "min": 1,
+          "max": 8,
+          "def": 3,
+          "group": "Motion"
+        },
+        "rushGain": {
+          "type": "range",
+          "label": "Rush brightness",
+          "min": 0,
+          "max": 1.5,
+          "def": 0.35,
+          "step": 0.01,
+          "group": "Motion"
+        },
+        "blur": {
+          "type": "range",
+          "label": "Zoom blur",
+          "min": 0,
+          "max": 3,
+          "def": 0.17,
+          "step": 0.01,
+          "group": "Lens"
+        },
+        "blurTaps": {
+          "type": "int",
+          "label": "Blur quality",
+          "min": 2,
+          "max": 16,
+          "def": 8,
+          "group": "Quality",
+          "mutate": 0
+        },
+        "core": {
+          "type": "range",
+          "label": "Core glow",
+          "min": 0,
+          "max": 2,
+          "def": 0.1,
+          "step": 0.01,
+          "group": "Lens"
+        },
+        "shade": {
+          "type": "range",
+          "label": "Streak shading",
+          "min": 0,
+          "max": 1,
+          "def": 0.62,
+          "step": 0.01,
+          "group": "Lens"
+        },
+        "exposure": {
+          "type": "range",
+          "label": "Exposure",
+          "min": -2,
+          "max": 2,
+          "def": -0.05,
+          "step": 0.05,
+          "unit": "EV",
+          "group": "Lens"
+        },
+        "grain": {
+          "type": "range",
+          "label": "Film grain",
+          "min": 0,
+          "max": 1,
+          "def": 0.06,
+          "step": 0.01,
+          "group": "Lens"
+        }
+      }
+    }
+  ]
+}

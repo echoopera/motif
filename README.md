@@ -9,6 +9,7 @@ Browser-based, prompt-directed procedural animation studio for type, shapes, par
 | `docs/` | PRD & Engineering Spec (md, docx, pdf), Competitive landscape (md, pdf), Style Lab pro enhancements |
 | `site/` | Marketing one-pager (`motif-one-pager.html`) |
 | `style-lab/` | Motif Style Lab — 25-style parametric playground: full source, design specs, build script, tests, and `dist/standalone.html` |
+| `agent-motif/` | AgentMotif: shader director agent (image/description → real-time Motif kit shader), GLSL library, look-dev toolchain (analyze, compare, tune, qa, film), knowledge base, showcase kit |
 | `agent-skills/` | 16 studio agent skills (SKILL.md), Claude Code subagent definitions, house-style template, README, and `motif-skills.zip` |
 
 ## Live links

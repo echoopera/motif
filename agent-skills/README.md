@@ -1,6 +1,6 @@
 # Motif Studio Agents
 
-16 agent skills that give any MCP client (Claude Code, Codex, VS Code, Cursor, Claude Desktop) a full animation studio team for Motif.
+17 agent skills that give any MCP client (Claude Code, Codex, VS Code, Cursor, Claude Desktop) a full animation studio team for Motif.
 
 ## Roster
 
@@ -22,6 +22,7 @@
 | Sound and interaction | interaction | States, triggers, UI motion |
 | Quality and delivery | critic | Scored review and notes (read-only) |
 | Quality and delivery | delivery | Exports, Lottie checks, verification |
+| Shaders | agent-motif | Image or description → real-time kit shader: look-dev, fidelity scoring, tuning, SDK proposals (engine in `agent-motif/`) |
 
 ## Pipeline
 

@@ -1,0 +1,89 @@
+[
+  {
+    "p": 0.25,
+    "score": 25.33,
+    "parts": {
+      "palette": 31.3,
+      "tone": 12.3,
+      "texture": 29,
+      "layout": 16.1,
+      "structure": 39.8
+    },
+    "detail": {
+      "swd": 0.0607,
+      "ssim": 0.398,
+      "dMeanL": 0.092,
+      "dBeta": 0.64
+    },
+    "gaps": [
+      "brighter than target by 0.09 OKLab L → lower exposure / emission (≈-0.4 stops)",
+      "contrast too flat (RMS 0.16 vs 0.24) → deepen shadows / punchier tone map / sharper falloffs",
+      "clipping: 49.7% near-white vs 36.4% → reduce peak radiance or use AgX",
+      "over-saturated (chroma 0.053 vs 0.029)",
+      "hue mass differs: target peaks at 90–120° OKLCh, render at 120–150° → retune palette (use the analyze palette) or hue-shift",
+      "spectral slope β 3.36 vs target 2.73 → too smooth: add octaves, finer detail, grain or sharper edges",
+      "edge density 0.072 vs 0.336 → add crisp structure (thinner lines, harder SDF edges)",
+      "grain 0.011 vs 0.056 → add film grain / micro-texture",
+      "composition: brightness centroid off by (0.03, -0.01) frame units; radial profile target has a bright centre → move the focal element / reshape vignette",
+      "mirror symmetry L/R 0.99 vs 0.04"
+    ]
+  },
+  {
+    "p": 0.5,
+    "score": 26.78,
+    "parts": {
+      "palette": 32.6,
+      "tone": 13.5,
+      "texture": 30.8,
+      "layout": 17.2,
+      "structure": 41.7
+    },
+    "detail": {
+      "swd": 0.058,
+      "ssim": 0.417,
+      "dMeanL": 0.086,
+      "dBeta": 0.59
+    },
+    "gaps": [
+      "brighter than target by 0.09 OKLab L → lower exposure / emission (≈-0.3 stops)",
+      "contrast too flat (RMS 0.16 vs 0.24) → deepen shadows / punchier tone map / sharper falloffs",
+      "clipping: 49.3% near-white vs 36.4% → reduce peak radiance or use AgX",
+      "over-saturated (chroma 0.051 vs 0.029)",
+      "hue mass differs: target peaks at 90–120° OKLCh, render at 120–150° → retune palette (use the analyze palette) or hue-shift",
+      "spectral slope β 3.32 vs target 2.73 → too smooth: add octaves, finer detail, grain or sharper edges",
+      "edge density 0.056 vs 0.336 → add crisp structure (thinner lines, harder SDF edges)",
+      "grain 0.008 vs 0.056 → add film grain / micro-texture",
+      "composition: brightness centroid off by (0.03, -0.00) frame units; radial profile target has a bright centre → move the focal element / reshape vignette",
+      "mirror symmetry L/R 0.99 vs 0.04"
+    ]
+  },
+  {
+    "p": 0.75,
+    "score": 26.18,
+    "parts": {
+      "palette": 32.6,
+      "tone": 13.8,
+      "texture": 28.5,
+      "layout": 17,
+      "structure": 41.9
+    },
+    "detail": {
+      "swd": 0.0576,
+      "ssim": 0.419,
+      "dMeanL": 0.084,
+      "dBeta": 0.66
+    },
+    "gaps": [
+      "brighter than target by 0.08 OKLab L → lower exposure / emission (≈-0.3 stops)",
+      "contrast too flat (RMS 0.16 vs 0.24) → deepen shadows / punchier tone map / sharper falloffs",
+      "clipping: 49.3% near-white vs 36.4% → reduce peak radiance or use AgX",
+      "over-saturated (chroma 0.052 vs 0.029)",
+      "hue mass differs: target peaks at 90–120° OKLCh, render at 120–150° → retune palette (use the analyze palette) or hue-shift",
+      "spectral slope β 3.39 vs target 2.73 → too smooth: add octaves, finer detail, grain or sharper edges",
+      "edge density 0.053 vs 0.336 → add crisp structure (thinner lines, harder SDF edges)",
+      "grain 0.007 vs 0.056 → add film grain / micro-texture",
+      "composition: brightness centroid off by (0.03, -0.00) frame units; radial profile target has a bright centre → move the focal element / reshape vignette",
+      "mirror symmetry L/R 0.99 vs 0.04"
+    ]
+  }
+]

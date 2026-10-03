@@ -1,0 +1,83 @@
+[
+  {
+    "p": 0.25,
+    "score": 39.49,
+    "parts": {
+      "palette": 43.2,
+      "tone": 32.4,
+      "texture": 42.3,
+      "layout": 36.9,
+      "structure": 39
+    },
+    "detail": {
+      "swd": 0.0477,
+      "ssim": 0.39,
+      "dMeanL": 0.01,
+      "dBeta": -0.08
+    },
+    "gaps": [
+      "contrast too flat (RMS 0.15 vs 0.24) → deepen shadows / punchier tone map / sharper falloffs",
+      "missing highlights (36.4% near-white in target vs 28.0%) → add HDR hot cores + bloom",
+      "hue mass differs: target peaks at 90–120° OKLCh, render at 120–150° → retune palette (use the analyze palette) or hue-shift",
+      "edge density 0.145 vs 0.336 → add crisp structure (thinner lines, harder SDF edges)",
+      "radial streak index 0.83 vs target 0.59 → less radial streaking",
+      "grain 0.019 vs 0.056 → add film grain / micro-texture",
+      "composition: brightness centroid off by (0.01, -0.01) frame units; radial profile target has a bright centre → move the focal element / reshape vignette",
+      "mirror symmetry L/R 0.53 vs 0.04"
+    ]
+  },
+  {
+    "p": 0.5,
+    "score": 41.23,
+    "parts": {
+      "palette": 44,
+      "tone": 37.6,
+      "texture": 40.8,
+      "layout": 41.4,
+      "structure": 42.1
+    },
+    "detail": {
+      "swd": 0.046,
+      "ssim": 0.421,
+      "dMeanL": 0.002,
+      "dBeta": -0.06
+    },
+    "gaps": [
+      "contrast too flat (RMS 0.16 vs 0.24) → deepen shadows / punchier tone map / sharper falloffs",
+      "missing highlights (36.4% near-white in target vs 27.1%) → add HDR hot cores + bloom",
+      "hue mass differs: target peaks at 90–120° OKLCh, render at 120–150° → retune palette (use the analyze palette) or hue-shift",
+      "edge density 0.143 vs 0.336 → add crisp structure (thinner lines, harder SDF edges)",
+      "radial streak index 0.84 vs target 0.59 → less radial streaking",
+      "grain 0.018 vs 0.056 → add film grain / micro-texture",
+      "composition: brightness centroid off by (0.01, -0.01) frame units; radial profile target has a bright centre → move the focal element / reshape vignette",
+      "mirror symmetry L/R 0.54 vs 0.04"
+    ]
+  },
+  {
+    "p": 0.75,
+    "score": 39.72,
+    "parts": {
+      "palette": 43.4,
+      "tone": 34.8,
+      "texture": 40.3,
+      "layout": 37.9,
+      "structure": 40.3
+    },
+    "detail": {
+      "swd": 0.0479,
+      "ssim": 0.403,
+      "dMeanL": 0.005,
+      "dBeta": 0.03
+    },
+    "gaps": [
+      "contrast too flat (RMS 0.15 vs 0.24) → deepen shadows / punchier tone map / sharper falloffs",
+      "missing highlights (36.4% near-white in target vs 28.7%) → add HDR hot cores + bloom",
+      "hue mass differs: target peaks at 90–120° OKLCh, render at 120–150° → retune palette (use the analyze palette) or hue-shift",
+      "edge density 0.125 vs 0.336 → add crisp structure (thinner lines, harder SDF edges)",
+      "radial streak index 0.84 vs target 0.59 → less radial streaking",
+      "grain 0.016 vs 0.056 → add film grain / micro-texture",
+      "composition: brightness centroid off by (0.01, -0.01) frame units; radial profile target has a bright centre → move the focal element / reshape vignette",
+      "mirror symmetry L/R 0.54 vs 0.04"
+    ]
+  }
+]

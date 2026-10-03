@@ -1,0 +1,976 @@
+<title>AgentMotif Screening Room</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: a dark screening room. Style reel on the left, the live stage in the middle, the inspector on the right; stacks at phone width. */
+:root {
+  --ground: #0D0C12; --panel: #15131C; --raised: #1D1A26; --line: #2A2635;
+  --fg: #EDEAF3; --muted: #9C97AB; --faint: #6E697C; --accent: #A894FF; --accent-ink: #120E22; --warn: #FFB547;
+  --display: "Bricolage Grotesque", "Avenir Next", "Segoe UI", system-ui, sans-serif;
+  --body: "IBM Plex Sans", "Helvetica Neue", Arial, system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --r: 10px;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { height: 100%; }
+body { margin: 0; background: var(--ground); color: var(--fg); font: 14px/1.5 var(--body); }
+.app { display: grid; grid-template-columns: 250px minmax(0, 1fr) 310px; gap: 16px; padding-block: 16px; padding-inline: 16px; min-height: 100%; }
+header.brand { grid-column: 1 / -1; display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
+.brand h1 { font: 700 26px/1.1 var(--display); letter-spacing: -0.01em; margin: 0; }
+.brand p { margin: 0; color: var(--muted); max-width: 70ch; }
+.brand .sdk { font: 500 11px var(--mono); color: var(--faint); letter-spacing: 0.06em; text-transform: uppercase; margin-left: auto; }
+/* Reel */
+.reel { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.reel h2, .insp h2 { font: 500 11px var(--mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--faint); margin: 4px 0 6px; }
+.reel button { all: unset; cursor: pointer; display: grid; gap: 2px; padding: 10px 12px; border-radius: var(--r); border: 1px solid transparent; }
+.reel button:hover { background: var(--panel); }
+.reel button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.reel button[aria-current="true"] { background: var(--panel); border-color: var(--line); }
+.reel .nm { font: 600 15px var(--display); display: flex; align-items: center; gap: 8px; }
+.reel .grp { font: 400 11px var(--mono); color: var(--faint); text-transform: uppercase; letter-spacing: 0.05em; }
+.badge { font: 500 9.5px var(--mono); letter-spacing: 0.06em; padding: 1px 5px; border-radius: 4px; border: 1px solid var(--line); color: var(--muted); }
+/* Stage */
+.stagecol { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.stage { position: relative; width: 100%; aspect-ratio: 16 / 9; max-width: 100%; background: #000; border-radius: var(--r); overflow: hidden; border: 1px solid var(--line); }
+.stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; image-rendering: auto; }
+.stage .over { position: absolute; inset: 0; display: grid; place-items: center; font: 500 12px var(--mono); color: var(--muted); background: rgba(0, 0, 0, 0.55); text-align: center; padding: 24px; white-space: pre-wrap; }
+.stage.drag { outline: 2px dashed var(--accent); outline-offset: -6px; }
+.hud { position: absolute; left: 10px; bottom: 8px; font: 500 11px var(--mono); color: rgba(255, 255, 255, 0.7); text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8); font-variant-numeric: tabular-nums; pointer-events: none; }
+.transport { display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: center; }
+.transport .grow { flex: 1 1 220px; display: flex; align-items: center; gap: 10px; min-width: 0; }
+.btn { all: unset; cursor: pointer; font: 500 12px var(--mono); padding: 7px 12px; border-radius: 8px; background: var(--raised); border: 1px solid var(--line); color: var(--fg); }
+.btn:hover { border-color: var(--faint); }
+.btn:focus-visible { outline: 2px solid var(--accent); }
+.btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.field { display: flex; align-items: center; gap: 6px; font: 400 12px var(--mono); color: var(--muted); }
+.field select, .field input[type=number] { background: var(--raised); color: var(--fg); border: 1px solid var(--line); border-radius: 6px; padding: 5px 6px; font: 400 12px var(--mono); }
+.field input[type=number] { width: 4.5em; }
+.pals { display: flex; gap: 8px; flex-wrap: wrap; }
+.pal { all: unset; cursor: pointer; display: flex; border-radius: 6px; overflow: hidden; border: 1px solid var(--line); height: 22px; }
+.pal span { width: 12px; }
+.pal[aria-pressed="true"] { outline: 2px solid var(--accent); outline-offset: 2px; }
+.pal:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }
+.about { display: grid; gap: 6px; background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); padding: 14px 16px; }
+.about h3 { margin: 0; font: 700 20px/1.2 var(--display); text-wrap: balance; }
+.about p { margin: 0; color: var(--muted); max-width: 70ch; }
+.tags { display: flex; gap: 6px; flex-wrap: wrap; }
+.tags span { font: 400 11px var(--mono); color: var(--faint); }
+/* Inspector */
+.insp { min-width: 0; display: flex; flex-direction: column; gap: 10px; }
+details.grp { background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); }
+details.grp summary { cursor: pointer; padding: 10px 14px; font: 600 13px var(--body); list-style: none; display: flex; justify-content: space-between; }
+details.grp summary::-webkit-details-marker { display: none; }
+details.grp summary::after { content: "–"; color: var(--faint); font-family: var(--mono); }
+details.grp:not([open]) summary::after { content: "+"; }
+details.grp summary:focus-visible { outline: 2px solid var(--accent); border-radius: var(--r); }
+.rows { display: grid; gap: 10px; padding: 0 14px 14px; }
+.row { display: grid; gap: 4px; }
+.row label { display: flex; justify-content: space-between; gap: 8px; font: 400 12px var(--body); color: var(--muted); }
+.row label output { font: 500 11px var(--mono); color: var(--fg); font-variant-numeric: tabular-nums; }
+.row input[type=range] { width: 100%; accent-color: var(--accent); }
+.row select { background: var(--raised); color: var(--fg); border: 1px solid var(--line); border-radius: 6px; padding: 5px 6px; font: 400 12px var(--body); }
+.row input[type=color] { width: 100%; height: 26px; border: 1px solid var(--line); border-radius: 6px; background: var(--raised); padding: 2px; }
+.row .tog { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 12px; }
+.row .tog input { accent-color: var(--accent); }
+.hint { font: 400 11px var(--body); color: var(--faint); }
+.foot { grid-column: 1 / -1; font: 400 11px var(--mono); color: var(--faint); display: flex; flex-wrap: wrap; gap: 6px 18px; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+@media (max-width: 1100px) { .app { grid-template-columns: 220px minmax(0, 1fr); } .insp { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); align-items: start; } .insp h2 { grid-column: 1 / -1; } }
+@media (max-width: 720px) { .app { grid-template-columns: minmax(0, 1fr); } .reel { flex-direction: row; overflow-x: auto; padding-bottom: 4px; } .reel h2 { display: none; } .reel button { flex: 0 0 auto; } .reel .grp { display: none; } .brand .sdk { margin-left: 0; } }
+@media (prefers-reduced-motion: reduce) { .stage { scroll-behavior: auto; } }
+</style>
+
+<div class="app">
+  <header class="brand">
+    <h1>AgentMotif Screening Room</h1>
+    <p>Seven shader styles AgentMotif built for the Motif Kit SDK, running live through Motif's own kit-gl runtime. Every loop is seamless, and every control is a real kit parameter.</p>
+    <span class="sdk">motif-kit@1 · SDK 1.2 · WebGL2</span>
+  </header>
+
+  <nav class="reel" id="reel" aria-label="Styles"><h2>Styles</h2></nav>
+
+  <main class="stagecol">
+    <div class="stage" id="stage">
+      <canvas id="view" aria-label="Live shader output"></canvas>
+      <div class="over" id="over" hidden></div>
+      <div class="hud" id="hud"></div>
+    </div>
+    <div class="transport">
+      <button class="btn primary" id="play" type="button">Pause</button>
+      <div class="grow"><input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Loop position" style="width:100%;accent-color:var(--accent)"></div>
+      <label class="field" for="loopLen">Loop <input id="loopLen" type="number" min="1" max="60" step="0.5" value="8"> s</label>
+      <label class="field" for="tempo">Tempo <select id="tempo"><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option></select></label>
+      <label class="field" for="res">Resolution <select id="res"><option value="0.5">50%</option><option value="0.75" selected>75%</option><option value="1">100%</option></select></label>
+      <label class="field" for="seed">Seed <input id="seed" type="number" min="1" max="9999" value="417"></label>
+      <button class="btn" id="mediaBtn" type="button">Add media…</button>
+      <input id="mediaIn" type="file" accept="image/*,video/*" class="sr" tabindex="-1" aria-hidden="true">
+      <button class="btn" id="mediaClear" type="button" hidden>Remove media</button>
+    </div>
+    <div class="pals" id="pals" role="group" aria-label="Palettes"></div>
+    <section class="about" id="about"></section>
+  </main>
+
+  <aside class="insp" id="insp" aria-label="Inspector"><h2>Inspector</h2></aside>
+
+  <footer class="foot">
+    <span>Built and QA'd by AgentMotif: loop seam Δ0, WCAG flash audit passed, procedural fallbacks for media styles.</span>
+    <span>Drop an image or video on the stage to feed Liquid Glass, Painterly or Light Tunnel. Media stays in this browser.</span>
+  </footer>
+</div>
+
+<script>window.KG = (function(){ // Copy of Motif 3 kit-gl (DOM-free validation + WebGL2 runtime), SDK 1.2 with media inputs and custom params. Generated from the app build.
+// kit-gl/prelude — the Motif Kit GLSL prelude (API motif-kit@1). Every kit pass is compiled as:
+//   PRELUDE + generated param uniforms + kit common.glsl + pass source + MAIN.
+// Contract for authors: time enters ONLY through u_p (loop phase 0..1). Any periodic function
+// of u_p with integer frequencies loops exactly. Use the M_ helpers; never read the clock.
+const PRELUDE = `#version 300 es
+precision highp float;
+precision highp int;
+precision highp sampler2D;
+uniform vec2 u_res;      // pass resolution in pixels
+uniform float u_p;       // loop phase 0..1 (tempo and phase already applied)
+uniform float u_L;       // effective loop duration in seconds (loop / tempo)
+uniform float u_seed;    // 1..9999
+uniform float u_safe;    // 1 = photosensitive-safe limiter on
+uniform vec3 u_bg, u_ink, u_a0, u_a1, u_a2; // palette, linear RGB
+uniform sampler2D u_buf0, u_buf1, u_buf2, u_buf3; // earlier passes of this frame
+out vec4 M_out;
+#define TAU 6.283185307179586
+#define PI 3.141592653589793
+#define M_PH (u_p * TAU)
+
+// ---- hashing (PCG, seeded) ----
+uint M_pcg(uint v) { uint s = v * 747796405u + 2891336453u; uint w = ((s >> ((s >> 28u) + 4u)) ^ s) * 277803737u; return (w >> 22u) ^ w; }
+uint M_seedU() { return M_pcg(uint(u_seed) * 2654435761u); }
+float M_u2f(uint x) { return float(x >> 8u) * (1.0 / 16777216.0); }
+float h11(float x) { return M_u2f(M_pcg(floatBitsToUint(x + 0.0) ^ M_seedU())); }
+float h21(vec2 p) { return M_u2f(M_pcg(M_pcg(floatBitsToUint(p.x + 0.0) ^ M_seedU()) ^ floatBitsToUint(p.y + 0.0))); }
+vec2 h22(vec2 p) { uint a = M_pcg(M_pcg(floatBitsToUint(p.x + 0.0) ^ M_seedU()) ^ floatBitsToUint(p.y + 0.0)); return vec2(M_u2f(a), M_u2f(M_pcg(a))); }
+vec3 h33(vec3 p) { uint a = M_pcg(M_pcg(M_pcg(floatBitsToUint(p.x + 0.0) ^ M_seedU()) ^ floatBitsToUint(p.y + 0.0)) ^ floatBitsToUint(p.z + 0.0)); uint b = M_pcg(a); return vec3(M_u2f(a), M_u2f(b), M_u2f(M_pcg(b))); }
+vec2 M_seedOff() { return vec2(M_u2f(M_seedU()), M_u2f(M_pcg(M_seedU()))) * 173.0 - 86.0; }
+
+// ---- small maths ----
+mat2 rot(float a) { float c = cos(a), s = sin(a); return mat2(c, s, -s, c); }
+float sat(float x) { return clamp(x, 0.0, 1.0); }
+vec3 sat(vec3 x) { return clamp(x, 0.0, 1.0); }
+float remap(float x, float a, float b) { return sat((x - a) / (b - a)); }
+float smin(float a, float b, float k) { float h = sat(0.5 + 0.5 * (b - a) / k); return mix(b, a, h) - k * h * (1.0 - h); }
+float smax(float a, float b, float k) { return -smin(-a, -b, k); }
+float luma(vec3 c) { return dot(c, vec3(0.2126, 0.7152, 0.0722)); }
+// Loop circle: frequency k (integer to loop), phase offset ph (0..1).
+vec2 lc(float k, float ph) { float a = TAU * (k * u_p + ph); return vec2(cos(a), sin(a)); }
+float lsin(float k, float ph) { return sin(TAU * (k * u_p + ph)); }
+float lsaw(float k, float ph) { return fract(k * u_p + ph); }
+
+// ---- simplex noise 3D / 4D (Ashima Arts, MIT) ----
+vec4 M_mod289(vec4 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+vec3 M_mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+float M_mod289(float x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+vec4 M_perm(vec4 x) { return M_mod289(((x * 34.0) + 1.0) * x); }
+float M_perm(float x) { return M_mod289(((x * 34.0) + 1.0) * x); }
+vec4 M_tis(vec4 r) { return 1.79284291400159 - 0.85373472095314 * r; }
+float M_tis(float r) { return 1.79284291400159 - 0.85373472095314 * r; }
+float snoise(vec3 v) {
+  const vec2 C = vec2(1.0 / 6.0, 1.0 / 3.0); const vec4 D = vec4(0.0, 0.5, 1.0, 2.0);
+  vec3 i = floor(v + dot(v, C.yyy)); vec3 x0 = v - i + dot(i, C.xxx);
+  vec3 g = step(x0.yzx, x0.xyz); vec3 l = 1.0 - g; vec3 i1 = min(g.xyz, l.zxy); vec3 i2 = max(g.xyz, l.zxy);
+  vec3 x1 = x0 - i1 + C.xxx; vec3 x2 = x0 - i2 + C.yyy; vec3 x3 = x0 - D.yyy;
+  i = M_mod289(i);
+  vec4 p = M_perm(M_perm(M_perm(i.z + vec4(0.0, i1.z, i2.z, 1.0)) + i.y + vec4(0.0, i1.y, i2.y, 1.0)) + i.x + vec4(0.0, i1.x, i2.x, 1.0));
+  float n_ = 0.142857142857; vec3 ns = n_ * D.wyz - D.xzx;
+  vec4 j = p - 49.0 * floor(p * ns.z * ns.z); vec4 x_ = floor(j * ns.z); vec4 y_ = floor(j - 7.0 * x_);
+  vec4 x = x_ * ns.x + ns.yyyy; vec4 y = y_ * ns.x + ns.yyyy; vec4 h = 1.0 - abs(x) - abs(y);
+  vec4 b0 = vec4(x.xy, y.xy); vec4 b1 = vec4(x.zw, y.zw);
+  vec4 s0 = floor(b0) * 2.0 + 1.0; vec4 s1 = floor(b1) * 2.0 + 1.0; vec4 sh = -step(h, vec4(0.0));
+  vec4 a0 = b0.xzyw + s0.xzyw * sh.xxyy; vec4 a1 = b1.xzyw + s1.xzyw * sh.zzww;
+  vec3 p0 = vec3(a0.xy, h.x); vec3 p1 = vec3(a0.zw, h.y); vec3 p2 = vec3(a1.xy, h.z); vec3 p3 = vec3(a1.zw, h.w);
+  vec4 norm = M_tis(vec4(dot(p0, p0), dot(p1, p1), dot(p2, p2), dot(p3, p3)));
+  p0 *= norm.x; p1 *= norm.y; p2 *= norm.z; p3 *= norm.w;
+  vec4 m = max(0.6 - vec4(dot(x0, x0), dot(x1, x1), dot(x2, x2), dot(x3, x3)), 0.0); m = m * m;
+  return 42.0 * dot(m * m, vec4(dot(p0, x0), dot(p1, x1), dot(p2, x2), dot(p3, x3)));
+}
+vec4 M_grad4(float j, vec4 ip) {
+  const vec4 ones = vec4(1.0, 1.0, 1.0, -1.0); vec4 p, s;
+  p.xyz = floor(fract(vec3(j) * ip.xyz) * 7.0) * ip.z - 1.0; p.w = 1.5 - dot(abs(p.xyz), ones.xyz);
+  s = vec4(lessThan(p, vec4(0.0))); p.xyz = p.xyz + (s.xyz * 2.0 - 1.0) * s.www; return p;
+}
+float snoise(vec4 v) {
+  const vec4 C = vec4(0.138196601125011, 0.276393202250021, 0.414589803375032, -0.447213595499958);
+  vec4 i = floor(v + dot(v, vec4(0.309016994374947451))); vec4 x0 = v - i + dot(i, C.xxxx);
+  vec4 i0; vec3 isX = step(x0.yzw, x0.xxx); vec3 isYZ = step(x0.zww, x0.yyz);
+  i0.x = isX.x + isX.y + isX.z; i0.yzw = 1.0 - isX; i0.y += isYZ.x + isYZ.y; i0.zw += 1.0 - isYZ.xy; i0.z += isYZ.z; i0.w += 1.0 - isYZ.z;
+  vec4 i3 = clamp(i0, 0.0, 1.0); vec4 i2 = clamp(i0 - 1.0, 0.0, 1.0); vec4 i1 = clamp(i0 - 2.0, 0.0, 1.0);
+  vec4 x1 = x0 - i1 + C.xxxx; vec4 x2 = x0 - i2 + C.yyyy; vec4 x3 = x0 - i3 + C.zzzz; vec4 x4 = x0 + C.wwww;
+  i = M_mod289(i);
+  float j0 = M_perm(M_perm(M_perm(M_perm(i.w) + i.z) + i.y) + i.x);
+  vec4 j1 = M_perm(M_perm(M_perm(M_perm(i.w + vec4(i1.w, i2.w, i3.w, 1.0)) + i.z + vec4(i1.z, i2.z, i3.z, 1.0)) + i.y + vec4(i1.y, i2.y, i3.y, 1.0)) + i.x + vec4(i1.x, i2.x, i3.x, 1.0));
+  vec4 ip = vec4(1.0 / 294.0, 1.0 / 49.0, 1.0 / 7.0, 0.0);
+  vec4 p0 = M_grad4(j0, ip); vec4 p1 = M_grad4(j1.x, ip); vec4 p2 = M_grad4(j1.y, ip); vec4 p3 = M_grad4(j1.z, ip); vec4 p4 = M_grad4(j1.w, ip);
+  vec4 norm = M_tis(vec4(dot(p0, p0), dot(p1, p1), dot(p2, p2), dot(p3, p3)));
+  p0 *= norm.x; p1 *= norm.y; p2 *= norm.z; p3 *= norm.w; p4 *= M_tis(dot(p4, p4));
+  vec3 m0 = max(0.6 - vec3(dot(x0, x0), dot(x1, x1), dot(x2, x2)), 0.0); vec2 m1 = max(0.6 - vec2(dot(x3, x3), dot(x4, x4)), 0.0);
+  m0 = m0 * m0; m1 = m1 * m1;
+  return 49.0 * (dot(m0 * m0, vec3(dot(p0, x0), dot(p1, x1), dot(p2, x2))) + dot(m1 * m1, vec2(dot(p3, x3), dot(p4, x4))));
+}
+// Loop noise: space x, travels a circle of radius r in the 4th dimension k times per loop.
+float ln2(vec2 x, float k, float r) { return snoise(vec4(x + M_seedOff(), r * lc(k, 0.0))); }
+float ln3(vec3 x, float k, float r) { vec2 c = r * lc(k, 0.0); return snoise(vec4(x.xy + M_seedOff(), x.z + c.x, c.y)); }
+float lfbm(vec2 x, int oct, float k, float r) {
+  float s = 0.0, a = 0.5; mat2 m = mat2(1.6, 1.2, -1.2, 1.6);
+  for (int i = 0; i < 8; i++) { if (i >= oct) break; s += a * ln2(x, k, r); x = m * x + 11.7; a *= 0.5; }
+  return s;
+}
+float lfbm3(vec3 x, int oct, float k, float r) {
+  float s = 0.0, a = 0.5;
+  for (int i = 0; i < 8; i++) { if (i >= oct) break; s += a * ln3(x, k, r); x = x * 2.02 + vec3(7.1, 3.3, 1.9); a *= 0.5; }
+  return s;
+}
+float lridge(vec2 x, int oct, float k, float r) {
+  float s = 0.0, a = 0.5; mat2 m = mat2(1.6, 1.2, -1.2, 1.6);
+  for (int i = 0; i < 8; i++) { if (i >= oct) break; float n = 1.0 - abs(ln2(x, k, r)); s += a * n * n; x = m * x + 5.3; a *= 0.5; }
+  return s;
+}
+// Loop-animated Voronoi: sites orbit their cell centre (amp) k times per loop.
+// Returns (F1, F2, cell id hash); .w of M_voroId gives the nearest site's cell coords.
+vec3 lvoro(vec2 x, float jit, float k, float amp) {
+  vec2 n = floor(x), f = fract(x); float d1 = 8.0, d2 = 8.0, id = 0.0;
+  for (int j = -1; j <= 1; j++) for (int i = -1; i <= 1; i++) {
+    vec2 g = vec2(float(i), float(j)); vec2 h = h22(n + g);
+    vec2 o = 0.5 + jit * (h - 0.5) + amp * lc(k, h.x) * 0.5 * (0.5 + h.y);
+    float d = length(g + o - f);
+    if (d < d1) { d2 = d1; d1 = d; id = h.x; } else if (d < d2) d2 = d;
+  }
+  return vec3(d1, d2, id);
+}
+
+// ---- shapes ----
+float sdSeg(vec2 p, vec2 a, vec2 b) { vec2 pa = p - a, ba = b - a; float h = sat(dot(pa, ba) / dot(ba, ba)); return length(pa - ba * h); }
+float sdBox(vec2 p, vec2 b) { vec2 d = abs(p) - b; return length(max(d, 0.0)) + min(max(d.x, d.y), 0.0); }
+float sdBox3(vec3 p, vec3 b) { vec3 q = abs(p) - b; return length(max(q, 0.0)) + min(max(q.x, max(q.y, q.z)), 0.0); }
+float sdTorus(vec3 p, vec2 t) { vec2 q = vec2(length(p.xz) - t.x, p.y); return length(q) - t.y; }
+float glowd(float d, float w) { return w / (abs(d) + w); }
+float glow2(float d, float w) { float x = d / w; return 1.0 / (1.0 + x * x); }
+float gauss1(float d, float w) { return exp(-d * d / (w * w)); }
+float line(float d, float w) { return 1.0 - smoothstep(w * 0.5, w * 0.5 + 1.5 / min(u_res.x, u_res.y), d); }
+float aa() { return 1.5 / min(u_res.x, u_res.y); }
+
+// ---- colour ----
+vec3 ramp(float t) { // bg -> a2 -> a0 -> a1 -> ink
+  t = sat(t) * 4.0;
+  if (t < 1.0) return mix(u_bg, u_a2, t);
+  if (t < 2.0) return mix(u_a2, u_a0, t - 1.0);
+  if (t < 3.0) return mix(u_a0, u_a1, t - 2.0);
+  return mix(u_a1, u_ink, t - 3.0);
+}
+vec3 accent(float i) { float j = mod(floor(i), 3.0); return j < 0.5 ? u_a0 : j < 1.5 ? u_a1 : u_a2; }
+vec3 hot(float t) { t = max(t, 0.0); return mix(u_a2, u_a0, sat(t * 1.4)) * sat(t * 3.0) + u_ink * max(t - 0.6, 0.0) * 1.2 + u_a1 * sat(t - 1.0) * 0.5; }
+vec3 aces(vec3 x) { return sat((x * (2.51 * x + 0.03)) / (x * (2.43 * x + 0.59) + 0.14)); }
+vec3 bb(float T) { // approx blackbody tint, T in 1000..12000 K
+  T = clamp(T, 1000.0, 40000.0) / 100.0; vec3 c;
+  c.r = T <= 66.0 ? 1.0 : sat(1.2929 * pow(T - 60.0, -0.1332));
+  c.g = T <= 66.0 ? sat(0.3901 * log(T) - 0.6318) : sat(1.1298 * pow(T - 60.0, -0.0755));
+  c.b = T >= 66.0 ? 1.0 : (T <= 19.0 ? 0.0 : sat(0.5432 * log(T - 10.0) - 1.1963));
+  return c * c;
+}
+// Emissive content: premultiplied, alpha = brightness (reads well over any background).
+vec4 emit(vec3 c) { c = max(c, 0.0); return vec4(c, max(c.r, max(c.g, c.b))); }
+vec4 solid(vec3 c, float a) { return vec4(c * a, a); }
+vec4 over(vec4 top, vec4 base) { return top + base * (1.0 - top.a); }
+vec4 addc(vec4 a, vec4 b) { return vec4(a.rgb + b.rgb, max(a.a, b.a)); }
+
+// ---- time slots with the photosensitive limiter ----
+// n slots per loop; when u_safe is on, at most 3 changes per second (WCAG 2.3.1).
+// Under the limiter a rate can drop to 0 (frozen) when even one change per loop would exceed 3 Hz.
+float M_rate(float n) { n = max(0.0, floor(n + 0.5)); return u_safe > 0.5 ? min(n, floor(3.0 * u_L)) : n; }
+float tslot(float n) { float r = M_rate(n); return r < 1.0 ? 0.0 : floor(fract(u_p) * r); }
+float tfrac(float n) { float r = M_rate(n); return r < 1.0 ? 0.0 : fract(fract(u_p) * r); }
+// Integer cycles-per-loop for anything that flashes (beams, merger flashes): capped under the limiter.
+float safeCycles(float k) { return M_rate(k); }
+// Periodic strobe 0..1 at k cycles per loop (capped under the limiter), duty 0..1, soft edges.
+float strobe(float k, float duty) { float r = M_rate(k); if (r < 1.0) return duty; float f = fract(u_p * r); float soft = u_safe > 0.5 ? 0.18 : 0.02; return smoothstep(0.0, soft, f) * (1.0 - smoothstep(duty, duty + soft, f)); }
+// Flash intensity limiter: scales large full-field luminance swings under the safe mode.
+float flashAmt(float x) { return u_safe > 0.5 ? x * 0.35 : x; }
+
+// ---- loop envelopes ----
+// Travelling pulse train along a coordinate s: k pulses per loop, phase ph, width wd (in s units).
+float pulse(float s, float k, float ph, float wd) { float x = fract(s - k * u_p - ph); return exp(-x * x / (wd * wd)) + exp(-(1.0 - x) * (1.0 - x) / (wd * wd)); }
+// 0 -> 1 -> 0 envelope over the loop with a hold fraction h at full.
+float growEnv(float h) { float x = fract(u_p); float a = (1.0 - h) * 0.5; return smoothstep(0.0, a, x) * (1.0 - smoothstep(1.0 - a * 0.6, 1.0, x)); }
+
+// ---- coordinates ----
+vec2 M_uv(vec2 fc) { return (fc - 0.5 * u_res) / min(u_res.x, u_res.y); }
+vec2 M_asp() { return u_res / min(u_res.x, u_res.y); } // half-extent*2 of uv space
+vec4 buf(sampler2D b, vec2 fc) { return texture(b, fc / u_res); }
+`;
+
+const MAIN_FINAL = `
+float M_dither(vec2 fc) { return M_u2f(M_pcg(uint(fc.x) * 1973u ^ M_pcg(uint(fc.y) * 9277u))) - 0.5; }
+vec3 M_srgb(vec3 c) { return mix(c * 12.92, 1.055 * pow(c, vec3(1.0 / 2.4)) - 0.055, step(0.0031308, c)); }
+void main() {
+  vec2 fc = gl_FragCoord.xy;
+  vec4 c = motif(M_uv(fc), fc);
+  if (any(isnan(c))) c = vec4(0.0);
+  c = max(c, vec4(0.0));
+  float a = clamp(max(c.a, max(c.r, max(c.g, c.b))), 0.0, 1.0);
+  vec3 s = a > 1e-5 ? clamp(c.rgb / a, 0.0, 1.0) : vec3(0.0);
+  s = M_srgb(s) + M_dither(fc) / 255.0;
+  M_out = vec4(clamp(s, 0.0, 1.0) * a, a);
+}
+`;
+const MAIN_PASS = `
+void main() { vec2 fc = gl_FragCoord.xy; vec4 c = motif(M_uv(fc), fc); if (any(isnan(c))) c = vec4(0.0); M_out = c; }
+`;
+
+// kit-gl/validate — manifest + file validation for .motifkit packages (motif-kit@1).
+// Pure (no DOM). Shared by the app's Kit Manager and the SDK CLI.
+const KIT_FORMAT = 'motif-kit@1';
+const KIT_LIMITS = { styles: 40, params: 32, passes: 4, fileBytes: 96 * 1024, kitBytes: 3 * 1024 * 1024, palettes: 8, inputs: 2, expanded: 48 };
+// Media inputs (SDK 1.1): an image or video the user attaches to a layer, sampled in GLSL as u_<id>.
+const INPUT_RE = /^[a-z][a-zA-Z0-9]{0,15}$/;
+const INPUT_TYPES = ['image', 'video', 'media'];
+const INPUT_FITS = ['fill', 'fit', 'stretch'];
+const INPUT_RESERVED = new Set(['res', 'p', 'l', 'seed', 'safe', 'bg', 'ink', 'a0', 'a1', 'a2', 'buf0', 'buf1', 'buf2', 'buf3', 'out']);
+// A `show` condition hides a control unless another control has a given value.
+//   { "param": "mode", "is": "ripple" }   { "param": "mode", "is": ["a","b"] }   { "param": "mode", "not": "off" }
+//   { "param": "count", "gt": 3 }   { "param": "glow", "lt": 0.5 }   toggles use true / false.
+function normShow(sh, raw, self) {
+  if (!sh || typeof sh !== 'object' || Array.isArray(sh)) return 'must be an object like { "param": "mode", "is": "ripple" }.';
+  const t = raw[sh.param];
+  if (!t || sh.param === self) return `"${sh.param}" is not another param of this style.`;
+  if (!['range', 'int', 'toggle', 'select'].includes(t.type)) return `"${sh.param}" is a ${t.type}; a condition can only read a range, int, toggle or select.`;
+  const out = { param: sh.param };
+  if ('is' in sh) out.is = Array.isArray(sh.is) ? sh.is.slice(0, 12) : sh.is;
+  else if ('not' in sh) out.not = Array.isArray(sh.not) ? sh.not.slice(0, 12) : sh.not;
+  else if (Number.isFinite(Number(sh.gt))) out.gt = Number(sh.gt);
+  else if (Number.isFinite(Number(sh.lt))) out.lt = Number(sh.lt);
+  else return 'needs one of is, not, gt or lt.';
+  if (t.type === 'select' && ('is' in out || 'not' in out)) { const vals = [].concat(out.is !== undefined ? out.is : out.not); const known = (t.options || []).map(x => (typeof x === 'string' ? x : x && x.v)); if (vals.some(v => !known.includes(v))) return `value not among ${sh.param}'s options.`; }
+  return out;
+}
+function normInputs(list, where, err) {
+  if (list == null) return null;
+  if (!Array.isArray(list)) { err(`${where}inputs must be an array.`); return []; }
+  if (list.length > KIT_LIMITS.inputs) err(`${where}inputs: at most ${KIT_LIMITS.inputs} media inputs.`);
+  const out = [], seen = new Set();
+  list.slice(0, KIT_LIMITS.inputs).forEach((x, i) => {
+    const w = `${where}inputs[${i}]`;
+    if (!x || !INPUT_RE.test(x.id || '')) return err(`${w}.id must be camelCase letters/digits (max 16), e.g. "source".`);
+    if (INPUT_RESERVED.has(String(x.id).toLowerCase())) return err(`${w}.id "${x.id}" clashes with a built-in uniform.`);
+    if (seen.has(x.id)) return err(`${w}: duplicate input id "${x.id}".`); seen.add(x.id);
+    const type = x.type == null ? 'media' : x.type;
+    if (!INPUT_TYPES.includes(type)) return err(`${w}.type must be image, video or media.`);
+    const fit = x.fit == null ? 'fill' : x.fit;
+    if (!INPUT_FITS.includes(fit)) return err(`${w}.fit must be fill, fit or stretch.`);
+    out.push({ id: x.id, type, label: String(x.label || x.id[0].toUpperCase() + x.id.slice(1)).slice(0, 24), fit, required: !!x.required, hint: String(x.hint || '').slice(0, 120) });
+  });
+  return out;
+}
+const ID_RE = /^[a-z][a-z0-9-]{1,31}$/;
+const KEY_RE = /^[a-z][a-zA-Z0-9]{0,23}$/;
+const HEX_RE = /^#[0-9a-fA-F]{6}$/;
+const SEMVER_RE = /^\d+\.\d+\.\d+$/;
+const RESERVED_KITS = new Set(['core', 'motif', 'builtin', 'all']);
+
+function validateKit(manifest, files) {
+  const errors = [], warnings = [];
+  const err = m => errors.push(m), warn = m => warnings.push(m);
+  if (!manifest || typeof manifest !== 'object') return { ok: false, errors: ['manifest.json is missing or not an object.'], warnings };
+  const m = manifest;
+  if (m.format !== KIT_FORMAT) err(`format must be "${KIT_FORMAT}" (got ${JSON.stringify(m.format)}).`);
+  if (!ID_RE.test(m.id || '')) err('id must be 2–32 chars: lowercase letters, digits and hyphens, starting with a letter.');
+  else if (RESERVED_KITS.has(m.id)) err(`id "${m.id}" is reserved.`);
+  if (!m.name || String(m.name).length > 32) err('name is required (max 32 chars).');
+  if (!SEMVER_RE.test(m.version || '')) err('version must be semver, e.g. "1.0.0".');
+  if (m.accent && !HEX_RE.test(m.accent)) err('accent must be a #RRGGBB colour.');
+  let total = 0; for (const [k, v] of Object.entries(files || {})) { const n = typeof v === 'string' ? v.length : (v && v.byteLength) || 0; total += n; if (/\.glsl$/.test(k) && n > KIT_LIMITS.fileBytes) err(`${k} is larger than ${KIT_LIMITS.fileBytes / 1024} KB.`); }
+  if (total > KIT_LIMITS.kitBytes) err(`Kit is larger than ${KIT_LIMITS.kitBytes / 1048576} MB.`);
+  const fileText = p => { const v = files && files[p]; return typeof v === 'string' ? v : null; };
+  const common = m.common ? fileText(m.common) : '';
+  if (m.common && common == null) err(`common file "${m.common}" is not in the package.`);
+  if (common && /\bvoid\s+main\s*\(/.test(common)) err('common.glsl must not define main().');
+  // Palettes
+  const palettes = [];
+  if (m.palettes != null && !Array.isArray(m.palettes)) err('palettes must be an array.');
+  (m.palettes || []).slice(0, KIT_LIMITS.palettes).forEach((p, i) => {
+    const where = `palettes[${i}]`;
+    if (!p || !ID_RE.test(p.id || '')) return err(`${where}.id is invalid.`);
+    const cols = [p.bg, p.ink, ...(Array.isArray(p.a) ? p.a : [])];
+    if (!Array.isArray(p.a) || p.a.length !== 3 || !cols.every(c => HEX_RE.test(c || ''))) return err(`${where} needs bg, ink and exactly three accents as #RRGGBB.`);
+    palettes.push({ id: `${m.id}.${p.id}`, name: String(p.name || p.id).slice(0, 24), bg: p.bg.toUpperCase(), ink: p.ink.toUpperCase(), a: p.a.map(c => c.toUpperCase()), kit: m.id });
+  });
+  if ((m.palettes || []).length > KIT_LIMITS.palettes) warn(`Only the first ${KIT_LIMITS.palettes} palettes are used.`);
+  const kitInputs = normInputs(m.inputs, '', err);
+  // Styles
+  const styles = [], seen = new Set();
+  if (!Array.isArray(m.styles) || !m.styles.length) err('styles must be a non-empty array.');
+  else if (m.styles.length > KIT_LIMITS.styles) err(`A kit can hold at most ${KIT_LIMITS.styles} styles.`);
+  (Array.isArray(m.styles) ? m.styles : []).slice(0, KIT_LIMITS.styles).forEach((s, i) => {
+    const where = `styles[${i}]${s && s.id ? ` (${s.id})` : ''}`;
+    if (!s || !ID_RE.test(s.id || '')) return err(`${where}: id is invalid.`);
+    if (seen.has(s.id)) return err(`${where}: duplicate id.`); seen.add(s.id);
+    if (!s.name || String(s.name).length > 32) err(`${where}: name is required (max 32 chars).`);
+    const passes = [];
+    if (!Array.isArray(s.passes) || !s.passes.length || s.passes.length > KIT_LIMITS.passes) err(`${where}: passes must list 1–${KIT_LIMITS.passes} shader files.`);
+    else s.passes.forEach((ps, j) => {
+      const src = fileText(ps && ps.src);
+      if (src == null) return err(`${where}: pass ${j + 1} file "${ps && ps.src}" is not in the package.`);
+      if (!/\bvec4\s+motif\s*\(\s*vec2\s+\w+\s*,\s*vec2\s+\w+\s*\)/.test(src)) err(`${where}: ${ps.src} must define vec4 motif(vec2 uv, vec2 fc).`);
+      if (/\bvoid\s+main\s*\(/.test(src)) err(`${where}: ${ps.src} must not define main(); the runtime supplies it.`);
+      if (/\buniform\b/.test(src)) warn(`${where}: ${ps.src} declares its own uniforms; only params and u_ inputs are set by the runtime.`);
+      const scale = ps.scale == null ? 1 : Number(ps.scale);
+      if (!(scale >= 0.125 && scale <= 1)) err(`${where}: pass ${j + 1} scale must be 0.125–1.`);
+      passes.push({ file: ps.src, src, scale });
+    });
+    const params = {};
+    const raw = s.params || {};
+    if (typeof raw !== 'object' || Array.isArray(raw)) err(`${where}: params must be an object.`);
+    const keys = Object.keys(raw);
+    if (keys.length > KIT_LIMITS.params) err(`${where}: at most ${KIT_LIMITS.params} params (a colour counts as one, a point as one).`);
+    for (const k of keys.slice(0, KIT_LIMITS.params)) {
+      const p = raw[k], pw = `${where}.params.${k}`;
+      if (!KEY_RE.test(k)) { err(`${pw}: key must be camelCase letters/digits (max 24).`); continue; }
+      if (['palette', 'invert', 'tempo', 'phase', 'seed', 'zoom', 'rotate', 'loop'].includes(k)) { err(`${pw}: "${k}" is a shared parameter name.`); continue; }
+      if (!p || typeof p !== 'object') { err(`${pw}: must be an object.`); continue; }
+      const label = String(p.label || k).slice(0, 24), o = { label };
+      if (p.unit) o.unit = String(p.unit).slice(0, 4);
+      if (p.mutate != null) o.mutate = Math.max(0, Math.min(1, Number(p.mutate) || 0));
+      if (p.group != null && String(p.group).trim()) o.group = String(p.group).trim().slice(0, 20);
+      if (p.hint != null && String(p.hint).trim()) o.hint = String(p.hint).trim().slice(0, 90);
+      if (p.show != null) { const sh = normShow(p.show, raw, k); if (typeof sh === 'string') { err(`${pw}.show: ${sh}`); } else o.show = sh; }
+      if (p.type === 'color') {
+        if (!/^#[0-9a-fA-F]{6}$/.test(p.def || '')) { err(`${pw}: color needs def like "#FF8800".`); continue; }
+        const rgb = [1, 3, 5].map(i => parseInt(p.def.slice(i, i + 1 + 1), 16) / 255);
+        if (['R', 'G', 'B'].some(c => k.length + 1 > 24 || raw[k + c])) { err(`${pw}: "${k}R/G/B" would clash with another param or exceed 24 characters.`); continue; }
+        ['R', 'G', 'B'].forEach((c, i) => { params[k + c] = { ...o, label: `${label} ${c}`.slice(0, 24), type: 'range', min: 0, max: 1, def: +rgb[i].toFixed(4), step: 0.001, mutate: o.mutate == null ? 0.5 : o.mutate, part: { of: k, kind: 'color', i, label } }; });
+        continue;
+      }
+      if (p.type === 'point') {
+        const lo = p.min == null ? -1 : Number(p.min), hi = p.max == null ? 1 : Number(p.max), d = p.def == null ? [0, 0] : p.def;
+        if (!Number.isFinite(lo) || !Number.isFinite(hi) || !(lo < hi)) { err(`${pw}: point needs numeric min < max.`); continue; }
+        if (!Array.isArray(d) || d.length !== 2 || !d.every(x => Number.isFinite(Number(x)) && Number(x) >= lo && Number(x) <= hi)) { err(`${pw}: point def must be [x, y] within ${lo}–${hi}.`); continue; }
+        if (['X', 'Y'].some(c => k.length + 1 > 24 || raw[k + c])) { err(`${pw}: "${k}X/Y" would clash with another param or exceed 24 characters.`); continue; }
+        ['X', 'Y'].forEach((c, i) => { params[k + c] = { ...o, label: `${label} ${c}`.slice(0, 24), type: 'range', min: lo, max: hi, def: Number(d[i]), step: +((hi - lo) / 400).toPrecision(2), part: { of: k, kind: 'point', i, label } }; });
+        continue;
+      }
+      if (p.type === 'range' || p.type === 'int') {
+        const min = Number(p.min), max = Number(p.max), def = Number(p.def);
+        if (![min, max, def].every(Number.isFinite) || !(min < max)) { err(`${pw}: needs numeric min < max and def.`); continue; }
+        if (def < min || def > max) { err(`${pw}: def ${def} is outside ${min}–${max}.`); continue; }
+        if (p.type === 'int' && ![min, max, def].every(Number.isInteger)) { err(`${pw}: int min, max and def must be integers.`); continue; }
+        Object.assign(o, { type: p.type, min, max, def, step: p.type === 'int' ? 1 : Number(p.step) > 0 ? Number(p.step) : 0.01 });
+        if (p.log) { if (min > 0) o.log = true; else warn(`${pw}: "log" needs min > 0; ignored.`); }
+        if (p.randMax != null) { if (Number(p.randMax) > min && Number(p.randMax) <= max) o.randMax = Number(p.randMax); else warn(`${pw}: randMax must be within min–max; ignored.`); }
+      } else if (p.type === 'toggle') Object.assign(o, { type: 'toggle', def: !!p.def });
+      else if (p.type === 'select') {
+        const opts = (Array.isArray(p.options) ? p.options : []).map(x => (typeof x === 'string' ? { v: x, l: x[0].toUpperCase() + x.slice(1) } : x && typeof x.v === 'string' ? { v: x.v, l: String(x.l || x.v) } : null)).filter(Boolean);
+        if (opts.length < 2 || opts.length > 12) { err(`${pw}: select needs 2–12 options.`); continue; }
+        if (!opts.every(x => /^[a-z][a-z0-9-]{0,23}$/.test(x.v))) { err(`${pw}: option values must be lowercase ids.`); continue; }
+        Object.assign(o, { type: 'select', options: opts, def: opts.some(x => x.v === p.def) ? p.def : opts[0].v });
+      } else { err(`${pw}: type must be range, int, toggle, select, color or point.`); continue; }
+      params[k] = o;
+    }
+    if (Object.keys(params).length > KIT_LIMITS.expanded) err(`${where}: colour and point params count as 3 and 2 uniforms; at most ${KIT_LIMITS.expanded} in total.`);
+    if (keys.length < 4) warn(`${where}: fewer than 4 params gives Mutate and Evolve little to work with.`);
+    // Media inputs: the style's own list wins, else the kit-level list. Kits written before SDK 1.1 that declare
+    // \`uniform sampler2D u_<name>;\` themselves get an implicit input so they work unchanged.
+    let inputs = normInputs(s.inputs, `${where}.`, err);
+    if (inputs == null) inputs = kitInputs;
+    if (inputs == null) {
+      inputs = []; const text = [common || '', ...passes.map(x => x.src || '')].join('\n'); const re = /\buniform\s+sampler2D\s+u_([A-Za-z][A-Za-z0-9]{0,15})\s*;/g; let mm;
+      while ((mm = re.exec(text)) && inputs.length < KIT_LIMITS.inputs) { const id = mm[1]; if (INPUT_RESERVED.has(id.toLowerCase()) || inputs.some(q => q.id === id)) continue; inputs.push({ id, type: 'media', label: id[0].toUpperCase() + id.slice(1), fit: 'fill', required: false, hint: '', implicit: true }); }
+      if (inputs.length && !styles.some(x => x.inputs.some(q => q.implicit))) warn(`Declares ${inputs.map(q => 'u_' + q.id).join(', ')} without "inputs"; treated as media input${inputs.length > 1 ? 's' : ''}. Add "inputs": [{ "id": "${inputs[0].id}", "type": "media" }] to the manifest.`);
+    }
+    for (const q of inputs) if (params[q.id + 'On'] || params[q.id]) warn(`${where}: param "${q.id}" shares a name with media input "${q.id}".`);
+    const pal = s.palette ? `${m.id}.${s.palette}` : null;
+    if (pal && !palettes.some(p => p.id === pal)) warn(`${where}: palette "${s.palette}" is not defined by the kit.`);
+    const cost = Math.max(0.25, Math.min(24, Number(s.cost) || 1));
+    styles.push({ id: `${m.id}/${s.id}`, localId: s.id, cost, name: String(s.name || s.id).slice(0, 32), blurb: String(s.blurb || '').slice(0, 160), group: String(s.group || '').slice(0, 24), tags: (Array.isArray(s.tags) ? s.tags : []).map(String).slice(0, 8), palette: pal && palettes.some(p => p.id === pal) ? pal : null, flash: !!s.flash, passes, params, inputs });
+  });
+  const ok = errors.length === 0;
+  return { ok, errors, warnings, kit: ok ? { format: KIT_FORMAT, id: m.id, name: String(m.name), version: m.version, author: String(m.author || '').slice(0, 48), description: String(m.description || '').slice(0, 280), accent: m.accent || null, license: String(m.license || '').slice(0, 32), palettes, styles, common: common || '' } : null };
+}
+
+// kit-gl v2 (Motif 3) — WebGL2 runtime for Motif Kit shader styles (motif-kit@1): adaptive internal
+// resolution, banded submission for heavy frames, LRU render targets and context-loss recovery.
+// One shared GL canvas. Programs compile lazily per style, passes render into half-float
+// targets, the final pass lands in the bottom-left w×h region of the shared canvas, and the
+// caller copies it with drawImage. Stateless per frame: every frame is a pure function of
+// (params, palette, seed, phase), so exports are deterministic and loops close exactly.
+
+const MAX_PASSES = 4;
+const RESERVED = /^(u_|M_|gl_)/;
+
+function hexToLin(hex) {
+  const n = parseInt(String(hex).replace('#', '').slice(0, 6), 16) || 0;
+  return [(n >> 16) & 255, (n >> 8) & 255, n & 255].map(v => { v /= 255; return v <= 0.04045 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); });
+}
+
+// Uniform declarations for a style's params: range → float, int → int, toggle → bool, select → int (option index).
+function paramUniforms(params) {
+  let s = '', helpers = '';
+  for (const [k, p] of Object.entries(params || {})) {
+    if (p.type === 'text') continue;
+    if (p.part && p.part.i === 0) helpers += p.part.kind === 'color'
+      ? `vec3 s_${p.part.of}() { return vec3(p_${p.part.of}R, p_${p.part.of}G, p_${p.part.of}B); }\nvec3 c_${p.part.of}() { vec3 c = s_${p.part.of}(); return mix(c / 12.92, pow((c + 0.055) / 1.055, vec3(2.4)), step(vec3(0.04045), c)); }\n`
+      : `vec2 v_${p.part.of}() { return vec2(p_${p.part.of}X, p_${p.part.of}Y); }\n`;
+    const t = p.type === 'range' ? 'float' : p.type === 'toggle' ? 'bool' : 'int';
+    s += `uniform ${t} p_${k};\n`;
+    if (p.type === 'select') p.options.forEach((o, i) => { s += `#define ${k.replace(/([a-z0-9])([A-Z])/g, '$1_$2').toUpperCase()}_${String(o.v).toUpperCase().replace(/[^A-Z0-9]/g, '_')} ${i}\n`; });
+  }
+  return s + helpers;
+}
+
+// Media inputs. The host bakes each attached image/video into a texture with the frame's aspect ratio (fit
+// already applied), so frame-normalized q = fc / u_res samples it directly with no distortion.
+//   u_<id>        sampler2D  premultiplied, linear light (texture unit 4 + input index)
+//   u_<id>On      float      1.0 when media is attached, else 0.0 (sampling then returns transparent black)
+//   u_<id>Size    vec2       the media's own pixel size
+//   u_<id>Time    float      video time in seconds (0 for images)
+//   m_<id>(q)     vec4       sample at frame-normalized q (0..1, origin bottom-left), clamped
+//   m_<id>UV(uv)  vec4       sample at the centred uv that motif() receives
+//   m_<id>Px(fc)  vec4       sample at pixel coordinates
+function inputSource(inputs) {
+  let s = '';
+  for (const q of inputs || []) {
+    const n = q.id;
+    s += `uniform sampler2D u_${n};\nuniform float u_${n}On;\nuniform vec2 u_${n}Size;\nuniform float u_${n}Time;\n`;
+    s += `vec4 m_${n}(vec2 q) { return texture(u_${n}, clamp(q, vec2(0.0), vec2(1.0))); }\n`;
+    s += `vec4 m_${n}Px(vec2 fc) { return m_${n}(fc / u_res); }\n`;
+    s += `vec4 m_${n}UV(vec2 uv) { return m_${n}(uv * min(u_res.x, u_res.y) / u_res + 0.5); }\n`;
+  }
+  return s;
+}
+// Kits may declare the input uniforms themselves (SDK 1.0 style); strip those so the runtime's declarations win.
+// The declaration is blanked in place, so pass-local line numbers stay correct.
+function stripInputDecls(text, inputs) {
+  if (!text || !inputs || !inputs.length) return text || '';
+  for (const q of inputs) text = text.replace(new RegExp(`\\buniform\\s+\\w+\\s+u_${q.id}(On|Size|Time)?\\s*;`, 'g'), '');
+  return text;
+}
+function buildSource(passSrc, common, params, final, inputs) {
+  passSrc = stripInputDecls(passSrc, inputs); common = stripInputDecls(common, inputs);
+  const head = PRELUDE + '\n// ---- params ----\n' + paramUniforms(params) + (inputs && inputs.length ? '\n// ---- media inputs ----\n' + inputSource(inputs) : '') + '\n// ---- kit common ----\n' + (common || '') + '\n// ---- pass ----\n#line 1 1\n';
+  return { src: head + passSrc + (final ? MAIN_FINAL : MAIN_PASS), headLines: head.split('\n').length - 1 };
+}
+
+function createGlRuntime() {
+  const canvas = typeof document !== 'undefined' ? document.createElement('canvas') : null;
+  let gl = null, reason = '', halfFloat = false, lost = false, loseExt = null, timerExt = null, parExt = null, frameNo = 0, lostCount = 0;
+  const compiling = new Map(); // key -> { def, passes:[{p, v, f, scale}] } while KHR_parallel_shader_compile works in the background
+  const programs = new Map(); // key -> { passes:[{prog, uniforms, scale}], error }
+  const targets = new Map();  // `${key}|${i}` -> { tex, fbo, w, h, used }
+  const gpuMs = new Map();    // key -> EMA of GPU milliseconds per megapixel (when the timer extension exists)
+  const pending = [];         // in-flight timer queries
+  const listeners = new Set();
+  let vao = null, vbo = null, last = { w: 0, h: 0 }, rendererName = '', software = false;
+  // Media input textures (SDK 1.1). Keyed by the host's baked canvas; re-uploaded when its rev changes.
+  let mediaTex = new Map(), blankTex = null;
+  const MEDIA_UNIT = 4;
+  const emit = ev => listeners.forEach(fn => { try { fn(ev); } catch (e) { /* listener errors never break rendering */ } });
+  function setup() {
+    halfFloat = !!gl.getExtension('EXT_color_buffer_float') || !!gl.getExtension('EXT_color_buffer_half_float');
+    gl.getExtension('OES_texture_float_linear');
+    loseExt = gl.getExtension('WEBGL_lose_context');
+    timerExt = gl.getExtension('EXT_disjoint_timer_query_webgl2');
+    parExt = gl.getExtension('KHR_parallel_shader_compile');
+    try { const di = gl.getExtension('WEBGL_debug_renderer_info'); rendererName = String(gl.getParameter(di ? di.UNMASKED_RENDERER_WEBGL : gl.RENDERER) || ''); } catch (e) { rendererName = ''; }
+    software = /swiftshader|llvmpipe|softpipe|software|basic render|mesa offscreen|angle \(.*\bcpu\b/i.test(rendererName);
+    vao = gl.createVertexArray(); gl.bindVertexArray(vao);
+    vbo = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+    mediaTex = new Map();
+    blankTex = gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D, blankTex);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array(4));
+  }
+  // Upload (or refresh) a baked media canvas as an sRGB texture, so shaders sample linear light.
+  function mediaTexture(m) {
+    let e = mediaTex.get(m.canvas);
+    if (e && e.rev === m.rev) return e.tex;
+    if (!e) {
+      e = { tex: gl.createTexture(), rev: -1 }; mediaTex.set(m.canvas, e);
+      if (mediaTex.size > 12) { const [k0, e0] = mediaTex.entries().next().value; gl.deleteTexture(e0.tex); mediaTex.delete(k0); }
+    }
+    gl.activeTexture(gl.TEXTURE0 + MEDIA_UNIT + 3); gl.bindTexture(gl.TEXTURE_2D, e.tex);
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true); gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true);
+    try { gl.texImage2D(gl.TEXTURE_2D, 0, gl.SRGB8_ALPHA8, gl.RGBA, gl.UNSIGNED_BYTE, m.canvas); }
+    finally { gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false); gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false); }
+    gl.generateMipmap(gl.TEXTURE_2D);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    e.rev = m.rev; return e.tex;
+  }
+  function init() {
+    if (gl || !canvas) return !!gl;
+    canvas.width = 2; canvas.height = 2;
+    try { gl = canvas.getContext('webgl2', { premultipliedAlpha: true, preserveDrawingBuffer: true, antialias: false, alpha: true, depth: false, stencil: false, powerPreference: 'high-performance' }); } catch (e) { gl = null; }
+    if (!gl) { reason = 'WebGL2 is not available in this browser.'; return false; }
+    setup();
+    // Context loss (a GPU reset, often a watchdog timeout on a long draw): keep the context object,
+    // ask the browser to restore it, then rebuild programs lazily. Callers draw a placeholder meanwhile.
+    canvas.addEventListener('webglcontextlost', e => {
+      e.preventDefault(); lost = true; lostCount++; pending.length = 0; emit({ type: 'lost', count: lostCount });
+      const ext = loseExt; setTimeout(() => { if (lost && ext) { try { ext.restoreContext(); } catch (err) { /* browser restores on its own */ } } }, 1500);
+    });
+    canvas.addEventListener('webglcontextrestored', () => { lost = false; programs.clear(); targets.clear(); compiling.clear(); setup(); emit({ type: 'restored', count: lostCount }); });
+    return true;
+  }
+  const VS = '#version 300 es\nin vec2 a_pos;\nvoid main(){ gl_Position = vec4(a_pos, 0.0, 1.0); }\n';
+  function shader(type, src) { const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s); return s; }
+  // Maps driver log lines back to pass-local line numbers (the pass source starts at #line 1 1).
+  function cleanLog(log) {
+    return String(log || '').split('\n').filter(Boolean).map(l => l.replace(/^(ERROR|WARNING): 1:(\d+):/, (m, k, n) => `${k === 'ERROR' ? 'Error' : 'Warning'} line ${n}:`).replace(/^(ERROR|WARNING): 0:(\d+):/, (m, k, n) => `${k === 'ERROR' ? 'Error' : 'Warning'} in prelude/common (line ${n}):`)).slice(0, 12).join('\n');
+  }
+  function startPass(src, final, common, params, inputs) {
+    const { src: fs } = buildSource(src, common, params, final, inputs);
+    const v = shader(gl.VERTEX_SHADER, VS), f = shader(gl.FRAGMENT_SHADER, fs);
+    const p = gl.createProgram(); gl.attachShader(p, v); gl.attachShader(p, f); gl.bindAttribLocation(p, 0, 'a_pos'); gl.linkProgram(p);
+    return { p, v, f };
+  }
+  function finishPass({ p, v, f }) {
+    if (!gl.getProgramParameter(p, gl.LINK_STATUS)) {
+      const log = cleanLog(gl.getShaderInfoLog(f)) || gl.getProgramInfoLog(p);
+      gl.deleteProgram(p); gl.deleteShader(v); gl.deleteShader(f);
+      if (gl.isContextLost()) return { error: 'lost' };
+      return { error: log || 'Shader failed to compile.' };
+    }
+    gl.deleteShader(v); gl.deleteShader(f);
+    const n = gl.getProgramParameter(p, gl.ACTIVE_UNIFORMS), uniforms = {};
+    for (let i = 0; i < n; i++) { const u = gl.getActiveUniform(p, i); uniforms[u.name.replace(/\[0\]$/, '')] = gl.getUniformLocation(p, u.name); }
+    return { prog: p, uniforms };
+  }
+  function finalize(key, started) {
+    const passes = [];
+    for (let i = 0; i < started.length; i++) {
+      const r = finishPass(started[i]);
+      if (r.error) {
+        passes.forEach(x => gl.deleteProgram(x.prog)); started.slice(i + 1).forEach(x => { gl.deleteProgram(x.p); gl.deleteShader(x.v); gl.deleteShader(x.f); });
+        if (r.error === 'lost') return { ok: false, error: 'lost', lost: true };
+        const e = { error: `Pass ${i + 1}: ${r.error}` }; programs.set(key, e); return { ok: false, error: e.error };
+      }
+      passes.push({ ...r, scale: started[i].scale });
+    }
+    programs.set(key, { passes, inputs: started.inputs || [] }); return { ok: true };
+  }
+  // def: { passes:[{src, scale}], common, params }. Returns { ok, error } or { ok:false, pending:true } while
+  // the driver compiles in the background (KHR_parallel_shader_compile), so the UI never freezes on a big shader.
+  // sync: true waits for the result (used when importing a kit, to report errors with line numbers).
+  function compile(key, def, sync) {
+    if (!init()) return { ok: false, error: reason };
+    if (lost) return { ok: false, error: 'lost', lost: true };
+    if (programs.has(key)) { const e = programs.get(key); return { ok: !e.error, error: e.error }; }
+    let job = compiling.get(key);
+    if (!job) {
+      job = def.passes.map((ps, i) => ({ ...startPass(ps.src, i === def.passes.length - 1, def.common, def.params, def.inputs), scale: Math.min(1, Math.max(0.125, ps.scale || 1)) }));
+      job.inputs = def.inputs || []; compiling.set(key, job);
+    }
+    if (!sync && parExt && !job.every(x => gl.getProgramParameter(x.p, parExt.COMPLETION_STATUS_KHR))) return { ok: false, pending: true };
+    compiling.delete(key);
+    return finalize(key, job);
+  }
+  // Finish any background compiles that are ready; returns the keys that completed.
+  function poll() {
+    const done = [];
+    if (!gl || lost || !parExt) return done;
+    for (const [key, job] of compiling) if (job.every(x => gl.getProgramParameter(x.p, parExt.COMPLETION_STATUS_KHR))) { compiling.delete(key); finalize(key, job); done.push(key); }
+    return done;
+  }
+  function forget(prefix) {
+    if (!gl) return;
+    for (const [k, v] of programs) if (k.startsWith(prefix)) { (v.passes || []).forEach(x => gl.deleteProgram(x.prog)); programs.delete(k); }
+    for (const [k, v] of targets) if (k.startsWith(prefix)) { gl.deleteTexture(v.tex); gl.deleteFramebuffer(v.fbo); targets.delete(k); }
+  }
+  function target(key, i, w, h) {
+    const k = `${key}|${i}`; let t = targets.get(k);
+    if (t && t.w === w && t.h === h) { t.used = frameNo; return t; }
+    if (!t) { t = { tex: gl.createTexture(), fbo: gl.createFramebuffer() }; targets.set(k, t); }
+    t.w = w; t.h = h; t.used = frameNo;
+    gl.bindTexture(gl.TEXTURE_2D, t.tex);
+    gl.texImage2D(gl.TEXTURE_2D, 0, halfFloat ? gl.RGBA16F : gl.RGBA8, w, h, 0, gl.RGBA, halfFloat ? gl.HALF_FLOAT : gl.UNSIGNED_BYTE, null);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, t.fbo); gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, t.tex, 0);
+    // Evict least-recently-used targets (never one written this frame) beyond 24.
+    if (targets.size > 24) {
+      let oldK = null, oldT = null;
+      for (const [kk, tt] of targets) if (tt.used !== frameNo && (!oldT || tt.used < oldT.used)) { oldK = kk; oldT = tt; }
+      if (oldT) { gl.deleteTexture(oldT.tex); gl.deleteFramebuffer(oldT.fbo); targets.delete(oldK); }
+    }
+    return t;
+  }
+  // Collect finished GPU timer queries into a per-style cost estimate (ms per megapixel).
+  function pollTimers() {
+    if (!timerExt) return;
+    const disjoint = gl.getParameter(timerExt.GPU_DISJOINT_EXT);
+    for (let i = pending.length - 1; i >= 0; i--) {
+      const q = pending[i];
+      if (!gl.getQueryParameter(q.q, gl.QUERY_RESULT_AVAILABLE)) continue;
+      const ns = gl.getQueryParameter(q.q, gl.QUERY_RESULT); gl.deleteQuery(q.q); pending.splice(i, 1);
+      if (disjoint || !(ns > 0)) continue;
+      const perMpx = (ns / 1e6) / Math.max(0.01, q.px / 1e6);
+      const prev = gpuMs.get(q.key); gpuMs.set(q.key, prev == null ? perMpx : prev * 0.75 + perMpx * 0.25);
+    }
+  }
+  // Render style `key` at w×h. u: { p, L, seed, safe, pal:{bg,ink,a}, params, spec, media }.
+  // media: { <inputId>: { canvas, rev, w, h, time } } — baked by the host at the frame's aspect (see inputSource).
+  // opt.scale renders internally at w·scale × h·scale (blit upsamples); opt.bands splits every pass into
+  // horizontal bands flushed separately, so one very heavy frame never becomes one long GPU submission.
+  function draw(key, w, h, u, opt = {}) {
+    if (!init() || lost) return null;
+    const entry = programs.get(key); if (!entry || entry.error) return null;
+    frameNo++;
+    const sc = Math.min(1, Math.max(0.2, opt.scale || 1));
+    w = Math.max(1, Math.round(w * sc)); h = Math.max(1, Math.round(h * sc));
+    const bands = Math.max(1, Math.min(32, Math.round(opt.bands || 1)));
+    if (canvas.width < w || canvas.height < h) { canvas.width = Math.max(canvas.width, w); canvas.height = Math.max(canvas.height, h); }
+    const pal = [hexToLin(u.pal.bg), hexToLin(u.pal.ink), ...u.pal.a.slice(0, 3).map(hexToLin)];
+    gl.bindVertexArray(vao); gl.bindBuffer(gl.ARRAY_BUFFER, vbo); gl.enableVertexAttribArray(0); gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
+    gl.disable(gl.BLEND); gl.disable(gl.DEPTH_TEST);
+    pollTimers();
+    let query = null;
+    if (timerExt && pending.length < 4) { query = gl.createQuery(); gl.beginQuery(timerExt.TIME_ELAPSED_EXT, query); }
+    const texs = [];
+    entry.passes.forEach((ps, i) => {
+      const lastPass = i === entry.passes.length - 1;
+      const pw = lastPass ? w : Math.max(1, Math.round(w * ps.scale)), ph = lastPass ? h : Math.max(1, Math.round(h * ps.scale));
+      if (lastPass) { gl.bindFramebuffer(gl.FRAMEBUFFER, null); gl.viewport(0, 0, pw, ph); }
+      else { const t = target(key, i, pw, ph); gl.bindFramebuffer(gl.FRAMEBUFFER, t.fbo); gl.viewport(0, 0, pw, ph); texs.push(t.tex); }
+      gl.useProgram(ps.prog); const U = ps.uniforms;
+      if (U.u_res) gl.uniform2f(U.u_res, pw, ph);
+      if (U.u_p) gl.uniform1f(U.u_p, u.p);
+      if (U.u_L) gl.uniform1f(U.u_L, u.L);
+      if (U.u_seed) gl.uniform1f(U.u_seed, u.seed);
+      if (U.u_safe) gl.uniform1f(U.u_safe, u.safe ? 1 : 0);
+      ['u_bg', 'u_ink', 'u_a0', 'u_a1', 'u_a2'].forEach((n, j) => { if (U[n]) gl.uniform3fv(U[n], pal[j]); });
+      for (let b = 0; b < MAX_PASSES; b++) { const n = 'u_buf' + b; if (U[n]) { gl.activeTexture(gl.TEXTURE0 + b); gl.bindTexture(gl.TEXTURE_2D, b < i ? texs[b] || null : null); gl.uniform1i(U[n], b); } }
+      entry.inputs.forEach((q, j) => {
+        const loc = U['u_' + q.id]; const m = u.media && u.media[q.id];
+        if (U['u_' + q.id + 'On']) gl.uniform1f(U['u_' + q.id + 'On'], m ? 1 : 0);
+        if (U['u_' + q.id + 'Size']) gl.uniform2f(U['u_' + q.id + 'Size'], m ? m.w : 0, m ? m.h : 0);
+        if (U['u_' + q.id + 'Time']) gl.uniform1f(U['u_' + q.id + 'Time'], m ? m.time || 0 : 0);
+        if (!loc) return;
+        // An SDK 1.0 kit that declared the sampler itself read u_buf0 (unit 0) when nothing was bound; keep that fallback.
+        if (!m && q.implicit) { gl.uniform1i(loc, 0); return; }
+        const tex = m ? mediaTexture(m) : blankTex;
+        gl.activeTexture(gl.TEXTURE0 + MEDIA_UNIT + j); gl.bindTexture(gl.TEXTURE_2D, tex); gl.uniform1i(loc, MEDIA_UNIT + j);
+      });
+      for (const [k, sp] of Object.entries(u.spec)) {
+        const loc = U['p_' + k]; if (!loc) continue; const v = u.params[k];
+        if (sp.type === 'range') gl.uniform1f(loc, +v);
+        else if (sp.type === 'int') gl.uniform1i(loc, Math.round(v));
+        else if (sp.type === 'toggle') gl.uniform1i(loc, v ? 1 : 0);
+        else if (sp.type === 'select') gl.uniform1i(loc, Math.max(0, sp.options.findIndex(o => o.v === v)));
+      }
+      gl.enable(gl.SCISSOR_TEST);
+      if (lastPass) { gl.scissor(0, 0, pw, ph); gl.clearColor(0, 0, 0, 0); gl.clear(gl.COLOR_BUFFER_BIT); }
+      const nb = Math.min(bands, ph);
+      for (let b = 0; b < nb; b++) {
+        const y0 = Math.floor((b * ph) / nb), y1 = Math.floor(((b + 1) * ph) / nb);
+        gl.scissor(0, y0, pw, y1 - y0);
+        gl.drawArrays(gl.TRIANGLES, 0, 3);
+        if (nb > 1) gl.flush();
+      }
+      gl.disable(gl.SCISSOR_TEST);
+    });
+    if (query) { gl.endQuery(timerExt.TIME_ELAPSED_EXT); pending.push({ q: query, key, px: w * h }); }
+    last = { w, h };
+    return canvas;
+  }
+  // Copy the last draw (bottom-left of the GL canvas) into a 2D context at 0,0, scaled to w×h.
+  function blit(ctx, w, h) {
+    const sw = last.w || Math.round(w), sh = last.h || Math.round(h);
+    const up = sw !== Math.round(w) || sh !== Math.round(h);
+    if (up) { ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high'; }
+    ctx.drawImage(canvas, 0, canvas.height - sh, sw, sh, 0, 0, w, h);
+  }
+  return {
+    init, compile, poll, forget, draw, blit, canvas, hexToLin, programs, get pendingCompiles() { return compiling.size; },
+    get ok() { return init(); }, get reason() { return reason; }, get halfFloat() { return halfFloat; },
+    get lost() { return lost; }, get lostCount() { return lostCount; }, get timer() { return !!timerExt; }, get renderer() { init(); return rendererName; }, get software() { init(); return software; },
+    costOf(key) { return gpuMs.get(key); }, on(fn) { listeners.add(fn); return () => listeners.delete(fn); },
+  };
+}
+
+return { KIT_FORMAT, KIT_LIMITS, SDK_VERSION: '1.2.0', validateKit, createGlRuntime, PRELUDE, MAIN_FINAL, MAIN_PASS, buildSource, paramUniforms, inputSource, RESERVED, MAX_PASSES, hexToLin };
+
+ })();</script>
+<script>window.KIT = {"manifest":{"format":"motif-kit@1","id":"agent-motif","name":"AgentMotif","version":"1.0.0","author":"AgentMotif","license":"MIT","accent":"#7C5CFF","description":"Showcase kit built by AgentMotif: material, nature, cosmic and media looks on a shared physically based lens stack.","common":"common.glsl","palettes":[{"id":"silk","name":"Silk","bg":"#06050B","ink":"#F6F0FF","a":["#8B6CFF","#FF5A8E","#38E0C8"]},{"id":"chrome","name":"Chrome","bg":"#07080A","ink":"#F2F4F8","a":["#9FB8FF","#FF8A4C","#5CF0FF"]},{"id":"lagoon","name":"Lagoon","bg":"#011219","ink":"#E8FFFB","a":["#1FC7E0","#A3E635","#0B6E99"]},{"id":"nebula","name":"Nebula","bg":"#020109","ink":"#FFF4E8","a":["#FF4F7B","#6B5CFF","#FFB547"]},{"id":"gallery","name":"Gallery","bg":"#1C1813","ink":"#F3EBDD","a":["#E0773A","#3B6FD8","#E6B53A"]},{"id":"glass","name":"Glass","bg":"#0A0B12","ink":"#FFFFFF","a":["#8B5CF6","#06B6D4","#F472B6"]},{"id":"trail","name":"Trail","bg":"#F7FAFB","ink":"#1A1F1B","a":["#A3B03A","#A9C8E8","#8A8C80"]}],"styles":[{"id":"silk-aurora","name":"Silk Aurora","group":"Materials","palette":"silk","tags":["silk","fabric","iridescent","domain warp","luxury","abstract"],"blurb":"Warped drapes shaded as real silk, foil or velvet, with thin-film sheen and pulsing aurora veins.","flash":false,"passes":[{"src":"styles/scenes/silk.glsl","scale":0.5},{"src":"styles/post/bloom-prep.glsl","scale":0.125},{"src":"styles/post/finish.glsl"}],"params":{"flow":{"type":"int","label":"Flow cycles / loop","min":1,"max":4,"def":1,"group":"Motion","hint":"Integer, so the loop closes exactly."},"drift":{"type":"range","label":"Drift","min":0.05,"max":1.5,"def":0.45,"step":0.01,"log":true,"group":"Motion","hint":"How far the warp travels each loop."},"lightTurns":{"type":"int","label":"Light orbits / loop","min":0,"max":3,"def":1,"group":"Motion"},"mat":{"type":"select","label":"Material","options":[{"v":"silk","l":"Silk"},{"v":"foil","l":"Holo foil"},{"v":"velvet","l":"Velvet"}],"def":"silk","hint":"Changes the BRDF: satin, anodised foil or velvet sheen."},"scale":{"type":"range","label":"Scale","min":0.4,"max":4,"def":0.6,"step":0.01,"group":"Form"},"stretch":{"type":"range","label":"Drape stretch","min":0.5,"max":4,"def":2.6,"step":0.01,"group":"Form","hint":"Anisotropy: long drapes vs. crumpled cloth."},"angle":{"type":"range","label":"Drape angle","min":-90,"max":90,"def":-28,"step":1,"unit":"°","group":"Form"},"warp":{"type":"range","label":"Fold warp","min":0,"max":6,"def":2.4,"step":0.01,"group":"Form"},"relief":{"type":"range","label":"Relief","min":0.1,"max":4,"def":1,"step":0.01,"group":"Form"},"spec":{"type":"range","label":"Specular","min":0,"max":3,"def":1.2,"step":0.01,"group":"Material"},"irid":{"type":"range","label":"Iridescence","min":0,"max":1,"def":0.55,"step":0.01,"group":"Material","hint":"Thin-film interference on the highlights."},"veins":{"type":"range","label":"Aurora veins","min":0,"max":2,"def":0.6,"step":0.01,"group":"Material","hint":"Emissive iso-lines that pulse along the folds."},"exposure":{"type":"range","label":"Exposure","min":-3,"max":3,"def":0.2,"step":0.05,"unit":"EV","group":"Lens","hint":"Scene exposure in stops, before tone mapping.","mutate":0.3},"tonemap":{"type":"select","label":"Tone map","options":[{"v":"agx","l":"AgX"},{"v":"punchy","l":"AgX Punchy"},{"v":"neutral","l":"PBR Neutral"},{"v":"aces","l":"ACES"}],"def":"agx","group":"Lens","hint":"AgX rolls highlights off without hue skew; Neutral keeps brand colours.","mutate":0},"bloom":{"type":"range","label":"Bloom","min":0,"max":2,"def":0.7,"step":0.01,"group":"Lens"},"threshold":{"type":"range","label":"Bloom threshold","min":0,"max":4,"def":0.9,"step":0.01,"group":"Lens","hint":"HDR level where glow starts (soft knee).","show":{"param":"bloom","gt":0}},"halation":{"type":"range","label":"Halation","min":0,"max":1,"def":0.12,"step":0.01,"group":"Lens","hint":"Film emulsion: highlights bleed warm red."},"streak":{"type":"range","label":"Anamorphic","min":0,"max":1.5,"def":0,"step":0.01,"group":"Lens","hint":"Horizontal lens streaks from highlights."},"ca":{"type":"range","label":"Chromatic aberration","min":0,"max":1,"def":0.2,"step":0.01,"group":"Lens","hint":"7-tap spectral lateral CA toward the frame edges."},"distort":{"type":"range","label":"Lens distortion","min":-1,"max":1,"def":0,"step":0.01,"group":"Lens"},"vignette":{"type":"range","label":"Vignette","min":0,"max":1,"def":0.45,"step":0.01,"group":"Lens"},"grain":{"type":"range","label":"Film grain","min":0,"max":1,"def":0.35,"step":0.01,"group":"Lens","hint":"Luma-weighted, 24 fps, loops exactly."}}},{"id":"liquid-chrome","name":"Liquid Chrome","group":"Materials","palette":"chrome","tags":["chrome","metal","metaballs","raymarch","3d","liquid"],"blurb":"Raymarched liquid-metal metaballs lit by a procedural photo studio, with mirror floor and anodised film.","flash":false,"passes":[{"src":"styles/scenes/chrome.glsl","scale":0.66},{"src":"styles/post/bloom-prep.glsl","scale":0.125},{"src":"styles/post/finish.glsl"}],"params":{"count":{"type":"int","label":"Blobs","min":2,"max":8,"def":5,"group":"Form"},"size":{"type":"range","label":"Blob size","min":0.4,"max":1.8,"def":1,"step":0.01,"group":"Form"},"blend":{"type":"range","label":"Merge","min":0.05,"max":2,"def":1,"step":0.01,"group":"Form","hint":"Smooth-union radius: how gooey the merge is."},"spread":{"type":"range","label":"Spread","min":0.3,"max":1.6,"def":1,"step":0.01,"group":"Form"},"ripple":{"type":"range","label":"Surface ripple","min":0,"max":3,"def":0.8,"step":0.01,"group":"Form"},"orbits":{"type":"int","label":"Orbits / loop","min":1,"max":3,"def":1,"group":"Motion"},"spin":{"type":"int","label":"Studio turns / loop","min":0,"max":3,"def":1,"group":"Motion","hint":"Rotates the lights so reflections sweep across the surface."},"camTurns":{"type":"int","label":"Camera orbits / loop","min":0,"max":2,"def":0,"group":"Motion"},"rough":{"type":"range","label":"Roughness","min":0,"max":0.8,"def":0.06,"step":0.005,"group":"Material"},"tint":{"type":"color","label":"Metal tint","def":"#F2D9B8","group":"Material","hint":"Gold, copper, titanium…"},"tintMix":{"type":"range","label":"Tint amount","min":0,"max":1,"def":0,"step":0.01,"group":"Material"},"film":{"type":"range","label":"Anodised film","min":0,"max":1,"def":0,"step":0.01,"group":"Material","hint":"Thin-film interference like heat-tinted titanium."},"floor":{"type":"range","label":"Floor reflection","min":0,"max":2,"def":1,"step":0.01,"group":"Material"},"steps":{"type":"int","label":"Quality (steps)","min":24,"max":160,"def":72,"group":"Quality","mutate":0,"hint":"Raymarch steps. Lower for live performance."},"exposure":{"type":"range","label":"Exposure","min":-3,"max":3,"def":0,"step":0.05,"unit":"EV","group":"Lens","hint":"Scene exposure in stops, before tone mapping.","mutate":0.3},"tonemap":{"type":"select","label":"Tone map","options":[{"v":"agx","l":"AgX"},{"v":"punchy","l":"AgX Punchy"},{"v":"neutral","l":"PBR Neutral"},{"v":"aces","l":"ACES"}],"def":"agx","group":"Lens","hint":"AgX rolls highlights off without hue skew; Neutral keeps brand colours.","mutate":0},"bloom":{"type":"range","label":"Bloom","min":0,"max":2,"def":0.5,"step":0.01,"group":"Lens"},"threshold":{"type":"range","label":"Bloom threshold","min":0,"max":4,"def":1.4,"step":0.01,"group":"Lens","hint":"HDR level where glow starts (soft knee).","show":{"param":"bloom","gt":0}},"halation":{"type":"range","label":"Halation","min":0,"max":1,"def":0.1,"step":0.01,"group":"Lens","hint":"Film emulsion: highlights bleed warm red."},"streak":{"type":"range","label":"Anamorphic","min":0,"max":1.5,"def":0.06,"step":0.01,"group":"Lens","hint":"Horizontal lens streaks from highlights."},"ca":{"type":"range","label":"Chromatic aberration","min":0,"max":1,"def":0.15,"step":0.01,"group":"Lens","hint":"7-tap spectral lateral CA toward the frame edges."},"distort":{"type":"range","label":"Lens distortion","min":-1,"max":1,"def":0,"step":0.01,"group":"Lens"},"vignette":{"type":"range","label":"Vignette","min":0,"max":1,"def":0.5,"step":0.01,"group":"Lens"},"grain":{"type":"range","label":"Film grain","min":0,"max":1,"def":0.25,"step":0.01,"group":"Lens","hint":"Luma-weighted, 24 fps, loops exactly."}}},{"id":"caustic-light","name":"Caustic Light","group":"Nature","palette":"lagoon","tags":["water","caustics","underwater","god rays","light","nature"],"blurb":"Shallow-sea caustics with spectral dispersion, depth absorption, god rays and drifting motes.","flash":false,"passes":[{"src":"styles/scenes/caustics.glsl","scale":0.75},{"src":"styles/post/bloom-prep.glsl","scale":0.125},{"src":"styles/post/finish.glsl"}],"params":{"scale":{"type":"range","label":"Caustic scale","min":0.3,"max":3,"def":1,"step":0.01,"group":"Water"},"detail":{"type":"int","label":"Detail","min":2,"max":6,"def":4,"group":"Water","mutate":0.3},"sharp":{"type":"range","label":"Sharpness","min":2,"max":14,"def":8,"step":0.1,"group":"Water"},"intensity":{"type":"range","label":"Intensity","min":0,"max":3,"def":1.2,"step":0.01,"group":"Water"},"dispersion":{"type":"range","label":"Dispersion","min":0,"max":2,"def":0.8,"step":0.01,"group":"Water","hint":"Each wavelength focuses at a slightly different depth."},"murk":{"type":"range","label":"Murk","min":0,"max":2,"def":0.6,"step":0.01,"group":"Water"},"tilt":{"type":"range","label":"View tilt","min":0,"max":1,"def":0.4,"step":0.01,"group":"Camera"},"rays":{"type":"range","label":"God rays","min":0,"max":2,"def":0.8,"step":0.01,"group":"Light"},"rayDensity":{"type":"range","label":"Ray density","min":0.3,"max":3,"def":1,"step":0.01,"group":"Light"},"sun":{"type":"range","label":"Sun position","min":-1,"max":1,"def":0.2,"step":0.01,"group":"Light"},"motes":{"type":"range","label":"Motes","min":0,"max":2,"def":0.6,"step":0.01,"group":"Light"},"flow":{"type":"int","label":"Cycles / loop","min":1,"max":4,"def":1,"group":"Motion"},"exposure":{"type":"range","label":"Exposure","min":-3,"max":3,"def":0.1,"step":0.05,"unit":"EV","group":"Lens","hint":"Scene exposure in stops, before tone mapping.","mutate":0.3},"tonemap":{"type":"select","label":"Tone map","options":[{"v":"agx","l":"AgX"},{"v":"punchy","l":"AgX Punchy"},{"v":"neutral","l":"PBR Neutral"},{"v":"aces","l":"ACES"}],"def":"punchy","group":"Lens","hint":"AgX rolls highlights off without hue skew; Neutral keeps brand colours.","mutate":0},"bloom":{"type":"range","label":"Bloom","min":0,"max":2,"def":0.35,"step":0.01,"group":"Lens"},"threshold":{"type":"range","label":"Bloom threshold","min":0,"max":4,"def":1.4,"step":0.01,"group":"Lens","hint":"HDR level where glow starts (soft knee).","show":{"param":"bloom","gt":0}},"halation":{"type":"range","label":"Halation","min":0,"max":1,"def":0.05,"step":0.01,"group":"Lens","hint":"Film emulsion: highlights bleed warm red."},"streak":{"type":"range","label":"Anamorphic","min":0,"max":1.5,"def":0,"step":0.01,"group":"Lens","hint":"Horizontal lens streaks from highlights."},"ca":{"type":"range","label":"Chromatic aberration","min":0,"max":1,"def":0.3,"step":0.01,"group":"Lens","hint":"7-tap spectral lateral CA toward the frame edges."},"distort":{"type":"range","label":"Lens distortion","min":-1,"max":1,"def":0,"step":0.01,"group":"Lens"},"vignette":{"type":"range","label":"Vignette","min":0,"max":1,"def":0.55,"step":0.01,"group":"Lens"},"grain":{"type":"range","label":"Film grain","min":0,"max":1,"def":0.3,"step":0.01,"group":"Lens","hint":"Luma-weighted, 24 fps, loops exactly."}}},{"id":"nebula-drift","name":"Nebula Drift","group":"Cosmic","palette":"nebula","tags":["nebula","space","volumetric","raymarch","stars","cosmic"],"blurb":"Volumetric emission nebula with an embedded star, forward scattering and a deep star field.","flash":false,"passes":[{"src":"styles/scenes/nebula.glsl","scale":0.5},{"src":"styles/post/bloom-prep.glsl","scale":0.125},{"src":"styles/post/finish.glsl"}],"params":{"scale":{"type":"range","label":"Cloud scale","min":0.4,"max":3,"def":1,"step":0.01,"group":"Gas"},"fill":{"type":"range","label":"Density","min":0,"max":1,"def":0.55,"step":0.01,"group":"Gas"},"turb":{"type":"range","label":"Turbulence drift","min":0.05,"max":2,"def":0.6,"step":0.01,"log":true,"group":"Gas"},"glow":{"type":"range","label":"Emission","min":0,"max":3,"def":1,"step":0.01,"group":"Gas"},"absorb":{"type":"range","label":"Dust absorption","min":0.1,"max":3,"def":1,"step":0.01,"group":"Gas"},"core":{"type":"range","label":"Core star","min":0,"max":2,"def":1,"step":0.01,"group":"Gas"},"flow":{"type":"int","label":"Cycles / loop","min":1,"max":3,"def":1,"group":"Motion"},"camTurns":{"type":"int","label":"Camera orbits / loop","min":0,"max":2,"def":0,"group":"Motion"},"steps":{"type":"int","label":"Quality (steps)","min":16,"max":128,"def":56,"group":"Quality","mutate":0},"exposure":{"type":"range","label":"Exposure","min":-3,"max":3,"def":0,"step":0.05,"unit":"EV","group":"Lens","hint":"Scene exposure in stops, before tone mapping.","mutate":0.3},"tonemap":{"type":"select","label":"Tone map","options":[{"v":"agx","l":"AgX"},{"v":"punchy","l":"AgX Punchy"},{"v":"neutral","l":"PBR Neutral"},{"v":"aces","l":"ACES"}],"def":"agx","group":"Lens","hint":"AgX rolls highlights off without hue skew; Neutral keeps brand colours.","mutate":0},"bloom":{"type":"range","label":"Bloom","min":0,"max":2,"def":0.9,"step":0.01,"group":"Lens"},"threshold":{"type":"range","label":"Bloom threshold","min":0,"max":4,"def":0.7,"step":0.01,"group":"Lens","hint":"HDR level where glow starts (soft knee).","show":{"param":"bloom","gt":0}},"halation":{"type":"range","label":"Halation","min":0,"max":1,"def":0.2,"step":0.01,"group":"Lens","hint":"Film emulsion: highlights bleed warm red."},"streak":{"type":"range","label":"Anamorphic","min":0,"max":1.5,"def":0.25,"step":0.01,"group":"Lens","hint":"Horizontal lens streaks from highlights."},"ca":{"type":"range","label":"Chromatic aberration","min":0,"max":1,"def":0.2,"step":0.01,"group":"Lens","hint":"7-tap spectral lateral CA toward the frame edges."},"distort":{"type":"range","label":"Lens distortion","min":-1,"max":1,"def":0,"step":0.01,"group":"Lens"},"vignette":{"type":"range","label":"Vignette","min":0,"max":1,"def":0.6,"step":0.01,"group":"Lens"},"grain":{"type":"range","label":"Film grain","min":0,"max":1,"def":0.3,"step":0.01,"group":"Lens","hint":"Luma-weighted, 24 fps, loops exactly."}}},{"id":"painterly","name":"Painterly","group":"Media","palette":"gallery","tags":["paint","media","image","video","kuwahara","illustration"],"blurb":"Turns any photo or clip into living gouache: Kuwahara patches, structure-aligned strokes, paper tooth, boil.","flash":false,"inputs":[{"id":"source","type":"media","label":"Source","fit":"fill","hint":"Photo or clip to paint. Without one, a landscape plays."}],"passes":[{"src":"styles/scenes/paint-source.glsl","scale":0.5},{"src":"styles/scenes/paint.glsl"}],"params":{"brush":{"type":"range","label":"Brush size","min":1,"max":12,"def":4,"step":0.1,"group":"Paint"},"texture":{"type":"range","label":"Bristle & tooth","min":0,"max":2,"def":1,"step":0.01,"group":"Paint"},"edges":{"type":"range","label":"Pigment edges","min":0,"max":2,"def":0.8,"step":0.01,"group":"Paint"},"harmony":{"type":"range","label":"Palette harmony","min":0,"max":1,"def":0.25,"step":0.01,"group":"Colour","hint":"Pulls hues toward the palette; 0 keeps the photo's colour."},"boil":{"type":"range","label":"Boil","min":0,"max":2,"def":0.6,"step":0.01,"group":"Motion","hint":"Hand-made jitter on twos, like painted animation."},"exposure":{"type":"range","label":"Exposure","min":-2,"max":2,"def":0,"step":0.05,"unit":"EV","group":"Colour"}}},{"id":"liquid-glass","name":"Liquid Glass","group":"Media","palette":"glass","tags":["glass","refraction","dispersion","ui","media","liquid"],"blurb":"Merging glass lozenges that refract your media with spectral dispersion, bevel highlights and frost.","flash":false,"inputs":[{"id":"source","type":"media","label":"Source","fit":"fill","hint":"Photo or clip to paint. Without one, a landscape plays."}],"passes":[{"src":"styles/scenes/glass-backdrop.glsl"},{"src":"styles/scenes/glass.glsl"}],"params":{"backdrop":{"type":"select","label":"Backdrop","options":[{"v":"mesh","l":"Mesh gradient"},{"v":"stripes","l":"Stripes"},{"v":"grid","l":"Grid"}],"def":"stripes","hint":"Used when no media is attached."},"shape":{"type":"select","label":"Shape","options":[{"v":"tiles","l":"Tiles"},{"v":"pills","l":"Pills"},{"v":"drops","l":"Drops"}],"def":"pills","group":"Form"},"count":{"type":"int","label":"Pieces","min":1,"max":7,"def":4,"group":"Form"},"size":{"type":"range","label":"Size","min":0.4,"max":2,"def":1,"step":0.01,"group":"Form"},"merge":{"type":"range","label":"Merge","min":0,"max":2,"def":0.8,"step":0.01,"group":"Form","hint":"Pieces fuse like liquid when they meet."},"wander":{"type":"range","label":"Wander","min":0,"max":2,"def":1,"step":0.01,"group":"Motion"},"orbits":{"type":"int","label":"Orbits / loop","min":1,"max":3,"def":1,"group":"Motion"},"lightTurns":{"type":"int","label":"Light orbits / loop","min":0,"max":3,"def":1,"group":"Motion"},"bevel":{"type":"range","label":"Bevel","min":0.2,"max":3,"def":1,"step":0.01,"group":"Optics"},"refract":{"type":"range","label":"Refraction","min":0,"max":2,"def":1.3,"step":0.01,"group":"Optics"},"dispersion":{"type":"range","label":"Dispersion","min":0,"max":2,"def":0.7,"step":0.01,"group":"Optics"},"frost":{"type":"range","label":"Frost","min":0,"max":1,"def":0,"step":0.01,"group":"Optics","hint":"Disc blur through the glass (32 taps × 7 wavelengths: costly)."},"shine":{"type":"range","label":"Shine","min":0,"max":2,"def":1,"step":0.01,"group":"Optics"},"shadow":{"type":"range","label":"Shadow","min":0,"max":2,"def":1,"step":0.01,"group":"Optics"},"tint":{"type":"color","label":"Glass tint","def":"#BFD4FF","group":"Optics"},"tintMix":{"type":"range","label":"Tint amount","min":0,"max":1,"def":0.15,"step":0.01,"group":"Optics"}}},{"id":"light-tunnel","name":"Light Tunnel","group":"Media","palette":"trail","tags":["tunnel","speed","zoom","transition","media","streaks"],"blurb":"Shatters any image into converging speed streaks around a vanishing point, with rushing light and zoom blur.","flash":false,"inputs":[{"id":"source","type":"media","label":"Source","fit":"fill","hint":"Photo or clip to stretch. Without one, a trail scene plays."}],"passes":[{"src":"styles/scenes/tunnel-source.glsl","scale":0.5},{"src":"styles/scenes/tunnel.glsl"}],"params":{"center":{"type":"point","label":"Vanishing point","min":-0.5,"max":0.5,"def":[-0.1575,-0.195],"group":"Tunnel","hint":"Where every streak converges."},"radius":{"type":"range","label":"Stretch radius","min":0.03,"max":0.8,"def":0.42,"step":0.005,"log":true,"group":"Tunnel","hint":"Inside stays sharp; beyond, the image smears into streaks."},"jag":{"type":"range","label":"Jagged front","min":0,"max":1.5,"def":1.14,"step":0.01,"group":"Tunnel"},"jagFreq":{"type":"range","label":"Front detail","min":0.5,"max":6,"def":2.59,"step":0.01,"group":"Tunnel"},"squash":{"type":"range","label":"Streak length","min":0,"max":0.6,"def":0,"step":0.005,"group":"Tunnel","hint":"0 = infinite streaks; higher keeps some of the outer image."},"breathe":{"type":"range","label":"Breathe","min":0,"max":1,"def":0.11,"step":0.01,"group":"Motion","hint":"The stretch front travels in and out once per loop."},"rush":{"type":"int","label":"Light rushes / loop","min":1,"max":8,"def":3,"group":"Motion"},"rushGain":{"type":"range","label":"Rush brightness","min":0,"max":1.5,"def":0.35,"step":0.01,"group":"Motion"},"blur":{"type":"range","label":"Zoom blur","min":0,"max":3,"def":0.17,"step":0.01,"group":"Lens"},"blurTaps":{"type":"int","label":"Blur quality","min":2,"max":16,"def":8,"group":"Quality","mutate":0},"core":{"type":"range","label":"Core glow","min":0,"max":2,"def":0.1,"step":0.01,"group":"Lens"},"shade":{"type":"range","label":"Streak shading","min":0,"max":1,"def":0.62,"step":0.01,"group":"Lens"},"exposure":{"type":"range","label":"Exposure","min":-2,"max":2,"def":-0.05,"step":0.05,"unit":"EV","group":"Lens"},"grain":{"type":"range","label":"Film grain","min":0,"max":1,"def":0.06,"step":0.01,"group":"Lens"}}}]},"files":{"common.glsl":"// AgentMotif library: color, noise, light, post, sdf, motion (built by am lib build; edit the kit's own code below the marker)\n\n// ======== color ========\n// OKLab (Björn Ottosson 2020). Mix and grade in OKLab: hue-stable gradients, no muddy midpoints.\nvec3 am_toOklab(vec3 c) {\n  vec3 l = mat3(0.4122214708, 0.2119034982, 0.0883024619, 0.5363325363, 0.6806995451, 0.2817188376, 0.0514459929, 0.1073969566, 0.6299787005) * c;\n  l = sign(l) * pow(abs(l), vec3(1.0 / 3.0));\n  return mat3(0.2104542553, 1.9779984951, 0.0259040371, 0.7936177850, -2.4285922050, 0.7827717662, -0.0040720468, 0.4505937099, -0.8086757660) * l;\n}\nvec3 am_fromOklab(vec3 c) {\n  vec3 l = mat3(1.0, 1.0, 1.0, 0.3963377774, -0.1055613458, -0.0894841775, 0.2158037573, -0.0638541728, -1.2914855480) * c;\n  l = l * l * l;\n  return mat3(4.0767416621, -1.2684380046, -0.0041960863, -3.3077115913, 2.6097574011, -0.7034186147, 0.2309699292, -0.3413193965, 1.7076147010) * l;\n}\nvec3 am_mixOk(vec3 a, vec3 b, float t) { return am_fromOklab(mix(am_toOklab(a), am_toOklab(b), t)); }\n// OKLCh: (L, C, h radians)\nvec3 am_toOklch(vec3 c) { vec3 o = am_toOklab(c); return vec3(o.x, length(o.yz), atan(o.z, o.y)); }\nvec3 am_fromOklch(vec3 c) { return am_fromOklab(vec3(c.x, c.y * cos(c.z), c.y * sin(c.z))); }\nvec3 am_hueShift(vec3 c, float rad) { vec3 l = am_toOklch(max(c, 0.0)); l.z += rad; return max(am_fromOklch(l), 0.0); }\nvec3 am_saturate(vec3 c, float s) { vec3 o = am_toOklab(max(c, 0.0)); o.yz *= s; return max(am_fromOklab(o), 0.0); }\n// Ramp through the five palette colours in OKLab (bg -> a2 -> a0 -> a1 -> ink), the perceptual twin of ramp().\nvec3 am_rampOk(float t) {\n  t = sat(t) * 4.0;\n  if (t < 1.0) return am_mixOk(u_bg, u_a2, t);\n  if (t < 2.0) return am_mixOk(u_a2, u_a0, t - 1.0);\n  if (t < 3.0) return am_mixOk(u_a0, u_a1, t - 2.0);\n  return am_mixOk(u_a1, u_ink, t - 3.0);\n}\n// Accent-only cyclic ramp a0 -> a1 -> a2 -> a0 (for hue-cycling content that must stay on palette).\nvec3 am_accentLoop(float t) { t = fract(t) * 3.0; return t < 1.0 ? am_mixOk(u_a0, u_a1, t) : t < 2.0 ? am_mixOk(u_a1, u_a2, t - 1.0) : am_mixOk(u_a2, u_a0, t - 2.0); }\n// Cosine palette (Quílez). Fit a, b, c, d to a reference with the tune tool when the palette is not enough.\nvec3 am_cosPal(float t, vec3 a, vec3 b, vec3 c, vec3 d) { return a + b * cos(TAU * (c * t + d)); }\n\n// ---- tone mapping (HDR linear -> display linear 0..1) ----\n// AgX (Sobotka; polynomial fit by bwrensch / three.js). Filmic, hue-preserving highlight roll-off: the default.\nvec3 am_agxCurve(vec3 x) { vec3 x2 = x * x, x4 = x2 * x2; return 15.5 * x4 * x2 - 40.14 * x4 * x + 31.96 * x4 - 6.868 * x2 * x + 0.4298 * x2 + 0.1191 * x - 0.00232; }\nvec3 am_agx(vec3 c, float look) { // look: 0 base, 1 punchy\n  const mat3 inM = mat3(0.842479062253094, 0.0423282422610123, 0.0423756549057051, 0.0784335999999992, 0.878468636469772, 0.0784336, 0.0792237451477643, 0.0791661274605434, 0.879142973793104);\n  const mat3 outM = mat3(1.19687900512017, -0.0528968517574562, -0.0529716355144438, -0.0980208811401368, 1.15190312990417, -0.0980434501171241, -0.0990297440797205, -0.0989611768448433, 1.15107367264116);\n  c = inM * max(c, 0.0);\n  c = clamp((log2(max(c, 1e-10)) + 12.47393) / 16.5, 0.0, 1.0);\n  c = am_agxCurve(c);\n  if (look > 0.0) { vec3 p = pow(max(c, 0.0), vec3(1.35)); vec3 pl = mix(c, p, look); c = mix(vec3(luma(pl)), pl, 1.0 + 0.4 * look); }\n  c = outM * c;\n  return clamp(pow(max(c, 0.0), vec3(2.2)), 0.0, 1.0);\n}\n// Khronos PBR Neutral: keeps base colours accurate (product shots, brand colours), soft shoulder.\nvec3 am_neutral(vec3 c) {\n  const float s = 0.8 - 0.04, d = 0.15; float x = min(c.r, min(c.g, c.b)); float o = x < 0.08 ? x - 6.25 * x * x : 0.04; c -= o;\n  float p = max(c.r, max(c.g, c.b)); if (p < s) return c;\n  float d2 = 1.0 - s; float np = 1.0 - d2 * d2 / (p + d2 - s); c *= np / p; float g = 1.0 - 1.0 / (d * (p - np) + 1.0); return mix(c, vec3(np), g);\n}\n// Exposure in stops, then tone map. mode 0 AgX, 1 AgX punchy, 2 Neutral, 3 ACES (prelude).\nvec3 am_tonemap(vec3 c, float stops, int mode) {\n  c *= exp2(stops);\n  if (mode == 0) return am_agx(c, 0.0);\n  if (mode == 1) return am_agx(c, 1.0);\n  if (mode == 2) return am_neutral(c);\n  return aces(c);\n}\n// Lift/gamma/gain grade in linear (ASC-CDL-like), plus split-tone toward shadow/highlight tints.\nvec3 am_grade(vec3 c, vec3 lift, vec3 gamma, vec3 gain) { c = max(c * gain + lift * (1.0 - c), 0.0); return pow(c, 1.0 / max(gamma, vec3(0.05))); }\nvec3 am_splitTone(vec3 c, vec3 shadow, vec3 high, float amt) { float l = sat(luma(c) * 1.4); return c * mix(mix(vec3(1.0), shadow * 1.6, amt * (1.0 - l)), high * 1.6, amt * l * 0.5); }\n// Display-referred contrast around 0.18 grey in log space (no clipping).\nvec3 am_contrast(vec3 c, float k) { vec3 l = log2(max(c, 1e-5) / 0.18); return 0.18 * exp2(l * k); }\n\n// ======== noise ========\n// exactly when its cycle count k is an integer (time only enters through u_p via lc/lsaw).\n\n// Frame index at a nominal fps that still loops: N = round(u_L * fps) frames per loop. Use for grain, boil, on-twos.\nfloat am_frames(float fps) { return max(1.0, floor(u_L * fps + 0.5)); }\nfloat am_frame(float fps) { float n = am_frames(fps); return mod(floor(fract(u_p) * n), n); }\n// Interleaved gradient noise (Jimenez 2014): the best cheap per-pixel dither for raymarch jitter and banding.\nfloat am_ign(vec2 fc) { return fract(52.9829189 * fract(dot(fc, vec2(0.06711056, 0.00583715)))); }\nfloat am_ignT(vec2 fc, float fps) { return am_ign(fc + 5.588238 * am_frame(fps)); }\n\n// Value noise from the seeded prelude hash; smooth C2 interpolation.\nfloat am_vnoise(vec2 x) {\n  vec2 i = floor(x), f = fract(x); vec2 u = f * f * f * (f * (f * 6.0 - 15.0) + 10.0);\n  return mix(mix(h21(i), h21(i + vec2(1, 0)), u.x), mix(h21(i + vec2(0, 1)), h21(i + vec2(1, 1)), u.x), u.y) * 2.0 - 1.0;\n}\n\n// Curl of looping simplex noise: divergence-free 2D flow (smoke, ink, silk). Magnitude ~1.\nvec2 am_curl(vec2 x, float k, float r) {\n  const float e = 0.03;\n  float n1 = ln2(x + vec2(0.0, e), k, r), n2 = ln2(x - vec2(0.0, e), k, r);\n  float n3 = ln2(x + vec2(e, 0.0), k, r), n4 = ln2(x - vec2(e, 0.0), k, r);\n  return vec2(n1 - n2, n4 - n3) / (2.0 * e) * 0.25;\n}\n// Multi-octave curl (oct <= 4).\nvec2 am_curlFbm(vec2 x, int oct, float k, float r) {\n  vec2 s = vec2(0.0); float a = 1.0;\n  for (int i = 0; i < 4; i++) { if (i >= oct) break; s += a * am_curl(x, k, r); x = x * 2.03 + 3.7; a *= 0.5; }\n  return s;\n}\n// Quílez two-level domain warp on looping fBm. Returns the warped field (~-1..1); q and w expose the warp\n// vectors, which make excellent colour drivers (colour by q, w and the field for silk / marble / aurora).\nfloat am_warp(vec2 x, int oct, float k, float r, float amt, out vec2 q, out vec2 w) {\n  q = vec2(lfbm(x, oct, k, r), lfbm(x + vec2(5.2, 1.3), oct, k, r));\n  w = vec2(lfbm(x + amt * q + vec2(1.7, 9.2), oct, k, r), lfbm(x + amt * q + vec2(8.3, 2.8), oct, k, r));\n  return lfbm(x + amt * w, oct, k, r);\n}\n// Flow-map advection that loops: two phases half a cycle apart, crossfaded so neither reset is visible.\n// Returns (t0, t1, w0); sample at uv - flow * t0 * s and uv - flow * t1 * s, blend with w0 / 1 - w0.\nvec3 am_flowPhases(float k) { float t0 = lsaw(k, 0.0), t1 = lsaw(k, 0.5); return vec3(t0 - 0.5, t1 - 0.5, abs(1.0 - 2.0 * t0)); }\n\n// Cheap looping volumetric noise for raymarchers: rotated sine octaves (gyroid family), ~10x cheaper than simplex.\n// The field drifts around a circle of radius r k times per loop.\nfloat am_gyroid(vec3 p) { return dot(sin(p), cos(p.yzx)); }\nfloat am_sinFbm3(vec3 p, int oct, float k, float r) {\n  vec2 c = r * lc(k, 0.0); p += vec3(c.x, c.y, c.x * 0.5);\n  float s = 0.0, a = 0.5;\n  const mat3 m = mat3(0.00, 0.80, 0.60, -0.80, 0.36, -0.48, -0.60, -0.48, 0.64);\n  for (int i = 0; i < 6; i++) { if (i >= oct) break; s += a * am_gyroid(p); p = m * p * 2.03 + 1.3; a *= 0.5; }\n  return s;\n}\n\n// Looping water caustics (iterated warp, after Dave Hoskins / joltz0r's \"tileable water caustic\").\n// Returns ~0..1 brightness; feed it a slight per-channel offset for dispersion.\nfloat am_caustic(vec2 uv, int iter, float k, float sharp) {\n  vec2 p = mod(uv * TAU, TAU) - 250.0; vec2 i = p; float c = 1.0; const float inten = 0.005;\n  for (int n = 0; n < 6; n++) {\n    if (n >= iter) break;\n    vec2 t = lc(k, float(n) * 0.13) * (1.0 - 0.35 * float(n) / 6.0);\n    i = p + vec2(cos(t.x * 3.0 - i.x) + sin(t.y * 3.0 + i.y), sin(t.y * 3.0 - i.y) + cos(t.x * 3.0 + i.x));\n    c += 1.0 / length(vec2(p.x / (sin(i.x + t.x) / inten), p.y / (cos(i.y + t.y) / inten)));\n  }\n  c /= float(iter); c = 1.17 - pow(c, 1.4);\n  return pow(abs(c), sharp);\n}\n\n// Hash-free star field: one candidate star per cell, loop-safe twinkle at integer rates. Returns radiance.\nvec3 am_stars(vec2 uv, float density, float size, float twinkle) {\n  vec3 col = vec3(0.0);\n  for (int l = 0; l < 2; l++) {\n    vec2 g = uv * density * (1.0 + float(l) * 1.7); vec2 id = floor(g), f = fract(g) - 0.5;\n    vec3 h = h33(vec3(id, float(l) + 3.1));\n    vec2 o = (h.xy - 0.5) * 0.7; float d = length(f - o);\n    float m = pow(h.z, 9.0);\n    float tw = 1.0 + twinkle * sin(TAU * (floor(1.0 + h.x * 3.0) * u_p + h.y));\n    float s = size * (0.5 + m); // radius in cell units\n    col += bb(3500.0 + 8500.0 * h.y) * (0.15 + m * 3.0) * tw * (gauss1(d, 0.035 * s) + 0.06 * glow2(d, 0.02 * s));\n  }\n  return col;\n}\n\n// ======== light ========\n// thin-film iridescence, spectral dispersion, subsurface wrap and sheen. Radiance out is HDR linear: tone map it.\n\nfloat am_pow5(float x) { float x2 = x * x; return x2 * x2 * x; }\nvec3 am_fresnel(vec3 f0, float cosT) { return f0 + (1.0 - f0) * am_pow5(1.0 - sat(cosT)); }\nfloat am_fresnelF(float f0, float cosT) { return f0 + (1.0 - f0) * am_pow5(1.0 - sat(cosT)); }\nfloat am_ggxD(float nh, float a) { float a2 = a * a; float d = nh * nh * (a2 - 1.0) + 1.0; return a2 / (PI * d * d); }\nfloat am_smithV(float nv, float nl, float a) { float a2 = a * a; float gv = nl * sqrt(nv * nv * (1.0 - a2) + a2), gl = nv * sqrt(nl * nl * (1.0 - a2) + a2); return 0.5 / max(gv + gl, 1e-5); }\n// Direct light: Cook-Torrance GGX + Lambert (energy split by metalness). rough is perceptual (squared inside).\nvec3 am_brdf(vec3 n, vec3 v, vec3 l, vec3 albedo, float metal, float rough) {\n  vec3 h = normalize(v + l); float nl = sat(dot(n, l)), nv = max(dot(n, v), 1e-4), nh = sat(dot(n, h)), vh = sat(dot(v, h));\n  float a = max(rough * rough, 0.002); vec3 f0 = mix(vec3(0.04), albedo, metal); vec3 F = am_fresnel(f0, vh);\n  vec3 spec = F * am_ggxD(nh, a) * am_smithV(nv, nl, a);\n  vec3 diff = (1.0 - F) * (1.0 - metal) * albedo / PI;\n  return (diff + spec) * nl;\n}\n// Split-sum environment BRDF, analytic fit (Karis / Lazarov). Multiply prefiltered env radiance by this.\nvec3 am_envBRDF(vec3 f0, float rough, float nv) {\n  const vec4 c0 = vec4(-1.0, -0.0275, -0.572, 0.022), c1 = vec4(1.0, 0.0425, 1.04, -0.04);\n  vec4 r = rough * c0 + c1; float a004 = min(r.x * r.x, exp2(-9.28 * nv)) * r.x + r.y; vec2 ab = vec2(-1.04, 1.04) * a004 + r.zw;\n  return f0 * ab.x + ab.y;\n}\n// Procedural photo studio (the secret of convincing chrome and glass): dark cyclorama, large overhead key,\n// two vertical strip lights and a warm kicker. soft 0..1 widens every edge (use roughness to \"prefilter\").\n// spin rotates the studio (radians) — animate it with an integer number of turns per loop for moving reflections.\nfloat am_box(float x, float a, float b, float s) { return smoothstep(a - s, a + s, x) * (1.0 - smoothstep(b - s, b + s, x)); }\nvec3 am_studio(vec3 d, float spin, float soft, vec3 keyCol, vec3 rimCol) {\n  d.xz = rot(spin) * d.xz;\n  float y = d.y, ph = atan(d.z, d.x); float s = 0.015 + soft * 0.35;\n  vec3 c = mix(vec3(0.010, 0.010, 0.012), vec3(0.045, 0.047, 0.055), smoothstep(-0.4, 0.6, y));\n  c += vec3(0.25) * exp(-abs(y) * 18.0 / (1.0 + soft * 6.0)) * 0.35;            // horizon line\n  float key = am_box(d.x, -0.45, 0.45, s) * am_box(d.z, -0.3, 0.55, s) * step(0.0, y) * smoothstep(0.55 - s, 0.75 + s, y);\n  c += keyCol * key * 7.0;\n  float strip1 = am_box(ph, 0.35, 0.52, s * 0.7) * am_box(y, -0.25, 0.55, s);\n  float strip2 = am_box(ph, 2.55, 2.68, s * 0.7) * am_box(y, -0.15, 0.45, s);\n  c += rimCol * (strip1 * 5.0 + strip2 * 3.5);\n  float kick = am_box(ph, -1.9, -1.2, s * 1.4) * am_box(y, -0.08, 0.18, s);\n  c += vec3(1.0, 0.62, 0.32) * kick * 2.2;\n  return c;\n}\n// Thin-film interference (soap, oil, anodised metal, holographic foil). cosT: view angle cosine,\n// thick: film thickness in nm (200..900), ior: film IOR (1.2..1.6). Returns reflectance tint (0..~1.5).\nvec3 am_thinFilm(float cosT, float thick, float ior) {\n  float sinT2 = (1.0 - cosT * cosT) / (ior * ior); float cosF = sqrt(max(1.0 - sinT2, 0.0));\n  float opd = 2.0 * ior * thick * cosF; // optical path difference, nm\n  vec3 lam = vec3(650.0, 532.0, 450.0);\n  vec3 ph = TAU * opd / lam;\n  return 0.5 + 0.5 * cos(ph + PI); // phase flip at the top interface\n}\n// Spectral weight of a wavelength sample w in 0..1 (0 = violet, 1 = red); sums to roughly white over uniform w.\nvec3 am_spectrum(float w) {\n  vec3 c = sat(1.0 - abs((vec3(w) - vec3(0.80, 0.52, 0.22)) * vec3(2.9, 3.3, 2.7)));\n  return c * c * (3.0 - 2.0 * c) * vec3(1.05, 1.0, 1.15);\n}\n// Wrapped diffuse for cheap subsurface (skin, wax, jade): w 0..1 wrap, tinted by scatter colour.\nvec3 am_wrapDiffuse(float nl, float w, vec3 scatter) { float d = sat((nl + w) / (1.0 + w)); return mix(scatter * d, vec3(sat(nl)), sat(nl)); }\n// Charlie sheen (velvet, fabric, peach fuzz).\nfloat am_sheen(float nh, float rough) { float inv = 1.0 / max(rough, 0.05); float s = sqrt(max(1.0 - nh * nh, 0.0)); return (2.0 + inv) * pow(s, inv) / TAU; }\n// Henyey-Greenstein phase for volumes (g > 0 forward scatter: god rays, fog toward the sun).\nfloat am_hg(float cosT, float g) { float g2 = g * g; return (1.0 - g2) / (4.0 * PI * pow(max(1.0 + g2 - 2.0 * g * cosT, 1e-4), 1.5)); }\n\n// ======== post ========\n// chromatic aberration, lens distortion, bokeh blur, painterly filters, sharpening, vignette and film grain.\n// Functions take any sampler2D (u_buf0..3 or a media input) and frame-normalised q = fc / u_res.\n// Intermediate passes are linear HDR (RGBA16F where available), so bloom thresholds above 1.0 work.\n\n// Soft-knee bright pass (threshold t, knee k): keeps bloom from outlining mid-tones.\nvec3 am_bright(vec3 c, float t, float k) { float br = max(c.r, max(c.g, c.b)); float rq = clamp(br - t + k, 0.0, 2.0 * k); rq = rq * rq / (4.0 * k + 1e-5); return c * max(rq, br - t) / max(br, 1e-5); }\n// Wide, smooth bloom in one pass: 3 rings x 8 taps + centre at radii r, 2.5r, 6r texels of the source buffer.\n// Read a scale 0.25–0.5 buffer for a cheap, very wide glow. Returns the blurred HDR radiance.\nvec3 am_bloom(sampler2D b, vec2 q, float r) {\n  vec2 px = r / vec2(textureSize(b, 0)); vec3 s = texture(b, q).rgb * 0.5; float w = 0.5;\n  for (int ring = 0; ring < 3; ring++) {\n    float rr = ring == 0 ? 1.0 : ring == 1 ? 2.5 : 6.0; float ww = ring == 0 ? 1.0 : ring == 1 ? 0.7 : 0.45;\n    for (int i = 0; i < 8; i++) { float a = (float(i) + 0.5 * float(ring)) * (TAU / 8.0); s += texture(b, q + vec2(cos(a), sin(a)) * px * rr).rgb * ww; w += ww; }\n  }\n  return s / w;\n}\n// Film halation: highlights bleed red-orange through the emulsion. Feed it the bloom result.\nvec3 am_halation(vec3 bloom, float amt) { return bloom * vec3(1.0, 0.36, 0.12) * amt; }\n// Anamorphic streak: long horizontal flare from highlights (tint it with a palette accent).\nvec3 am_streak(sampler2D b, vec2 q, float len, float t) {\n  vec2 px = vec2(1.0 / float(textureSize(b, 0).x), 0.0); vec3 s = vec3(0.0); float w = 0.0;\n  for (int i = -12; i <= 12; i++) { float f = float(i) / 12.0; float ww = exp(-f * f * 3.0); s += am_bright(texture(b, q + px * f * len * 40.0).rgb, t, 0.3) * ww; w += ww; }\n  return s / w;\n}\n// Radial chromatic aberration with N spectral taps (N 3..12; 3 = classic RGB split).\nvec3 am_ca(sampler2D b, vec2 q, float amt, int n) {\n  vec2 d = (q - 0.5) * amt; vec3 s = vec3(0.0), w = vec3(0.0);\n  for (int i = 0; i < 12; i++) { if (i >= n) break; float t = (float(i) + 0.5) / float(n); vec3 sp = am_spectrum(t); s += texture(b, q - d * (t - 0.5)).rgb * sp; w += sp; }\n  return s / max(w, 1e-4);\n}\n// Brown–Conrady style barrel (k > 0) / pincushion (k < 0) distortion on q.\nvec2 am_barrel(vec2 q, float k, float asp) { vec2 c = (q - 0.5) * vec2(asp, 1.0); float r2 = dot(c, c); c *= 1.0 + k * r2; return c / vec2(asp, 1.0) + 0.5; }\n// Golden-angle disc blur (bokeh); 32 taps, radius in pixels of the source. Highlights bloom into discs.\nvec3 am_bokeh(sampler2D b, vec2 q, float radius) {\n  vec2 px = radius / vec2(textureSize(b, 0)); vec3 s = vec3(0.0), w = vec3(0.0);\n  for (int i = 0; i < 32; i++) { float r = sqrt((float(i) + 0.5) / 32.0); float a = float(i) * 2.39996323; vec3 c = texture(b, q + vec2(cos(a), sin(a)) * r * px).rgb; vec3 ww = 1.0 + c * c * 0.4; s += c * ww; w += ww; }\n  return s / w;\n}\n// Contrast-adaptive sharpening (AMD FidelityFX CAS, simplified). amt 0..1.\nvec3 am_cas(sampler2D b, vec2 q, float amt) {\n  vec2 px = 1.0 / vec2(textureSize(b, 0));\n  vec3 e = texture(b, q).rgb, n = texture(b, q + vec2(0, px.y)).rgb, s = texture(b, q - vec2(0, px.y)).rgb, w = texture(b, q - vec2(px.x, 0)).rgb, ea = texture(b, q + vec2(px.x, 0)).rgb;\n  vec3 mn = min(e, min(min(n, s), min(w, ea))), mx = max(e, max(max(n, s), max(w, ea)));\n  vec3 k = sqrt(sat(min(mn, 2.0 - mx) / max(mx, 1e-4))) * -mix(0.125, 0.2, amt);\n  return max((e + (n + s + w + ea) * k) / (1.0 + 4.0 * k), 0.0);\n}\n// Generalised Kuwahara (4 sectors, Papari-style weights): turns photos into painted strokes with crisp edges.\n// radius in source pixels (2..10).\nvec3 am_kuwahara(sampler2D b, vec2 q, float radius) {\n  vec2 px = radius / vec2(textureSize(b, 0)) / 3.0;\n  vec3 m[4]; vec3 s2[4];\n  for (int k = 0; k < 4; k++) { m[k] = vec3(0.0); s2[k] = vec3(0.0); }\n  for (int j = -3; j <= 3; j++) for (int i = -3; i <= 3; i++) {\n    vec3 c = texture(b, q + vec2(i, j) * px).rgb; vec3 c2 = c * c;\n    if (i <= 0 && j <= 0) { m[0] += c; s2[0] += c2; }\n    if (i >= 0 && j <= 0) { m[1] += c; s2[1] += c2; }\n    if (i <= 0 && j >= 0) { m[2] += c; s2[2] += c2; }\n    if (i >= 0 && j >= 0) { m[3] += c; s2[3] += c2; }\n  }\n  vec3 acc = vec3(0.0); float wsum = 0.0;\n  for (int k = 0; k < 4; k++) { m[k] /= 16.0; vec3 v = abs(s2[k] / 16.0 - m[k] * m[k]); float sg = v.r + v.g + v.b; float w = 1.0 / (1.0 + pow(sg * 600.0, 4.0)); acc += m[k] * w; wsum += w; }\n  return acc / max(wsum, 1e-5);\n}\n// Sobel luminance gradient of any sampler (structure tensor input for flow-aligned strokes).\nvec2 am_sobel(sampler2D b, vec2 q, float r) {\n  vec2 px = r / vec2(textureSize(b, 0));\n  float tl = luma(texture(b, q + px * vec2(-1, 1)).rgb), t = luma(texture(b, q + px * vec2(0, 1)).rgb), tr = luma(texture(b, q + px * vec2(1, 1)).rgb);\n  float l = luma(texture(b, q + px * vec2(-1, 0)).rgb), rr = luma(texture(b, q + px * vec2(1, 0)).rgb);\n  float bl = luma(texture(b, q + px * vec2(-1, -1)).rgb), bt = luma(texture(b, q + px * vec2(0, -1)).rgb), br = luma(texture(b, q + px * vec2(1, -1)).rgb);\n  return vec2(tr + 2.0 * rr + br - tl - 2.0 * l - bl, tl + 2.0 * t + tr - bl - 2.0 * bt - br);\n}\n// Natural (cos^4) vignette; amt 0..1, uv as motif() receives it.\nfloat am_vignette(vec2 uv, float amt) { float r = length(uv * vec2(0.9, 1.0)) * 1.35; float c = cos(min(r * amt, 1.5)); return c * c * c * c; }\n// Film grain: luma-weighted (strongest in mid-tones, like silver halide), changes at 24 fps and loops exactly.\nvec3 am_grain(vec3 c, vec2 fc, float amt, float size) {\n  vec2 g = floor(fc / max(size, 1.0)); float f = am_frame(24.0);\n  vec3 n = h33(vec3(g, f)) - 0.5; n = mix(vec3(n.r), n, 0.25);\n  float l = sqrt(sat(luma(c))); float w = 4.0 * l * (1.0 - l) + 0.15;\n  return max(c + n * amt * w * 0.12, 0.0);\n}\n\n// ======== sdf ========\n// GLSL ES has no function pointers, so the march/normal/shadow/AO helpers are macros over your scene function\n// name. Your scene function must have the signature `float NAME(vec3 p)` (or return .x of a vec2 via a wrapper).\n\n// ---- 2D ----\nfloat am_sdCircle(vec2 p, float r) { return length(p) - r; }\nfloat am_sdRoundBox(vec2 p, vec2 b, float r) { vec2 q = abs(p) - b + r; return length(max(q, 0.0)) + min(max(q.x, q.y), 0.0) - r; }\nfloat am_sdHex(vec2 p, float r) { const vec3 k = vec3(-0.866025404, 0.5, 0.577350269); p = abs(p); p -= 2.0 * min(dot(k.xy, p), 0.0) * k.xy; p -= vec2(clamp(p.x, -k.z * r, k.z * r), r); return length(p) * sign(p.y); }\nfloat am_sdStar(vec2 p, float r, int n, float m) { // n points, m in 2..n inner sharpness (Quílez)\n  float an = PI / float(n), en = PI / m; vec2 acs = vec2(cos(an), sin(an)), ecs = vec2(cos(en), sin(en));\n  float bn = mod(atan(p.x, p.y), 2.0 * an) - an; p = length(p) * vec2(cos(bn), abs(sin(bn)));\n  p -= r * acs; p += ecs * clamp(-dot(p, ecs), 0.0, r * acs.y / ecs.y); return length(p) * sign(p.x);\n}\n// Polar repeat: n copies around the origin (kaleidoscopes, mandalas, radial mograph).\nvec2 am_polarRep(vec2 p, float n) { float a = TAU / n; float t = atan(p.y, p.x) + a * 0.5; t = mod(t, a) - a * 0.5; return length(p) * vec2(cos(t), sin(t)); }\nvec2 am_kaleido(vec2 p, float n) { p = am_polarRep(p, n); p.y = abs(p.y); return p; }\n// Hex grid: returns (local xy, cell id xy).\nvec4 am_hexGrid(vec2 p) {\n  const vec2 s = vec2(1.0, 1.7320508);\n  vec4 c = floor(vec4(p, p - vec2(0.5, 1.0)) / s.xyxy) + 0.5;\n  vec4 h = vec4(p - c.xy * s, p - (c.zw + 0.5) * s);\n  return dot(h.xy, h.xy) < dot(h.zw, h.zw) ? vec4(h.xy, c.xy) : vec4(h.zw, c.zw + 0.5);\n}\n\n// ---- 3D ----\nfloat am_sdSphere(vec3 p, float r) { return length(p) - r; }\nfloat am_sdRoundBox3(vec3 p, vec3 b, float r) { vec3 q = abs(p) - b + r; return length(max(q, 0.0)) + min(max(q.x, max(q.y, q.z)), 0.0) - r; }\nfloat am_sdCapsule(vec3 p, vec3 a, vec3 b, float r) { vec3 pa = p - a, ba = b - a; float h = sat(dot(pa, ba) / dot(ba, ba)); return length(pa - ba * h) - r; }\nfloat am_sdOcta(vec3 p, float s) { p = abs(p); return (p.x + p.y + p.z - s) * 0.57735027; }\nfloat am_sdGyroidShell(vec3 p, float scale, float thick) { p *= scale; return (abs(dot(sin(p), cos(p.yzx))) - thick) / scale * 0.6; }\n// Smooth boolean with a blend factor for colour/material mixing: returns (d, h) where h = 0 -> a, 1 -> b.\nvec2 am_sminH(float a, float b, float k) { float h = sat(0.5 + 0.5 * (b - a) / k); return vec2(mix(b, a, h) - k * h * (1.0 - h), 1.0 - h); }\nfloat am_smin3(float a, float b, float k) { k *= 6.0; float h = max(k - abs(a - b), 0.0) / k; return min(a, b) - h * h * h * k * (1.0 / 6.0); } // cubic, C2\nvec3 am_twist(vec3 p, float k) { float c = cos(k * p.y), s = sin(k * p.y); return vec3(mat2(c, -s, s, c) * p.xz, p.y).xzy; }\nvec3 am_bend(vec3 p, float k) { float c = cos(k * p.x), s = sin(k * p.x); return vec3(mat2(c, -s, s, c) * p.xy, p.z); }\nvec3 am_repLim(vec3 p, float s, vec3 l) { return p - s * clamp(floor(p / s + 0.5), -l, l); }\n\n// ---- camera ----\n// Look-at camera: returns ray direction for uv with focal length f (≈ 1.5 normal, 2.5 tele, 0.9 wide).\nvec3 am_camRay(vec3 ro, vec3 ta, vec2 uv, float f, float roll) {\n  vec3 w = normalize(ta - ro), u = normalize(cross(w, vec3(sin(roll), cos(roll), 0.0))), v = cross(u, w);\n  return normalize(uv.x * u + uv.y * v + f * w);\n}\n\n// ---- raymarch macros ----\n// AM_MARCH(MAP, ro, rd, tmax, STEPS, t, hit): sphere-trace with relaxation-free safety factor 0.9.\n#define AM_MARCH(MAP, RO, RD, TMAX, STEPS, T, HIT) { T = 0.0; HIT = false; for (int i_ = 0; i_ < 256; i_++) { if (i_ >= STEPS) break; float d_ = MAP(RO + RD * T); if (d_ < 0.0005 * T + 0.0005) { HIT = true; break; } T += d_ * 0.9; if (T > TMAX) break; } }\n// Tetrahedral normal (4 taps, Quílez).\n#define AM_NORMAL(MAP, P) normalize(vec3(1, -1, -1) * MAP(P + vec3(1, -1, -1) * 0.0007) + vec3(-1, -1, 1) * MAP(P + vec3(-1, -1, 1) * 0.0007) + vec3(-1, 1, -1) * MAP(P + vec3(-1, 1, -1) * 0.0007) + vec3(1, 1, 1) * MAP(P + vec3(1, 1, 1) * 0.0007))\n// Soft shadow with improved penumbra (Aaltonen / Quílez). RES: result in 0..1, K: hardness (8 soft .. 64 hard).\n#define AM_SHADOW(MAP, RO, RD, K, RES) { RES = 1.0; float t_ = 0.02, ph_ = 1e10; for (int i_ = 0; i_ < 40; i_++) { float h_ = MAP(RO + RD * t_); float y_ = h_ * h_ / (2.0 * ph_); float d_ = sqrt(max(h_ * h_ - y_ * y_, 0.0)); RES = min(RES, K * d_ / max(0.0, t_ - y_)); ph_ = h_; t_ += clamp(h_, 0.01, 0.3); if (RES < 0.002 || t_ > 6.0) break; } RES = sat(RES); RES = RES * RES * (3.0 - 2.0 * RES); }\n// Ambient occlusion, 5 taps along the normal.\n#define AM_AO(MAP, P, N, RES) { float o_ = 0.0, s_ = 1.0; for (int i_ = 0; i_ < 5; i_++) { float h_ = 0.01 + 0.11 * float(i_); o_ += (h_ - MAP(P + N * h_)) * s_; s_ *= 0.85; } RES = sat(1.0 - 2.2 * o_); }\n\n// ======== motion ========\n// Everything maps the loop phase u_p (or any 0..1 t) so it stays deterministic and seamless.\n\n// Progress 0..1 of the loop window [a, b] (fractions of the loop). Clamped.\nfloat am_seg(float a, float b) { return sat((fract(u_p) - a) / max(b - a, 1e-5)); }\nfloat am_segT(float t, float a, float b) { return sat((t - a) / max(b - a, 1e-5)); }\n// Easing (Penner / CSS equivalents). t 0..1.\nfloat am_easeInOutCubic(float t) { return t < 0.5 ? 4.0 * t * t * t : 1.0 - pow(-2.0 * t + 2.0, 3.0) * 0.5; }\nfloat am_easeOutExpo(float t) { return t >= 1.0 ? 1.0 : 1.0 - exp2(-10.0 * t); }\nfloat am_easeInExpo(float t) { return t <= 0.0 ? 0.0 : exp2(10.0 * t - 10.0); }\nfloat am_easeInOutExpo(float t) { return t <= 0.0 ? 0.0 : t >= 1.0 ? 1.0 : t < 0.5 ? exp2(20.0 * t - 10.0) * 0.5 : (2.0 - exp2(-20.0 * t + 10.0)) * 0.5; }\nfloat am_easeOutBack(float t, float s) { t -= 1.0; return 1.0 + (s + 1.0) * t * t * t + s * t * t; }\n// Cubic-bezier(x1, y1, x2, y2) like CSS/After Effects, solved with 5 Newton steps. Matches the house-style eases:\n// am_bezier(t, 0.16, 1.0, 0.3, 1.0) is the default entrance, am_bezier(t, 0.7, 0.0, 0.84, 0.0) the exit.\nfloat am_bezier(float x, float x1, float y1, float x2, float y2) {\n  float t = x;\n  for (int i = 0; i < 5; i++) {\n    float u = 1.0 - t; float bx = 3.0 * u * u * t * x1 + 3.0 * u * t * t * x2 + t * t * t;\n    float dx = 3.0 * u * u * x1 + 6.0 * u * t * (x2 - x1) + 3.0 * t * t * (1.0 - x2);\n    t = sat(t - (bx - x) / max(dx, 1e-4));\n  }\n  float u = 1.0 - t; return 3.0 * u * u * t * y1 + 3.0 * u * t * t * y2 + t * t * t;\n}\n// Damped spring step response (closed form, no state): 0 -> 1 with overshoot. t in seconds since release,\n// stiffness k (≈ 100..600) and damping c (≈ 8..40), unit mass. Matches Motif's \"snappy (300, 20)\".\nfloat am_spring(float t, float k, float c) {\n  if (t <= 0.0) return 0.0;\n  float w0 = sqrt(k), z = c / (2.0 * w0);\n  if (z < 1.0) { float wd = w0 * sqrt(1.0 - z * z); return 1.0 - exp(-z * w0 * t) * (cos(wd * t) + z * w0 / wd * sin(wd * t)); }\n  return 1.0 - exp(-w0 * t) * (1.0 + w0 * t);\n}\n// Spring that fires at loop fraction a and settles back by the loop end: seconds come from u_L.\nfloat am_springAt(float a, float k, float c) { return am_spring((fract(u_p) - a) * u_L, k, c) * (1.0 - am_seg(0.92, 1.0)); }\n// Stagger: element i of n starts spread * i / n later. Returns the element's local 0..1 progress for window [a,b].\nfloat am_stagger(float i, float n, float spread, float a, float b) { float off = spread * i / max(n - 1.0, 1.0); return am_seg(a + off * (1.0 - (b - a)), b + off * (1.0 - (b - a))); }\n// In / hold / out over the loop: rises over [0, inT], holds, falls over [1 - outT, 1], eased.\nfloat am_inHoldOut(float inT, float outT) { float x = fract(u_p); return am_easeOutExpo(sat(x / inT)) * (1.0 - am_easeInExpo(sat((x - 1.0 + outT) / outT))); }\n// Ping-pong 0..1..0 with smooth turnarounds (k round trips per loop).\nfloat am_pingpong(float k) { return 0.5 - 0.5 * cos(TAU * k * u_p); }\nfloat am_framesM(float fps) { return max(1.0, floor(u_L * fps + 0.5)); }\n// Hand-drawn \"on twos\" phase: quantises u_p to fps/2 so motion steps like cel animation (loops exactly).\nfloat am_onTwos(float fps) { float n = am_framesM(fps * 0.5); return floor(fract(u_p) * n) / n; }\n\n// ======== kit ========\n// Kit-specific helpers for agent-motif (appended after the AgentMotif library). Rebuild common.glsl with:\n//   node ../../tools/am.mjs lib build color noise light post sdf motion --append kit.glsl --out common.glsl\n","kit.glsl":"// Kit-specific helpers for agent-motif (appended after the AgentMotif library). Rebuild common.glsl with:\n//   node ../../tools/am.mjs lib build color noise light post sdf motion --append kit.glsl --out common.glsl\n","styles/post/bloom-prep.glsl":"// Shared post, pass 2 (scale 0.125): soft-knee bright pass + pre-blur of the HDR scene in u_buf0.\n// Runs at 1/8 resolution, so a very wide bloom costs almost nothing.\nvec4 motif(vec2 uv, vec2 fc) {\n  vec2 q = fc / u_res;\n  vec3 c = am_bloom(u_buf0, q, 1.6);\n  return vec4(am_bright(c, p_threshold, 0.6), 1.0);\n}\n","styles/post/finish.glsl":"// Shared post, final pass (full resolution): the lens and film stack every hero style shares, so artists get\n// the same \"Lens\" controls everywhere. u_buf0 = HDR scene, u_buf1 = bright-passed 1/8-res bloom source.\nvec4 motif(vec2 uv, vec2 fc) {\n  vec2 q = fc / u_res;\n  vec2 qd = am_barrel(q, p_distort * 0.12, u_res.x / u_res.y);\n  vec3 c = p_ca > 0.001 ? am_ca(u_buf0, qd, p_ca * 0.014, 7) : texture(u_buf0, qd).rgb;\n  vec3 b = am_bloom(u_buf1, qd, 1.0) * 0.55 + am_bloom(u_buf1, qd, 3.2) * 0.45;\n  c += b * p_bloom + am_halation(b, p_halation);\n  if (p_streak > 0.001) c += am_streak(u_buf1, qd, 1.0, 0.0) * mix(u_ink, u_a0, 0.5) * p_streak;\n  c = am_tonemap(c, p_exposure, p_tonemap);\n  c *= mix(1.0, am_vignette(uv, 1.0), p_vignette);\n  c = am_grain(c, fc, p_grain, 1.0 + 1.5 * step(1600.0, u_res.y));\n  return vec4(c, 1.0);\n}\n","styles/scenes/caustics.glsl":"// Caustic Light — scene pass (scale 0.75, HDR linear; thin caustic lines need the resolution).\n// A shallow sea floor seen in perspective: looping iterated-warp caustics sampled per wavelength for dispersion,\n// Beer–Lambert absorption by depth, crepuscular shafts from the surface and drifting motes that loop exactly.\nfloat causticL(vec2 p, int it, float k) {\n  // Two rotated, rescaled layers multiplied: breaks the tile repeat and sharpens the network like real caustics.\n  p += 0.25 * vec2(ln2(p * 0.21, 0.0, 0.0), ln2(p * 0.21 + 5.3, 0.0, 0.0));\n  float a = am_caustic(p, it, k, p_sharp * 0.6);\n  float b = am_caustic(rot(0.62) * p * 1.37 + 0.37, it, k, p_sharp * 0.6);\n  return pow(a * b, 0.75) * 2.2;\n}\nvec3 causticRGB(vec2 p) {\n  int it = p_detail; float k = float(p_flow);\n  vec2 d = vec2(0.7, 0.45) * p_dispersion * 0.006;   // tiny lateral shift per wavelength = dispersion fringes\n  return vec3(causticL(p - d, it, k), causticL(p, it, k), causticL(p + d, it, k));\n}\nvec4 motif(vec2 uv, vec2 fc) {\n  // Perspective floor: the horizon sits at y = hz; below it, a ground plane recedes into the haze.\n  float hz = 0.75 - p_tilt * 0.5;\n  float y = max(hz - uv.y, 0.0); float persp = 1.0 / max(y, 0.02);\n  vec2 fl = vec2(uv.x * persp, persp + 4.0) * 1.6 * p_scale;\n  float dist = persp * 0.22;                               // pseudo distance through the water\n  vec3 cau = causticRGB(fl * 0.9);\n  cau = mix(cau, vec3(0.1), sat(dist * 0.035));            // distant caustics average out (no shimmer/aliasing)\n  float sand = 0.6 + 0.22 * ln2(fl * 1.3, 0.0, 0.0) + 0.1 * ln2(fl * 5.0, 0.0, 0.0);\n  vec3 floorCol = mix(u_a2 * 0.25 + u_ink * 0.03, u_ink * 0.22, sand * 0.5) * sand;\n  vec3 lit = floorCol * (0.12 + cau * p_intensity * 9.0);\n  // Absorption: water swallows red first; the palette's main accent tints the deep colour.\n  vec3 sigma = mix(vec3(0.45, 0.10, 0.05), (1.0 - am_saturate(u_a0, 1.3)) * 0.6 + 0.05, 0.5) * p_murk;\n  vec3 trans = exp(-sigma * dist * 2.0);\n  vec3 deep = am_mixOk(u_bg, u_a0, 0.4) * 0.3;\n  float haze = 1.0 - exp(-dist * 0.18 * (0.5 + p_murk));\n  vec3 col = mix(lit * trans + deep * (1.0 - trans), deep, haze);\n  col += am_mixOk(u_a0, u_ink, 0.5) * exp(-y * 9.0) * 0.12;      // bright band where light scatters at distance\n  // God rays: looping noise stripes radiating from a point above frame.\n  vec2 src = vec2(0.25 * sin(p_sun * PI), 0.95);\n  vec2 dv = uv - src; float ang = atan(dv.x, -dv.y);\n  float ray = ln2(vec2(ang * 9.0 * p_rayDensity, 0.0), float(p_flow), 0.6) * 0.5 + 0.5;\n  ray = pow(ray, 3.0) * smoothstep(1.6, 0.1, length(dv)) * smoothstep(0.0, 0.5, length(dv));\n  col += am_mixOk(u_a0, u_ink, 0.6) * ray * p_rays * 1.2 * (0.6 + 0.4 * trans.g);\n  // Motes: 32 particles in a wrapped column, each rising a whole number of wraps per loop (exact loop),\n  // with seeded size, speed tier and soft defocus.\n  if (p_motes > 0.001) {\n    vec2 ext = M_asp() * 0.5 + 0.05;\n    for (int i = 0; i < 32; i++) {\n      vec3 hh = h33(vec3(float(i), 2.0, 5.0));\n      float wraps = float(p_flow) * (1.0 + floor(hh.z * 2.0));\n      vec2 mp = vec2((hh.x * 2.0 - 1.0) * ext.x + 0.03 * lsin(1.0, hh.y), mod(hh.y + wraps * u_p, 1.0) * 2.0 * ext.y - ext.y);\n      float sz = 0.002 + 0.006 * hh.x * hh.x;\n      col += u_ink * gauss1(length(uv - mp), sz) * (0.25 + 0.5 * hh.z) * p_motes;\n    }\n  }\n  return vec4(max(col, 0.0), 1.0);\n}\n","styles/scenes/chrome.glsl":"// Liquid Chrome — scene pass (scale 0.66, HDR linear).\n// Metaballs on integer Lissajous orbits merge with a C2 smooth union; surface ripples travel on the loop.\n// Shading is image-based from a procedural photo studio (softboxes + strip lights), prefiltered by roughness,\n// with split-sum env BRDF, optional thin-film anodising, ambient occlusion and a mirror-floor reflection.\nvec3 blobPos(int i) {\n  float fi = float(i); vec3 h = h33(vec3(fi, 7.0, 3.0));\n  float k1 = 1.0 + floor(h.x * 2.0), k2 = 1.0 + floor(h.y * 2.0);\n  vec2 a = lc(k1 * float(p_orbits), h.z), b = lc(k2 * float(p_orbits), h.x + 0.25);\n  return vec3(a.x * 0.85, b.y * 0.32, a.y * 0.55) * p_spread;\n}\nfloat chromeMap(vec3 p) {\n  float d = 1e5;\n  for (int i = 0; i < 8; i++) {\n    if (i >= p_count) break;\n    float r = 0.26 + 0.16 * h11(float(i) + 0.5);\n    d = am_smin3(d, length(p - blobPos(i)) - r * p_size, p_blend * 0.18);\n  }\n  float rip = sin(9.0 * p.x + TAU * 2.0 * u_p) * sin(8.0 * p.y - TAU * u_p) * sin(7.0 * p.z + TAU * u_p);\n  return d + p_ripple * 0.012 * rip;\n}\n// The studio spin sweeps bright softboxes across the surface: route it through the limiter (safeCycles) so it\n// slows/freezes when tempo would push reflections past 3 flashes per second.\nvec3 envAt(vec3 d, float rough) { return am_studio(d, TAU * safeCycles(float(p_spin)) * u_p, rough, u_ink, mix(u_ink, u_a0, 0.55)); }\nvec4 motif(vec2 uv, vec2 fc) {\n  float ca = TAU * float(p_camTurns) * u_p + 0.6;\n  vec3 ro = vec3(sin(ca) * 4.4, 0.9, cos(ca) * 4.4), ta = vec3(0.0, -0.1, 0.0);\n  vec3 rd = am_camRay(ro, ta, uv, 1.75, 0.0);\n  float t; bool hit;\n  AM_MARCH(chromeMap, ro, rd, 10.0, p_steps, t, hit);\n  float floorY = -0.85;\n  vec3 bg = mix(u_bg, u_bg * 0.4 + u_a2 * 0.05, sat(uv.y + 0.5)) + envAt(rd, 0.9) * 0.05;\n  vec3 col = bg;\n  vec3 f0 = mix(vec3(0.95, 0.93, 0.9), c_tint(), p_tintMix);\n  float rough = p_rough;\n  if (hit) {\n    vec3 p = ro + rd * t; vec3 n = AM_NORMAL(chromeMap, p);\n    float nv = sat(dot(n, -rd)); vec3 rf = reflect(rd, n);\n    float ao; AM_AO(chromeMap, p, n, ao);\n    vec3 F0 = f0;\n    if (p_film > 0.001) F0 *= mix(vec3(1.0), am_thinFilm(nv, 380.0 + 320.0 * sin(TAU * u_p + p.y * 2.0), 1.45) * 1.6, p_film);\n    vec3 env = envAt(rf, rough);\n    // Floor bounce: what the reflected ray sees when it heads down onto the mirror floor.\n    if (rf.y < 0.0) { float tf = (floorY - p.y) / rf.y; vec3 fp = p + rf * tf; env = mix(env, u_bg * 0.6 + envAt(reflect(rf, vec3(0, 1, 0)), 0.6) * 0.04, sat(1.0 - length(fp.xz) * 0.15)); }\n    col = env * am_envBRDF(F0, rough, nv) * mix(0.35, 1.0, ao);\n    col += F0 * envAt(n, 1.0) * 0.04 * ao; // soft fill\n  } else if (rd.y < 0.0) {\n    // Mirror floor: reflect the blobs once (cheap second march), fade with distance and Fresnel.\n    float tf = (floorY - ro.y) / rd.y; vec3 fp = ro + rd * tf;\n    vec3 rr = reflect(rd, vec3(0, 1, 0)); float t2; bool h2;\n    AM_MARCH(chromeMap, fp, rr, 5.0, p_steps / 2, t2, h2);\n    float fres = am_fresnelF(0.04, -rd.y) * p_floor;\n    vec3 refl = envAt(rr, 0.8) * 0.06;\n    if (h2) { vec3 p2 = fp + rr * t2; vec3 n2 = AM_NORMAL(chromeMap, p2); refl = envAt(reflect(rr, n2), rough) * am_envBRDF(f0, rough, sat(dot(n2, -rr))); }\n    float fade = exp(-length(fp.xz) * 0.35);\n    col = mix(bg, refl, sat(fres * 3.0) * fade) + bg * 0.2;\n    // Contact shadow under the blobs.\n    float occ = 1.0; for (int i = 0; i < 8; i++) { if (i >= p_count) break; vec3 bp = blobPos(i); occ *= 1.0 - 0.55 * exp(-length(fp.xz - bp.xz) * 2.5) * exp(-max(bp.y - floorY, 0.0) * 1.2); }\n    col *= occ;\n  }\n  return vec4(max(col, 0.0), 1.0);\n}\n","styles/scenes/glass-backdrop.glsl":"// Liquid Glass — pass 1 (full res): what the glass refracts. The attached media, or a slow OKLab mesh gradient\n// with optional editorial stripes / grid so refraction and dispersion read clearly.\nvec4 motif(vec2 uv, vec2 fc) {\n  vec2 q = fc / u_res;\n  vec3 g = vec3(0.0); float ws = 0.0;\n  for (int i = 0; i < 5; i++) {\n    float fi = float(i); vec3 h = h33(vec3(fi, 4.0, 1.0));\n    vec2 c = (h.xy - 0.5) * M_asp() * 0.9 + 0.18 * lc(1.0, h.z) * vec2(1.0, 0.7);\n    float w = exp(-dot(uv - c, uv - c) * (3.0 + 4.0 * h.z));\n    vec3 col = i == 0 ? u_a0 : i == 1 ? u_a1 : i == 2 ? u_a2 : i == 3 ? am_mixOk(u_a0, u_ink, 0.5) : am_mixOk(u_bg, u_a2, 0.6);\n    g += am_toOklab(col) * w; ws += w;\n  }\n  vec3 bg = am_fromOklab(mix(am_toOklab(u_bg), g / max(ws, 1e-4), sat(ws * 1.4)));\n  if (p_backdrop == BACKDROP_STRIPES) bg *= 0.75 + 0.35 * smoothstep(0.35, 0.65, abs(fract(uv.x * 18.0 + uv.y * 4.0) - 0.5) * 2.0);\n  if (p_backdrop == BACKDROP_GRID) { vec2 gg = abs(fract(uv * 12.0) - 0.5); bg = mix(bg, u_ink, (1.0 - smoothstep(0.0, 0.03, min(gg.x, gg.y))) * 0.35); }\n  vec4 m = m_source(q);\n  vec3 src = m.rgb + bg * (1.0 - m.a);\n  return vec4(mix(bg, src, u_sourceOn), 1.0);\n}\n","styles/scenes/glass.glsl":"// Liquid Glass — pass 2 (full res). Soft-merging glass lozenges over u_buf0. A circular bevel profile turns the\n// 2D SDF into a height field; its gradient bends the backdrop (Snell-like offset) with N-tap spectral dispersion,\n// optional frosting (disc blur), a specular rim from a moving key light, an inner shadow and Fresnel edge light.\nfloat glassSdf(vec2 p) {\n  float d = 1e5;\n  for (int i = 0; i < 7; i++) {\n    if (i >= p_count) break;\n    float fi = float(i); vec3 h = h33(vec3(fi, 1.0, 8.0));\n    vec2 c = (h.xy - 0.5) * vec2(M_asp().x * 0.7, 0.55) + lc(float(1 + int(h.z * 2.0)) * float(p_orbits), h.z) * vec2(0.14, 0.09) * p_wander;\n    vec2 sz = vec2(0.10 + 0.12 * h.x, 0.07 + 0.08 * h.y) * p_size;\n    float di = p_shape == SHAPE_PILLS ? am_sdRoundBox(p - c, sz, min(sz.x, sz.y)) : p_shape == SHAPE_DROPS ? length(p - c) - (sz.x + sz.y) * 0.5 : am_sdRoundBox(p - c, sz, 0.035);\n    d = am_smin3(d, di, p_merge * 0.06);\n  }\n  return d;\n}\nvec4 motif(vec2 uv, vec2 fc) {\n  vec2 q = fc / u_res;\n  float d = glassSdf(uv);\n  float px = 1.0 / u_res.y;\n  vec3 back = texture(u_buf0, q).rgb;\n  float sh = exp(-max(glassSdf(uv + vec2(0.0, 0.018)), 0.0) * 40.0) * 0.28 * p_shadow;\n  vec3 outside = back * (1.0 - sh);\n  if (d > 2.0 * px) return vec4(outside, 1.0);\n  // Height from a circular bevel; gradient by central differences on the SDF.\n  float bev = 0.045 * p_bevel;\n  float e = 0.0015;\n  vec2 gd = vec2(glassSdf(uv + vec2(e, 0)) - glassSdf(uv - vec2(e, 0)), glassSdf(uv + vec2(0, e)) - glassSdf(uv - vec2(0, e))) / (2.0 * e);\n  float x = sat(1.0 + d / bev);                 // 0 at the inner edge of the bevel, 1 at the rim\n  float slope = x / sqrt(max(1.0 - x * x, 1e-3)); // derivative of a quarter-circle profile\n  vec3 n = normalize(vec3(gd * slope * step(d, 0.0), 1.0));\n  vec2 off = -n.xy * p_refract * 0.06;\n  // Spectral refraction: each wavelength bends a little differently.\n  vec3 acc = vec3(0.0), wsum = vec3(0.0); int N = 7;\n  for (int i = 0; i < 7; i++) {\n    float t = (float(i) + 0.5) / float(N); vec3 sp = am_spectrum(t);\n    vec2 o = off * (1.0 + (t - 0.5) * p_dispersion * 0.9);\n    vec3 s = p_frost > 0.01 ? am_bokeh(u_buf0, q + o * vec2(u_res.y / u_res.x, 1.0), p_frost * 14.0) : texture(u_buf0, q + o * vec2(u_res.y / u_res.x, 1.0)).rgb;\n    acc += s * sp; wsum += sp;\n  }\n  vec3 glass = acc / wsum;\n  glass = mix(glass, glass * c_tint() * 1.4, p_tintMix) * 1.03 + 0.012;\n  // Lighting: key light orbits (integer turns), specular on the bevel, inner shadow, Fresnel rim.\n  vec3 l = normalize(vec3(lc(float(p_lightTurns), 0.375) * 0.8, 0.55));\n  vec3 hv = normalize(l + vec3(0, 0, 1));\n  float spec = pow(sat(dot(n, hv)), 90.0) * 2.5 + pow(sat(dot(n, hv)), 12.0) * 0.18;\n  float fres = am_fresnelF(0.04, n.z);\n  float rim = smoothstep(-0.006, 0.0, d) * (1.0 - smoothstep(0.0, 0.004, d));\n  float inner = smoothstep(-bev * 2.2, 0.0, d) * 0.25 * (1.0 - n.z);\n  vec3 col = glass * (1.0 - inner) + u_ink * (spec * p_shine + fres * 0.35 + rim * 0.45 * p_shine);\n  float a = 1.0 - smoothstep(-px, px, d);\n  return vec4(mix(outside, col, a), 1.0);\n}\n","styles/scenes/nebula.glsl":"// Nebula Drift — scene pass (scale 0.5, HDR linear).\n// Emission–absorption volume rendering through a cheap looping gyroid-fBm density (10x cheaper than simplex),\n// lit by an embedded star with Henyey–Greenstein forward scattering. Colour is temperature-mapped through the\n// palette in OKLab; a parallax star field sits behind. Step count is the Quality control; IGN jitter hides banding.\nfloat nebDensity(vec3 p, out float dust) {\n  float k = float(p_flow);\n  float n = am_sinFbm3(p * p_scale * 2.2, 5, k, 0.6 * p_turb);\n  float shell = length(p * vec3(1.0, 1.4, 1.0)) - 0.9 + n * 0.55;    // envelope, eroded by the noise\n  float env = smoothstep(0.25, -0.6, shell);\n  float fil = pow(sat(1.0 - abs(n) * 1.6), 5.0);                     // ridged: thin glowing filaments\n  float soft = sat(n * 0.9 + 0.25);                                  // broad diffuse glow\n  dust = sat(am_sinFbm3(p * p_scale * 3.4 + 7.1, 3, k, 0.4 * p_turb) * 1.6 - 0.15) * env;\n  return (fil + soft * soft * soft * 0.25) * env * (0.3 + p_fill * 1.4);\n}\nvec4 motif(vec2 uv, vec2 fc) {\n  float ca = TAU * float(p_camTurns) * u_p;\n  vec3 ro = vec3(sin(ca) * 2.6, 0.25, cos(ca) * 2.6);\n  vec3 rd = am_camRay(ro, vec3(0.0), uv, 1.35, 0.08);\n  vec3 col = vec3(0.0); float T = 1.0;\n  // Bound the march to the cloud's sphere.\n  float b = dot(ro, rd), c = dot(ro, ro) - 1.7 * 1.7, disc = b * b - c;\n  vec3 star = mix(u_ink, bb(6500.0), 0.5) * 1.0;\n  if (disc > 0.0) {\n    float t0 = max(-b - sqrt(disc), 0.0), t1 = -b + sqrt(disc);\n    int N = p_steps; float dt = (t1 - t0) / float(N);\n    float t = t0 + dt * am_ign(fc);\n    for (int i = 0; i < 128; i++) {\n      if (i >= N || T < 0.01) break;\n      vec3 p = ro + rd * t;\n      float dust; float d = nebDensity(p, dust);\n      if (d + dust > 0.001) {\n        float r = length(p);\n        float temp = sat(d * 1.2 + (1.0 - r) * 0.7);\n        vec3 hue = am_mixOk(am_mixOk(u_a1, u_a0, smoothstep(0.2, 0.75, r)), mix(u_a2, u_ink, 0.5), smoothstep(0.55, 1.0, temp));\n        vec3 emi = hue * d * p_glow * 1.8;\n        float ph = am_hg(dot(rd, -normalize(p + 1e-4)), 0.4);\n        vec3 scat = star * ph * exp(-r * 2.2) * 10.0 * (d + dust * 0.5);\n        float sig = (d * 0.6 + dust * 3.0) * p_absorb * 3.0;\n        float a = 1.0 - exp(-sig * dt);\n        col += T * (emi + scat) * (sig > 1e-4 ? a / sig : dt);\n        T *= 1.0 - a;\n      }\n      t += dt;\n    }\n  }\n  // Embedded star (behind/inside the gas) and the background field, both attenuated by what the ray crossed.\n  vec3 sc = vec3(0.0); float bs = dot(-ro, rd); vec3 cp = ro + rd * max(bs, 0.0); float dc = length(cp);\n  sc += star * (gauss1(dc, 0.02) * 14.0 + glow2(dc, 0.035) * 1.2) * p_core;\n  vec2 sky = vec2(atan(rd.z, rd.x), asin(rd.y)) * 3.0;\n  sc += am_stars(sky, 9.0, 1.0, 0.25) * 1.4;\n  col += sc * T + u_bg * T;\n  return vec4(col, 1.0);\n}\n","styles/scenes/paint-source.glsl":"// Painterly — pass 1 (scale 0.5): the subject. The attached image/video, or (with no media) a procedural\n// sunset landscape so the style is never blank. A hand-made \"boil\" jitters the sampling on twos.\nvec3 landscape(vec2 uv) {\n  float y = uv.y;\n  vec3 top = am_mixOk(u_bg, u_a1, 0.6), hor = am_mixOk(u_a0, u_a2, 0.45);\n  vec3 sky = am_mixOk(hor, top, smoothstep(-0.05, 0.5, y));\n  vec2 sun = vec2(0.18, 0.05 + 0.025 * lsin(1.0, 0.0));\n  float ds = length(uv - sun);\n  sky = am_mixOk(sky, am_mixOk(u_a2, u_ink, 0.5), exp(-ds * 5.0) * 0.7);\n  sky += mix(u_a2, u_ink, 0.7) * smoothstep(0.065, 0.055, ds) * 1.2;\n  vec3 col = sky;\n  for (int i = 0; i < 4; i++) {\n    float fi = float(i);\n    float h = -0.02 - fi * 0.09 + 0.07 * lfbm(vec2(uv.x * (1.4 + fi * 0.6) + fi * 7.3, fi), 4, 0.0, 0.0) + 0.04 * sin(uv.x * 2.0 + fi);\n    // Atmospheric perspective: far ridges take the sky's colour, near ones go dark and cool.\n    vec3 hill = am_mixOk(am_mixOk(hor, u_a1, 0.5), am_mixOk(u_bg, u_a1, 0.25), fi / 3.0) * (1.0 - 0.12 * fi);\n    col = mix(col, hill, smoothstep(0.004, -0.004, y - h));\n  }\n  float water = smoothstep(0.004, -0.004, y + 0.36);\n  vec3 refl = am_mixOk(hor, top, 0.35) * (0.75 + 0.25 * sin(uv.y * 160.0 + 4.0 * ln2(uv * vec2(3.0, 30.0), 1.0, 0.3)));\n  refl += mix(u_a2, u_ink, 0.6) * exp(-abs(uv.x - sun.x) * 14.0) * 0.5 * (0.5 + 0.5 * sin(uv.y * 220.0));\n  return mix(col, refl * 0.8, water);\n}\nvec4 motif(vec2 uv, vec2 fc) {\n  float ft = am_onTwos(24.0);                       // stepped time for the boil, loops exactly\n  vec2 jit = vec2(h21(vec2(ft, 1.7)), h21(vec2(ft, 9.1))) - 0.5;\n  vec2 bw = vec2(ln2(uv * 6.0 + jit * 3.0, 0.0, 0.0), ln2(uv * 6.0 + 4.1 + jit * 3.0, 0.0, 0.0)) * p_boil * 0.004;\n  vec2 q = fc / u_res + bw;\n  vec4 m = m_source(q);\n  vec3 fall = landscape(uv + bw);\n  vec3 src = m.rgb + u_bg * (1.0 - m.a);\n  return vec4(mix(fall, src, u_sourceOn), 1.0);\n}\n","styles/scenes/paint.glsl":"// Painterly — pass 2 (full res). Generalised Kuwahara on the subject flattens it into paint patches with crisp\n// edges; strokes follow the image's own structure (bristle streaks run perpendicular to the luminance gradient),\n// then pigment darkening at patch borders, a canvas/paper tooth and a subtle palette harmonisation.\nvec4 motif(vec2 uv, vec2 fc) {\n  vec2 q = fc / u_res;\n  vec3 c = am_kuwahara(u_buf0, q, p_brush * min(u_res.x, u_res.y) / 540.0 * 0.5 + 1.0);\n  // Stroke direction from the subject's gradient (sampled wide so strokes are smooth).\n  vec2 g = am_sobel(u_buf0, q, 2.5);\n  vec2 dir = length(g) > 1e-4 ? normalize(mix(vec2(1.0, 0.0) * 1e-3, normalize(vec2(-g.y, g.x)), sat(length(g) * 30.0)) + vec2(1e-5, 0.0)) : vec2(1.0, 0.0); // flat areas: horizontal strokes\n  float ang = atan(dir.y, dir.x);\n  vec2 sp = rot(-ang) * (uv * 260.0 / max(p_brush, 0.5));\n  float ft = am_onTwos(24.0);\n  float bristle = ln2(vec2(sp.x * 0.08, sp.y * 1.2) + ft * 3.1 * p_boil, 0.0, 0.0);\n  c *= 1.0 + bristle * 0.16 * p_texture;\n  // Pigment pooling at patch edges (watercolour / gouache darkening).\n  vec3 e1 = am_kuwahara(u_buf0, q + vec2(1.5, 0.0) / u_res, 2.0);\n  float edge = sat(length(c - e1) * 6.0);\n  c *= 1.0 - edge * 0.35 * p_edges;\n  // Paper / canvas tooth.\n  float tooth = ln2(fc * 0.35, 0.0, 0.0) * 0.5 + ln2(fc * 0.9 + 3.0, 0.0, 0.0) * 0.5;\n  float weave = (sin(fc.x * 1.7) * sin(fc.y * 1.7)) * 0.5;\n  c *= 1.0 + (tooth * 0.6 + weave * 0.4) * 0.08 * p_texture;\n  // Harmonise toward the palette (keeps a series of painted shots consistent).\n  vec3 o = am_toOklab(max(c, 0.0)); vec3 pk = am_toOklab(am_rampOk(sat(o.x * 1.1)));\n  o.yz = mix(o.yz, pk.yz, p_harmony * 0.6);\n  c = am_fromOklab(o);\n  c = am_tonemap(c, p_exposure, 2);\n  c *= mix(1.0, am_vignette(uv, 1.0), 0.35);\n  return vec4(max(c, 0.0), 1.0);\n}\n","styles/scenes/silk.glsl":"// Silk Aurora — scene pass (scale 0.5, HDR linear).\n// A two-level domain-warped height field, stretched into drapes, shaded as a real material: wrapped diffuse,\n// GGX-like specular along the folds, Charlie sheen at grazing angles and thin-film iridescence on the highlights.\n// Emissive \"veins\" trace one iso-level of the field like aurora curtains. All motion is the warp drifting on a loop.\nfloat silkField(vec2 p, float k, float r, out vec2 q) {\n  q = vec2(lfbm(p, 2, k, r), lfbm(p + vec2(5.2, 1.3), 2, k, r));\n  return lfbm(p + p_warp * q, 3, k, r) + 0.06 * ln2(p * 3.1 + q, k, r);\n}\nvec4 motif(vec2 uv, vec2 fc) {\n  float k = float(p_flow), r = p_drift;\n  vec2 s = rot(p_angle * PI / 180.0) * uv;\n  s *= vec2(1.0, p_stretch) * p_scale;\n  vec2 q, qx, qy;\n  float h = silkField(s, k, r, q);\n  const float e = 0.02;\n  float hx = silkField(s + vec2(e, 0.0), k, r, qx), hy = silkField(s + vec2(0.0, e), k, r, qy);\n  vec3 n = normalize(vec3(-(hx - h) / e * p_relief * 0.12, -(hy - h) / e * p_relief * 0.12, 1.0));\n  vec3 v = vec3(0.0, 0.0, 1.0);\n  vec2 la = lc(float(p_lightTurns), 0.125) * 0.75;\n  vec3 l = normalize(vec3(la, 0.65));\n  vec3 hv = normalize(l + v);\n  float nl = dot(n, l), nv = sat(n.z), nh = sat(dot(n, hv));\n\n  // Base colour: palette driven by the warp vectors (q) and height, mixed in OKLab.\n  vec3 base = am_mixOk(u_a2, u_a0, smoothstep(-0.35, 0.35, q.x));\n  base = am_mixOk(base, u_a1, smoothstep(0.05, 0.5, q.y) * 0.85);\n  base = am_mixOk(u_bg * 2.0, base, sat(0.45 + h * 1.6));\n\n  float occl = mix(0.06, 1.0, smoothstep(-0.5, 0.4, h)); // deep folds collect shadow\n  vec3 diff = am_wrapDiffuse(nl, 0.45, base * 0.6 + u_a1 * 0.1) * base;\n  float rough = p_mat == MAT_FOIL ? 0.18 : p_mat == MAT_VELVET ? 0.75 : 0.34;\n  float a = rough * rough;\n  float spec = am_ggxD(nh, a) * am_smithV(nv, sat(nl), a) * sat(nl) * 0.9;\n  float sheen = am_sheen(nh, rough) * pow(1.0 - nv, 2.0);\n  vec3 film = am_thinFilm(dot(n, hv) * 0.5 + nv * 0.5, 260.0 + 620.0 * sat(0.5 + 0.8 * h), 1.38);\n  vec3 specCol = mix(u_ink, film * 1.6, p_irid);\n\n  vec3 col;\n  if (p_mat == MAT_FOIL) col = base * 0.04 + specCol * spec * p_spec * 2.2 * mix(base + 0.2, vec3(1.0), 0.4) + film * sheen * 0.4;\n  else if (p_mat == MAT_VELVET) col = diff * 0.75 + base * sheen * 3.0 * p_spec + specCol * spec * 0.15;\n  else col = diff * 0.9 + specCol * spec * p_spec + base * sheen * 1.2;\n  col *= occl;\n\n  // Aurora veins: thin emissive iso-lines of the field, pulsing along their length (integer pulses per loop).\n  if (p_veins > 0.001) {\n    float iso = abs(h - 0.12) / max(length(vec2(hx - h, hy - h)) / e, 0.25); // screen-even line width\n    float w = 0.018;\n    float travel = 0.6 + 0.4 * lsin(float(p_flow) * 2.0, q.x * 1.5 + q.y);\n    col += am_accentLoop(0.15 * h + 0.35 * q.x) * (gauss1(iso, w) * 3.0 + glow2(iso, w * 4.0) * 0.35) * p_veins * travel * occl;\n  }\n  return vec4(max(col, 0.0), 1.0);\n}\n","styles/scenes/tunnel-source.glsl":"// Light Tunnel — pass 1 (scale 0.5): the subject that gets stretched. The attached media, or a procedural\n// trail scene (blown-out sky, scrub with flowers, a path to the vanishing point) built to have the fine angular\n// detail that turns into crisp streaks.\nvec3 scrub(vec2 uv, float dryness) {\n  // Dry brush: bright twig lines (ridged noise) over dark gaps, with olive and grey variation.\n  float tw = lridge(uv * vec2(20.0, 14.0), 4, 0.0, 0.0);\n  float tw2 = lridge(rot(0.9) * uv * vec2(55.0, 30.0) + 3.0, 3, 0.0, 0.0);\n  float body = lfbm(uv * 9.0 + 2.0, 3, 0.0, 0.0) * 0.5 + 0.5;\n  vec3 dark = am_mixOk(u_ink, u_a2, 0.25) * 0.5;\n  vec3 dry = am_mixOk(u_a2, u_bg, 0.35);\n  float twig = smoothstep(0.55, 0.8, max(tw, tw2 * 0.9));\n  vec3 c = mix(dark * (0.4 + 0.6 * body), dry * 1.15, twig);\n  return am_mixOk(c, u_a0 * 0.7, (1.0 - dryness) * body * 0.6);\n}\nvec3 trail(vec2 uv) {\n  vec2 vp = v_center(); vec2 d = uv - vp;\n  // Sky: blown-out white with pale blue gaps (upper left), like an overexposed phone shot.\n  float gaps = smoothstep(0.15, 0.55, lfbm(uv * vec2(1.6, 2.2) + vec2(1.0, 4.0), 4, 0.0, 0.0) + 0.25 * (-uv.x) + 0.2 * uv.y);\n  vec3 sky = mix(u_bg * 1.08, am_mixOk(u_a1, u_bg, 0.35), gaps * 0.8);\n  // Embankments rising from the vanishing point: the right bank is higher and flowered, the left lower.\n  float rTop = vp.y + max(d.x, 0.0) * 0.62 + 0.03 * ln2(vec2(uv.x * 6.0, 1.0), 0.0, 0.0);\n  float lTop = vp.y + max(-d.x, 0.0) * 0.18 + 0.025 * ln2(vec2(uv.x * 7.0, 2.0), 0.0, 0.0);\n  float rBot = vp.y - max(d.x, 0.0) * 0.32, lBot = vp.y - max(-d.x, 0.0) * 0.55;\n  float onR = step(0.0, d.x) * step(uv.y, rTop) * step(rBot, uv.y);\n  float onL = step(d.x, 0.0) * step(uv.y, lTop) * step(lBot, uv.y);\n  vec3 col = sky;\n  vec3 bankR = scrub(uv, 0.75), bankL = scrub(uv + 11.0, 0.85);\n  float fl = smoothstep(0.62, 0.72, ln2(uv * vec2(26.0, 20.0) + 7.0, 0.0, 0.0)) * smoothstep(rTop - 0.02, rTop - 0.25, uv.y);\n  bankR = mix(bankR, vec3(1.0, 0.86, 0.04) * 0.95, fl);\n  // Ground: bright grass and a pale path converging on the vanishing point.\n  float gx = d.x / max(-d.y, 0.02);\n  // Blades: fine angular stripes (they become crisp green streaks) over broad light/dark patches.\n  float lgy = log(max(-d.y, 0.01));\n  float grassN = lfbm(vec2(gx * 3.0, lgy * 6.0), 3, 0.0, 0.0) * 0.5 + 0.5;\n  float blades = lridge(vec2(gx * 22.0, lgy * 2.0), 3, 0.0, 0.0);\n  vec3 grass = am_mixOk(am_mixOk(u_a0, u_ink, 0.7), am_mixOk(u_a0, u_bg, 0.15), sat(grassN * 0.7 + blades * 0.6 - 0.15));\n  float path = smoothstep(0.16, 0.08, abs(gx + 0.02));\n  vec3 ground = mix(grass, am_mixOk(u_bg, u_a2, 0.45) * (0.85 + 0.25 * grassN), path);\n  col = d.y < 0.0 ? ground : col;\n  col = mix(col, bankL, onL);\n  col = mix(col, bankR, onR);\n  return col;\n}\nvec4 motif(vec2 uv, vec2 fc) {\n  vec4 m = m_source(fc / u_res);\n  return vec4(mix(trail(uv), m.rgb + u_bg * (1.0 - m.a), u_sourceOn), 1.0);\n}\n","styles/scenes/tunnel.glsl":"// Light Tunnel — pass 2 (full res). A \"tunnel of light\" polar stretch: around the vanishing point, every pixel\n// beyond a jagged radius R(θ) samples the subject at R(θ), so colour stays constant along each ray and the frame\n// shatters into converging speed streaks. A short zoom blur adds motion, light pulses rush outward k times per loop,\n// and the radius breathes so the stretch front travels. Mirrors Resolve's Tunnel of Light, procedurally.\nvec4 motif(vec2 uv, vec2 fc) {\n  vec2 vp = v_center();\n  vec2 d = uv - vp; float r = length(d); float th = atan(d.y, d.x);\n  vec2 ang = vec2(cos(th), sin(th));\n  // Jagged stretch front: angular noise sampled on the unit circle (seamless in θ), drifting on the loop.\n  float jag = ln2(ang * p_jagFreq, 1.0, 0.25) * 0.6 + ln2(ang * p_jagFreq * 3.7 + 5.0, 1.0, 0.25) * 0.4;\n  float breathe = 1.0 + p_breathe * 0.35 * lsin(1.0, 0.0);\n  float R = max(0.02, p_radius * breathe * (1.0 + p_jag * jag));\n  float soft = 0.015;\n  float stretchT = smoothstep(R - soft, R + soft, r);\n  float rs = mix(r, R + (r - R) * p_squash, stretchT);           // source radius\n  vec2 asp = vec2(u_res.y / u_res.x, 1.0);\n  vec2 qv = vp * asp + 0.5;\n  // Zoom blur along the ray (motion), stronger in the streak region.\n  vec3 acc = vec3(0.0); float wsum = 0.0;\n  int N = p_blurTaps;\n  for (int i = 0; i < 16; i++) {\n    if (i >= N) break;\n    float t = (float(i) + am_ign(fc)) / float(N);\n    float rr = rs * (1.0 - p_blur * 0.08 * t * (0.3 + stretchT));\n    vec2 q = qv + ang * rr * asp;\n    float w = 1.0 - t * 0.5;\n    acc += texture(u_buf0, q).rgb * w; wsum += w;\n  }\n  vec3 col = acc / wsum;\n  // Light rushing outward along the streaks: pulses travel in log-radius, an integer number per loop.\n  float lr = log(max(r, 1e-3));\n  float rush = pulse(lr * 0.6 + h21(vec2(floor(th * 60.0), 3.0)) * 0.3, float(p_rush), 0.0, 0.07);\n  col *= 1.0 + rush * p_rushGain * stretchT * 1.5;\n  // Hot core at the vanishing point (overexposed sky in the reference), and edge darkening on the streaks.\n  col += mix(u_bg, u_ink, 0.0) * p_core * (exp(-r * 7.0) * 0.9 + exp(-r * 2.2) * 0.25);\n  col *= mix(1.0, 0.82 + 0.18 * (1.0 - stretchT * sat(r * 1.2)), p_shade);\n  col = am_tonemap(col, p_exposure, 2);\n  col = am_grain(col, fc, p_grain, 1.0);\n  return vec4(max(col, 0.0), 1.0);\n}\n"}};</script>
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  const v = KG.validateKit(KIT.manifest, KIT.files);
+  const over = $('over');
+  if (!v.ok) { over.hidden = false; over.textContent = 'Kit failed validation:\n' + v.errors.join('\n'); return; }
+  const kit = v.kit, raw = KIT.manifest;
+  const rt = KG.createGlRuntime();
+  if (!rt.ok) { over.hidden = false; over.textContent = 'WebGL2 is not available in this browser, so the live stage cannot run.'; return; }
+  const view = $('view'), ctx = view.getContext('2d');
+  const S = { i: 0, playing: true, t: 0, last: performance.now(), L: 8, tempo: 1, scale: 0.75, seed: 417, pal: {}, vals: {}, media: null, ready: false, fps: 0 };
+  const store = { get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }, set(k, x) { try { localStorage.setItem(k, x); } catch (e) { /* storage unavailable */ } } };
+
+  const defaults = st => Object.fromEntries(Object.entries(st.params).map(([k, s]) => [k, s.def]));
+  kit.styles.forEach(st => { S.vals[st.id] = defaults(st); });
+  const palOf = st => S.pal[st.id] || kit.palettes.find(p => p.id === st.palette) || kit.palettes[0];
+
+  // ---- reel
+  const reel = $('reel');
+  kit.styles.forEach((st, i) => {
+    const b = document.createElement('button'); b.type = 'button';
+    b.innerHTML = `<span class="nm">${st.name}${(st.inputs || []).length ? ' <span class="badge">MEDIA</span>' : ''}</span><span class="grp">${st.group || ''}</span>`;
+    b.addEventListener('click', () => select(i)); reel.appendChild(b);
+  });
+
+  // ---- palettes
+  function drawPals() {
+    const box = $('pals'); box.innerHTML = ''; const st = kit.styles[S.i]; const cur = palOf(st);
+    kit.palettes.forEach(p => {
+      const b = document.createElement('button'); b.type = 'button'; b.className = 'pal'; b.title = p.name; b.setAttribute('aria-label', 'Palette ' + p.name);
+      b.setAttribute('aria-pressed', String(p === cur));
+      [p.bg, p.a[0], p.a[1], p.a[2], p.ink].forEach(c => { const s = document.createElement('span'); s.style.background = c; b.appendChild(s); });
+      b.addEventListener('click', () => { S.pal[st.id] = p; drawPals(); });
+      box.appendChild(b);
+    });
+  }
+
+  // ---- inspector (built from the raw manifest params; values live in expanded channels)
+  const hex = (r, g, b) => '#' + [r, g, b].map(x => Math.round(Math.max(0, Math.min(1, x)) * 255).toString(16).padStart(2, '0')).join('');
+  function visible(spec, vals) {
+    const c = spec.show; if (!c) return true; const x = vals[c.param];
+    if ('is' in c) return Array.isArray(c.is) ? c.is.includes(x) : x === c.is;
+    if ('not' in c) return Array.isArray(c.not) ? !c.not.includes(x) : x !== c.not;
+    if ('gt' in c) return x > c.gt; if ('lt' in c) return x < c.lt; return true;
+  }
+  const fmt = (s, x) => (s.type === 'int' ? String(x) : (Math.abs(x) >= 100 ? x.toFixed(0) : x.toFixed(2))) + (s.unit ? (s.unit.length > 1 ? ' ' : '') + s.unit : '');
+  function drawInspector() {
+    const insp = $('insp'); insp.querySelectorAll('details').forEach(d => d.remove());
+    const st = kit.styles[S.i], rs = raw.styles.find(x => kit.id + '/' + x.id === st.id) || raw.styles[S.i];
+    const vals = S.vals[st.id]; const groups = new Map();
+    for (const [k, spec] of Object.entries(rs.params)) { const g = spec.group || 'Style'; if (!groups.has(g)) groups.set(g, []); groups.get(g).push([k, spec]); }
+    const rowsByKey = {};
+    for (const [g, items] of groups) {
+      const d = document.createElement('details'); d.className = 'grp'; d.open = g !== 'Quality';
+      const sm = document.createElement('summary'); sm.textContent = g; d.appendChild(sm);
+      const rows = document.createElement('div'); rows.className = 'rows'; d.appendChild(rows);
+      for (const [k, spec] of items) {
+        const row = document.createElement('div'); row.className = 'row'; const id = `p-${st.localId}-${k}`; rowsByKey[k] = row;
+        const lab = document.createElement('label'); lab.htmlFor = id; lab.textContent = spec.label || k; if (spec.hint) lab.title = spec.hint;
+        const out = document.createElement('output');
+        if (spec.type === 'range' || spec.type === 'int') {
+          const inp = document.createElement('input'); inp.type = 'range'; inp.id = id;
+          const lg = spec.type === 'range' && spec.log && spec.min > 0;
+          const to = x => lg ? Math.log(x / spec.min) / Math.log(spec.max / spec.min) * 1000 : x;
+          const from = u => lg ? spec.min * Math.pow(spec.max / spec.min, u / 1000) : +u;
+          if (lg) { inp.min = 0; inp.max = 1000; inp.step = 1; } else { inp.min = spec.min; inp.max = spec.max; inp.step = spec.type === 'int' ? 1 : (spec.step || (spec.max - spec.min) / 500); }
+          inp.value = to(vals[k]); out.textContent = fmt(spec, vals[k]);
+          inp.addEventListener('input', () => { let x = from(inp.value); if (spec.type === 'int') x = Math.round(x); vals[k] = x; out.textContent = fmt(spec, x); refreshShow(); });
+          lab.appendChild(out); row.append(lab, inp);
+        } else if (spec.type === 'toggle') {
+          const w = document.createElement('label'); w.className = 'tog'; w.htmlFor = id; const inp = document.createElement('input'); inp.type = 'checkbox'; inp.id = id; inp.checked = !!vals[k];
+          inp.addEventListener('change', () => { vals[k] = inp.checked; refreshShow(); }); w.append(inp, document.createTextNode(spec.label || k)); row.append(w);
+        } else if (spec.type === 'select') {
+          const sel = document.createElement('select'); sel.id = id;
+          spec.options.forEach(o => { const v2 = typeof o === 'string' ? o : o.v; const op = document.createElement('option'); op.value = v2; op.textContent = typeof o === 'string' ? o : (o.l || o.v); sel.appendChild(op); });
+          sel.value = vals[k]; sel.addEventListener('change', () => { vals[k] = sel.value; refreshShow(); }); row.append(lab, sel);
+        } else if (spec.type === 'color') {
+          const inp = document.createElement('input'); inp.type = 'color'; inp.id = id; inp.value = hex(vals[k + 'R'], vals[k + 'G'], vals[k + 'B']);
+          inp.addEventListener('input', () => { const h = inp.value; vals[k + 'R'] = parseInt(h.slice(1, 3), 16) / 255; vals[k + 'G'] = parseInt(h.slice(3, 5), 16) / 255; vals[k + 'B'] = parseInt(h.slice(5, 7), 16) / 255; });
+          row.append(lab, inp);
+        } else if (spec.type === 'point') {
+          row.append(lab);
+          ['X', 'Y'].forEach(ax => { const inp = document.createElement('input'); inp.type = 'range'; inp.id = ax === 'X' ? id : id + 'Y'; inp.setAttribute('aria-label', (spec.label || k) + ' ' + ax); inp.min = spec.min ?? -1; inp.max = spec.max ?? 1; inp.step = 0.005; inp.value = vals[k + ax]; inp.addEventListener('input', () => { vals[k + ax] = +inp.value; out.textContent = vals[k + 'X'].toFixed(2) + ', ' + vals[k + 'Y'].toFixed(2); }); row.append(inp); });
+          out.textContent = vals[k + 'X'].toFixed(2) + ', ' + vals[k + 'Y'].toFixed(2); lab.appendChild(out);
+        }
+        if (spec.hint) { const h = document.createElement('div'); h.className = 'hint'; h.textContent = spec.hint; row.appendChild(h); }
+        rows.appendChild(row);
+      }
+      insp.appendChild(d);
+    }
+    function refreshShow() { for (const [k, spec] of Object.entries(rs.params)) if (rowsByKey[k]) rowsByKey[k].hidden = !visible(spec, vals); }
+    refreshShow();
+    const reset = document.createElement('details'); reset.className = 'grp'; reset.open = true;
+    reset.innerHTML = '<summary>Reset</summary><div class="rows"><button class="btn" type="button" id="resetBtn">Restore defaults</button></div>';
+    insp.appendChild(reset); $('resetBtn').addEventListener('click', () => { S.vals[st.id] = defaults(st); delete S.pal[st.id]; drawInspector(); drawPals(); });
+  }
+
+  function drawAbout() {
+    const st = kit.styles[S.i]; const tags = (st.tags || []).map(t => `<span>#${t}</span>`).join('');
+    const passes = st.passes.map(p => `${p.file.split('/').pop().replace('.glsl', '')} ${p.scale < 1 ? '@' + p.scale : ''}`).join(' → ');
+    $('about').innerHTML = `<h3>${st.name}</h3><p>${st.blurb || ''}</p><div class="tags">${tags}</div><div class="hint">Passes: ${passes}${(st.inputs || []).length ? ' · media input: drop a photo or clip on the stage' : ''}</div>`;
+  }
+
+  function select(i) {
+    S.i = i; S.ready = false; store.set('am-style', String(i));
+    [...reel.querySelectorAll('button')].forEach((b, j) => b.setAttribute('aria-current', String(j === i)));
+    drawPals(); drawInspector(); drawAbout();
+  }
+
+  // ---- media (fill-fit to the stage aspect, like Motif's host)
+  let bakeC = document.createElement('canvas'), bakeX = bakeC.getContext('2d'), rev = 1;
+  function bake(src, w, h) {
+    const sw = src.videoWidth || src.naturalWidth || src.width, sh = src.videoHeight || src.naturalHeight || src.height; if (!sw || !sh) return null;
+    const ar = w / h; let cw = sw, ch = sh; if (sw / sh > ar) cw = sh * ar; else ch = sw / ar;
+    const tw = Math.min(1920, Math.round(cw)), th = Math.round(tw * ch / cw);
+    if (bakeC.width !== tw || bakeC.height !== th) { bakeC.width = tw; bakeC.height = th; }
+    bakeX.drawImage(src, (sw - cw) / 2, (sh - ch) / 2, cw, ch, 0, 0, tw, th);
+    return { canvas: bakeC, rev: ++rev, w: sw, h: sh, time: src.currentTime || 0 };
+  }
+  let mediaEl = null, mediaKey = '', baked = null;
+  function setMedia(file) {
+    if (!file) return; const url = URL.createObjectURL(file);
+    if (file.type.startsWith('video')) { const vd = document.createElement('video'); vd.src = url; vd.muted = true; vd.loop = true; vd.playsInline = true; vd.play().catch(() => {}); mediaEl = vd; }
+    else { const im = new Image(); im.src = url; mediaEl = im; }
+    mediaKey = ''; $('mediaClear').hidden = false;
+  }
+  $('mediaBtn').addEventListener('click', () => $('mediaIn').click());
+  $('mediaIn').addEventListener('change', e => setMedia(e.target.files[0]));
+  $('mediaClear').addEventListener('click', () => { mediaEl = null; baked = null; $('mediaClear').hidden = true; });
+  const stage = $('stage');
+  stage.addEventListener('dragover', e => { e.preventDefault(); stage.classList.add('drag'); });
+  stage.addEventListener('dragleave', () => stage.classList.remove('drag'));
+  stage.addEventListener('drop', e => { e.preventDefault(); stage.classList.remove('drag'); setMedia(e.dataTransfer.files[0]); });
+
+  // ---- transport
+  const play = $('play'), scrub = $('scrub');
+  play.addEventListener('click', () => { S.playing = !S.playing; play.textContent = S.playing ? 'Pause' : 'Play'; });
+  scrub.addEventListener('input', () => { S.playing = false; play.textContent = 'Play'; S.t = (+scrub.value / 1000) * (S.L / S.tempo); });
+  $('loopLen').addEventListener('change', e => { S.L = Math.max(1, +e.target.value || 8); });
+  $('tempo').addEventListener('change', e => { S.tempo = +e.target.value; });
+  $('res').addEventListener('change', e => { S.scale = +e.target.value; });
+  $('seed').addEventListener('change', e => { S.seed = Math.max(1, Math.min(9999, Math.round(+e.target.value) || 1)); });
+  document.addEventListener('keydown', e => { if (e.code === 'Space' && e.target === document.body) { e.preventDefault(); play.click(); } });
+
+  // ---- render loop
+  let frames = 0, fpsT = performance.now();
+  function tick(now) {
+    requestAnimationFrame(tick);
+    const dt = Math.min(0.1, (now - S.last) / 1000); S.last = now; if (S.playing) S.t += dt;
+    const st = kit.styles[S.i];
+    if (!S.ready) {
+      const r = rt.compile(st.id, { passes: st.passes, common: kit.common, params: st.params, inputs: st.inputs || [] });
+      if (r.pending) { rt.poll(); over.hidden = false; over.textContent = 'Compiling ' + st.name + '…'; return; }
+      if (!r.ok) { over.hidden = false; over.textContent = 'Compile error\n' + r.error; return; }
+      S.ready = true; over.hidden = true;
+    }
+    const L = S.L / S.tempo; const p = ((S.t / L) % 1 + 1) % 1; if (S.playing) scrub.value = Math.round(p * 1000);
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const w = Math.max(64, Math.round(stage.clientWidth * dpr * S.scale)), h = Math.max(36, Math.round(w * 9 / 16));
+    let media = null;
+    if (mediaEl && (st.inputs || []).length) {
+      const key = w + 'x' + h; const isVid = mediaEl.tagName === 'VIDEO';
+      if (isVid || key !== mediaKey || !baked) { const b = bake(mediaEl, w, h); if (b) { baked = b; mediaKey = key; } }
+      if (baked) media = Object.fromEntries(st.inputs.map(q => [q.id, baked]));
+    }
+    rt.draw(st.id, w, h, { p, L, seed: S.seed, safe: true, pal: palOf(st), params: S.vals[st.id], spec: st.params, media });
+    if (view.width !== w || view.height !== h) { view.width = w; view.height = h; }
+    ctx.fillStyle = palOf(st).bg; ctx.fillRect(0, 0, w, h); rt.blit(ctx, w, h);
+    frames++; if (now - fpsT > 500) { S.fps = frames * 1000 / (now - fpsT); frames = 0; fpsT = now; }
+    $('hud').textContent = `${w}×${h} · ${S.fps.toFixed(0)} fps · p ${p.toFixed(3)} · loop ${L.toFixed(1)} s${rt.software ? ' · software GL' : ''}`;
+  }
+  const saved = parseInt(store.get('am-style') || '0', 10);
+  const hashI = kit.styles.findIndex(s => '#' + s.localId === location.hash);
+  select(hashI >= 0 ? hashI : (saved >= 0 && saved < kit.styles.length ? saved : 0));
+  requestAnimationFrame(tick);
+})();
+</script>

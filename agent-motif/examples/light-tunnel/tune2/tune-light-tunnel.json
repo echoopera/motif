@@ -1,0 +1,42 @@
+{
+  "style": "light-tunnel",
+  "mode": "style",
+  "phases": [
+    0.25,
+    0.5,
+    0.75
+  ],
+  "score": {
+    "before": 55.75,
+    "after": 58.64
+  },
+  "history": [
+    55.75,
+    55.75,
+    55.75,
+    55.75,
+    56.75,
+    57.27,
+    58.22,
+    58.22,
+    58.64
+  ],
+  "params": {
+    "centerX": -0.1575,
+    "centerY": -0.195,
+    "radius": 0.42,
+    "jag": 1.14,
+    "jagFreq": 2.59,
+    "squash": 0,
+    "breathe": 0.11,
+    "rush": 3,
+    "rushGain": 0.35,
+    "blur": 0.17,
+    "blurTaps": 8,
+    "core": 0.1,
+    "shade": 0.62,
+    "exposure": -0.05,
+    "grain": 0.06
+  },
+  "palette": null
+}

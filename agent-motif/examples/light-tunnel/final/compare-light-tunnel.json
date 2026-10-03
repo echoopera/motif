@@ -1,0 +1,74 @@
+[
+  {
+    "p": 0.25,
+    "score": 56.2,
+    "parts": {
+      "palette": 61.5,
+      "tone": 56.2,
+      "texture": 63.6,
+      "layout": 39.4,
+      "structure": 35.6
+    },
+    "detail": {
+      "swd": 0.0238,
+      "ssim": 0.356,
+      "dMeanL": 0.01,
+      "dBeta": -0.47
+    },
+    "gaps": [
+      "contrast too flat (RMS 0.21 vs 0.24) → deepen shadows / punchier tone map / sharper falloffs",
+      "clipping: 42.5% near-white vs 36.4% → reduce peak radiance or use AgX",
+      "hue mass differs: target peaks at 90–120° OKLCh, render at 90–120° → retune palette (use the analyze palette) or hue-shift",
+      "spectral slope β 2.26 vs target 2.73 → too much fine detail: fewer octaves, lower frequency, more blur",
+      "composition: brightness centroid off by (-0.00, 0.00) frame units; radial profile target has a bright centre → move the focal element / reshape vignette"
+    ]
+  },
+  {
+    "p": 0.5,
+    "score": 53.55,
+    "parts": {
+      "palette": 58.3,
+      "tone": 51.5,
+      "texture": 61.5,
+      "layout": 38.7,
+      "structure": 35.7
+    },
+    "detail": {
+      "swd": 0.0276,
+      "ssim": 0.357,
+      "dMeanL": 0.01,
+      "dBeta": -0.25
+    },
+    "gaps": [
+      "contrast too flat (RMS 0.21 vs 0.24) → deepen shadows / punchier tone map / sharper falloffs",
+      "clipping: 42.5% near-white vs 36.4% → reduce peak radiance or use AgX",
+      "hue mass differs: target peaks at 90–120° OKLCh, render at 90–120° → retune palette (use the analyze palette) or hue-shift",
+      "edge density 0.257 vs 0.336 → add crisp structure (thinner lines, harder SDF edges)",
+      "composition: brightness centroid off by (-0.00, 0.00) frame units; radial profile target has a bright centre → move the focal element / reshape vignette"
+    ]
+  },
+  {
+    "p": 0.75,
+    "score": 56.17,
+    "parts": {
+      "palette": 59.5,
+      "tone": 56.1,
+      "texture": 63.6,
+      "layout": 41.6,
+      "structure": 39.7
+    },
+    "detail": {
+      "swd": 0.0256,
+      "ssim": 0.397,
+      "dMeanL": 0.007,
+      "dBeta": -0.36
+    },
+    "gaps": [
+      "clipping: 44.0% near-white vs 36.4% → reduce peak radiance or use AgX",
+      "hue mass differs: target peaks at 90–120° OKLCh, render at 90–120° → retune palette (use the analyze palette) or hue-shift",
+      "spectral slope β 2.37 vs target 2.73 → too much fine detail: fewer octaves, lower frequency, more blur",
+      "edge density 0.284 vs 0.336 → add crisp structure (thinner lines, harder SDF edges)",
+      "composition: brightness centroid off by (0.00, 0.00) frame units; radial profile target has a bright centre → move the focal element / reshape vignette"
+    ]
+  }
+]

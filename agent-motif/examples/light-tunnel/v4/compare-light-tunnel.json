@@ -1,0 +1,74 @@
+[
+  {
+    "p": 0.25,
+    "score": 54.11,
+    "parts": {
+      "palette": 59.1,
+      "tone": 50.3,
+      "texture": 63.4,
+      "layout": 39.8,
+      "structure": 34.9
+    },
+    "detail": {
+      "swd": 0.0274,
+      "ssim": 0.349,
+      "dMeanL": -0.012,
+      "dBeta": -0.16
+    },
+    "gaps": [
+      "contrast too flat (RMS 0.21 vs 0.24) → deepen shadows / punchier tone map / sharper falloffs",
+      "missing highlights (36.4% near-white in target vs 31.1%) → add HDR hot cores + bloom",
+      "hue mass differs: target peaks at 90–120° OKLCh, render at 90–120° → retune palette (use the analyze palette) or hue-shift",
+      "edge density 0.251 vs 0.336 → add crisp structure (thinner lines, harder SDF edges)",
+      "composition: brightness centroid off by (0.00, 0.01) frame units; radial profile target has a bright centre → move the focal element / reshape vignette"
+    ]
+  },
+  {
+    "p": 0.5,
+    "score": 51.83,
+    "parts": {
+      "palette": 58.9,
+      "tone": 47.4,
+      "texture": 58.1,
+      "layout": 37.5,
+      "structure": 36.9
+    },
+    "detail": {
+      "swd": 0.028,
+      "ssim": 0.369,
+      "dMeanL": -0.026,
+      "dBeta": -0.21
+    },
+    "gaps": [
+      "contrast too flat (RMS 0.21 vs 0.24) → deepen shadows / punchier tone map / sharper falloffs",
+      "missing highlights (36.4% near-white in target vs 28.2%) → add HDR hot cores + bloom",
+      "hue mass differs: target peaks at 90–120° OKLCh, render at 90–120° → retune palette (use the analyze palette) or hue-shift",
+      "edge density 0.260 vs 0.336 → add crisp structure (thinner lines, harder SDF edges)",
+      "radial streak index 0.71 vs target 0.59 → less radial streaking",
+      "composition: brightness centroid off by (0.00, 0.00) frame units; radial profile target has a bright centre → move the focal element / reshape vignette"
+    ]
+  },
+  {
+    "p": 0.75,
+    "score": 53.47,
+    "parts": {
+      "palette": 58.8,
+      "tone": 50.3,
+      "texture": 62.7,
+      "layout": 36,
+      "structure": 35.9
+    },
+    "detail": {
+      "swd": 0.0281,
+      "ssim": 0.359,
+      "dMeanL": -0.028,
+      "dBeta": -0.09
+    },
+    "gaps": [
+      "missing highlights (36.4% near-white in target vs 33.0%) → add HDR hot cores + bloom",
+      "hue mass differs: target peaks at 90–120° OKLCh, render at 90–120° → retune palette (use the analyze palette) or hue-shift",
+      "edge density 0.246 vs 0.336 → add crisp structure (thinner lines, harder SDF edges)",
+      "composition: brightness centroid off by (0.00, 0.01) frame units; radial profile target has a bright centre → move the focal element / reshape vignette"
+    ]
+  }
+]
