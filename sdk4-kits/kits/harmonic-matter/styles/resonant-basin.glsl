@@ -140,7 +140,8 @@ vec4 scene_main(vec2 uv, vec2 fc, int variant) {
     float fres = pow(1.0 - ndv, 3.0);
     vec3 hv = normalize(K - rd);
     float spec = pow(max(dot(n, hv), 0.0), 60.0);
-    float peak = smoothstep(0.18, 0.62, hg.x / (amax + 1e-3));
+    float hnorm = hg.x / (amax + 1e-3) * (variant >= 4 ? 1.9 : 1.0);   // radial and interference fields use a smaller share of the slab
+    float peak = smoothstep(0.18, 0.62, hnorm);
     float warm = p_warmth * peak * (variant == 2 ? 2.0 : 1.6);
     float fadeD = exp(-t * 0.18);
     vec3 base = mix(u_a2 * 0.8, u_a0, 0.25 + 0.5 * ndl);
@@ -153,7 +154,7 @@ vec4 scene_main(vec2 uv, vec2 fc, int variant) {
     float node = nodeW > 0.0 ? exp(-pow(nd / max(nodeW, 1e-4), 2.0)) : 0.0;
     node *= 1.0 - smoothstep(0.0, 0.5, t * k_px() * 5.0 / max(nodeW, 1e-3) * 0.02);
     vec3 em = mix(u_a0, u_ink, 0.6) * node * (s == 0 ? 0.7 : 0.18);       // contours read on the top sheet; lower sheets stay quiet
-    em += u_a1 * pow(smoothstep(0.25, 0.65, hg.x / (amax + 1e-3)), 1.5) * clamp(warm, 0.0, 1.0) * (variant == 2 ? 4.2 : 2.4);              // amber light concentrated at the peaks
+    em += u_a1 * pow(smoothstep(0.25, 0.65, hnorm), 1.5) * clamp(warm, 0.0, 1.0) * (variant == 2 ? 4.2 : 2.4);              // amber light concentrated at the peaks
     vec3 pcl = particles(xz, hg, t, float(kind), float(s));
     float pw = variant == 2 ? (0.3 + 1.6 * peak) : 1.0;
     vec3 pcol = mix(u_a0 * 1.3, u_a1 * 1.6, clamp(warm + peak * 0.3, 0.0, 1.0));

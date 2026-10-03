@@ -1,0 +1,299 @@
+{
+  "kit": "harmonic-matter",
+  "style": "standing-crest",
+  "phase": 0.37,
+  "size": [
+    120,
+    213
+  ],
+  "note": "effect = max mean-abs 8-bit change vs the default frame over min/max (or every option)",
+  "rows": [
+    {
+      "key": "modes",
+      "label": "Wave modes",
+      "type": "int",
+      "def": 3,
+      "vals": [
+        2,
+        6
+      ],
+      "diffs": [
+        23.4,
+        23.36
+      ],
+      "effect": 23.4
+    },
+    {
+      "key": "amp",
+      "label": "Amplitude",
+      "type": "range",
+      "def": 0.2,
+      "vals": [
+        0.03,
+        0.35
+      ],
+      "diffs": [
+        25.4,
+        21.21
+      ],
+      "effect": 25.4
+    },
+    {
+      "key": "wavelength",
+      "label": "Wavelength",
+      "type": "range",
+      "def": 0.8,
+      "vals": [
+        0.15,
+        1.5
+      ],
+      "diffs": [
+        27.04,
+        29.56
+      ],
+      "effect": 29.56
+    },
+    {
+      "key": "tilt",
+      "label": "Camera pitch",
+      "type": "range",
+      "def": 0.85,
+      "vals": [
+        0.15,
+        1.2
+      ],
+      "diffs": [
+        0,
+        0
+      ],
+      "effect": 0
+    },
+    {
+      "key": "nodeWidth",
+      "label": "Node width",
+      "type": "range",
+      "def": 0.005,
+      "vals": [
+        0.002,
+        0.03
+      ],
+      "diffs": [
+        15.3,
+        58.18
+      ],
+      "effect": 58.18
+    },
+    {
+      "key": "opacity",
+      "label": "Membrane opacity",
+      "type": "range",
+      "def": 0.35,
+      "vals": [
+        0.05,
+        0.7
+      ],
+      "diffs": [
+        4.1,
+        4.6
+      ],
+      "effect": 4.6
+    },
+    {
+      "key": "warmth",
+      "label": "Peak warmth",
+      "type": "range",
+      "def": 0.5,
+      "vals": [
+        0,
+        1
+      ],
+      "diffs": [
+        0.09,
+        0.09
+      ],
+      "effect": 0.09
+    },
+    {
+      "key": "density",
+      "label": "Particle density",
+      "type": "range",
+      "def": 0.4,
+      "vals": [
+        0.1,
+        1
+      ],
+      "diffs": [
+        0.28,
+        0.43
+      ],
+      "effect": 0.43
+    },
+    {
+      "key": "particleR",
+      "label": "Particle radius",
+      "type": "range",
+      "def": 0.003,
+      "vals": [
+        0.001,
+        0.012
+      ],
+      "diffs": [
+        0.37,
+        5.48
+      ],
+      "effect": 5.48
+    },
+    {
+      "key": "drift",
+      "label": "Particle drift",
+      "type": "range",
+      "def": 0.25,
+      "vals": [
+        0,
+        0.5
+      ],
+      "diffs": [
+        0,
+        0
+      ],
+      "effect": 0
+    },
+    {
+      "key": "osc",
+      "label": "Oscillations per loop",
+      "type": "int",
+      "def": 1,
+      "vals": [
+        1,
+        4
+      ],
+      "diffs": [
+        0,
+        26.54
+      ],
+      "effect": 26.54
+    },
+    {
+      "key": "orbit",
+      "label": "Camera orbit",
+      "type": "range",
+      "def": 0.08,
+      "vals": [
+        0,
+        0.3
+      ],
+      "diffs": [
+        0,
+        0
+      ],
+      "effect": 0
+    },
+    {
+      "key": "keyAngle",
+      "label": "Key direction",
+      "type": "range",
+      "def": 40,
+      "vals": [
+        -180,
+        180
+      ],
+      "diffs": [
+        0,
+        0
+      ],
+      "effect": 0
+    },
+    {
+      "key": "exposure",
+      "label": "Exposure",
+      "type": "range",
+      "def": 1,
+      "vals": [
+        0.4,
+        2.4
+      ],
+      "diffs": [
+        28.24,
+        32.87
+      ],
+      "effect": 32.87
+    },
+    {
+      "key": "bloom",
+      "label": "Bloom",
+      "type": "range",
+      "def": 0.5,
+      "vals": [
+        0,
+        1.6
+      ],
+      "diffs": [
+        6.56,
+        8.71
+      ],
+      "effect": 8.71
+    },
+    {
+      "key": "bloomRadius",
+      "label": "Bloom radius",
+      "type": "range",
+      "def": 1,
+      "vals": [
+        0.4,
+        2.2
+      ],
+      "diffs": [
+        1.99,
+        1.96
+      ],
+      "effect": 1.99
+    },
+    {
+      "key": "lensCA",
+      "label": "Edge fringe",
+      "type": "range",
+      "def": 0.12,
+      "vals": [
+        0,
+        0.5
+      ],
+      "diffs": [
+        0.64,
+        1.95
+      ],
+      "effect": 1.95
+    },
+    {
+      "key": "vignette",
+      "label": "Vignette",
+      "type": "range",
+      "def": 0.38,
+      "vals": [
+        0,
+        0.8
+      ],
+      "diffs": [
+        1.9,
+        2.54
+      ],
+      "effect": 2.54
+    },
+    {
+      "key": "quality",
+      "label": "Quality",
+      "type": "select",
+      "def": "balanced",
+      "vals": [
+        "live",
+        "balanced",
+        "export"
+      ],
+      "diffs": [
+        0,
+        0,
+        0
+      ],
+      "effect": 0
+    }
+  ]
+}

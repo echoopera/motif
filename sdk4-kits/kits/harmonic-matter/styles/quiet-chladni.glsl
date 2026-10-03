@@ -69,32 +69,6 @@ float sheetHit(vec3 ro, vec3 rd, float yoff, int kind, float amp, int steps, out
   return hit;
 }
 
-// attached particles on the sheet: returns (core, halo, peakness)
-vec3 particles(vec2 xz, vec3 hg, float tdist, float kindW, float sheetId) {
-  float cs = 0.06;
-  vec2 cell = floor(xz / cs);
-  float th = k_theta();
-  float core = 0.0, halo = 0.0;
-  float rad = max(p_particleR, tdist * k_px() * 0.55);
-  for (int j = -1; j <= 1; j++) for (int i = -1; i <= 1; i++) {
-    vec2 cid = cell + vec2(float(i), float(j));
-    vec2 hh = h22(cid + sheetId * 19.0);
-    float keep = step(hh.x, p_density);
-    if (keep < 0.5) continue;
-    vec2 c = (cid + 0.25 + 0.5 * h22(cid * 1.7 + 3.0 + sheetId)) * cs;
-    // displacement follows the field's own gradient with a fixed per-particle phase (closed in theta)
-    float ph = TAU * h21(cid + sheetId * 7.0);
-    vec2 gd; hField(c, int(kindW), th, p_amp, gd);
-    c += gd * p_drift * 0.4 * cos(float(p_osc) * th + ph) ;
-    vec2 d = xz - c;
-    float dd = length(d);
-    float bright = 0.55 + 0.9 * h21(cid * 3.1 + sheetId);
-    core += bright * exp(-(dd * dd) / (rad * rad));
-    halo += bright * exp(-dd / (rad * 5.0));
-  }
-  return vec3(core, halo, 0.0);
-}
-
 vec3 hmSky(vec2 uv) {
   float g = smoothstep(-0.9, 0.7, uv.y);
   vec3 c = mix(u_a2 * 0.28, u_bg, g);
@@ -108,80 +82,6 @@ mat3 camBasis(vec3 ro, vec3 target) {
 }
 
 // ribbon / ridge / chladni families draw directly in the picture plane
-vec3 hmRibbons(vec2 uv, int variant) {
-  float th = k_theta();
-  vec3 col = hmSky(uv);
-  float ribbons = float(6 + p_modes * 2);
-  vec2 g;
-  for (int j = 0; j < 20; j++) {
-    if (float(j) >= ribbons) break;
-    float zj = float(j) / (ribbons - 1.0);
-    float depth = 1.0 + zj * 1.6;
-    float xw = uv.x * depth * 1.4;                                       // world x seen at this ribbon's depth
-    float yb = 0.36 - zj * 0.9 + 0.05;
-    float h = hField(vec2(xw, zj * 1.4 - 0.7), 0, th + zj * 1.2 * floor(float(p_osc) + 0.5) * 0.0, p_amp * 2.6, g);
-    float ph = TAU * h11(float(j) * 1.9) ;
-    float y = (yb + h * (1.0 - zj * 0.5)) / depth * 1.0 - 0.18 + 0.0;
-    // second harmonic travelling term with an integer harmonic of theta, offset per ribbon
-    y += 0.03 * sin(xw * (TAU / p_wavelength) * 0.6 + float(p_osc) * th + ph) / depth;
-    float dy = abs(uv.y - y);
-    float w = p_nodeWidth * (1.5 + 2.0 * (1.0 - zj));
-    float line = exp(-pow(dy / w, 2.0));
-    float fillm = smoothstep(0.0, 0.5, (y - uv.y)) * p_opacity * 0.6 * exp(-(y - uv.y) * 3.0);
-    vec3 c = mix(u_a0, u_ink, 0.5) * (0.5 + 1.5 * (1.0 - zj));
-    float peak = smoothstep(0.4, 1.0, h / (p_amp * 2.6 + 1e-3)) * p_warmth;
-    c = mix(c, u_a1 * 2.0, peak);
-    col += c * line * (0.6 + 1.4 * (1.0 - zj) * (1.0 - zj)) + u_a2 * fillm * (1.0 - zj * 0.6);
-    // pearls riding the ribbon
-    float pr = p_particleR * 1.2;
-    float cs = 0.06 + 0.1 * zj;
-    float cid = floor(xw / cs + 0.0);
-    for (int k = -1; k <= 1; k++) {
-      float id = cid + float(k);
-      if (h11(id * 5.1 + float(j)) > p_density) continue;
-      float cx = (id + 0.5) * cs;
-      float hy; vec2 gg; hy = hField(vec2(cx, zj * 1.4 - 0.7), 0, th, p_amp * 2.6, gg);
-      float yy = (yb + hy * (1.0 - zj * 0.5)) / depth - 0.18 + 0.03 * sin(cx * (TAU / p_wavelength) * 0.6 + float(p_osc) * th + ph) / depth;
-      vec2 d = vec2(uv.x - cx / (depth * 1.4), uv.y - yy);
-      col += mix(u_ink, u_a1, p_warmth * smoothstep(0.2, 1.0, hy / (p_amp * 2.6))) * 2.2 * exp(-dot(d, d) / (pr * pr * 2.0)) / depth;
-    }
-  }
-  return col;
-}
-
-vec3 hmRidges(vec2 uv, int variant) {
-  float th = k_theta();
-  vec3 col = hmSky(uv);
-  float rows = float(10 + p_modes * 2);
-  vec2 g;
-  for (int j = 0; j < 22; j++) {
-    float jj = rows - 1.0 - float(j);                                    // far to near
-    if (jj < 0.0) break;
-    float zj = jj / (rows - 1.0);
-    float depth = 1.0 + zj * 2.0;
-    float xw = uv.x * depth * 1.5;
-    float h = hField(vec2(xw, zj * 2.0 - 1.0), 1, th, p_amp * 2.2, g);
-    float ys = -0.78 + zj * 1.25 + h * (1.3 - zj * 0.7) * (1.0 - zj * 0.3);
-    float below = uv.y - ys;
-    float inside = smoothstep(0.0, 0.004, -below);
-    vec3 body = mix(u_bg * 1.2, u_a2 * (0.5 + 0.8 * (1.0 - zj)), 0.55 + 0.4 * (-below < 0.2 ? 1.0 : 0.0));
-    body *= 0.45 + 0.8 * (1.0 - zj) + p_opacity;
-    col = mix(col, body, inside * (0.7 + 0.3 * p_opacity * 2.0));
-    float rim = exp(-pow(below / (p_nodeWidth * (1.0 + 2.2 * (1.0 - zj))), 2.0));
-    float crest = smoothstep(0.3, 1.0, h / (p_amp * 2.2));
-    vec3 rc = mix(mix(u_a0, u_ink, 0.6), u_a1 * 2.0, crest * p_warmth);
-    col += rc * rim * (0.35 + 1.8 * (1.0 - zj) * (1.0 - zj));
-    // dust on crests
-    float cs = 0.05;
-    float id = floor(uv.x / cs);
-    if (h11(id * 3.7 + jj) < p_density * 0.5) {
-      vec2 d = vec2(uv.x - (id + 0.5) * cs, below);
-      col += u_ink * 1.5 * exp(-dot(d, d) / (p_particleR * p_particleR * 2.0)) * (1.0 - zj * 0.7);
-    }
-  }
-  return col;
-}
-
 vec3 hmChladni(vec2 uv, int variant) {
   float th = k_theta();
   vec3 col = hmSky(uv) * 0.7;

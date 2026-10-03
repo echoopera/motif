@@ -69,32 +69,6 @@ float sheetHit(vec3 ro, vec3 rd, float yoff, int kind, float amp, int steps, out
   return hit;
 }
 
-// attached particles on the sheet: returns (core, halo, peakness)
-vec3 particles(vec2 xz, vec3 hg, float tdist, float kindW, float sheetId) {
-  float cs = 0.06;
-  vec2 cell = floor(xz / cs);
-  float th = k_theta();
-  float core = 0.0, halo = 0.0;
-  float rad = max(p_particleR, tdist * k_px() * 0.55);
-  for (int j = -1; j <= 1; j++) for (int i = -1; i <= 1; i++) {
-    vec2 cid = cell + vec2(float(i), float(j));
-    vec2 hh = h22(cid + sheetId * 19.0);
-    float keep = step(hh.x, p_density);
-    if (keep < 0.5) continue;
-    vec2 c = (cid + 0.25 + 0.5 * h22(cid * 1.7 + 3.0 + sheetId)) * cs;
-    // displacement follows the field's own gradient with a fixed per-particle phase (closed in theta)
-    float ph = TAU * h21(cid + sheetId * 7.0);
-    vec2 gd; hField(c, int(kindW), th, p_amp, gd);
-    c += gd * p_drift * 0.4 * cos(float(p_osc) * th + ph) ;
-    vec2 d = xz - c;
-    float dd = length(d);
-    float bright = 0.55 + 0.9 * h21(cid * 3.1 + sheetId);
-    core += bright * exp(-(dd * dd) / (rad * rad));
-    halo += bright * exp(-dd / (rad * 5.0));
-  }
-  return vec3(core, halo, 0.0);
-}
-
 vec3 hmSky(vec2 uv) {
   float g = smoothstep(-0.9, 0.7, uv.y);
   vec3 c = mix(u_a2 * 0.28, u_bg, g);
@@ -108,47 +82,6 @@ mat3 camBasis(vec3 ro, vec3 target) {
 }
 
 // ribbon / ridge / chladni families draw directly in the picture plane
-vec3 hmRibbons(vec2 uv, int variant) {
-  float th = k_theta();
-  vec3 col = hmSky(uv);
-  float ribbons = float(6 + p_modes * 2);
-  vec2 g;
-  for (int j = 0; j < 20; j++) {
-    if (float(j) >= ribbons) break;
-    float zj = float(j) / (ribbons - 1.0);
-    float depth = 1.0 + zj * 1.6;
-    float xw = uv.x * depth * 1.4;                                       // world x seen at this ribbon's depth
-    float yb = 0.36 - zj * 0.9 + 0.05;
-    float h = hField(vec2(xw, zj * 1.4 - 0.7), 0, th + zj * 1.2 * floor(float(p_osc) + 0.5) * 0.0, p_amp * 2.6, g);
-    float ph = TAU * h11(float(j) * 1.9) ;
-    float y = (yb + h * (1.0 - zj * 0.5)) / depth * 1.0 - 0.18 + 0.0;
-    // second harmonic travelling term with an integer harmonic of theta, offset per ribbon
-    y += 0.03 * sin(xw * (TAU / p_wavelength) * 0.6 + float(p_osc) * th + ph) / depth;
-    float dy = abs(uv.y - y);
-    float w = p_nodeWidth * (1.5 + 2.0 * (1.0 - zj));
-    float line = exp(-pow(dy / w, 2.0));
-    float fillm = smoothstep(0.0, 0.5, (y - uv.y)) * p_opacity * 0.6 * exp(-(y - uv.y) * 3.0);
-    vec3 c = mix(u_a0, u_ink, 0.5) * (0.5 + 1.5 * (1.0 - zj));
-    float peak = smoothstep(0.4, 1.0, h / (p_amp * 2.6 + 1e-3)) * p_warmth;
-    c = mix(c, u_a1 * 2.0, peak);
-    col += c * line * (0.6 + 1.4 * (1.0 - zj) * (1.0 - zj)) + u_a2 * fillm * (1.0 - zj * 0.6);
-    // pearls riding the ribbon
-    float pr = p_particleR * 1.2;
-    float cs = 0.06 + 0.1 * zj;
-    float cid = floor(xw / cs + 0.0);
-    for (int k = -1; k <= 1; k++) {
-      float id = cid + float(k);
-      if (h11(id * 5.1 + float(j)) > p_density) continue;
-      float cx = (id + 0.5) * cs;
-      float hy; vec2 gg; hy = hField(vec2(cx, zj * 1.4 - 0.7), 0, th, p_amp * 2.6, gg);
-      float yy = (yb + hy * (1.0 - zj * 0.5)) / depth - 0.18 + 0.03 * sin(cx * (TAU / p_wavelength) * 0.6 + float(p_osc) * th + ph) / depth;
-      vec2 d = vec2(uv.x - cx / (depth * 1.4), uv.y - yy);
-      col += mix(u_ink, u_a1, p_warmth * smoothstep(0.2, 1.0, hy / (p_amp * 2.6))) * 2.2 * exp(-dot(d, d) / (pr * pr * 2.0)) / depth;
-    }
-  }
-  return col;
-}
-
 vec3 hmRidges(vec2 uv, int variant) {
   float th = k_theta();
   vec3 col = hmSky(uv);
@@ -178,56 +111,6 @@ vec3 hmRidges(vec2 uv, int variant) {
       vec2 d = vec2(uv.x - (id + 0.5) * cs, below);
       col += u_ink * 1.5 * exp(-dot(d, d) / (p_particleR * p_particleR * 2.0)) * (1.0 - zj * 0.7);
     }
-  }
-  return col;
-}
-
-vec3 hmChladni(vec2 uv, int variant) {
-  float th = k_theta();
-  vec3 col = hmSky(uv) * 0.7;
-  vec2 q = uv * vec2(1.0, 1.0) * (1.0 / 0.46);
-  float L = 0.50;
-  // plate is a rounded square; mode mixes cos(a x)cos(b z) - cos(b x)cos(a z), weights close on theta
-  float pm = 0.0; vec2 grad = vec2(0.0);
-  float sumw = 0.0;
-  for (int i = 0; i < KMODES; i++) {
-    if (i >= p_modes) break;
-    float fi = float(i);
-    float a = 2.0 + fi, b = 3.0 + fi + mod(fi, 2.0);
-    float w = (0.5 + 0.5 * cos(float(p_osc) * th + TAU * h11(fi + 20.0))) * pow(0.78, fi);
-    vec2 p = q * (TAU * 0.5 / p_wavelength * 0.55);
-    pm += w * (cos(a * p.x) * cos(b * p.y) - cos(b * p.x) * cos(a * p.y));
-    grad += w * vec2(-a * sin(a * p.x) * cos(b * p.y) + b * sin(b * p.x) * cos(a * p.y), -b * cos(a * p.x) * sin(b * p.y) + a * cos(b * p.x) * sin(a * p.y));
-    sumw += w;
-  }
-  pm /= max(sumw, 1e-3); grad /= max(sumw, 1e-3);
-  float distNode = abs(pm) / max(length(grad) * 0.8, 0.25) * 0.46 * 0.55;
-  float plate = k_cover(sdRoundBox(uv, vec2(0.44, 0.78), 0.04), k_px());
-  vec3 pc = mix(u_bg * 1.6, u_a2 * 0.5, 0.5);
-  col = mix(col, pc + u_a0 * 0.035 * (0.5 + 0.5 * pm), plate);
-  // sand grains gather on the node lines: bright with a narrow core, glow follows the field
-  float line = exp(-pow(distNode / (p_nodeWidth * 1.4), 2.0));
-  col += mix(u_a0, u_ink, 0.55) * line * plate * 1.5;
-  col += u_a0 * exp(-distNode / (p_nodeWidth * 5.0)) * 0.2 * plate;
-  float cs = 0.014;
-  vec2 cell = floor(uv / cs);
-  for (int j = -1; j <= 1; j++) for (int i = -1; i <= 1; i++) {
-    vec2 cid = cell + vec2(float(i), float(j));
-    vec2 hh = h22(cid);
-    vec2 c = (cid + 0.5 + 0.5 * (h22(cid + 5.0) - 0.5)) * cs;
-    vec2 pq = c / 0.46 * (TAU * 0.5 / p_wavelength * 0.55);
-    float pv = 0.0; float sw = 0.0;
-    for (int m = 0; m < KMODES; m++) {
-      if (m >= p_modes) break;
-      float fm = float(m); float a = 2.0 + fm, b = 3.0 + fm + mod(fm, 2.0);
-      float w = (0.5 + 0.5 * cos(float(p_osc) * th + TAU * h11(fm + 20.0))) * pow(0.78, fm);
-      pv += w * (cos(a * pq.x) * cos(b * pq.y) - cos(b * pq.x) * cos(a * pq.y)); sw += w;
-    }
-    pv /= max(sw, 1e-3);
-    float near = exp(-pow(pv * 2.4, 2.0));                                   // grains settle near nodes, smoothly
-    if (hh.x > p_density * (0.15 + 0.85 * near)) continue;
-    vec2 d = uv - c;
-    col += mix(u_ink, u_a1, p_warmth * 0.6) * (0.8 + 0.8 * hh.y) * exp(-dot(d, d) / (p_particleR * p_particleR * 0.9)) * plate * (0.3 + near);
   }
   return col;
 }

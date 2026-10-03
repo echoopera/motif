@@ -119,6 +119,7 @@ float sheetHit(vec3 ro, vec3 rd, float yoff, int kind, float amp, int steps, out
   return hit;
 }
 
+//@if 0 1 2 3 4 5
 // attached particles on the sheet: returns (core, halo, peakness)
 vec3 particles(vec2 xz, vec3 hg, float tdist, float kindW, float sheetId) {
   float cs = 0.06;
@@ -145,6 +146,7 @@ vec3 particles(vec2 xz, vec3 hg, float tdist, float kindW, float sheetId) {
   return vec3(core, halo, 0.0);
 }
 
+//@endif
 vec3 hmSky(vec2 uv) {
   float g = smoothstep(-0.9, 0.7, uv.y);
   vec3 c = mix(u_a2 * 0.28, u_bg, g);
@@ -159,6 +161,7 @@ mat3 camBasis(vec3 ro, vec3 target) {
 
 //@if 6 7 8
 // ribbon / ridge / chladni families draw directly in the picture plane
+//@if 6
 vec3 hmRibbons(vec2 uv, int variant) {
   float th = k_theta();
   vec3 col = hmSky(uv);
@@ -200,6 +203,8 @@ vec3 hmRibbons(vec2 uv, int variant) {
   return col;
 }
 
+//@endif
+//@if 7
 vec3 hmRidges(vec2 uv, int variant) {
   float th = k_theta();
   vec3 col = hmSky(uv);
@@ -233,6 +238,8 @@ vec3 hmRidges(vec2 uv, int variant) {
   return col;
 }
 
+//@endif
+//@if 8
 vec3 hmChladni(vec2 uv, int variant) {
   float th = k_theta();
   vec3 col = hmSky(uv) * 0.7;
@@ -284,6 +291,7 @@ vec3 hmChladni(vec2 uv, int variant) {
 }
 
 //@endif
+//@endif
 vec4 scene_main(vec2 uv, vec2 fc, int variant) {
 //@if 6
   return vec4(hmRibbons(uv, variant), 1.0);
@@ -329,7 +337,8 @@ vec4 scene_main(vec2 uv, vec2 fc, int variant) {
     float fres = pow(1.0 - ndv, 3.0);
     vec3 hv = normalize(K - rd);
     float spec = pow(max(dot(n, hv), 0.0), 60.0);
-    float peak = smoothstep(0.18, 0.62, hg.x / (amax + 1e-3));
+    float hnorm = hg.x / (amax + 1e-3) * (variant >= 4 ? 1.9 : 1.0);   // radial and interference fields use a smaller share of the slab
+    float peak = smoothstep(0.18, 0.62, hnorm);
     float warm = p_warmth * peak * (variant == 2 ? 2.0 : 1.6);
     float fadeD = exp(-t * 0.18);
     vec3 base = mix(u_a2 * 0.8, u_a0, 0.25 + 0.5 * ndl);
@@ -347,7 +356,7 @@ vec4 scene_main(vec2 uv, vec2 fc, int variant) {
     float node = nodeW > 0.0 ? exp(-pow(nd / max(nodeW, 1e-4), 2.0)) : 0.0;
     node *= 1.0 - smoothstep(0.0, 0.5, t * k_px() * 5.0 / max(nodeW, 1e-3) * 0.02);
     vec3 em = mix(u_a0, u_ink, 0.6) * node * (s == 0 ? 0.7 : 0.18);       // contours read on the top sheet; lower sheets stay quiet
-    em += u_a1 * pow(smoothstep(0.25, 0.65, hg.x / (amax + 1e-3)), 1.5) * clamp(warm, 0.0, 1.0) * (variant == 2 ? 4.2 : 2.4);              // amber light concentrated at the peaks
+    em += u_a1 * pow(smoothstep(0.25, 0.65, hnorm), 1.5) * clamp(warm, 0.0, 1.0) * (variant == 2 ? 4.2 : 2.4);              // amber light concentrated at the peaks
     vec3 pcl = particles(xz, hg, t, float(kind), float(s));
     float pw = variant == 2 ? (0.3 + 1.6 * peak) : 1.0;
     vec3 pcol = mix(u_a0 * 1.3, u_a1 * 1.6, clamp(warm + peak * 0.3, 0.0, 1.0));
