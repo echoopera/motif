@@ -1,0 +1,254 @@
+{
+  "kit": "topological-tide",
+  "style": "perforated-fold",
+  "phase": 0.37,
+  "size": [
+    120,
+    213
+  ],
+  "note": "effect = max mean-abs 8-bit change vs the default frame over min/max (or every option)",
+  "rows": [
+    {
+      "key": "freq",
+      "label": "Spatial frequency",
+      "type": "range",
+      "def": 4,
+      "vals": [
+        2,
+        7
+      ],
+      "diffs": [
+        9.53,
+        8.27
+      ],
+      "effect": 9.53
+    },
+    {
+      "key": "shell",
+      "label": "Shell thickness",
+      "type": "range",
+      "def": 0.3,
+      "vals": [
+        0.04,
+        0.35
+      ],
+      "diffs": [
+        15.7,
+        3.25
+      ],
+      "effect": 15.7
+    },
+    {
+      "key": "bound",
+      "label": "Bound radius",
+      "type": "range",
+      "def": 1.2,
+      "vals": [
+        0.6,
+        1.6
+      ],
+      "diffs": [
+        24.85,
+        26.18
+      ],
+      "effect": 26.18
+    },
+    {
+      "key": "metal",
+      "label": "Ceramic ↔ metal mix",
+      "type": "range",
+      "def": 0,
+      "vals": [
+        0,
+        1
+      ],
+      "diffs": [
+        0,
+        7.1
+      ],
+      "effect": 7.1
+    },
+    {
+      "key": "rough",
+      "label": "Roughness",
+      "type": "range",
+      "def": 0.3,
+      "vals": [
+        0.12,
+        0.7
+      ],
+      "diffs": [
+        0.1,
+        2.29
+      ],
+      "effect": 2.29
+    },
+    {
+      "key": "cavity",
+      "label": "Cavity contrast",
+      "type": "range",
+      "def": 0.55,
+      "vals": [
+        0,
+        1
+      ],
+      "diffs": [
+        1.04,
+        1.03
+      ],
+      "effect": 1.04
+    },
+    {
+      "key": "morph",
+      "label": "Morph amplitude",
+      "type": "range",
+      "def": 0.08,
+      "vals": [
+        0,
+        0.12
+      ],
+      "diffs": [
+        6.94,
+        3.54
+      ],
+      "effect": 6.94
+    },
+    {
+      "key": "turns",
+      "label": "Turns per loop",
+      "type": "int",
+      "def": 1,
+      "vals": [
+        0,
+        2
+      ],
+      "diffs": [
+        45.21,
+        34.75
+      ],
+      "effect": 45.21
+    },
+    {
+      "key": "orbit",
+      "label": "Camera orbit",
+      "type": "range",
+      "def": 0.06,
+      "vals": [
+        0,
+        0.25
+      ],
+      "diffs": [
+        4.9,
+        13.42
+      ],
+      "effect": 13.42
+    },
+    {
+      "key": "keyAngle",
+      "label": "Key direction",
+      "type": "range",
+      "def": 130,
+      "vals": [
+        -180,
+        180
+      ],
+      "diffs": [
+        7.4,
+        7.4
+      ],
+      "effect": 7.4
+    },
+    {
+      "key": "exposure",
+      "label": "Exposure",
+      "type": "range",
+      "def": 1,
+      "vals": [
+        0.4,
+        2.4
+      ],
+      "diffs": [
+        15.95,
+        24.07
+      ],
+      "effect": 24.07
+    },
+    {
+      "key": "bloom",
+      "label": "Bloom",
+      "type": "range",
+      "def": 0.25,
+      "vals": [
+        0,
+        1.6
+      ],
+      "diffs": [
+        0.81,
+        2.87
+      ],
+      "effect": 2.87
+    },
+    {
+      "key": "bloomRadius",
+      "label": "Bloom radius",
+      "type": "range",
+      "def": 1,
+      "vals": [
+        0.4,
+        2.2
+      ],
+      "diffs": [
+        0.41,
+        0.66
+      ],
+      "effect": 0.66
+    },
+    {
+      "key": "lensCA",
+      "label": "Edge fringe",
+      "type": "range",
+      "def": 0.12,
+      "vals": [
+        0,
+        0.5
+      ],
+      "diffs": [
+        0.21,
+        0.46
+      ],
+      "effect": 0.46
+    },
+    {
+      "key": "vignette",
+      "label": "Vignette",
+      "type": "range",
+      "def": 0.4,
+      "vals": [
+        0,
+        0.8
+      ],
+      "diffs": [
+        0.88,
+        0.98
+      ],
+      "effect": 0.98
+    },
+    {
+      "key": "quality",
+      "label": "Quality",
+      "type": "select",
+      "def": "balanced",
+      "vals": [
+        "live",
+        "balanced",
+        "export"
+      ],
+      "diffs": [
+        3.1,
+        0,
+        0.05
+      ],
+      "effect": 3.1
+    }
+  ]
+}

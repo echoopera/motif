@@ -11,6 +11,20 @@
 // Opaque surface only: ceramic (diffuse + dielectric specular) and metal (specular only, no diffuse) are separate energy models.
 // Loop: object rotation = integer turns of theta; thickness, warp and fold amplitude are periodic oscillators; camera orbit is closed.
 
+//@if 0 1 2 3 6 7 8
+#define Q_FREQ p_freq
+#define Q_WARP p_warp
+//@endif
+//@if 4 5
+#define Q_FREQ 4.0
+#define Q_WARP 0.0
+//@endif
+//@if 4
+#define Q_MORPH 0.0
+//@endif
+//@if 0 1 2 3 5 6 7 8
+#define Q_MORPH p_morph
+//@endif
 mat3 rotXm(float a) { float c = cos(a), s = sin(a); return mat3(1, 0, 0, 0, c, s, 0, -s, c); }
 mat3 rotYm(float a) { float c = cos(a), s = sin(a); return mat3(c, 0, -s, 0, 1, 0, s, 0, c); }
 
@@ -18,10 +32,10 @@ float gyroidG(vec3 q, float k) { vec3 a = q * k; return dot(sin(a), cos(a.yzx));
 
 // -------- scene fields (object space). graw = raw implicit used by the material (which wall of the shell) --------
 float tideMap(vec3 p, float th, float calm, out float graw) {
-  float k = p_freq;
-  float A = p_warp * calm, kw = 2.0;
+  float k = Q_FREQ;
+  float A = Q_WARP * calm, kw = 2.0;
   vec3 w = p + A * sin(kw * p.yzx + vec3(0.0, 2.1, 4.2) + th);
-  float thick = p_shell * (1.0 + p_morph * 4.0 * calm * sin(th));                      // closed breathing of the shell
+  float thick = p_shell * (1.0 + Q_MORPH * 4.0 * calm * sin(th));                      // closed breathing of the shell
   float L = k * 2.4494897 * (1.0 + A * kw);
   float c = 0.0;
 //@if 0 1 2 6 8
@@ -49,7 +63,7 @@ float tideMap(vec3 p, float th, float calm, out float graw) {
   float rho = length(p.xz) - R, ph = atan(p.z, p.x);
   float ca = cos(ph * 0.5), sa = sin(ph * 0.5);
   vec2 rq = vec2(ca * rho - sa * p.y, sa * rho + ca * p.y);                              // half twist: continuous because the box is 180-degree symmetric
-  vec2 bx = vec2(0.30 + 0.04 * calm * sin(th), 0.075);
+  vec2 bx = vec2(0.30 + 0.04 * calm * sin(th) + p_morph * 1.5 * calm * sin(th), 0.045 + 0.3 * p_shell * 0.5);   // shell = ribbon thickness, morph = width pulse
   float d = sdBox(rq, bx);
   float Lm = sqrt(1.0 + pow(rmax / (2.0 * (R - rmax)), 2.0));
   graw = gyroidG(w, k * 0.0 + 1.0) * 0.0 + sin(ph * 6.0 + th * 2.0) * 0.5 + 0.0;       // inlay current: integer 6 around, travelling at 2 theta
@@ -60,9 +74,10 @@ float tideMap(vec3 p, float th, float calm, out float graw) {
   float f = fa * sin(p.x * 3.2) + 0.5 * fa * sin(p.z * 2.6 + 1.0);
   float Lp = sqrt(1.0 + pow(fa * 3.2 + 0.5 * fa * 2.6, 2.0));
   float plate = (abs(p.y - f) - thick * 0.45) / Lp;
-  vec2 hq = vec2(cos(p.x * 9.0), cos(p.z * 9.0));
+  float hk = p_freq * 2.25;
+  vec2 hq = vec2(cos(p.x * hk), cos(p.z * hk));
   graw = hq.x + hq.y;
-  float holes = (0.55 - graw) / 12.7;                                                    // negative inside a hole; |grad| <= 9*sqrt(2)
+  float holes = (0.55 - graw) / (hk * 1.4143);                                                    // negative inside a hole; |grad| <= hk*sqrt(2)
   return max(max(plate, -holes), length(p) - p_bound);
 //@endif
 }

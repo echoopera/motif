@@ -12,6 +12,9 @@
 // Opaque surface only: ceramic (diffuse + dielectric specular) and metal (specular only, no diffuse) are separate energy models.
 // Loop: object rotation = integer turns of theta; thickness, warp and fold amplitude are periodic oscillators; camera orbit is closed.
 
+#define Q_FREQ 4.0
+#define Q_WARP 0.0
+#define Q_MORPH 0.0
 mat3 rotXm(float a) { float c = cos(a), s = sin(a); return mat3(1, 0, 0, 0, c, s, 0, -s, c); }
 mat3 rotYm(float a) { float c = cos(a), s = sin(a); return mat3(c, 0, -s, 0, 1, 0, s, 0, c); }
 
@@ -19,17 +22,17 @@ float gyroidG(vec3 q, float k) { vec3 a = q * k; return dot(sin(a), cos(a.yzx));
 
 // -------- scene fields (object space). graw = raw implicit used by the material (which wall of the shell) --------
 float tideMap(vec3 p, float th, float calm, out float graw) {
-  float k = p_freq;
-  float A = p_warp * calm, kw = 2.0;
+  float k = Q_FREQ;
+  float A = Q_WARP * calm, kw = 2.0;
   vec3 w = p + A * sin(kw * p.yzx + vec3(0.0, 2.1, 4.2) + th);
-  float thick = p_shell * (1.0 + p_morph * 4.0 * calm * sin(th));                      // closed breathing of the shell
+  float thick = p_shell * (1.0 + Q_MORPH * 4.0 * calm * sin(th));                      // closed breathing of the shell
   float L = k * 2.4494897 * (1.0 + A * kw);
   float c = 0.0;
   float R = 0.82, rmax = 0.34;
   float rho = length(p.xz) - R, ph = atan(p.z, p.x);
   float ca = cos(ph * 0.5), sa = sin(ph * 0.5);
   vec2 rq = vec2(ca * rho - sa * p.y, sa * rho + ca * p.y);                              // half twist: continuous because the box is 180-degree symmetric
-  vec2 bx = vec2(0.30 + 0.04 * calm * sin(th), 0.075);
+  vec2 bx = vec2(0.30 + 0.04 * calm * sin(th) + p_morph * 1.5 * calm * sin(th), 0.045 + 0.3 * p_shell * 0.5);   // shell = ribbon thickness, morph = width pulse
   float d = sdBox(rq, bx);
   float Lm = sqrt(1.0 + pow(rmax / (2.0 * (R - rmax)), 2.0));
   graw = gyroidG(w, k * 0.0 + 1.0) * 0.0 + sin(ph * 6.0 + th * 2.0) * 0.5 + 0.0;       // inlay current: integer 6 around, travelling at 2 theta

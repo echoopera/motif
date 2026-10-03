@@ -1108,16 +1108,6 @@
         ]
       },
       "params": {
-        "freq": {
-          "type": "range",
-          "label": "Spatial frequency",
-          "min": 2,
-          "max": 7,
-          "def": 4,
-          "step": 0.025,
-          "group": "Form",
-          "hint": "Gyroid frequency k (cells per radian of object space). Higher = finer lattice."
-        },
         "shell": {
           "type": "range",
           "label": "Shell thickness",
@@ -1137,16 +1127,6 @@
           "step": 0.005,
           "group": "Form",
           "hint": "Radius of the clipping ball. Larger shows more of the lattice."
-        },
-        "warp": {
-          "type": "range",
-          "label": "Warp amplitude",
-          "min": 0,
-          "max": 0.15,
-          "def": 0.04,
-          "step": 0.00075,
-          "group": "Form",
-          "hint": "Domain warp. The sphere-tracing bound is re-derived for it."
         },
         "metal": {
           "type": "range",
@@ -1386,16 +1366,6 @@
           "step": 0.005,
           "group": "Form",
           "hint": "Radius of the clipping ball. Larger shows more of the lattice."
-        },
-        "warp": {
-          "type": "range",
-          "label": "Warp amplitude",
-          "min": 0,
-          "max": 0.15,
-          "def": 0.04,
-          "step": 0.00075,
-          "group": "Form",
-          "hint": "Domain warp. The sphere-tracing bound is re-derived for it."
         },
         "metal": {
           "type": "range",

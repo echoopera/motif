@@ -1,0 +1,269 @@
+{
+  "kit": "topological-tide",
+  "style": "chrome-channels",
+  "phase": 0.37,
+  "size": [
+    120,
+    213
+  ],
+  "note": "effect = max mean-abs 8-bit change vs the default frame over min/max (or every option)",
+  "rows": [
+    {
+      "key": "freq",
+      "label": "Spatial frequency",
+      "type": "range",
+      "def": 4.6,
+      "vals": [
+        2,
+        7
+      ],
+      "diffs": [
+        25.48,
+        20.6
+      ],
+      "effect": 25.48
+    },
+    {
+      "key": "shell",
+      "label": "Shell thickness",
+      "type": "range",
+      "def": 0.1,
+      "vals": [
+        0.04,
+        0.35
+      ],
+      "diffs": [
+        2.12,
+        6.67
+      ],
+      "effect": 6.67
+    },
+    {
+      "key": "bound",
+      "label": "Bound radius",
+      "type": "range",
+      "def": 1.1,
+      "vals": [
+        0.6,
+        1.6
+      ],
+      "diffs": [
+        30.21,
+        40.38
+      ],
+      "effect": 40.38
+    },
+    {
+      "key": "warp",
+      "label": "Warp amplitude",
+      "type": "range",
+      "def": 0.04,
+      "vals": [
+        0,
+        0.15
+      ],
+      "diffs": [
+        6.31,
+        13.8
+      ],
+      "effect": 13.8
+    },
+    {
+      "key": "metal",
+      "label": "Ceramic ↔ metal mix",
+      "type": "range",
+      "def": 1,
+      "vals": [
+        0,
+        1
+      ],
+      "diffs": [
+        15.11,
+        0
+      ],
+      "effect": 15.11
+    },
+    {
+      "key": "rough",
+      "label": "Roughness",
+      "type": "range",
+      "def": 0.14,
+      "vals": [
+        0.12,
+        0.7
+      ],
+      "diffs": [
+        0.02,
+        8.97
+      ],
+      "effect": 8.97
+    },
+    {
+      "key": "cavity",
+      "label": "Cavity contrast",
+      "type": "range",
+      "def": 0.4,
+      "vals": [
+        0,
+        1
+      ],
+      "diffs": [
+        1.43,
+        2.26
+      ],
+      "effect": 2.26
+    },
+    {
+      "key": "morph",
+      "label": "Morph amplitude",
+      "type": "range",
+      "def": 0.035,
+      "vals": [
+        0,
+        0.12
+      ],
+      "diffs": [
+        0.5,
+        0.94
+      ],
+      "effect": 0.94
+    },
+    {
+      "key": "turns",
+      "label": "Turns per loop",
+      "type": "int",
+      "def": 1,
+      "vals": [
+        0,
+        2
+      ],
+      "diffs": [
+        19.65,
+        17.85
+      ],
+      "effect": 19.65
+    },
+    {
+      "key": "orbit",
+      "label": "Camera orbit",
+      "type": "range",
+      "def": 0.06,
+      "vals": [
+        0,
+        0.25
+      ],
+      "diffs": [
+        4.28,
+        10.28
+      ],
+      "effect": 10.28
+    },
+    {
+      "key": "keyAngle",
+      "label": "Key direction",
+      "type": "range",
+      "def": 130,
+      "vals": [
+        -180,
+        180
+      ],
+      "diffs": [
+        2.69,
+        2.69
+      ],
+      "effect": 2.69
+    },
+    {
+      "key": "exposure",
+      "label": "Exposure",
+      "type": "range",
+      "def": 1,
+      "vals": [
+        0.4,
+        2.4
+      ],
+      "diffs": [
+        17.3,
+        23.87
+      ],
+      "effect": 23.87
+    },
+    {
+      "key": "bloom",
+      "label": "Bloom",
+      "type": "range",
+      "def": 0.35,
+      "vals": [
+        0,
+        1.6
+      ],
+      "diffs": [
+        1.06,
+        3.02
+      ],
+      "effect": 3.02
+    },
+    {
+      "key": "bloomRadius",
+      "label": "Bloom radius",
+      "type": "range",
+      "def": 1,
+      "vals": [
+        0.4,
+        2.2
+      ],
+      "diffs": [
+        0.66,
+        1.03
+      ],
+      "effect": 1.03
+    },
+    {
+      "key": "lensCA",
+      "label": "Edge fringe",
+      "type": "range",
+      "def": 0.12,
+      "vals": [
+        0,
+        0.5
+      ],
+      "diffs": [
+        0.26,
+        0.62
+      ],
+      "effect": 0.62
+    },
+    {
+      "key": "vignette",
+      "label": "Vignette",
+      "type": "range",
+      "def": 0.4,
+      "vals": [
+        0,
+        0.8
+      ],
+      "diffs": [
+        0.8,
+        0.82
+      ],
+      "effect": 0.82
+    },
+    {
+      "key": "quality",
+      "label": "Quality",
+      "type": "select",
+      "def": "balanced",
+      "vals": [
+        "live",
+        "balanced",
+        "export"
+      ],
+      "diffs": [
+        4.36,
+        0,
+        0.13
+      ],
+      "effect": 4.36
+    }
+  ]
+}
