@@ -1,0 +1,239 @@
+{
+  "kit": "astral-threshold",
+  "style": "folded-ether",
+  "phase": 0.37,
+  "size": [
+    120,
+    213
+  ],
+  "note": "effect = max mean-abs 8-bit change vs the default frame over min/max (or every option)",
+  "rows": [
+    {
+      "key": "layers",
+      "label": "Membrane layers",
+      "type": "int",
+      "def": 7,
+      "vals": [
+        3,
+        12
+      ],
+      "diffs": [
+        35.08,
+        7.42
+      ],
+      "effect": 35.08
+    },
+    {
+      "key": "aperture",
+      "label": "Aperture radius",
+      "type": "range",
+      "def": 0.2,
+      "vals": [
+        0.08,
+        0.45
+      ],
+      "diffs": [
+        19.62,
+        17.91
+      ],
+      "effect": 19.62
+    },
+    {
+      "key": "filament",
+      "label": "Filament scale",
+      "type": "range",
+      "def": 0.07,
+      "vals": [
+        0.02,
+        0.3
+      ],
+      "diffs": [
+        2.08,
+        4.5
+      ],
+      "effect": 4.5
+    },
+    {
+      "key": "warp",
+      "label": "Warp amplitude",
+      "type": "range",
+      "def": 0.2,
+      "vals": [
+        0,
+        0.25
+      ],
+      "diffs": [
+        15.95,
+        10.78
+      ],
+      "effect": 15.95
+    },
+    {
+      "key": "density",
+      "label": "Density",
+      "type": "range",
+      "def": 0.8,
+      "vals": [
+        0.1,
+        2
+      ],
+      "diffs": [
+        47.08,
+        26.61
+      ],
+      "effect": 47.08
+    },
+    {
+      "key": "absorb",
+      "label": "Absorption",
+      "type": "range",
+      "def": 1.4,
+      "vals": [
+        0.1,
+        3
+      ],
+      "diffs": [
+        54.97,
+        22.12
+      ],
+      "effect": 54.97
+    },
+    {
+      "key": "emission",
+      "label": "Emission",
+      "type": "range",
+      "def": 1.8,
+      "vals": [
+        0.1,
+        5
+      ],
+      "diffs": [
+        60.93,
+        43.27
+      ],
+      "effect": 60.93
+    },
+    {
+      "key": "travel",
+      "label": "Depth travel",
+      "type": "range",
+      "def": 0.12,
+      "vals": [
+        0,
+        0.4
+      ],
+      "diffs": [
+        14.83,
+        17.99
+      ],
+      "effect": 17.99
+    },
+    {
+      "key": "advect",
+      "label": "Advection cycles per loo",
+      "type": "int",
+      "def": 1,
+      "vals": [
+        1,
+        3
+      ],
+      "diffs": [
+        0,
+        16.11
+      ],
+      "effect": 16.11
+    },
+    {
+      "key": "exposure",
+      "label": "Exposure",
+      "type": "range",
+      "def": 1,
+      "vals": [
+        0.4,
+        2.4
+      ],
+      "diffs": [
+        27.97,
+        37.09
+      ],
+      "effect": 37.09
+    },
+    {
+      "key": "bloom",
+      "label": "Bloom",
+      "type": "range",
+      "def": 0.6,
+      "vals": [
+        0,
+        1.6
+      ],
+      "diffs": [
+        0.54,
+        0.8
+      ],
+      "effect": 0.8
+    },
+    {
+      "key": "bloomRadius",
+      "label": "Bloom radius",
+      "type": "range",
+      "def": 1,
+      "vals": [
+        0.4,
+        2.2
+      ],
+      "diffs": [
+        0.18,
+        0.35
+      ],
+      "effect": 0.35
+    },
+    {
+      "key": "lensCA",
+      "label": "Edge fringe",
+      "type": "range",
+      "def": 0.12,
+      "vals": [
+        0,
+        0.5
+      ],
+      "diffs": [
+        0.44,
+        1.35
+      ],
+      "effect": 1.35
+    },
+    {
+      "key": "vignette",
+      "label": "Vignette",
+      "type": "range",
+      "def": 0.38,
+      "vals": [
+        0,
+        0.8
+      ],
+      "diffs": [
+        2.32,
+        3.04
+      ],
+      "effect": 3.04
+    },
+    {
+      "key": "quality",
+      "label": "Quality",
+      "type": "select",
+      "def": "balanced",
+      "vals": [
+        "live",
+        "balanced",
+        "export"
+      ],
+      "diffs": [
+        9.89,
+        0,
+        7.04
+      ],
+      "effect": 9.89
+    }
+  ]
+}
