@@ -1,0 +1,83 @@
+[
+  {
+    "kit": "nacre",
+    "id": "cellsea",
+    "seamDelta": 0.0,
+    "motion": 15.88,
+    "pop": 1.26,
+    "flashesPerSec": 0.0,
+    "qualityExposure": null
+  },
+  {
+    "kit": "nacre",
+    "id": "symbiosis",
+    "seamDelta": 0.0,
+    "motion": 12.97,
+    "pop": 2.07,
+    "flashesPerSec": 0.0,
+    "qualityExposure": null
+  },
+  {
+    "kit": "nacre",
+    "id": "colony-bloom",
+    "seamDelta": 0.0,
+    "motion": 14.98,
+    "pop": 1.51,
+    "flashesPerSec": 0.0,
+    "qualityExposure": null
+  },
+  {
+    "kit": "nacre",
+    "id": "membrane-choir",
+    "seamDelta": 0.0,
+    "motion": 16.99,
+    "pop": 1.46,
+    "flashesPerSec": 0.0,
+    "qualityExposure": null
+  },
+  {
+    "kit": "nacre",
+    "id": "tide-organism",
+    "seamDelta": 0.0,
+    "motion": 15.4,
+    "pop": 1.79,
+    "flashesPerSec": 0.0,
+    "qualityExposure": null
+  },
+  {
+    "kit": "nacre",
+    "id": "biolume",
+    "seamDelta": 0.0,
+    "motion": 13.46,
+    "pop": 1.48,
+    "flashesPerSec": 0.0,
+    "qualityExposure": null
+  },
+  {
+    "kit": "nacre",
+    "id": "mitosis",
+    "seamDelta": 0.0,
+    "motion": 9.17,
+    "pop": 2.34,
+    "flashesPerSec": 0.0,
+    "qualityExposure": null
+  },
+  {
+    "kit": "nacre",
+    "id": "polyp-garden",
+    "seamDelta": 0.0,
+    "motion": 10.48,
+    "pop": 1.87,
+    "flashesPerSec": 0.0,
+    "qualityExposure": null
+  },
+  {
+    "kit": "nacre",
+    "id": "hollow-moon",
+    "seamDelta": 0.0,
+    "motion": 15.92,
+    "pop": 1.45,
+    "flashesPerSec": 0.0,
+    "qualityExposure": null
+  }
+]

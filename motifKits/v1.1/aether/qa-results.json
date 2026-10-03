@@ -1,0 +1,83 @@
+[
+  {
+    "kit": "aether",
+    "id": "cloudwake",
+    "seamDelta": 0.0,
+    "motion": 4.47,
+    "pop": 1.45,
+    "flashesPerSec": 0.0,
+    "qualityExposure": 1.0
+  },
+  {
+    "kit": "aether",
+    "id": "pale-current",
+    "seamDelta": 0.0,
+    "motion": 1.89,
+    "pop": 1.91,
+    "flashesPerSec": 0.0,
+    "qualityExposure": 1.0
+  },
+  {
+    "kit": "aether",
+    "id": "ion-rain",
+    "seamDelta": 0.0,
+    "motion": 2.04,
+    "pop": 3.34,
+    "flashesPerSec": 0.0,
+    "qualityExposure": 1.0
+  },
+  {
+    "kit": "aether",
+    "id": "duskfront",
+    "seamDelta": 0.0,
+    "motion": 3.05,
+    "pop": 1.55,
+    "flashesPerSec": 0.0,
+    "qualityExposure": 1.0
+  },
+  {
+    "kit": "aether",
+    "id": "high-tide",
+    "seamDelta": 0.0,
+    "motion": 3.7,
+    "pop": 2.2,
+    "flashesPerSec": 0.0,
+    "qualityExposure": 1.0
+  },
+  {
+    "kit": "aether",
+    "id": "blue-hour",
+    "seamDelta": 0.0,
+    "motion": 3.52,
+    "pop": 1.36,
+    "flashesPerSec": 0.0,
+    "qualityExposure": 1.0
+  },
+  {
+    "kit": "aether",
+    "id": "lightwell",
+    "seamDelta": 0.0,
+    "motion": 2.5,
+    "pop": 1.66,
+    "flashesPerSec": 0.0,
+    "qualityExposure": 1.0
+  },
+  {
+    "kit": "aether",
+    "id": "cirrus-garden",
+    "seamDelta": 0.0,
+    "motion": 2.55,
+    "pop": 1.73,
+    "flashesPerSec": 0.0,
+    "qualityExposure": 1.0
+  },
+  {
+    "kit": "aether",
+    "id": "ember-haze",
+    "seamDelta": 0.0,
+    "motion": 3.75,
+    "pop": 1.71,
+    "flashesPerSec": 0.0,
+    "qualityExposure": 1.0
+  }
+]

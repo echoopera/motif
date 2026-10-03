@@ -1,0 +1,2 @@
+// HDR highlight isolation at quarter resolution. Four taps avoid tiny highlight aliasing.
+vec4 motif(vec2 uv,vec2 fc){vec2 q=fc/u_res;vec2 px=1./vec2(textureSize(g_scene,0));vec3 c=(g_sceneAt(q+px*vec2(-.5,-.5)).rgb+g_sceneAt(q+px*vec2(.5,-.5)).rgb+g_sceneAt(q+px*vec2(-.5,.5)).rgb+g_sceneAt(q+px*vec2(.5,.5)).rgb)*.25;float peak=max(c.r,max(c.g,c.b));return vec4(c*smoothstep(p_threshold,p_threshold+max(.015,p_threshold*.6),peak),1.);}

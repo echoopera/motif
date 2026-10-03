@@ -1,0 +1,83 @@
+[
+  {
+    "kit": "oriel",
+    "id": "living-flower",
+    "seamDelta": 0.0,
+    "motion": 20.2,
+    "pop": 1.01,
+    "flashesPerSec": 0.0,
+    "qualityExposure": null
+  },
+  {
+    "kit": "oriel",
+    "id": "phi-garden",
+    "seamDelta": 0.0,
+    "motion": 12.44,
+    "pop": 1.06,
+    "flashesPerSec": 0.0,
+    "qualityExposure": null
+  },
+  {
+    "kit": "oriel",
+    "id": "fibonacci-sea",
+    "seamDelta": 0.0,
+    "motion": 3.57,
+    "pop": 1.29,
+    "flashesPerSec": 0.0,
+    "qualityExposure": null
+  },
+  {
+    "kit": "oriel",
+    "id": "vesica",
+    "seamDelta": 0.0,
+    "motion": 3.6,
+    "pop": 1.12,
+    "flashesPerSec": 0.0,
+    "qualityExposure": null
+  },
+  {
+    "kit": "oriel",
+    "id": "golden-bloom",
+    "seamDelta": 0.0,
+    "motion": 1.23,
+    "pop": 1.15,
+    "flashesPerSec": 0.0,
+    "qualityExposure": null
+  },
+  {
+    "kit": "oriel",
+    "id": "torus-choir",
+    "seamDelta": 0.0,
+    "motion": 7.7,
+    "pop": 1.15,
+    "flashesPerSec": 0.0,
+    "qualityExposure": null
+  },
+  {
+    "kit": "oriel",
+    "id": "stellate",
+    "seamDelta": 0.0,
+    "motion": 5.0,
+    "pop": 1.05,
+    "flashesPerSec": 0.0,
+    "qualityExposure": null
+  },
+  {
+    "kit": "oriel",
+    "id": "quasicrystal",
+    "seamDelta": 0.0,
+    "motion": 11.46,
+    "pop": 1.03,
+    "flashesPerSec": 0.0,
+    "qualityExposure": null
+  },
+  {
+    "kit": "oriel",
+    "id": "metatron-field",
+    "seamDelta": 0.0,
+    "motion": 6.61,
+    "pop": 1.02,
+    "flashesPerSec": 0.0,
+    "qualityExposure": null
+  }
+]

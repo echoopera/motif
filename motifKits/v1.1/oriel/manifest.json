@@ -1,0 +1,1886 @@
+{
+  "format": "motif-kit@4",
+  "id": "oriel",
+  "name": "Oriel",
+  "version": "1.1.0",
+  "author": "Echo Opera",
+  "description": "Nine living geometric fields built from sacred geometry and golden-ratio growth.",
+  "accent": "#D9CA9B",
+  "common": "common.glsl",
+  "capabilities": [],
+  "palettes": [
+    {
+      "id": "gilt",
+      "name": "Gilt",
+      "bg": "#0A0806",
+      "ink": "#F5E9C8",
+      "a": [
+        "#E0B35A",
+        "#B4623C",
+        "#6E7FA8"
+      ]
+    },
+    {
+      "id": "lapis",
+      "name": "Lapis",
+      "bg": "#05081A",
+      "ink": "#EAF0FF",
+      "a": [
+        "#5B7FE0",
+        "#C9A44C",
+        "#8E5BC8"
+      ]
+    },
+    {
+      "id": "verdigris",
+      "name": "Verdigris",
+      "bg": "#041412",
+      "ink": "#E6F7EF",
+      "a": [
+        "#4DB6A0",
+        "#D8C073",
+        "#3D6F8F"
+      ]
+    },
+    {
+      "id": "rose",
+      "name": "Rose quartz",
+      "bg": "#140A10",
+      "ink": "#FBEAEA",
+      "a": [
+        "#E59AAE",
+        "#E8C28A",
+        "#7A6AB8"
+      ]
+    }
+  ],
+  "styles": [
+    {
+      "id": "living-flower",
+      "name": "Living Flower",
+      "group": "Oriel",
+      "palette": "gilt",
+      "tags": [
+        "oriel",
+        "ambient",
+        "procedural"
+      ],
+      "blurb": "A sixfold circle lattice blooms within a golden field.",
+      "flash": false,
+      "cost": 2,
+      "graph": {
+        "buffers": {
+          "scene": {
+            "scale": 0.75
+          },
+          "bright": {
+            "scale": 0.25
+          },
+          "glow": {
+            "scale": 0.125
+          },
+          "wide": {
+            "scale": 0.125
+          }
+        },
+        "passes": [
+          {
+            "src": "styles/living-flower.glsl",
+            "writes": "scene"
+          },
+          {
+            "src": "post/bright.glsl",
+            "reads": [
+              "scene"
+            ],
+            "writes": "bright"
+          },
+          {
+            "src": "post/glow.glsl",
+            "reads": [
+              "bright"
+            ],
+            "writes": "glow"
+          },
+          {
+            "src": "post/wide.glsl",
+            "reads": [
+              "bright"
+            ],
+            "writes": "wide"
+          },
+          {
+            "src": "post/output.glsl",
+            "reads": [
+              "scene",
+              "glow",
+              "wide"
+            ],
+            "writes": "output"
+          }
+        ]
+      },
+      "params": {
+        "scale": {
+          "type": "range",
+          "label": "Form scale",
+          "min": 0.55,
+          "max": 2.2,
+          "step": 0.01,
+          "group": "Form",
+          "def": 1,
+          "hint": "Overall size of the form."
+        },
+        "complexity": {
+          "type": "range",
+          "label": "Geometric detail",
+          "min": 0,
+          "max": 1.2,
+          "step": 0.01,
+          "group": "Form",
+          "def": 0.6,
+          "hint": "Adds line detail and fine harmonics to the geometry."
+        },
+        "density": {
+          "type": "range",
+          "label": "Pattern spread",
+          "min": 0.4,
+          "max": 1.8,
+          "step": 0.01,
+          "group": "Form",
+          "def": 1,
+          "hint": "How far the pattern repeats across the frame."
+        },
+        "depth": {
+          "type": "range",
+          "label": "Depth haze",
+          "min": 3,
+          "max": 10,
+          "step": 0.01,
+          "group": "Material",
+          "def": 6.5,
+          "hint": "How quickly deeper layers fade into the dark."
+        },
+        "membrane": {
+          "type": "range",
+          "label": "Line weight",
+          "min": 0.5,
+          "max": 2,
+          "step": 0.01,
+          "group": "Material",
+          "def": 1,
+          "hint": "Thickness of the drawn lines."
+        },
+        "radiance": {
+          "type": "range",
+          "label": "Radiance",
+          "min": 0.4,
+          "max": 2,
+          "step": 0.01,
+          "group": "Light",
+          "def": 1.1,
+          "hint": "Brightness of the light the form emits; also drives bloom.",
+          "randMax": 1.5
+        },
+        "exposure": {
+          "type": "range",
+          "label": "Exposure",
+          "min": 0.45,
+          "max": 1.7,
+          "step": 0.01,
+          "group": "Light",
+          "def": 1,
+          "hint": "Final exposure before the tone map.",
+          "randMax": 1.25
+        },
+        "glow": {
+          "type": "range",
+          "label": "Bloom mix",
+          "min": 0,
+          "max": 0.9,
+          "step": 0.01,
+          "group": "Lens",
+          "def": 0.36,
+          "hint": "How much bloom is mixed back into the image.",
+          "randMax": 0.6
+        },
+        "threshold": {
+          "type": "range",
+          "label": "Bloom threshold",
+          "min": 0.1,
+          "max": 1.5,
+          "step": 0.01,
+          "group": "Lens",
+          "def": 0.68,
+          "hint": "Brightness above which pixels bloom. Lower is hazier.",
+          "randMax": 1.0
+        },
+        "radius": {
+          "type": "range",
+          "label": "Bloom spread",
+          "min": 0.75,
+          "max": 3,
+          "step": 0.01,
+          "group": "Lens",
+          "def": 1.5,
+          "hint": "Width of the bloom halo.",
+          "randMax": 2.2
+        },
+        "cycles": {
+          "type": "int",
+          "label": "Circuits / loop",
+          "min": 1,
+          "max": 2,
+          "group": "Motion",
+          "mutate": 0,
+          "def": 1,
+          "hint": "Whole circuits per loop keep the seam closed."
+        },
+        "layers": {
+          "type": "int",
+          "label": "Depth layers",
+          "min": 1,
+          "max": 4,
+          "group": "Form",
+          "mutate": 0,
+          "def": 3,
+          "hint": "Number of stacked copies, alternate ones counter-rotate."
+        },
+        "vignette": {
+          "type": "range",
+          "label": "Vignette",
+          "min": 0,
+          "max": 0.6,
+          "step": 0.01,
+          "group": "Lens",
+          "def": 0.34,
+          "hint": "Edge darkening that holds the eye on the focal point."
+        }
+      }
+    },
+    {
+      "id": "phi-garden",
+      "name": "Phi Garden",
+      "group": "Oriel",
+      "palette": "gilt",
+      "tags": [
+        "oriel",
+        "ambient",
+        "procedural"
+      ],
+      "blurb": "A living population arranged by the golden angle.",
+      "flash": false,
+      "cost": 2,
+      "graph": {
+        "buffers": {
+          "scene": {
+            "scale": 0.75
+          },
+          "bright": {
+            "scale": 0.25
+          },
+          "glow": {
+            "scale": 0.125
+          },
+          "wide": {
+            "scale": 0.125
+          }
+        },
+        "passes": [
+          {
+            "src": "styles/phi-garden.glsl",
+            "writes": "scene"
+          },
+          {
+            "src": "post/bright.glsl",
+            "reads": [
+              "scene"
+            ],
+            "writes": "bright"
+          },
+          {
+            "src": "post/glow.glsl",
+            "reads": [
+              "bright"
+            ],
+            "writes": "glow"
+          },
+          {
+            "src": "post/wide.glsl",
+            "reads": [
+              "bright"
+            ],
+            "writes": "wide"
+          },
+          {
+            "src": "post/output.glsl",
+            "reads": [
+              "scene",
+              "glow",
+              "wide"
+            ],
+            "writes": "output"
+          }
+        ]
+      },
+      "params": {
+        "scale": {
+          "type": "range",
+          "label": "Form scale",
+          "min": 0.55,
+          "max": 2.2,
+          "step": 0.01,
+          "group": "Form",
+          "def": 1,
+          "hint": "Overall size of the form."
+        },
+        "complexity": {
+          "type": "range",
+          "label": "Geometric detail",
+          "min": 0,
+          "max": 1.2,
+          "step": 0.01,
+          "group": "Form",
+          "def": 0.6,
+          "hint": "Adds line detail and fine harmonics to the geometry."
+        },
+        "density": {
+          "type": "range",
+          "label": "Pattern spread",
+          "min": 0.4,
+          "max": 1.8,
+          "step": 0.01,
+          "group": "Form",
+          "def": 1,
+          "hint": "How far the pattern repeats across the frame."
+        },
+        "depth": {
+          "type": "range",
+          "label": "Depth haze",
+          "min": 3,
+          "max": 10,
+          "step": 0.01,
+          "group": "Material",
+          "def": 6.5,
+          "hint": "How quickly deeper layers fade into the dark."
+        },
+        "membrane": {
+          "type": "range",
+          "label": "Line weight",
+          "min": 0.5,
+          "max": 2,
+          "step": 0.01,
+          "group": "Material",
+          "def": 1,
+          "hint": "Thickness of the drawn lines."
+        },
+        "radiance": {
+          "type": "range",
+          "label": "Radiance",
+          "min": 0.4,
+          "max": 2,
+          "step": 0.01,
+          "group": "Light",
+          "def": 1.1,
+          "hint": "Brightness of the light the form emits; also drives bloom.",
+          "randMax": 1.5
+        },
+        "exposure": {
+          "type": "range",
+          "label": "Exposure",
+          "min": 0.45,
+          "max": 1.7,
+          "step": 0.01,
+          "group": "Light",
+          "def": 1,
+          "hint": "Final exposure before the tone map.",
+          "randMax": 1.25
+        },
+        "glow": {
+          "type": "range",
+          "label": "Bloom mix",
+          "min": 0,
+          "max": 0.9,
+          "step": 0.01,
+          "group": "Lens",
+          "def": 0.36,
+          "hint": "How much bloom is mixed back into the image.",
+          "randMax": 0.6
+        },
+        "threshold": {
+          "type": "range",
+          "label": "Bloom threshold",
+          "min": 0.1,
+          "max": 1.5,
+          "step": 0.001,
+          "group": "Lens",
+          "def": 0.68,
+          "hint": "Brightness above which pixels bloom. Lower is hazier.",
+          "randMax": 1.0
+        },
+        "radius": {
+          "type": "range",
+          "label": "Bloom spread",
+          "min": 0.75,
+          "max": 3,
+          "step": 0.01,
+          "group": "Lens",
+          "def": 1.5,
+          "hint": "Width of the bloom halo.",
+          "randMax": 2.2
+        },
+        "cycles": {
+          "type": "int",
+          "label": "Circuits / loop",
+          "min": 1,
+          "max": 2,
+          "group": "Motion",
+          "mutate": 0,
+          "def": 1,
+          "hint": "Whole circuits per loop keep the seam closed."
+        },
+        "layers": {
+          "type": "int",
+          "label": "Depth layers",
+          "min": 1,
+          "max": 4,
+          "group": "Form",
+          "mutate": 0,
+          "def": 2,
+          "hint": "Number of stacked copies, alternate ones counter-rotate."
+        },
+        "vignette": {
+          "type": "range",
+          "label": "Vignette",
+          "min": 0,
+          "max": 0.6,
+          "step": 0.01,
+          "group": "Lens",
+          "def": 0.34,
+          "hint": "Edge darkening that holds the eye on the focal point."
+        }
+      }
+    },
+    {
+      "id": "fibonacci-sea",
+      "name": "Fibonacci Sea",
+      "group": "Oriel",
+      "palette": "gilt",
+      "tags": [
+        "oriel",
+        "ambient",
+        "procedural"
+      ],
+      "blurb": "Golden-ratio shells reveal repeated scales of space.",
+      "flash": false,
+      "cost": 2,
+      "graph": {
+        "buffers": {
+          "scene": {
+            "scale": 0.75
+          },
+          "bright": {
+            "scale": 0.25
+          },
+          "glow": {
+            "scale": 0.125
+          },
+          "wide": {
+            "scale": 0.125
+          }
+        },
+        "passes": [
+          {
+            "src": "styles/fibonacci-sea.glsl",
+            "writes": "scene"
+          },
+          {
+            "src": "post/bright.glsl",
+            "reads": [
+              "scene"
+            ],
+            "writes": "bright"
+          },
+          {
+            "src": "post/glow.glsl",
+            "reads": [
+              "bright"
+            ],
+            "writes": "glow"
+          },
+          {
+            "src": "post/wide.glsl",
+            "reads": [
+              "bright"
+            ],
+            "writes": "wide"
+          },
+          {
+            "src": "post/output.glsl",
+            "reads": [
+              "scene",
+              "glow",
+              "wide"
+            ],
+            "writes": "output"
+          }
+        ]
+      },
+      "params": {
+        "scale": {
+          "type": "range",
+          "label": "Form scale",
+          "min": 0.55,
+          "max": 2.2,
+          "step": 0.01,
+          "group": "Form",
+          "def": 1,
+          "hint": "Overall size of the form."
+        },
+        "complexity": {
+          "type": "range",
+          "label": "Geometric detail",
+          "min": 0,
+          "max": 1.2,
+          "step": 0.01,
+          "group": "Form",
+          "def": 0.6,
+          "hint": "Adds line detail and fine harmonics to the geometry."
+        },
+        "density": {
+          "type": "range",
+          "label": "Pattern spread",
+          "min": 0.4,
+          "max": 1.8,
+          "step": 0.01,
+          "group": "Form",
+          "def": 1,
+          "hint": "How far the pattern repeats across the frame."
+        },
+        "depth": {
+          "type": "range",
+          "label": "Depth haze",
+          "min": 3,
+          "max": 10,
+          "step": 0.01,
+          "group": "Material",
+          "def": 6.5,
+          "hint": "How quickly deeper layers fade into the dark."
+        },
+        "membrane": {
+          "type": "range",
+          "label": "Line weight",
+          "min": 0.5,
+          "max": 2,
+          "step": 0.01,
+          "group": "Material",
+          "def": 1,
+          "hint": "Thickness of the drawn lines."
+        },
+        "radiance": {
+          "type": "range",
+          "label": "Radiance",
+          "min": 0.4,
+          "max": 2,
+          "step": 0.01,
+          "group": "Light",
+          "def": 1.1,
+          "hint": "Brightness of the light the form emits; also drives bloom.",
+          "randMax": 1.5
+        },
+        "exposure": {
+          "type": "range",
+          "label": "Exposure",
+          "min": 0.45,
+          "max": 1.7,
+          "step": 0.01,
+          "group": "Light",
+          "def": 1,
+          "hint": "Final exposure before the tone map.",
+          "randMax": 1.25
+        },
+        "glow": {
+          "type": "range",
+          "label": "Bloom mix",
+          "min": 0,
+          "max": 0.9,
+          "step": 0.01,
+          "group": "Lens",
+          "def": 0.36,
+          "hint": "How much bloom is mixed back into the image.",
+          "randMax": 0.6
+        },
+        "threshold": {
+          "type": "range",
+          "label": "Bloom threshold",
+          "min": 0.1,
+          "max": 1.5,
+          "step": 0.001,
+          "group": "Lens",
+          "def": 0.68,
+          "hint": "Brightness above which pixels bloom. Lower is hazier.",
+          "randMax": 1.0
+        },
+        "radius": {
+          "type": "range",
+          "label": "Bloom spread",
+          "min": 0.75,
+          "max": 3,
+          "step": 0.01,
+          "group": "Lens",
+          "def": 1.5,
+          "hint": "Width of the bloom halo.",
+          "randMax": 2.2
+        },
+        "cycles": {
+          "type": "int",
+          "label": "Circuits / loop",
+          "min": 1,
+          "max": 2,
+          "group": "Motion",
+          "mutate": 0,
+          "def": 1,
+          "hint": "Whole circuits per loop keep the seam closed."
+        },
+        "layers": {
+          "type": "int",
+          "label": "Depth layers",
+          "min": 1,
+          "max": 4,
+          "group": "Form",
+          "mutate": 0,
+          "def": 3,
+          "hint": "Number of stacked copies, alternate ones counter-rotate."
+        },
+        "vignette": {
+          "type": "range",
+          "label": "Vignette",
+          "min": 0,
+          "max": 0.6,
+          "step": 0.01,
+          "group": "Lens",
+          "def": 0.34,
+          "hint": "Edge darkening that holds the eye on the focal point."
+        }
+      }
+    },
+    {
+      "id": "vesica",
+      "name": "Vesica",
+      "group": "Oriel",
+      "palette": "lapis",
+      "tags": [
+        "oriel",
+        "ambient",
+        "procedural"
+      ],
+      "blurb": "Overlapping lenses rotate into a quiet sacred geometry.",
+      "flash": false,
+      "cost": 2,
+      "graph": {
+        "buffers": {
+          "scene": {
+            "scale": 0.75
+          },
+          "bright": {
+            "scale": 0.25
+          },
+          "glow": {
+            "scale": 0.125
+          },
+          "wide": {
+            "scale": 0.125
+          }
+        },
+        "passes": [
+          {
+            "src": "styles/vesica.glsl",
+            "writes": "scene"
+          },
+          {
+            "src": "post/bright.glsl",
+            "reads": [
+              "scene"
+            ],
+            "writes": "bright"
+          },
+          {
+            "src": "post/glow.glsl",
+            "reads": [
+              "bright"
+            ],
+            "writes": "glow"
+          },
+          {
+            "src": "post/wide.glsl",
+            "reads": [
+              "bright"
+            ],
+            "writes": "wide"
+          },
+          {
+            "src": "post/output.glsl",
+            "reads": [
+              "scene",
+              "glow",
+              "wide"
+            ],
+            "writes": "output"
+          }
+        ]
+      },
+      "params": {
+        "scale": {
+          "type": "range",
+          "label": "Form scale",
+          "min": 0.55,
+          "max": 2.2,
+          "step": 0.01,
+          "group": "Form",
+          "def": 1,
+          "hint": "Overall size of the form."
+        },
+        "complexity": {
+          "type": "range",
+          "label": "Geometric detail",
+          "min": 0,
+          "max": 1.2,
+          "step": 0.01,
+          "group": "Form",
+          "def": 0.6,
+          "hint": "Adds line detail and fine harmonics to the geometry."
+        },
+        "density": {
+          "type": "range",
+          "label": "Pattern spread",
+          "min": 0.4,
+          "max": 1.8,
+          "step": 0.01,
+          "group": "Form",
+          "def": 1,
+          "hint": "How far the pattern repeats across the frame."
+        },
+        "depth": {
+          "type": "range",
+          "label": "Depth haze",
+          "min": 3,
+          "max": 10,
+          "step": 0.01,
+          "group": "Material",
+          "def": 6.5,
+          "hint": "How quickly deeper layers fade into the dark."
+        },
+        "membrane": {
+          "type": "range",
+          "label": "Line weight",
+          "min": 0.5,
+          "max": 2,
+          "step": 0.01,
+          "group": "Material",
+          "def": 1,
+          "hint": "Thickness of the drawn lines."
+        },
+        "radiance": {
+          "type": "range",
+          "label": "Radiance",
+          "min": 0.4,
+          "max": 2,
+          "step": 0.01,
+          "group": "Light",
+          "def": 1.1,
+          "hint": "Brightness of the light the form emits; also drives bloom.",
+          "randMax": 1.5
+        },
+        "exposure": {
+          "type": "range",
+          "label": "Exposure",
+          "min": 0.45,
+          "max": 1.7,
+          "step": 0.01,
+          "group": "Light",
+          "def": 1,
+          "hint": "Final exposure before the tone map.",
+          "randMax": 1.25
+        },
+        "glow": {
+          "type": "range",
+          "label": "Bloom mix",
+          "min": 0,
+          "max": 0.9,
+          "step": 0.01,
+          "group": "Lens",
+          "def": 0.36,
+          "hint": "How much bloom is mixed back into the image.",
+          "randMax": 0.6
+        },
+        "threshold": {
+          "type": "range",
+          "label": "Bloom threshold",
+          "min": 0.1,
+          "max": 1.5,
+          "step": 0.001,
+          "group": "Lens",
+          "def": 0.68,
+          "hint": "Brightness above which pixels bloom. Lower is hazier.",
+          "randMax": 1.0
+        },
+        "radius": {
+          "type": "range",
+          "label": "Bloom spread",
+          "min": 0.75,
+          "max": 3,
+          "step": 0.01,
+          "group": "Lens",
+          "def": 1.5,
+          "hint": "Width of the bloom halo.",
+          "randMax": 2.2
+        },
+        "cycles": {
+          "type": "int",
+          "label": "Circuits / loop",
+          "min": 1,
+          "max": 2,
+          "group": "Motion",
+          "mutate": 0,
+          "def": 1,
+          "hint": "Whole circuits per loop keep the seam closed."
+        },
+        "layers": {
+          "type": "int",
+          "label": "Depth layers",
+          "min": 1,
+          "max": 4,
+          "group": "Form",
+          "mutate": 0,
+          "def": 3,
+          "hint": "Number of stacked copies, alternate ones counter-rotate."
+        },
+        "vignette": {
+          "type": "range",
+          "label": "Vignette",
+          "min": 0,
+          "max": 0.6,
+          "step": 0.01,
+          "group": "Lens",
+          "def": 0.34,
+          "hint": "Edge darkening that holds the eye on the focal point."
+        }
+      }
+    },
+    {
+      "id": "golden-bloom",
+      "name": "Golden Bloom",
+      "group": "Oriel",
+      "palette": "lapis",
+      "tags": [
+        "oriel",
+        "ambient",
+        "procedural"
+      ],
+      "blurb": "Logarithmic spirals expand around a luminous living core.",
+      "flash": false,
+      "cost": 2,
+      "graph": {
+        "buffers": {
+          "scene": {
+            "scale": 0.75
+          },
+          "bright": {
+            "scale": 0.25
+          },
+          "glow": {
+            "scale": 0.125
+          },
+          "wide": {
+            "scale": 0.125
+          }
+        },
+        "passes": [
+          {
+            "src": "styles/golden-bloom.glsl",
+            "writes": "scene"
+          },
+          {
+            "src": "post/bright.glsl",
+            "reads": [
+              "scene"
+            ],
+            "writes": "bright"
+          },
+          {
+            "src": "post/glow.glsl",
+            "reads": [
+              "bright"
+            ],
+            "writes": "glow"
+          },
+          {
+            "src": "post/wide.glsl",
+            "reads": [
+              "bright"
+            ],
+            "writes": "wide"
+          },
+          {
+            "src": "post/output.glsl",
+            "reads": [
+              "scene",
+              "glow",
+              "wide"
+            ],
+            "writes": "output"
+          }
+        ]
+      },
+      "params": {
+        "scale": {
+          "type": "range",
+          "label": "Form scale",
+          "min": 0.55,
+          "max": 2.2,
+          "step": 0.01,
+          "group": "Form",
+          "def": 1,
+          "hint": "Overall size of the form."
+        },
+        "complexity": {
+          "type": "range",
+          "label": "Geometric detail",
+          "min": 0,
+          "max": 1.2,
+          "step": 0.01,
+          "group": "Form",
+          "def": 0.6,
+          "hint": "Adds line detail and fine harmonics to the geometry."
+        },
+        "density": {
+          "type": "range",
+          "label": "Pattern spread",
+          "min": 0.4,
+          "max": 1.8,
+          "step": 0.01,
+          "group": "Form",
+          "def": 1,
+          "hint": "How far the pattern repeats across the frame."
+        },
+        "depth": {
+          "type": "range",
+          "label": "Depth haze",
+          "min": 3,
+          "max": 10,
+          "step": 0.01,
+          "group": "Material",
+          "def": 6.5,
+          "hint": "How quickly deeper layers fade into the dark."
+        },
+        "membrane": {
+          "type": "range",
+          "label": "Line weight",
+          "min": 0.5,
+          "max": 2,
+          "step": 0.01,
+          "group": "Material",
+          "def": 1,
+          "hint": "Thickness of the drawn lines."
+        },
+        "radiance": {
+          "type": "range",
+          "label": "Radiance",
+          "min": 0.4,
+          "max": 2,
+          "step": 0.01,
+          "group": "Light",
+          "def": 1.1,
+          "hint": "Brightness of the light the form emits; also drives bloom.",
+          "randMax": 1.5
+        },
+        "exposure": {
+          "type": "range",
+          "label": "Exposure",
+          "min": 0.45,
+          "max": 1.7,
+          "step": 0.01,
+          "group": "Light",
+          "def": 1,
+          "hint": "Final exposure before the tone map.",
+          "randMax": 1.25
+        },
+        "glow": {
+          "type": "range",
+          "label": "Bloom mix",
+          "min": 0,
+          "max": 0.9,
+          "step": 0.01,
+          "group": "Lens",
+          "def": 0.36,
+          "hint": "How much bloom is mixed back into the image.",
+          "randMax": 0.6
+        },
+        "threshold": {
+          "type": "range",
+          "label": "Bloom threshold",
+          "min": 0.1,
+          "max": 1.5,
+          "step": 0.01,
+          "group": "Lens",
+          "def": 0.68,
+          "hint": "Brightness above which pixels bloom. Lower is hazier.",
+          "randMax": 1.0
+        },
+        "radius": {
+          "type": "range",
+          "label": "Bloom spread",
+          "min": 0.75,
+          "max": 3,
+          "step": 0.01,
+          "group": "Lens",
+          "def": 1.5,
+          "hint": "Width of the bloom halo.",
+          "randMax": 2.2
+        },
+        "cycles": {
+          "type": "int",
+          "label": "Circuits / loop",
+          "min": 1,
+          "max": 2,
+          "group": "Motion",
+          "mutate": 0,
+          "def": 1,
+          "hint": "Whole circuits per loop keep the seam closed."
+        },
+        "layers": {
+          "type": "int",
+          "label": "Depth layers",
+          "min": 1,
+          "max": 4,
+          "group": "Form",
+          "mutate": 0,
+          "def": 2,
+          "hint": "Number of stacked copies, alternate ones counter-rotate."
+        },
+        "vignette": {
+          "type": "range",
+          "label": "Vignette",
+          "min": 0,
+          "max": 0.6,
+          "step": 0.01,
+          "group": "Lens",
+          "def": 0.34,
+          "hint": "Edge darkening that holds the eye on the focal point."
+        }
+      }
+    },
+    {
+      "id": "torus-choir",
+      "name": "Torus Choir",
+      "group": "Oriel",
+      "palette": "lapis",
+      "tags": [
+        "oriel",
+        "ambient",
+        "procedural"
+      ],
+      "blurb": "Nested rosettes imply luminous toroidal movement.",
+      "flash": false,
+      "cost": 2,
+      "graph": {
+        "buffers": {
+          "scene": {
+            "scale": 0.75
+          },
+          "bright": {
+            "scale": 0.25
+          },
+          "glow": {
+            "scale": 0.125
+          },
+          "wide": {
+            "scale": 0.125
+          }
+        },
+        "passes": [
+          {
+            "src": "styles/torus-choir.glsl",
+            "writes": "scene"
+          },
+          {
+            "src": "post/bright.glsl",
+            "reads": [
+              "scene"
+            ],
+            "writes": "bright"
+          },
+          {
+            "src": "post/glow.glsl",
+            "reads": [
+              "bright"
+            ],
+            "writes": "glow"
+          },
+          {
+            "src": "post/wide.glsl",
+            "reads": [
+              "bright"
+            ],
+            "writes": "wide"
+          },
+          {
+            "src": "post/output.glsl",
+            "reads": [
+              "scene",
+              "glow",
+              "wide"
+            ],
+            "writes": "output"
+          }
+        ]
+      },
+      "params": {
+        "scale": {
+          "type": "range",
+          "label": "Form scale",
+          "min": 0.55,
+          "max": 2.2,
+          "step": 0.01,
+          "group": "Form",
+          "def": 1,
+          "hint": "Overall size of the form."
+        },
+        "complexity": {
+          "type": "range",
+          "label": "Geometric detail",
+          "min": 0,
+          "max": 1.2,
+          "step": 0.01,
+          "group": "Form",
+          "def": 0.6,
+          "hint": "Adds line detail and fine harmonics to the geometry."
+        },
+        "density": {
+          "type": "range",
+          "label": "Pattern spread",
+          "min": 0.4,
+          "max": 1.8,
+          "step": 0.01,
+          "group": "Form",
+          "def": 1,
+          "hint": "How far the pattern repeats across the frame."
+        },
+        "depth": {
+          "type": "range",
+          "label": "Depth haze",
+          "min": 3,
+          "max": 10,
+          "step": 0.01,
+          "group": "Material",
+          "def": 6.5,
+          "hint": "How quickly deeper layers fade into the dark."
+        },
+        "membrane": {
+          "type": "range",
+          "label": "Line weight",
+          "min": 0.5,
+          "max": 2,
+          "step": 0.01,
+          "group": "Material",
+          "def": 1,
+          "hint": "Thickness of the drawn lines."
+        },
+        "radiance": {
+          "type": "range",
+          "label": "Radiance",
+          "min": 0.4,
+          "max": 2,
+          "step": 0.01,
+          "group": "Light",
+          "def": 1.1,
+          "hint": "Brightness of the light the form emits; also drives bloom.",
+          "randMax": 1.5
+        },
+        "exposure": {
+          "type": "range",
+          "label": "Exposure",
+          "min": 0.45,
+          "max": 1.7,
+          "step": 0.01,
+          "group": "Light",
+          "def": 1,
+          "hint": "Final exposure before the tone map.",
+          "randMax": 1.25
+        },
+        "glow": {
+          "type": "range",
+          "label": "Bloom mix",
+          "min": 0,
+          "max": 0.9,
+          "step": 0.01,
+          "group": "Lens",
+          "def": 0.36,
+          "hint": "How much bloom is mixed back into the image.",
+          "randMax": 0.6
+        },
+        "threshold": {
+          "type": "range",
+          "label": "Bloom threshold",
+          "min": 0.1,
+          "max": 1.5,
+          "step": 0.001,
+          "group": "Lens",
+          "def": 0.68,
+          "hint": "Brightness above which pixels bloom. Lower is hazier.",
+          "randMax": 1.0
+        },
+        "radius": {
+          "type": "range",
+          "label": "Bloom spread",
+          "min": 0.75,
+          "max": 3,
+          "step": 0.01,
+          "group": "Lens",
+          "def": 1.5,
+          "hint": "Width of the bloom halo.",
+          "randMax": 2.2
+        },
+        "cycles": {
+          "type": "int",
+          "label": "Circuits / loop",
+          "min": 1,
+          "max": 2,
+          "group": "Motion",
+          "mutate": 0,
+          "def": 1,
+          "hint": "Whole circuits per loop keep the seam closed."
+        },
+        "layers": {
+          "type": "int",
+          "label": "Depth layers",
+          "min": 1,
+          "max": 4,
+          "group": "Form",
+          "mutate": 0,
+          "def": 3,
+          "hint": "Number of stacked copies, alternate ones counter-rotate."
+        },
+        "vignette": {
+          "type": "range",
+          "label": "Vignette",
+          "min": 0,
+          "max": 0.6,
+          "step": 0.01,
+          "group": "Lens",
+          "def": 0.34,
+          "hint": "Edge darkening that holds the eye on the focal point."
+        }
+      }
+    },
+    {
+      "id": "stellate",
+      "name": "Stellate",
+      "group": "Oriel",
+      "palette": "verdigris",
+      "tags": [
+        "oriel",
+        "ambient",
+        "procedural"
+      ],
+      "blurb": "A rotating star network shelters soft geometric seeds.",
+      "flash": false,
+      "cost": 2,
+      "graph": {
+        "buffers": {
+          "scene": {
+            "scale": 0.75
+          },
+          "bright": {
+            "scale": 0.25
+          },
+          "glow": {
+            "scale": 0.125
+          },
+          "wide": {
+            "scale": 0.125
+          }
+        },
+        "passes": [
+          {
+            "src": "styles/stellate.glsl",
+            "writes": "scene"
+          },
+          {
+            "src": "post/bright.glsl",
+            "reads": [
+              "scene"
+            ],
+            "writes": "bright"
+          },
+          {
+            "src": "post/glow.glsl",
+            "reads": [
+              "bright"
+            ],
+            "writes": "glow"
+          },
+          {
+            "src": "post/wide.glsl",
+            "reads": [
+              "bright"
+            ],
+            "writes": "wide"
+          },
+          {
+            "src": "post/output.glsl",
+            "reads": [
+              "scene",
+              "glow",
+              "wide"
+            ],
+            "writes": "output"
+          }
+        ]
+      },
+      "params": {
+        "scale": {
+          "type": "range",
+          "label": "Form scale",
+          "min": 0.55,
+          "max": 2.2,
+          "step": 0.01,
+          "group": "Form",
+          "def": 1,
+          "hint": "Overall size of the form."
+        },
+        "complexity": {
+          "type": "range",
+          "label": "Geometric detail",
+          "min": 0,
+          "max": 1.2,
+          "step": 0.01,
+          "group": "Form",
+          "def": 0.6,
+          "hint": "Adds line detail and fine harmonics to the geometry."
+        },
+        "density": {
+          "type": "range",
+          "label": "Pattern spread",
+          "min": 0.4,
+          "max": 1.8,
+          "step": 0.01,
+          "group": "Form",
+          "def": 1,
+          "hint": "How far the pattern repeats across the frame."
+        },
+        "depth": {
+          "type": "range",
+          "label": "Depth haze",
+          "min": 3,
+          "max": 10,
+          "step": 0.01,
+          "group": "Material",
+          "def": 6.5,
+          "hint": "How quickly deeper layers fade into the dark."
+        },
+        "membrane": {
+          "type": "range",
+          "label": "Line weight",
+          "min": 0.5,
+          "max": 2,
+          "step": 0.01,
+          "group": "Material",
+          "def": 1,
+          "hint": "Thickness of the drawn lines."
+        },
+        "radiance": {
+          "type": "range",
+          "label": "Radiance",
+          "min": 0.4,
+          "max": 2,
+          "step": 0.01,
+          "group": "Light",
+          "def": 1.1,
+          "hint": "Brightness of the light the form emits; also drives bloom.",
+          "randMax": 1.5
+        },
+        "exposure": {
+          "type": "range",
+          "label": "Exposure",
+          "min": 0.45,
+          "max": 1.7,
+          "step": 0.01,
+          "group": "Light",
+          "def": 1,
+          "hint": "Final exposure before the tone map.",
+          "randMax": 1.25
+        },
+        "glow": {
+          "type": "range",
+          "label": "Bloom mix",
+          "min": 0,
+          "max": 0.9,
+          "step": 0.01,
+          "group": "Lens",
+          "def": 0.36,
+          "hint": "How much bloom is mixed back into the image.",
+          "randMax": 0.6
+        },
+        "threshold": {
+          "type": "range",
+          "label": "Bloom threshold",
+          "min": 0.1,
+          "max": 1.5,
+          "step": 0.001,
+          "group": "Lens",
+          "def": 0.68,
+          "hint": "Brightness above which pixels bloom. Lower is hazier.",
+          "randMax": 1.0
+        },
+        "radius": {
+          "type": "range",
+          "label": "Bloom spread",
+          "min": 0.75,
+          "max": 3,
+          "step": 0.01,
+          "group": "Lens",
+          "def": 1.5,
+          "hint": "Width of the bloom halo.",
+          "randMax": 2.2
+        },
+        "cycles": {
+          "type": "int",
+          "label": "Circuits / loop",
+          "min": 1,
+          "max": 2,
+          "group": "Motion",
+          "mutate": 0,
+          "def": 1,
+          "hint": "Whole circuits per loop keep the seam closed."
+        },
+        "layers": {
+          "type": "int",
+          "label": "Depth layers",
+          "min": 1,
+          "max": 4,
+          "group": "Form",
+          "mutate": 0,
+          "def": 2,
+          "hint": "Number of stacked copies, alternate ones counter-rotate."
+        },
+        "vignette": {
+          "type": "range",
+          "label": "Vignette",
+          "min": 0,
+          "max": 0.6,
+          "step": 0.01,
+          "group": "Lens",
+          "def": 0.34,
+          "hint": "Edge darkening that holds the eye on the focal point."
+        }
+      }
+    },
+    {
+      "id": "quasicrystal",
+      "name": "Quasicrystal",
+      "group": "Oriel",
+      "palette": "verdigris",
+      "tags": [
+        "oriel",
+        "ambient",
+        "procedural"
+      ],
+      "blurb": "Fivefold interference becomes an organic luminous lattice.",
+      "flash": false,
+      "cost": 2,
+      "graph": {
+        "buffers": {
+          "scene": {
+            "scale": 0.75
+          },
+          "bright": {
+            "scale": 0.25
+          },
+          "glow": {
+            "scale": 0.125
+          },
+          "wide": {
+            "scale": 0.125
+          }
+        },
+        "passes": [
+          {
+            "src": "styles/quasicrystal.glsl",
+            "writes": "scene"
+          },
+          {
+            "src": "post/bright.glsl",
+            "reads": [
+              "scene"
+            ],
+            "writes": "bright"
+          },
+          {
+            "src": "post/glow.glsl",
+            "reads": [
+              "bright"
+            ],
+            "writes": "glow"
+          },
+          {
+            "src": "post/wide.glsl",
+            "reads": [
+              "bright"
+            ],
+            "writes": "wide"
+          },
+          {
+            "src": "post/output.glsl",
+            "reads": [
+              "scene",
+              "glow",
+              "wide"
+            ],
+            "writes": "output"
+          }
+        ]
+      },
+      "params": {
+        "scale": {
+          "type": "range",
+          "label": "Form scale",
+          "min": 0.55,
+          "max": 2.2,
+          "step": 0.01,
+          "group": "Form",
+          "def": 1,
+          "hint": "Overall size of the form."
+        },
+        "complexity": {
+          "type": "range",
+          "label": "Geometric detail",
+          "min": 0,
+          "max": 1.2,
+          "step": 0.01,
+          "group": "Form",
+          "def": 0.6,
+          "hint": "Adds line detail and fine harmonics to the geometry."
+        },
+        "density": {
+          "type": "range",
+          "label": "Pattern spread",
+          "min": 0.4,
+          "max": 1.8,
+          "step": 0.01,
+          "group": "Form",
+          "def": 1,
+          "hint": "How far the pattern repeats across the frame."
+        },
+        "depth": {
+          "type": "range",
+          "label": "Depth haze",
+          "min": 3,
+          "max": 10,
+          "step": 0.01,
+          "group": "Material",
+          "def": 6.5,
+          "hint": "How quickly deeper layers fade into the dark."
+        },
+        "membrane": {
+          "type": "range",
+          "label": "Line weight",
+          "min": 0.5,
+          "max": 2,
+          "step": 0.01,
+          "group": "Material",
+          "def": 1,
+          "hint": "Thickness of the drawn lines."
+        },
+        "radiance": {
+          "type": "range",
+          "label": "Radiance",
+          "min": 0.4,
+          "max": 2,
+          "step": 0.01,
+          "group": "Light",
+          "def": 1.1,
+          "hint": "Brightness of the light the form emits; also drives bloom.",
+          "randMax": 1.5
+        },
+        "exposure": {
+          "type": "range",
+          "label": "Exposure",
+          "min": 0.45,
+          "max": 1.7,
+          "step": 0.01,
+          "group": "Light",
+          "def": 1,
+          "hint": "Final exposure before the tone map.",
+          "randMax": 1.25
+        },
+        "glow": {
+          "type": "range",
+          "label": "Bloom mix",
+          "min": 0,
+          "max": 0.9,
+          "step": 0.01,
+          "group": "Lens",
+          "def": 0.36,
+          "hint": "How much bloom is mixed back into the image.",
+          "randMax": 0.6
+        },
+        "threshold": {
+          "type": "range",
+          "label": "Bloom threshold",
+          "min": 0.1,
+          "max": 1.5,
+          "step": 0.001,
+          "group": "Lens",
+          "def": 0.68,
+          "hint": "Brightness above which pixels bloom. Lower is hazier.",
+          "randMax": 1.0
+        },
+        "radius": {
+          "type": "range",
+          "label": "Bloom spread",
+          "min": 0.75,
+          "max": 3,
+          "step": 0.01,
+          "group": "Lens",
+          "def": 1.5,
+          "hint": "Width of the bloom halo.",
+          "randMax": 2.2
+        },
+        "cycles": {
+          "type": "int",
+          "label": "Circuits / loop",
+          "min": 1,
+          "max": 2,
+          "group": "Motion",
+          "mutate": 0,
+          "def": 1,
+          "hint": "Whole circuits per loop keep the seam closed."
+        },
+        "layers": {
+          "type": "int",
+          "label": "Depth layers",
+          "min": 1,
+          "max": 4,
+          "group": "Form",
+          "mutate": 0,
+          "def": 2,
+          "hint": "Number of stacked copies, alternate ones counter-rotate."
+        },
+        "vignette": {
+          "type": "range",
+          "label": "Vignette",
+          "min": 0,
+          "max": 0.6,
+          "step": 0.01,
+          "group": "Lens",
+          "def": 0.34,
+          "hint": "Edge darkening that holds the eye on the focal point."
+        }
+      }
+    },
+    {
+      "id": "metatron-field",
+      "name": "Metatron Field",
+      "group": "Oriel",
+      "palette": "verdigris",
+      "tags": [
+        "oriel",
+        "ambient",
+        "procedural"
+      ],
+      "blurb": "Thirteen nodes and their interwoven connections circulate.",
+      "flash": false,
+      "cost": 2,
+      "graph": {
+        "buffers": {
+          "scene": {
+            "scale": 0.75
+          },
+          "bright": {
+            "scale": 0.25
+          },
+          "glow": {
+            "scale": 0.125
+          },
+          "wide": {
+            "scale": 0.125
+          }
+        },
+        "passes": [
+          {
+            "src": "styles/metatron-field.glsl",
+            "writes": "scene"
+          },
+          {
+            "src": "post/bright.glsl",
+            "reads": [
+              "scene"
+            ],
+            "writes": "bright"
+          },
+          {
+            "src": "post/glow.glsl",
+            "reads": [
+              "bright"
+            ],
+            "writes": "glow"
+          },
+          {
+            "src": "post/wide.glsl",
+            "reads": [
+              "bright"
+            ],
+            "writes": "wide"
+          },
+          {
+            "src": "post/output.glsl",
+            "reads": [
+              "scene",
+              "glow",
+              "wide"
+            ],
+            "writes": "output"
+          }
+        ]
+      },
+      "params": {
+        "scale": {
+          "type": "range",
+          "label": "Form scale",
+          "min": 0.55,
+          "max": 2.2,
+          "step": 0.01,
+          "group": "Form",
+          "def": 1,
+          "hint": "Overall size of the form."
+        },
+        "complexity": {
+          "type": "range",
+          "label": "Geometric detail",
+          "min": 0,
+          "max": 1.2,
+          "step": 0.01,
+          "group": "Form",
+          "def": 0.6,
+          "hint": "Adds line detail and fine harmonics to the geometry."
+        },
+        "density": {
+          "type": "range",
+          "label": "Pattern spread",
+          "min": 0.4,
+          "max": 1.8,
+          "step": 0.01,
+          "group": "Form",
+          "def": 1,
+          "hint": "How far the pattern repeats across the frame."
+        },
+        "depth": {
+          "type": "range",
+          "label": "Depth haze",
+          "min": 3,
+          "max": 10,
+          "step": 0.01,
+          "group": "Material",
+          "def": 6.5,
+          "hint": "How quickly deeper layers fade into the dark."
+        },
+        "membrane": {
+          "type": "range",
+          "label": "Line weight",
+          "min": 0.5,
+          "max": 2,
+          "step": 0.01,
+          "group": "Material",
+          "def": 1,
+          "hint": "Thickness of the drawn lines."
+        },
+        "radiance": {
+          "type": "range",
+          "label": "Radiance",
+          "min": 0.4,
+          "max": 2,
+          "step": 0.01,
+          "group": "Light",
+          "def": 1.1,
+          "hint": "Brightness of the light the form emits; also drives bloom.",
+          "randMax": 1.5
+        },
+        "exposure": {
+          "type": "range",
+          "label": "Exposure",
+          "min": 0.45,
+          "max": 1.7,
+          "step": 0.01,
+          "group": "Light",
+          "def": 1,
+          "hint": "Final exposure before the tone map.",
+          "randMax": 1.25
+        },
+        "glow": {
+          "type": "range",
+          "label": "Bloom mix",
+          "min": 0,
+          "max": 0.9,
+          "step": 0.01,
+          "group": "Lens",
+          "def": 0.36,
+          "hint": "How much bloom is mixed back into the image.",
+          "randMax": 0.6
+        },
+        "threshold": {
+          "type": "range",
+          "label": "Bloom threshold",
+          "min": 0.1,
+          "max": 1.5,
+          "step": 0.001,
+          "group": "Lens",
+          "def": 0.68,
+          "hint": "Brightness above which pixels bloom. Lower is hazier.",
+          "randMax": 1.0
+        },
+        "radius": {
+          "type": "range",
+          "label": "Bloom spread",
+          "min": 0.75,
+          "max": 3,
+          "step": 0.01,
+          "group": "Lens",
+          "def": 1.5,
+          "hint": "Width of the bloom halo.",
+          "randMax": 2.2
+        },
+        "cycles": {
+          "type": "int",
+          "label": "Circuits / loop",
+          "min": 1,
+          "max": 2,
+          "group": "Motion",
+          "mutate": 0,
+          "def": 1,
+          "hint": "Whole circuits per loop keep the seam closed."
+        },
+        "layers": {
+          "type": "int",
+          "label": "Depth layers",
+          "min": 1,
+          "max": 4,
+          "group": "Form",
+          "mutate": 0,
+          "def": 2,
+          "hint": "Number of stacked copies, alternate ones counter-rotate."
+        },
+        "vignette": {
+          "type": "range",
+          "label": "Vignette",
+          "min": 0,
+          "max": 0.6,
+          "step": 0.01,
+          "group": "Lens",
+          "def": 0.34,
+          "hint": "Edge darkening that holds the eye on the focal point."
+        }
+      }
+    }
+  ]
+}
