@@ -2,8 +2,8 @@
   "kit": "phi-bloom",
   "version": "1.0.0",
   "size": [
-    90,
-    160
+    180,
+    320
   ],
   "renderer": "SwiftShader (software GL, headless Chromium)",
   "note": "Metric definitions in tools/qa.mjs. Software timings and metrics are relative diagnostics, not device performance.",
@@ -11,95 +11,171 @@
     {
       "id": "phi-bloom-hero",
       "delta0_p1": 0,
-      "seamStep": 2.396,
-      "seamStepAfter": 2.366,
-      "velMedian": 2.244,
-      "velMax": 2.392,
-      "seamRatio": 1.07,
-      "popRatio": 1.07,
+      "seamStep": 3.065,
+      "seamStepAfter": 3.042,
+      "velMedian": 2.944,
+      "velMax": 3.097,
+      "seamRatio": 1.04,
+      "popRatio": 1.05,
       "exposureByQuality": [
-        0.3132,
-        0.3124,
-        0.3124
+        0.3244,
+        0.3306,
+        0.3306
       ],
-      "exposureSpread": 0.003,
-      "meanLuma": 0.3124,
+      "exposureSpread": 0.019,
+      "meanLuma": 0.3306,
+      "flashTilesOver3": 0,
+      "flashPairsMaxPerSec": 0
+    },
+    {
+      "id": "golden-seed",
+      "delta0_p1": 0,
+      "seamStep": 0.159,
+      "seamStepAfter": 0.158,
+      "velMedian": 0.122,
+      "velMax": 0.159,
+      "seamRatio": 1.3,
+      "popRatio": 1.3,
+      "exposureByQuality": [
+        0.3185,
+        0.3246,
+        0.3246
+      ],
+      "exposureSpread": 0.019,
+      "meanLuma": 0.3246,
       "flashTilesOver3": 0,
       "flashPairsMaxPerSec": 0
     },
     {
       "id": "copper-fern",
       "delta0_p1": 0,
-      "seamStep": 0.043,
+      "seamStep": 0.041,
       "seamStepAfter": 0.052,
-      "velMedian": 2.495,
-      "velMax": 2.896,
+      "velMedian": 2.712,
+      "velMax": 3.233,
       "seamRatio": 0.02,
-      "popRatio": 1.16,
+      "popRatio": 1.19,
       "exposureByQuality": [
-        0.2027,
-        0.2043,
-        0.2043
+        0.2087,
+        0.213,
+        0.213
       ],
-      "exposureSpread": 0.008,
-      "meanLuma": 0.2043,
-      "flashTilesOver3": 0,
-      "flashPairsMaxPerSec": 0
-    },
-    {
-      "id": "spiral-canopy",
-      "delta0_p1": 0,
-      "seamStep": 1.426,
-      "seamStepAfter": 1.45,
-      "velMedian": 1.309,
-      "velMax": 1.463,
-      "seamRatio": 1.11,
-      "popRatio": 1.12,
-      "exposureByQuality": [
-        0.2991,
-        0.2986,
-        0.2986
-      ],
-      "exposureSpread": 0.002,
-      "meanLuma": 0.2986,
-      "flashTilesOver3": 0,
-      "flashPairsMaxPerSec": 0
-    },
-    {
-      "id": "twin-phyllotaxis",
-      "delta0_p1": 0,
-      "seamStep": 2.726,
-      "seamStepAfter": 2.66,
-      "velMedian": 2.863,
-      "velMax": 3.067,
-      "seamRatio": 0.95,
-      "popRatio": 1.07,
-      "exposureByQuality": [
-        0.2997,
-        0.301,
-        0.301
-      ],
-      "exposureSpread": 0.004,
-      "meanLuma": 0.301,
+      "exposureSpread": 0.021,
+      "meanLuma": 0.213,
       "flashTilesOver3": 0,
       "flashPairsMaxPerSec": 0
     },
     {
       "id": "ivory-helix",
       "delta0_p1": 0,
-      "seamStep": 1.455,
-      "seamStepAfter": 0.89,
-      "velMedian": 0.82,
-      "velMax": 0.868,
-      "seamRatio": 1.77,
-      "popRatio": 1.06,
+      "seamStep": 1.168,
+      "seamStepAfter": 1.106,
+      "velMedian": 1.005,
+      "velMax": 1.091,
+      "seamRatio": 1.16,
+      "popRatio": 1.09,
       "exposureByQuality": [
-        0.3127,
-        0.3104,
-        0.3104
+        0.3242,
+        0.3242,
+        0.3242
       ],
-      "exposureSpread": 0.008,
-      "meanLuma": 0.3104,
+      "exposureSpread": 0,
+      "meanLuma": 0.3242,
+      "flashTilesOver3": 0,
+      "flashPairsMaxPerSec": 0
+    },
+    {
+      "id": "jade-crown",
+      "delta0_p1": 0,
+      "seamStep": 7.235,
+      "seamStepAfter": 7.261,
+      "velMedian": 7.201,
+      "velMax": 7.382,
+      "seamRatio": 1.01,
+      "popRatio": 1.03,
+      "exposureByQuality": [
+        0.4462,
+        0.4587,
+        0.4587
+      ],
+      "exposureSpread": 0.028,
+      "meanLuma": 0.4587,
+      "flashTilesOver3": 0,
+      "flashPairsMaxPerSec": 0
+    },
+    {
+      "id": "spiral-canopy",
+      "delta0_p1": 0,
+      "seamStep": 2.013,
+      "seamStepAfter": 1.992,
+      "velMedian": 1.901,
+      "velMax": 2.106,
+      "seamRatio": 1.06,
+      "popRatio": 1.11,
+      "exposureByQuality": [
+        0.2975,
+        0.3041,
+        0.3041
+      ],
+      "exposureSpread": 0.022,
+      "meanLuma": 0.3041,
+      "flashTilesOver3": 0,
+      "flashPairsMaxPerSec": 0
+    },
+    {
+      "id": "twin-phyllotaxis",
+      "delta0_p1": 0,
+      "seamStep": 3.357,
+      "seamStepAfter": 3.373,
+      "velMedian": 3.542,
+      "velMax": 3.776,
+      "seamRatio": 0.95,
+      "popRatio": 1.07,
+      "exposureByQuality": [
+        0.3154,
+        0.3224,
+        0.3224
+      ],
+      "exposureSpread": 0.022,
+      "meanLuma": 0.3224,
+      "flashTilesOver3": 0,
+      "flashPairsMaxPerSec": 0
+    },
+    {
+      "id": "orbital-petals",
+      "delta0_p1": 0,
+      "seamStep": 1.824,
+      "seamStepAfter": 1.837,
+      "velMedian": 1.962,
+      "velMax": 2.241,
+      "seamRatio": 0.94,
+      "popRatio": 1.14,
+      "exposureByQuality": [
+        0.3035,
+        0.3157,
+        0.3157
+      ],
+      "exposureSpread": 0.04,
+      "meanLuma": 0.3157,
+      "flashTilesOver3": 0,
+      "flashPairsMaxPerSec": 0
+    },
+    {
+      "id": "quiet-unfold",
+      "delta0_p1": 0,
+      "seamStep": 0.184,
+      "seamStepAfter": 0.186,
+      "velMedian": 0.135,
+      "velMax": 0.191,
+      "seamRatio": 1.38,
+      "popRatio": 1.42,
+      "exposureByQuality": [
+        0.3124,
+        0.3117,
+        0.3117
+      ],
+      "exposureSpread": 0.002,
+      "meanLuma": 0.3117,
       "flashTilesOver3": 0,
       "flashPairsMaxPerSec": 0
     }

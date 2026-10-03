@@ -2,8 +2,8 @@
   "kit": "sacred-lattice",
   "version": "1.0.0",
   "size": [
-    72,
-    128
+    180,
+    320
   ],
   "renderer": "SwiftShader (software GL, headless Chromium)",
   "note": "Metric definitions in tools/qa.mjs. Software timings and metrics are relative diagnostics, not device performance.",
@@ -11,19 +11,159 @@
     {
       "id": "sacred-lattice-hero",
       "delta0_p1": 0,
-      "seamStep": 0.662,
-      "seamStepAfter": 0.657,
-      "velMedian": 0.766,
-      "velMax": 0.898,
+      "seamStep": 0.858,
+      "seamStepAfter": 0.854,
+      "velMedian": 1.001,
+      "velMax": 1.125,
       "seamRatio": 0.86,
+      "popRatio": 1.12,
+      "exposureByQuality": [
+        0.1966,
+        0.202,
+        0.202
+      ],
+      "exposureSpread": 0.027,
+      "meanLuma": 0.202,
+      "flashTilesOver3": 0,
+      "flashPairsMaxPerSec": 0
+    },
+    {
+      "id": "octahedral-chapel",
+      "delta0_p1": 0,
+      "seamStep": 3.424,
+      "seamStepAfter": 3.135,
+      "velMedian": 2.866,
+      "velMax": 4.332,
+      "seamRatio": 1.19,
+      "popRatio": 1.51,
+      "exposureByQuality": [
+        0.3742,
+        0.3783,
+        0.3783
+      ],
+      "exposureSpread": 0.011,
+      "meanLuma": 0.3783,
+      "flashTilesOver3": 1,
+      "flashPairsMaxPerSec": 3
+    },
+    {
+      "id": "tetrahedral-orbit",
+      "delta0_p1": 0,
+      "seamStep": 1.021,
+      "seamStepAfter": 1.041,
+      "velMedian": 0.968,
+      "velMax": 1.129,
+      "seamRatio": 1.08,
       "popRatio": 1.17,
       "exposureByQuality": [
-        0.2179,
-        0.2226,
-        0.2226
+        0.1548,
+        0.1593,
+        0.1593
       ],
-      "exposureSpread": 0.021,
-      "meanLuma": 0.2226,
+      "exposureSpread": 0.029,
+      "meanLuma": 0.1593,
+      "flashTilesOver3": 0,
+      "flashPairsMaxPerSec": 0
+    },
+    {
+      "id": "golden-icosahedron",
+      "delta0_p1": 0,
+      "seamStep": 1.138,
+      "seamStepAfter": 1.139,
+      "velMedian": 1.077,
+      "velMax": 1.201,
+      "seamRatio": 1.06,
+      "popRatio": 1.12,
+      "exposureByQuality": [
+        0.4017,
+        0.4376,
+        0.4376
+      ],
+      "exposureSpread": 0.09,
+      "meanLuma": 0.4376,
+      "flashTilesOver3": 0,
+      "flashPairsMaxPerSec": 0
+    },
+    {
+      "id": "circle-cathedral",
+      "delta0_p1": 0,
+      "seamStep": 0.718,
+      "seamStepAfter": 0.722,
+      "velMedian": 0.704,
+      "velMax": 0.726,
+      "seamRatio": 1.03,
+      "popRatio": 1.03,
+      "meanLuma": 0.1918,
+      "flashTilesOver3": 0,
+      "flashPairsMaxPerSec": 0
+    },
+    {
+      "id": "nested-compass",
+      "delta0_p1": 0,
+      "seamStep": 1.454,
+      "seamStepAfter": 1.445,
+      "velMedian": 1.421,
+      "velMax": 1.469,
+      "seamRatio": 1.02,
+      "popRatio": 1.03,
+      "meanLuma": 0.1679,
+      "flashTilesOver3": 0,
+      "flashPairsMaxPerSec": 0
+    },
+    {
+      "id": "glass-constellation",
+      "delta0_p1": 0,
+      "seamStep": 2.51,
+      "seamStepAfter": 2.474,
+      "velMedian": 2.262,
+      "velMax": 2.49,
+      "seamRatio": 1.11,
+      "popRatio": 1.1,
+      "exposureByQuality": [
+        0.1856,
+        0.205,
+        0.205
+      ],
+      "exposureSpread": 0.104,
+      "meanLuma": 0.205,
+      "flashTilesOver3": 0,
+      "flashPairsMaxPerSec": 0
+    },
+    {
+      "id": "axial-halo",
+      "delta0_p1": 0,
+      "seamStep": 0.81,
+      "seamStepAfter": 0.822,
+      "velMedian": 0.719,
+      "velMax": 0.871,
+      "seamRatio": 1.14,
+      "popRatio": 1.21,
+      "exposureByQuality": [
+        0.2219,
+        0.2275,
+        0.2275
+      ],
+      "exposureSpread": 0.025,
+      "meanLuma": 0.2275,
+      "flashTilesOver3": 0,
+      "flashPairsMaxPerSec": 0
+    },
+    {
+      "id": "silent-symmetry",
+      "delta0_p1": 0,
+      "seamStep": 1.03,
+      "seamStepAfter": 1.04,
+      "velMedian": 1.081,
+      "velMax": 1.152,
+      "seamRatio": 0.96,
+      "popRatio": 1.07,
+      "exposureByQuality": [
+        0.1258,
+        0.1282,
+        0.1282
+      ],
+      "exposureSpread": 0.019,
+      "meanLuma": 0.1282,
       "flashTilesOver3": 0,
       "flashPairsMaxPerSec": 0
     }

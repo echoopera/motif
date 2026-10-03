@@ -2,66 +2,180 @@
   "kit": "deconstruct-field",
   "version": "1.0.0",
   "size": [
-    90,
-    160
+    180,
+    320
   ],
   "renderer": "SwiftShader (software GL, headless Chromium)",
   "note": "Metric definitions in tools/qa.mjs. Software timings and metrics are relative diagnostics, not device performance.",
   "results": [
     {
+      "id": "deconstruct-field-hero",
+      "delta0_p1": 0,
+      "seamStep": 0.488,
+      "seamStepAfter": 0.482,
+      "velMedian": 0.327,
+      "velMax": 0.567,
+      "seamRatio": 1.49,
+      "popRatio": 1.73,
+      "exposureByQuality": [
+        0.5558,
+        0.5387,
+        0.5387
+      ],
+      "exposureSpread": 0.032,
+      "meanLuma": 0.5387,
+      "flashTilesOver3": 0,
+      "flashPairsMaxPerSec": 0
+    },
+    {
+      "id": "broken-axis",
+      "delta0_p1": 0,
+      "seamStep": 0.289,
+      "seamStepAfter": 0.296,
+      "velMedian": 0.192,
+      "velMax": 0.315,
+      "seamRatio": 1.54,
+      "popRatio": 1.64,
+      "exposureByQuality": [
+        0.7805,
+        0.7659,
+        0.7659
+      ],
+      "exposureSpread": 0.019,
+      "meanLuma": 0.7659,
+      "flashTilesOver3": 0,
+      "flashPairsMaxPerSec": 0
+    },
+    {
+      "id": "cobalt-cut",
+      "delta0_p1": 0,
+      "seamStep": 0.398,
+      "seamStepAfter": 0.397,
+      "velMedian": 0.224,
+      "velMax": 0.431,
+      "seamRatio": 1.78,
+      "popRatio": 1.72,
+      "exposureByQuality": [
+        0.6225,
+        0.6025,
+        0.6025
+      ],
+      "exposureSpread": 0.033,
+      "meanLuma": 0.6025,
+      "flashTilesOver3": 0,
+      "flashPairsMaxPerSec": 0
+    },
+    {
+      "id": "offset-scaffold",
+      "delta0_p1": 0,
+      "seamStep": 0.992,
+      "seamStepAfter": 0.995,
+      "velMedian": 0.686,
+      "velMax": 0.998,
+      "seamRatio": 1.45,
+      "popRatio": 1.46,
+      "exposureByQuality": [
+        0.7728,
+        0.7728,
+        0.7728
+      ],
+      "exposureSpread": 0,
+      "meanLuma": 0.7728,
+      "flashTilesOver3": 0,
+      "flashPairsMaxPerSec": 0
+    },
+    {
       "id": "plane-argument",
       "delta0_p1": 0,
-      "seamStep": 1.079,
-      "seamStepAfter": 1.088,
-      "velMedian": 0.388,
-      "velMax": 1.157,
-      "seamRatio": 2.81,
-      "popRatio": 2.98,
+      "seamStep": 1.222,
+      "seamStepAfter": 1.231,
+      "velMedian": 0.413,
+      "velMax": 1.213,
+      "seamRatio": 2.98,
+      "popRatio": 1.59,
       "exposureByQuality": [
-        0.3443,
-        0.3348,
-        0.3348
+        0.3427,
+        0.337,
+        0.337
       ],
-      "exposureSpread": 0.028,
-      "meanLuma": 0.3348,
+      "exposureSpread": 0.017,
+      "meanLuma": 0.337,
+      "flashTilesOver3": 0,
+      "flashPairsMaxPerSec": 0
+    },
+    {
+      "id": "partial-circle",
+      "delta0_p1": 0,
+      "seamStep": 0.516,
+      "seamStepAfter": 0.522,
+      "velMedian": 0.332,
+      "velMax": 0.597,
+      "seamRatio": 1.57,
+      "popRatio": 1.74,
+      "exposureByQuality": [
+        0.6412,
+        0.6246,
+        0.6246
+      ],
+      "exposureSpread": 0.027,
+      "meanLuma": 0.6246,
       "flashTilesOver3": 0,
       "flashPairsMaxPerSec": 0
     },
     {
       "id": "red-interruption",
       "delta0_p1": 0,
-      "seamStep": 0.523,
-      "seamStepAfter": 0.51,
-      "velMedian": 0.359,
-      "velMax": 0.692,
-      "seamRatio": 1.46,
-      "popRatio": 1.93,
+      "seamStep": 0.606,
+      "seamStepAfter": 0.596,
+      "velMedian": 0.431,
+      "velMax": 0.736,
+      "seamRatio": 1.4,
+      "popRatio": 1.5,
       "exposureByQuality": [
-        0.5864,
-        0.555,
-        0.555
+        0.5936,
+        0.5753,
+        0.5753
       ],
-      "exposureSpread": 0.057,
-      "meanLuma": 0.555,
+      "exposureSpread": 0.032,
+      "meanLuma": 0.5753,
       "flashTilesOver3": 0,
       "flashPairsMaxPerSec": 0
     },
     {
-      "id": "deconstruct-field-hero",
+      "id": "grid-dislocation",
       "delta0_p1": 0,
-      "seamStep": 0.445,
-      "seamStepAfter": 0.446,
-      "velMedian": 0.272,
-      "velMax": 0.506,
-      "seamRatio": 1.64,
-      "popRatio": 1.86,
+      "seamStep": 0.458,
+      "seamStepAfter": 0.466,
+      "velMedian": 0.417,
+      "velMax": 0.494,
+      "seamRatio": 1.12,
+      "popRatio": 1.19,
       "exposureByQuality": [
-        0.5487,
-        0.5181,
-        0.5181
+        0.3105,
+        0.302,
+        0.302
       ],
-      "exposureSpread": 0.059,
-      "meanLuma": 0.5181,
+      "exposureSpread": 0.028,
+      "meanLuma": 0.302,
+      "flashTilesOver3": 0,
+      "flashPairsMaxPerSec": 0
+    },
+    {
+      "id": "quiet-construct",
+      "delta0_p1": 0,
+      "seamStep": 0.078,
+      "seamStepAfter": 0.079,
+      "velMedian": 0.066,
+      "velMax": 0.132,
+      "seamRatio": 1.19,
+      "popRatio": 1.84,
+      "exposureByQuality": [
+        0.7466,
+        0.7372,
+        0.7372
+      ],
+      "exposureSpread": 0.013,
+      "meanLuma": 0.7372,
       "flashTilesOver3": 0,
       "flashPairsMaxPerSec": 0
     }
