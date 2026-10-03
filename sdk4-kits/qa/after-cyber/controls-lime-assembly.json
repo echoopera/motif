@@ -1,0 +1,254 @@
+{
+  "kit": "after-cyber",
+  "style": "lime-assembly",
+  "phase": 0.37,
+  "size": [
+    120,
+    213
+  ],
+  "note": "effect = max mean-abs 8-bit change vs the default frame over min/max (or every option)",
+  "rows": [
+    {
+      "key": "res",
+      "label": "Lattice resolution",
+      "type": "int",
+      "def": 10,
+      "vals": [
+        6,
+        18
+      ],
+      "diffs": [
+        28.13,
+        36.07
+      ],
+      "effect": 36.07
+    },
+    {
+      "key": "connect",
+      "label": "Connection radius",
+      "type": "range",
+      "def": 0.1,
+      "vals": [
+        0.03,
+        0.2
+      ],
+      "diffs": [
+        0,
+        0
+      ],
+      "effect": 0
+    },
+    {
+      "key": "disperse",
+      "label": "Dispersal radius",
+      "type": "range",
+      "def": 0.5,
+      "vals": [
+        0,
+        0.5
+      ],
+      "diffs": [
+        18.55,
+        0
+      ],
+      "effect": 18.55
+    },
+    {
+      "key": "edgeR",
+      "label": "Edge radius",
+      "type": "range",
+      "def": 0.002,
+      "vals": [
+        0.001,
+        0.01
+      ],
+      "diffs": [
+        0,
+        0
+      ],
+      "effect": 0
+    },
+    {
+      "key": "glass",
+      "label": "Glass opacity",
+      "type": "range",
+      "def": 0.16,
+      "vals": [
+        0,
+        0.55
+      ],
+      "diffs": [
+        0,
+        0
+      ],
+      "effect": 0
+    },
+    {
+      "key": "refr",
+      "label": "Refraction strength",
+      "type": "range",
+      "def": 0.035,
+      "vals": [
+        0,
+        0.12
+      ],
+      "diffs": [
+        0,
+        0
+      ],
+      "effect": 0
+    },
+    {
+      "key": "particleR",
+      "label": "Particle radius",
+      "type": "range",
+      "def": 0.0034,
+      "vals": [
+        0.001,
+        0.01
+      ],
+      "diffs": [
+        33.49,
+        73.81
+      ],
+      "effect": 73.81
+    },
+    {
+      "key": "lime",
+      "label": "Lime fraction",
+      "type": "range",
+      "def": 0.32,
+      "vals": [
+        0,
+        0.35
+      ],
+      "diffs": [
+        21.19,
+        4.13
+      ],
+      "effect": 21.19
+    },
+    {
+      "key": "cycles",
+      "label": "Reconstructions per loop",
+      "type": "int",
+      "def": 1,
+      "vals": [
+        1,
+        3
+      ],
+      "diffs": [
+        0,
+        26.02
+      ],
+      "effect": 26.02
+    },
+    {
+      "key": "keyAngle",
+      "label": "Key direction",
+      "type": "range",
+      "def": 60,
+      "vals": [
+        -180,
+        180
+      ],
+      "diffs": [
+        0,
+        0
+      ],
+      "effect": 0
+    },
+    {
+      "key": "exposure",
+      "label": "Exposure",
+      "type": "range",
+      "def": 1,
+      "vals": [
+        0.4,
+        2.4
+      ],
+      "diffs": [
+        20.46,
+        25.54
+      ],
+      "effect": 25.54
+    },
+    {
+      "key": "bloom",
+      "label": "Bloom",
+      "type": "range",
+      "def": 0.55,
+      "vals": [
+        0,
+        1.6
+      ],
+      "diffs": [
+        3.1,
+        4.94
+      ],
+      "effect": 4.94
+    },
+    {
+      "key": "bloomRadius",
+      "label": "Bloom radius",
+      "type": "range",
+      "def": 1,
+      "vals": [
+        0.4,
+        2.2
+      ],
+      "diffs": [
+        1.77,
+        2.47
+      ],
+      "effect": 2.47
+    },
+    {
+      "key": "lensCA",
+      "label": "Edge fringe",
+      "type": "range",
+      "def": 0.12,
+      "vals": [
+        0,
+        0.5
+      ],
+      "diffs": [
+        0.14,
+        0.45
+      ],
+      "effect": 0.45
+    },
+    {
+      "key": "vignette",
+      "label": "Vignette",
+      "type": "range",
+      "def": 0.38,
+      "vals": [
+        0,
+        0.8
+      ],
+      "diffs": [
+        1.1,
+        1.35
+      ],
+      "effect": 1.35
+    },
+    {
+      "key": "quality",
+      "label": "Quality",
+      "type": "select",
+      "def": "balanced",
+      "vals": [
+        "live",
+        "balanced",
+        "export"
+      ],
+      "diffs": [
+        0.61,
+        0,
+        0
+      ],
+      "effect": 0.61
+    }
+  ]
+}
