@@ -68,7 +68,7 @@ vec3 cage(vec2 q, int type, float Rk, mat3 M, float zoff, float edgeR, float fac
     float depthK = clamp(0.62 - 0.55 * P[i].z / max(Rk, 0.05), 0.15, 1.2);
     float d = length(q - P[i].xy);
     float rr = edgeR * (1.8 + 1.4 * depthK) * nodeK;
-    acc += mix(u_a1, u_ink, 0.6) * (exp(-(d * d) / (rr * rr)) * 2.2 + exp(-d / (rr * 4.0)) * 0.12) * depthK * lum * nodeK;
+    acc += mix(u_a1, u_ink, 0.6) * (exp(-(d * d) / (rr * rr)) * 2.2 + (k_q() > 0 ? exp(-d / (rr * 4.0)) * 0.12 : 0.0)) * depthK * lum * nodeK;
   }
   if (glassOn && facet > 0.001) {
     // glass facets: additive, view-dependent. every vertex triple whose pairwise dots equal the edge dot is a face.

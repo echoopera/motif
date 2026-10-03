@@ -53,7 +53,7 @@ vec3 cellBody(vec2 l, float F1, float F2, Site S, float species, float th, float
   float nf = float(p_filaments) * (species > 0.5 ? 0.6 : 1.0);
   float dirA = (S.id > 0.5) ? 1.0 : -1.0;
   float fl = 0.5 + 0.5 * sin(ang * floor(nf) + 1.2 * sin(r * 26.0 + dirA * th) + dirA * th * 2.0 + S.ph);
-  float fil = pow(fl, species > 0.5 ? 6.0 : 10.0);
+  float fil = mix(0.30, pow(fl, species > 0.5 ? 6.0 : 10.0), calm);          // sweeping rays calm down on very short loops
   float organsOn = (2 == 3 || 2 == 4 || 2 == 5) ? 0.0 : 1.0;
   float span = smoothstep(0.02, 0.14, r / cs) * (1.0 - smoothstep(0.35, 0.95, r / max(F1 + 0.5 * (F2 - F1), 1e-3)));
   col += mem * 0.9 * fil * span * inside * organsOn * (2 == 6 ? 1.9 : 1.0);
@@ -69,6 +69,7 @@ vec3 cellBody(vec2 l, float F1, float F2, Site S, float species, float th, float
   float od = 0.0;
   for (int k = 0; k < 7; k++) {
     if (float(k) >= p_organelles * 7.0) break;
+    if (k_q() == 0 && k >= 3) break;                                        // live: fewer organelle points
     float fk = float(k);
     float rk = (0.07 + 0.19 * h11(fk * 3.7 + S.id * 50.0)) * cs;
     float ak = TAU * h11(fk * 5.1 + S.id * 70.0) + dirA * th * (1.0 + mod(fk, 2.0));

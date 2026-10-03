@@ -1,0 +1,69 @@
+{
+  "kit": "topological-tide",
+  "version": "1.0.0",
+  "size": [
+    72,
+    128
+  ],
+  "renderer": "SwiftShader (software GL, headless Chromium)",
+  "note": "Metric definitions in tools/qa.mjs. Software timings and metrics are relative diagnostics, not device performance.",
+  "results": [
+    {
+      "id": "topological-tide-hero",
+      "delta0_p1": 0,
+      "seamStep": 1.051,
+      "seamStepAfter": 1.013,
+      "velMedian": 1.195,
+      "velMax": 1.393,
+      "seamRatio": 0.88,
+      "popRatio": 1.17,
+      "exposureByQuality": [
+        0.1636,
+        0.1461,
+        0.1463
+      ],
+      "exposureSpread": 0.12,
+      "meanLuma": 0.1461,
+      "flashTilesOver3": 0,
+      "flashPairsMaxPerSec": 0
+    },
+    {
+      "id": "ivory-gyroid",
+      "delta0_p1": 0,
+      "seamStep": 1.015,
+      "seamStepAfter": 0.999,
+      "velMedian": 0.985,
+      "velMax": 1.316,
+      "seamRatio": 1.03,
+      "popRatio": 1.34,
+      "exposureByQuality": [
+        0.2454,
+        0.2146,
+        0.2148
+      ],
+      "exposureSpread": 0.144,
+      "meanLuma": 0.2146,
+      "flashTilesOver3": 0,
+      "flashPairsMaxPerSec": 0
+    },
+    {
+      "id": "ceramic-web",
+      "delta0_p1": 0,
+      "seamStep": 1.235,
+      "seamStepAfter": 1.164,
+      "velMedian": 1.31,
+      "velMax": 1.495,
+      "seamRatio": 0.94,
+      "popRatio": 1.14,
+      "exposureByQuality": [
+        0.1874,
+        0.1635,
+        0.1636
+      ],
+      "exposureSpread": 0.146,
+      "meanLuma": 0.1635,
+      "flashTilesOver3": 0,
+      "flashPairsMaxPerSec": 0
+    }
+  ]
+}
