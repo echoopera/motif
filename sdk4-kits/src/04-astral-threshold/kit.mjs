@@ -12,6 +12,7 @@ const params = {
   advect: I('Advection cycles per loop', 1, 3, 1, { group: 'Motion', hint: 'Whole cycles the filaments slide along the membranes per loop.', mutate: 0 }),
   ...lens({ keyAngle: 90, exposure: 1.0, bloom: 0.6 }),
 };
+delete params.keyAngle;   // emissive volume: no key light
 
 export default {
   id: 'astral-threshold', name: 'Astral Threshold', version: '1.0.0', accent: '#8A4DFF', post: 'luminous', sceneScale: 0.6, cost: 3,

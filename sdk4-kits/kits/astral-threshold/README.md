@@ -33,7 +33,7 @@ Loop: warps and fibre advection use integer harmonics of theta; the camera excur
 
 - **Form**: Membrane layers (`layers`), Aperture radius (`aperture`), Filament scale (`filament`), Warp amplitude (`warp`)
 - **Material**: Density (`density`), Absorption (`absorb`)
-- **Light**: Emission (`emission`), Key direction (`keyAngle`), Exposure (`exposure`)
+- **Light**: Emission (`emission`), Exposure (`exposure`)
 - **Motion**: Depth travel (`travel`), Advection cycles per loop (`advect`)
 - **Lens**: Bloom (`bloom`), Bloom radius (`bloomRadius`), Edge fringe (`lensCA`), Vignette (`vignette`)
 - **Quality**: Quality (`quality`)

@@ -204,18 +204,6 @@
           "hint": "Whole cycles the filaments slide along the membranes per loop.",
           "mutate": 0
         },
-        "keyAngle": {
-          "type": "range",
-          "label": "Key direction",
-          "min": -180,
-          "max": 180,
-          "def": 90,
-          "step": 1,
-          "unit": "°",
-          "group": "Light",
-          "hint": "Direction of the key light in the picture plane, degrees.",
-          "randMax": 180
-        },
         "exposure": {
           "type": "range",
           "label": "Exposure",
@@ -444,18 +432,6 @@
           "group": "Motion",
           "hint": "Whole cycles the filaments slide along the membranes per loop.",
           "mutate": 0
-        },
-        "keyAngle": {
-          "type": "range",
-          "label": "Key direction",
-          "min": -180,
-          "max": 180,
-          "def": 90,
-          "step": 1,
-          "unit": "°",
-          "group": "Light",
-          "hint": "Direction of the key light in the picture plane, degrees.",
-          "randMax": 180
         },
         "exposure": {
           "type": "range",
@@ -686,18 +662,6 @@
           "hint": "Whole cycles the filaments slide along the membranes per loop.",
           "mutate": 0
         },
-        "keyAngle": {
-          "type": "range",
-          "label": "Key direction",
-          "min": -180,
-          "max": 180,
-          "def": 90,
-          "step": 1,
-          "unit": "°",
-          "group": "Light",
-          "hint": "Direction of the key light in the picture plane, degrees.",
-          "randMax": 180
-        },
         "exposure": {
           "type": "range",
           "label": "Exposure",
@@ -926,18 +890,6 @@
           "group": "Motion",
           "hint": "Whole cycles the filaments slide along the membranes per loop.",
           "mutate": 0
-        },
-        "keyAngle": {
-          "type": "range",
-          "label": "Key direction",
-          "min": -180,
-          "max": 180,
-          "def": 90,
-          "step": 1,
-          "unit": "°",
-          "group": "Light",
-          "hint": "Direction of the key light in the picture plane, degrees.",
-          "randMax": 180
         },
         "exposure": {
           "type": "range",
@@ -1168,18 +1120,6 @@
           "hint": "Whole cycles the filaments slide along the membranes per loop.",
           "mutate": 0
         },
-        "keyAngle": {
-          "type": "range",
-          "label": "Key direction",
-          "min": -180,
-          "max": 180,
-          "def": 90,
-          "step": 1,
-          "unit": "°",
-          "group": "Light",
-          "hint": "Direction of the key light in the picture plane, degrees.",
-          "randMax": 180
-        },
         "exposure": {
           "type": "range",
           "label": "Exposure",
@@ -1408,18 +1348,6 @@
           "group": "Motion",
           "hint": "Whole cycles the filaments slide along the membranes per loop.",
           "mutate": 0
-        },
-        "keyAngle": {
-          "type": "range",
-          "label": "Key direction",
-          "min": -180,
-          "max": 180,
-          "def": 90,
-          "step": 1,
-          "unit": "°",
-          "group": "Light",
-          "hint": "Direction of the key light in the picture plane, degrees.",
-          "randMax": 180
         },
         "exposure": {
           "type": "range",
@@ -1650,18 +1578,6 @@
           "hint": "Whole cycles the filaments slide along the membranes per loop.",
           "mutate": 0
         },
-        "keyAngle": {
-          "type": "range",
-          "label": "Key direction",
-          "min": -180,
-          "max": 180,
-          "def": 90,
-          "step": 1,
-          "unit": "°",
-          "group": "Light",
-          "hint": "Direction of the key light in the picture plane, degrees.",
-          "randMax": 180
-        },
         "exposure": {
           "type": "range",
           "label": "Exposure",
@@ -1891,18 +1807,6 @@
           "hint": "Whole cycles the filaments slide along the membranes per loop.",
           "mutate": 0
         },
-        "keyAngle": {
-          "type": "range",
-          "label": "Key direction",
-          "min": -180,
-          "max": 180,
-          "def": 90,
-          "step": 1,
-          "unit": "°",
-          "group": "Light",
-          "hint": "Direction of the key light in the picture plane, degrees.",
-          "randMax": 180
-        },
         "exposure": {
           "type": "range",
           "label": "Exposure",
@@ -2131,18 +2035,6 @@
           "group": "Motion",
           "hint": "Whole cycles the filaments slide along the membranes per loop.",
           "mutate": 0
-        },
-        "keyAngle": {
-          "type": "range",
-          "label": "Key direction",
-          "min": -180,
-          "max": 180,
-          "def": 90,
-          "step": 1,
-          "unit": "°",
-          "group": "Light",
-          "hint": "Direction of the key light in the picture plane, degrees.",
-          "randMax": 180
         },
         "exposure": {
           "type": "range",
