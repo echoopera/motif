@@ -1,0 +1,2508 @@
+{
+  "format": "motif-kit@4",
+  "id": "harmonic-matter",
+  "name": "Harmonic Matter",
+  "version": "1.0.0",
+  "author": "Motif",
+  "description": "Standing-wave membranes in blue-silver with concentrated amber peaks and particles attached to the field. Nine seamless infinite loops.",
+  "license": "",
+  "accent": "#6FA8E8",
+  "common": "common.glsl",
+  "palettes": [
+    {
+      "id": "navy-silver",
+      "name": "Navy Silver",
+      "bg": "#030818",
+      "ink": "#E6EEF8",
+      "a": [
+        "#6FA8E8",
+        "#FFB04A",
+        "#0E2A6B"
+      ]
+    },
+    {
+      "id": "graphite-amber",
+      "name": "Graphite Amber",
+      "bg": "#08090B",
+      "ink": "#EEF0F2",
+      "a": [
+        "#9FB4C8",
+        "#FF9F3A",
+        "#2A3138"
+      ]
+    },
+    {
+      "id": "teal-glass",
+      "name": "Teal Glass",
+      "bg": "#021210",
+      "ink": "#E4F6F2",
+      "a": [
+        "#5CD1C0",
+        "#F6C766",
+        "#0C4A47"
+      ]
+    },
+    {
+      "id": "violet-mist",
+      "name": "Violet Mist",
+      "bg": "#07041A",
+      "ink": "#EEE9FB",
+      "a": [
+        "#9C8DF0",
+        "#FF9CC2",
+        "#2C1E6B"
+      ]
+    }
+  ],
+  "styles": [
+    {
+      "id": "harmonic-matter-hero",
+      "name": "Harmonic Matter Hero",
+      "group": "Harmonic Matter",
+      "tags": [
+        "flagship",
+        "wave",
+        "particles"
+      ],
+      "blurb": "Three stacked silver membranes ring with a standing wave; amber peaks and attached particles follow the field.",
+      "palette": "navy-silver",
+      "flash": false,
+      "cost": 3,
+      "graph": {
+        "buffers": {
+          "scene": {
+            "scale": 0.75
+          },
+          "glowA": {
+            "scale": 0.25
+          },
+          "glowB": {
+            "scale": 0.125
+          }
+        },
+        "passes": [
+          {
+            "src": "styles/harmonic-matter-hero.glsl",
+            "reads": [],
+            "writes": "scene"
+          },
+          {
+            "src": "styles/_glowA.glsl",
+            "reads": [
+              "scene"
+            ],
+            "writes": "glowA"
+          },
+          {
+            "src": "styles/_glowB.glsl",
+            "reads": [
+              "glowA"
+            ],
+            "writes": "glowB"
+          },
+          {
+            "src": "styles/_out.glsl",
+            "reads": [
+              "scene",
+              "glowA",
+              "glowB"
+            ],
+            "writes": "output"
+          }
+        ]
+      },
+      "params": {
+        "modes": {
+          "type": "int",
+          "label": "Wave modes",
+          "min": 2,
+          "max": 6,
+          "def": 3,
+          "group": "Form",
+          "hint": "Number of superposed standing modes.",
+          "mutate": 0.3
+        },
+        "amp": {
+          "type": "range",
+          "label": "Amplitude",
+          "min": 0.03,
+          "max": 0.35,
+          "def": 0.16,
+          "step": 0.0016,
+          "group": "Form",
+          "hint": "Peak height of the surface in scene units."
+        },
+        "wavelength": {
+          "type": "range",
+          "label": "Wavelength",
+          "min": 0.15,
+          "max": 1.5,
+          "def": 0.6,
+          "step": 0.0068,
+          "group": "Form",
+          "hint": "Base spatial wavelength in scene units.",
+          "log": true
+        },
+        "tilt": {
+          "type": "range",
+          "label": "Camera pitch",
+          "min": 0.15,
+          "max": 1.2,
+          "def": 0.85,
+          "step": 0.0053,
+          "group": "Form",
+          "hint": "Elevation of the camera above the surface, radians."
+        },
+        "nodeWidth": {
+          "type": "range",
+          "label": "Node width",
+          "min": 0.002,
+          "max": 0.03,
+          "def": 0.006,
+          "step": 0.00014,
+          "group": "Material",
+          "hint": "Width of the glowing nodal contours, measured on the surface.",
+          "log": true
+        },
+        "opacity": {
+          "type": "range",
+          "label": "Membrane opacity",
+          "min": 0.05,
+          "max": 0.7,
+          "def": 0.28,
+          "step": 0.0032,
+          "group": "Material",
+          "hint": "How much each thin sheet covers what lies beneath."
+        },
+        "warmth": {
+          "type": "range",
+          "label": "Peak warmth",
+          "min": 0,
+          "max": 1,
+          "def": 0.35,
+          "step": 0.005,
+          "group": "Material",
+          "hint": "Amber light concentrated on the wave peaks."
+        },
+        "density": {
+          "type": "range",
+          "label": "Particle density",
+          "min": 0.1,
+          "max": 1,
+          "def": 0.5,
+          "step": 0.0045,
+          "group": "Particles",
+          "hint": "Fraction of lattice cells that hold a particle."
+        },
+        "particleR": {
+          "type": "range",
+          "label": "Particle radius",
+          "min": 0.001,
+          "max": 0.012,
+          "def": 0.004,
+          "step": 0.000055,
+          "group": "Particles",
+          "hint": "Particle radius in scene units.",
+          "log": true
+        },
+        "drift": {
+          "type": "range",
+          "label": "Particle drift",
+          "min": 0,
+          "max": 0.5,
+          "def": 0.25,
+          "step": 0.0025,
+          "group": "Particles",
+          "hint": "Displacement along the field gradient. Follows the same wave."
+        },
+        "osc": {
+          "type": "int",
+          "label": "Oscillations per loop",
+          "min": 1,
+          "max": 4,
+          "def": 1,
+          "group": "Motion",
+          "hint": "Whole standing-wave cycles per loop.",
+          "mutate": 0
+        },
+        "orbit": {
+          "type": "range",
+          "label": "Camera orbit",
+          "min": 0,
+          "max": 0.3,
+          "def": 0.08,
+          "step": 0.0015,
+          "group": "Motion",
+          "hint": "Closed yaw excursion of the camera."
+        },
+        "keyAngle": {
+          "type": "range",
+          "label": "Key direction",
+          "min": -180,
+          "max": 180,
+          "def": 40,
+          "step": 1,
+          "unit": "°",
+          "group": "Light",
+          "hint": "Direction of the key light in the picture plane, degrees.",
+          "randMax": 180
+        },
+        "exposure": {
+          "type": "range",
+          "label": "Exposure",
+          "min": 0.4,
+          "max": 2.4,
+          "def": 1,
+          "step": 0.01,
+          "unit": "×",
+          "log": true,
+          "group": "Light",
+          "hint": "Linear exposure before the single tone map.",
+          "randMax": 1.4
+        },
+        "bloom": {
+          "type": "range",
+          "label": "Bloom",
+          "min": 0,
+          "max": 1.6,
+          "def": 0.5,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Glow added around emissive light. 0 shows the bare geometry.",
+          "randMax": 0.9
+        },
+        "bloomRadius": {
+          "type": "range",
+          "label": "Bloom radius",
+          "min": 0.4,
+          "max": 2.2,
+          "def": 1,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Width of the glow relative to the frame.",
+          "randMax": 1.5
+        },
+        "lensCA": {
+          "type": "range",
+          "label": "Edge fringe",
+          "min": 0,
+          "max": 0.5,
+          "def": 0.12,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Spectral fringing toward the frame edge.",
+          "randMax": 0.25
+        },
+        "vignette": {
+          "type": "range",
+          "label": "Vignette",
+          "min": 0,
+          "max": 0.8,
+          "def": 0.38,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Darkens the frame edge; never touches the focal area.",
+          "randMax": 0.55
+        },
+        "quality": {
+          "type": "select",
+          "label": "Quality",
+          "options": [
+            {
+              "v": "live",
+              "l": "Live"
+            },
+            {
+              "v": "balanced",
+              "l": "Balanced"
+            },
+            {
+              "v": "export",
+              "l": "Export"
+            }
+          ],
+          "def": "balanced",
+          "mutate": 0,
+          "group": "Quality",
+          "hint": "Sample counts only. Composition, phase and exposure stay the same."
+        }
+      }
+    },
+    {
+      "id": "nodal-sea",
+      "name": "Nodal Sea",
+      "group": "Harmonic Matter",
+      "tags": [
+        "nodal",
+        "contours"
+      ],
+      "blurb": "One broad sheet where the nodal lines carry the picture: a glowing silver network on dark water.",
+      "palette": "navy-silver",
+      "flash": false,
+      "cost": 3,
+      "graph": {
+        "buffers": {
+          "scene": {
+            "scale": 0.75
+          },
+          "glowA": {
+            "scale": 0.25
+          },
+          "glowB": {
+            "scale": 0.125
+          }
+        },
+        "passes": [
+          {
+            "src": "styles/nodal-sea.glsl",
+            "reads": [],
+            "writes": "scene"
+          },
+          {
+            "src": "styles/_glowA.glsl",
+            "reads": [
+              "scene"
+            ],
+            "writes": "glowA"
+          },
+          {
+            "src": "styles/_glowB.glsl",
+            "reads": [
+              "glowA"
+            ],
+            "writes": "glowB"
+          },
+          {
+            "src": "styles/_out.glsl",
+            "reads": [
+              "scene",
+              "glowA",
+              "glowB"
+            ],
+            "writes": "output"
+          }
+        ]
+      },
+      "params": {
+        "modes": {
+          "type": "int",
+          "label": "Wave modes",
+          "min": 2,
+          "max": 6,
+          "def": 5,
+          "group": "Form",
+          "hint": "Number of superposed standing modes.",
+          "mutate": 0.3
+        },
+        "amp": {
+          "type": "range",
+          "label": "Amplitude",
+          "min": 0.03,
+          "max": 0.35,
+          "def": 0.12,
+          "step": 0.0016,
+          "group": "Form",
+          "hint": "Peak height of the surface in scene units."
+        },
+        "wavelength": {
+          "type": "range",
+          "label": "Wavelength",
+          "min": 0.15,
+          "max": 1.5,
+          "def": 0.45,
+          "step": 0.0068,
+          "group": "Form",
+          "hint": "Base spatial wavelength in scene units.",
+          "log": true
+        },
+        "tilt": {
+          "type": "range",
+          "label": "Camera pitch",
+          "min": 0.15,
+          "max": 1.2,
+          "def": 0.42,
+          "step": 0.0053,
+          "group": "Form",
+          "hint": "Elevation of the camera above the surface, radians."
+        },
+        "nodeWidth": {
+          "type": "range",
+          "label": "Node width",
+          "min": 0.002,
+          "max": 0.03,
+          "def": 0.014,
+          "step": 0.00014,
+          "group": "Material",
+          "hint": "Width of the glowing nodal contours, measured on the surface.",
+          "log": true
+        },
+        "opacity": {
+          "type": "range",
+          "label": "Membrane opacity",
+          "min": 0.05,
+          "max": 0.7,
+          "def": 0.4,
+          "step": 0.0032,
+          "group": "Material",
+          "hint": "How much each thin sheet covers what lies beneath."
+        },
+        "warmth": {
+          "type": "range",
+          "label": "Peak warmth",
+          "min": 0,
+          "max": 1,
+          "def": 0.35,
+          "step": 0.005,
+          "group": "Material",
+          "hint": "Amber light concentrated on the wave peaks."
+        },
+        "density": {
+          "type": "range",
+          "label": "Particle density",
+          "min": 0.1,
+          "max": 1,
+          "def": 0.3,
+          "step": 0.0045,
+          "group": "Particles",
+          "hint": "Fraction of lattice cells that hold a particle."
+        },
+        "particleR": {
+          "type": "range",
+          "label": "Particle radius",
+          "min": 0.001,
+          "max": 0.012,
+          "def": 0.004,
+          "step": 0.000055,
+          "group": "Particles",
+          "hint": "Particle radius in scene units.",
+          "log": true
+        },
+        "drift": {
+          "type": "range",
+          "label": "Particle drift",
+          "min": 0,
+          "max": 0.5,
+          "def": 0.25,
+          "step": 0.0025,
+          "group": "Particles",
+          "hint": "Displacement along the field gradient. Follows the same wave."
+        },
+        "osc": {
+          "type": "int",
+          "label": "Oscillations per loop",
+          "min": 1,
+          "max": 4,
+          "def": 1,
+          "group": "Motion",
+          "hint": "Whole standing-wave cycles per loop.",
+          "mutate": 0
+        },
+        "orbit": {
+          "type": "range",
+          "label": "Camera orbit",
+          "min": 0,
+          "max": 0.3,
+          "def": 0.08,
+          "step": 0.0015,
+          "group": "Motion",
+          "hint": "Closed yaw excursion of the camera."
+        },
+        "keyAngle": {
+          "type": "range",
+          "label": "Key direction",
+          "min": -180,
+          "max": 180,
+          "def": 40,
+          "step": 1,
+          "unit": "°",
+          "group": "Light",
+          "hint": "Direction of the key light in the picture plane, degrees.",
+          "randMax": 180
+        },
+        "exposure": {
+          "type": "range",
+          "label": "Exposure",
+          "min": 0.4,
+          "max": 2.4,
+          "def": 1,
+          "step": 0.01,
+          "unit": "×",
+          "log": true,
+          "group": "Light",
+          "hint": "Linear exposure before the single tone map.",
+          "randMax": 1.4
+        },
+        "bloom": {
+          "type": "range",
+          "label": "Bloom",
+          "min": 0,
+          "max": 1.6,
+          "def": 0.5,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Glow added around emissive light. 0 shows the bare geometry.",
+          "randMax": 0.9
+        },
+        "bloomRadius": {
+          "type": "range",
+          "label": "Bloom radius",
+          "min": 0.4,
+          "max": 2.2,
+          "def": 1,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Width of the glow relative to the frame.",
+          "randMax": 1.5
+        },
+        "lensCA": {
+          "type": "range",
+          "label": "Edge fringe",
+          "min": 0,
+          "max": 0.5,
+          "def": 0.12,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Spectral fringing toward the frame edge.",
+          "randMax": 0.25
+        },
+        "vignette": {
+          "type": "range",
+          "label": "Vignette",
+          "min": 0,
+          "max": 0.8,
+          "def": 0.38,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Darkens the frame edge; never touches the focal area.",
+          "randMax": 0.55
+        },
+        "quality": {
+          "type": "select",
+          "label": "Quality",
+          "options": [
+            {
+              "v": "live",
+              "l": "Live"
+            },
+            {
+              "v": "balanced",
+              "l": "Balanced"
+            },
+            {
+              "v": "export",
+              "l": "Export"
+            }
+          ],
+          "def": "balanced",
+          "mutate": 0,
+          "group": "Quality",
+          "hint": "Sample counts only. Composition, phase and exposure stay the same."
+        }
+      }
+    },
+    {
+      "id": "amber-antinodes",
+      "name": "Amber Antinodes",
+      "group": "Harmonic Matter",
+      "tags": [
+        "amber",
+        "peaks"
+      ],
+      "blurb": "The peaks glow. Particles gather on the antinodes and thin out toward the nodes.",
+      "palette": "graphite-amber",
+      "flash": false,
+      "cost": 3,
+      "graph": {
+        "buffers": {
+          "scene": {
+            "scale": 0.75
+          },
+          "glowA": {
+            "scale": 0.25
+          },
+          "glowB": {
+            "scale": 0.125
+          }
+        },
+        "passes": [
+          {
+            "src": "styles/amber-antinodes.glsl",
+            "reads": [],
+            "writes": "scene"
+          },
+          {
+            "src": "styles/_glowA.glsl",
+            "reads": [
+              "scene"
+            ],
+            "writes": "glowA"
+          },
+          {
+            "src": "styles/_glowB.glsl",
+            "reads": [
+              "glowA"
+            ],
+            "writes": "glowB"
+          },
+          {
+            "src": "styles/_out.glsl",
+            "reads": [
+              "scene",
+              "glowA",
+              "glowB"
+            ],
+            "writes": "output"
+          }
+        ]
+      },
+      "params": {
+        "modes": {
+          "type": "int",
+          "label": "Wave modes",
+          "min": 2,
+          "max": 6,
+          "def": 3,
+          "group": "Form",
+          "hint": "Number of superposed standing modes.",
+          "mutate": 0.3
+        },
+        "amp": {
+          "type": "range",
+          "label": "Amplitude",
+          "min": 0.03,
+          "max": 0.35,
+          "def": 0.22,
+          "step": 0.0016,
+          "group": "Form",
+          "hint": "Peak height of the surface in scene units."
+        },
+        "wavelength": {
+          "type": "range",
+          "label": "Wavelength",
+          "min": 0.15,
+          "max": 1.5,
+          "def": 0.6,
+          "step": 0.0068,
+          "group": "Form",
+          "hint": "Base spatial wavelength in scene units.",
+          "log": true
+        },
+        "tilt": {
+          "type": "range",
+          "label": "Camera pitch",
+          "min": 0.15,
+          "max": 1.2,
+          "def": 0.85,
+          "step": 0.0053,
+          "group": "Form",
+          "hint": "Elevation of the camera above the surface, radians."
+        },
+        "nodeWidth": {
+          "type": "range",
+          "label": "Node width",
+          "min": 0.002,
+          "max": 0.03,
+          "def": 0.004,
+          "step": 0.00014,
+          "group": "Material",
+          "hint": "Width of the glowing nodal contours, measured on the surface.",
+          "log": true
+        },
+        "opacity": {
+          "type": "range",
+          "label": "Membrane opacity",
+          "min": 0.05,
+          "max": 0.7,
+          "def": 0.22,
+          "step": 0.0032,
+          "group": "Material",
+          "hint": "How much each thin sheet covers what lies beneath."
+        },
+        "warmth": {
+          "type": "range",
+          "label": "Peak warmth",
+          "min": 0,
+          "max": 1,
+          "def": 0.85,
+          "step": 0.005,
+          "group": "Material",
+          "hint": "Amber light concentrated on the wave peaks."
+        },
+        "density": {
+          "type": "range",
+          "label": "Particle density",
+          "min": 0.1,
+          "max": 1,
+          "def": 0.7,
+          "step": 0.0045,
+          "group": "Particles",
+          "hint": "Fraction of lattice cells that hold a particle."
+        },
+        "particleR": {
+          "type": "range",
+          "label": "Particle radius",
+          "min": 0.001,
+          "max": 0.012,
+          "def": 0.005,
+          "step": 0.000055,
+          "group": "Particles",
+          "hint": "Particle radius in scene units.",
+          "log": true
+        },
+        "drift": {
+          "type": "range",
+          "label": "Particle drift",
+          "min": 0,
+          "max": 0.5,
+          "def": 0.25,
+          "step": 0.0025,
+          "group": "Particles",
+          "hint": "Displacement along the field gradient. Follows the same wave."
+        },
+        "osc": {
+          "type": "int",
+          "label": "Oscillations per loop",
+          "min": 1,
+          "max": 4,
+          "def": 1,
+          "group": "Motion",
+          "hint": "Whole standing-wave cycles per loop.",
+          "mutate": 0
+        },
+        "orbit": {
+          "type": "range",
+          "label": "Camera orbit",
+          "min": 0,
+          "max": 0.3,
+          "def": 0.08,
+          "step": 0.0015,
+          "group": "Motion",
+          "hint": "Closed yaw excursion of the camera."
+        },
+        "keyAngle": {
+          "type": "range",
+          "label": "Key direction",
+          "min": -180,
+          "max": 180,
+          "def": 40,
+          "step": 1,
+          "unit": "°",
+          "group": "Light",
+          "hint": "Direction of the key light in the picture plane, degrees.",
+          "randMax": 180
+        },
+        "exposure": {
+          "type": "range",
+          "label": "Exposure",
+          "min": 0.4,
+          "max": 2.4,
+          "def": 1,
+          "step": 0.01,
+          "unit": "×",
+          "log": true,
+          "group": "Light",
+          "hint": "Linear exposure before the single tone map.",
+          "randMax": 1.4
+        },
+        "bloom": {
+          "type": "range",
+          "label": "Bloom",
+          "min": 0,
+          "max": 1.6,
+          "def": 0.5,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Glow added around emissive light. 0 shows the bare geometry.",
+          "randMax": 0.9
+        },
+        "bloomRadius": {
+          "type": "range",
+          "label": "Bloom radius",
+          "min": 0.4,
+          "max": 2.2,
+          "def": 1,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Width of the glow relative to the frame.",
+          "randMax": 1.5
+        },
+        "lensCA": {
+          "type": "range",
+          "label": "Edge fringe",
+          "min": 0,
+          "max": 0.5,
+          "def": 0.12,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Spectral fringing toward the frame edge.",
+          "randMax": 0.25
+        },
+        "vignette": {
+          "type": "range",
+          "label": "Vignette",
+          "min": 0,
+          "max": 0.8,
+          "def": 0.38,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Darkens the frame edge; never touches the focal area.",
+          "randMax": 0.55
+        },
+        "quality": {
+          "type": "select",
+          "label": "Quality",
+          "options": [
+            {
+              "v": "live",
+              "l": "Live"
+            },
+            {
+              "v": "balanced",
+              "l": "Balanced"
+            },
+            {
+              "v": "export",
+              "l": "Export"
+            }
+          ],
+          "def": "balanced",
+          "mutate": 0,
+          "group": "Quality",
+          "hint": "Sample counts only. Composition, phase and exposure stay the same."
+        }
+      }
+    },
+    {
+      "id": "crosswave-veil",
+      "name": "Crosswave Veil",
+      "group": "Harmonic Matter",
+      "tags": [
+        "veil",
+        "crossing"
+      ],
+      "blurb": "Two wave families cross at right angles and weave a translucent veil.",
+      "palette": "violet-mist",
+      "flash": false,
+      "cost": 3,
+      "graph": {
+        "buffers": {
+          "scene": {
+            "scale": 0.75
+          },
+          "glowA": {
+            "scale": 0.25
+          },
+          "glowB": {
+            "scale": 0.125
+          }
+        },
+        "passes": [
+          {
+            "src": "styles/crosswave-veil.glsl",
+            "reads": [],
+            "writes": "scene"
+          },
+          {
+            "src": "styles/_glowA.glsl",
+            "reads": [
+              "scene"
+            ],
+            "writes": "glowA"
+          },
+          {
+            "src": "styles/_glowB.glsl",
+            "reads": [
+              "glowA"
+            ],
+            "writes": "glowB"
+          },
+          {
+            "src": "styles/_out.glsl",
+            "reads": [
+              "scene",
+              "glowA",
+              "glowB"
+            ],
+            "writes": "output"
+          }
+        ]
+      },
+      "params": {
+        "modes": {
+          "type": "int",
+          "label": "Wave modes",
+          "min": 2,
+          "max": 6,
+          "def": 4,
+          "group": "Form",
+          "hint": "Number of superposed standing modes.",
+          "mutate": 0.3
+        },
+        "amp": {
+          "type": "range",
+          "label": "Amplitude",
+          "min": 0.03,
+          "max": 0.35,
+          "def": 0.18,
+          "step": 0.0016,
+          "group": "Form",
+          "hint": "Peak height of the surface in scene units."
+        },
+        "wavelength": {
+          "type": "range",
+          "label": "Wavelength",
+          "min": 0.15,
+          "max": 1.5,
+          "def": 0.5,
+          "step": 0.0068,
+          "group": "Form",
+          "hint": "Base spatial wavelength in scene units.",
+          "log": true
+        },
+        "tilt": {
+          "type": "range",
+          "label": "Camera pitch",
+          "min": 0.15,
+          "max": 1.2,
+          "def": 0.85,
+          "step": 0.0053,
+          "group": "Form",
+          "hint": "Elevation of the camera above the surface, radians."
+        },
+        "nodeWidth": {
+          "type": "range",
+          "label": "Node width",
+          "min": 0.002,
+          "max": 0.03,
+          "def": 0.006,
+          "step": 0.00014,
+          "group": "Material",
+          "hint": "Width of the glowing nodal contours, measured on the surface.",
+          "log": true
+        },
+        "opacity": {
+          "type": "range",
+          "label": "Membrane opacity",
+          "min": 0.05,
+          "max": 0.7,
+          "def": 0.42,
+          "step": 0.0032,
+          "group": "Material",
+          "hint": "How much each thin sheet covers what lies beneath."
+        },
+        "warmth": {
+          "type": "range",
+          "label": "Peak warmth",
+          "min": 0,
+          "max": 1,
+          "def": 0.25,
+          "step": 0.005,
+          "group": "Material",
+          "hint": "Amber light concentrated on the wave peaks."
+        },
+        "density": {
+          "type": "range",
+          "label": "Particle density",
+          "min": 0.1,
+          "max": 1,
+          "def": 0.35,
+          "step": 0.0045,
+          "group": "Particles",
+          "hint": "Fraction of lattice cells that hold a particle."
+        },
+        "particleR": {
+          "type": "range",
+          "label": "Particle radius",
+          "min": 0.001,
+          "max": 0.012,
+          "def": 0.004,
+          "step": 0.000055,
+          "group": "Particles",
+          "hint": "Particle radius in scene units.",
+          "log": true
+        },
+        "drift": {
+          "type": "range",
+          "label": "Particle drift",
+          "min": 0,
+          "max": 0.5,
+          "def": 0.25,
+          "step": 0.0025,
+          "group": "Particles",
+          "hint": "Displacement along the field gradient. Follows the same wave."
+        },
+        "osc": {
+          "type": "int",
+          "label": "Oscillations per loop",
+          "min": 1,
+          "max": 4,
+          "def": 2,
+          "group": "Motion",
+          "hint": "Whole standing-wave cycles per loop.",
+          "mutate": 0
+        },
+        "orbit": {
+          "type": "range",
+          "label": "Camera orbit",
+          "min": 0,
+          "max": 0.3,
+          "def": 0.08,
+          "step": 0.0015,
+          "group": "Motion",
+          "hint": "Closed yaw excursion of the camera."
+        },
+        "keyAngle": {
+          "type": "range",
+          "label": "Key direction",
+          "min": -180,
+          "max": 180,
+          "def": 40,
+          "step": 1,
+          "unit": "°",
+          "group": "Light",
+          "hint": "Direction of the key light in the picture plane, degrees.",
+          "randMax": 180
+        },
+        "exposure": {
+          "type": "range",
+          "label": "Exposure",
+          "min": 0.4,
+          "max": 2.4,
+          "def": 1,
+          "step": 0.01,
+          "unit": "×",
+          "log": true,
+          "group": "Light",
+          "hint": "Linear exposure before the single tone map.",
+          "randMax": 1.4
+        },
+        "bloom": {
+          "type": "range",
+          "label": "Bloom",
+          "min": 0,
+          "max": 1.6,
+          "def": 0.5,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Glow added around emissive light. 0 shows the bare geometry.",
+          "randMax": 0.9
+        },
+        "bloomRadius": {
+          "type": "range",
+          "label": "Bloom radius",
+          "min": 0.4,
+          "max": 2.2,
+          "def": 1,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Width of the glow relative to the frame.",
+          "randMax": 1.5
+        },
+        "lensCA": {
+          "type": "range",
+          "label": "Edge fringe",
+          "min": 0,
+          "max": 0.5,
+          "def": 0.12,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Spectral fringing toward the frame edge.",
+          "randMax": 0.25
+        },
+        "vignette": {
+          "type": "range",
+          "label": "Vignette",
+          "min": 0,
+          "max": 0.8,
+          "def": 0.38,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Darkens the frame edge; never touches the focal area.",
+          "randMax": 0.55
+        },
+        "quality": {
+          "type": "select",
+          "label": "Quality",
+          "options": [
+            {
+              "v": "live",
+              "l": "Live"
+            },
+            {
+              "v": "balanced",
+              "l": "Balanced"
+            },
+            {
+              "v": "export",
+              "l": "Export"
+            }
+          ],
+          "def": "balanced",
+          "mutate": 0,
+          "group": "Quality",
+          "hint": "Sample counts only. Composition, phase and exposure stay the same."
+        }
+      }
+    },
+    {
+      "id": "resonant-basin",
+      "name": "Resonant Basin",
+      "group": "Harmonic Matter",
+      "tags": [
+        "radial",
+        "basin"
+      ],
+      "blurb": "A circular basin rings in radial modes; ripples stand where the rings meet.",
+      "palette": "teal-glass",
+      "flash": false,
+      "cost": 3,
+      "graph": {
+        "buffers": {
+          "scene": {
+            "scale": 0.75
+          },
+          "glowA": {
+            "scale": 0.25
+          },
+          "glowB": {
+            "scale": 0.125
+          }
+        },
+        "passes": [
+          {
+            "src": "styles/resonant-basin.glsl",
+            "reads": [],
+            "writes": "scene"
+          },
+          {
+            "src": "styles/_glowA.glsl",
+            "reads": [
+              "scene"
+            ],
+            "writes": "glowA"
+          },
+          {
+            "src": "styles/_glowB.glsl",
+            "reads": [
+              "glowA"
+            ],
+            "writes": "glowB"
+          },
+          {
+            "src": "styles/_out.glsl",
+            "reads": [
+              "scene",
+              "glowA",
+              "glowB"
+            ],
+            "writes": "output"
+          }
+        ]
+      },
+      "params": {
+        "modes": {
+          "type": "int",
+          "label": "Wave modes",
+          "min": 2,
+          "max": 6,
+          "def": 4,
+          "group": "Form",
+          "hint": "Number of superposed standing modes.",
+          "mutate": 0.3
+        },
+        "amp": {
+          "type": "range",
+          "label": "Amplitude",
+          "min": 0.03,
+          "max": 0.35,
+          "def": 0.2,
+          "step": 0.0016,
+          "group": "Form",
+          "hint": "Peak height of the surface in scene units."
+        },
+        "wavelength": {
+          "type": "range",
+          "label": "Wavelength",
+          "min": 0.15,
+          "max": 1.5,
+          "def": 0.42,
+          "step": 0.0068,
+          "group": "Form",
+          "hint": "Base spatial wavelength in scene units.",
+          "log": true
+        },
+        "tilt": {
+          "type": "range",
+          "label": "Camera pitch",
+          "min": 0.15,
+          "max": 1.2,
+          "def": 0.7,
+          "step": 0.0053,
+          "group": "Form",
+          "hint": "Elevation of the camera above the surface, radians."
+        },
+        "nodeWidth": {
+          "type": "range",
+          "label": "Node width",
+          "min": 0.002,
+          "max": 0.03,
+          "def": 0.008,
+          "step": 0.00014,
+          "group": "Material",
+          "hint": "Width of the glowing nodal contours, measured on the surface.",
+          "log": true
+        },
+        "opacity": {
+          "type": "range",
+          "label": "Membrane opacity",
+          "min": 0.05,
+          "max": 0.7,
+          "def": 0.3,
+          "step": 0.0032,
+          "group": "Material",
+          "hint": "How much each thin sheet covers what lies beneath."
+        },
+        "warmth": {
+          "type": "range",
+          "label": "Peak warmth",
+          "min": 0,
+          "max": 1,
+          "def": 0.35,
+          "step": 0.005,
+          "group": "Material",
+          "hint": "Amber light concentrated on the wave peaks."
+        },
+        "density": {
+          "type": "range",
+          "label": "Particle density",
+          "min": 0.1,
+          "max": 1,
+          "def": 0.4,
+          "step": 0.0045,
+          "group": "Particles",
+          "hint": "Fraction of lattice cells that hold a particle."
+        },
+        "particleR": {
+          "type": "range",
+          "label": "Particle radius",
+          "min": 0.001,
+          "max": 0.012,
+          "def": 0.004,
+          "step": 0.000055,
+          "group": "Particles",
+          "hint": "Particle radius in scene units.",
+          "log": true
+        },
+        "drift": {
+          "type": "range",
+          "label": "Particle drift",
+          "min": 0,
+          "max": 0.5,
+          "def": 0.25,
+          "step": 0.0025,
+          "group": "Particles",
+          "hint": "Displacement along the field gradient. Follows the same wave."
+        },
+        "osc": {
+          "type": "int",
+          "label": "Oscillations per loop",
+          "min": 1,
+          "max": 4,
+          "def": 1,
+          "group": "Motion",
+          "hint": "Whole standing-wave cycles per loop.",
+          "mutate": 0
+        },
+        "orbit": {
+          "type": "range",
+          "label": "Camera orbit",
+          "min": 0,
+          "max": 0.3,
+          "def": 0.08,
+          "step": 0.0015,
+          "group": "Motion",
+          "hint": "Closed yaw excursion of the camera."
+        },
+        "keyAngle": {
+          "type": "range",
+          "label": "Key direction",
+          "min": -180,
+          "max": 180,
+          "def": 40,
+          "step": 1,
+          "unit": "°",
+          "group": "Light",
+          "hint": "Direction of the key light in the picture plane, degrees.",
+          "randMax": 180
+        },
+        "exposure": {
+          "type": "range",
+          "label": "Exposure",
+          "min": 0.4,
+          "max": 2.4,
+          "def": 1,
+          "step": 0.01,
+          "unit": "×",
+          "log": true,
+          "group": "Light",
+          "hint": "Linear exposure before the single tone map.",
+          "randMax": 1.4
+        },
+        "bloom": {
+          "type": "range",
+          "label": "Bloom",
+          "min": 0,
+          "max": 1.6,
+          "def": 0.5,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Glow added around emissive light. 0 shows the bare geometry.",
+          "randMax": 0.9
+        },
+        "bloomRadius": {
+          "type": "range",
+          "label": "Bloom radius",
+          "min": 0.4,
+          "max": 2.2,
+          "def": 1,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Width of the glow relative to the frame.",
+          "randMax": 1.5
+        },
+        "lensCA": {
+          "type": "range",
+          "label": "Edge fringe",
+          "min": 0,
+          "max": 0.5,
+          "def": 0.12,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Spectral fringing toward the frame edge.",
+          "randMax": 0.25
+        },
+        "vignette": {
+          "type": "range",
+          "label": "Vignette",
+          "min": 0,
+          "max": 0.8,
+          "def": 0.38,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Darkens the frame edge; never touches the focal area.",
+          "randMax": 0.55
+        },
+        "quality": {
+          "type": "select",
+          "label": "Quality",
+          "options": [
+            {
+              "v": "live",
+              "l": "Live"
+            },
+            {
+              "v": "balanced",
+              "l": "Balanced"
+            },
+            {
+              "v": "export",
+              "l": "Export"
+            }
+          ],
+          "def": "balanced",
+          "mutate": 0,
+          "group": "Quality",
+          "hint": "Sample counts only. Composition, phase and exposure stay the same."
+        }
+      }
+    },
+    {
+      "id": "silver-interference",
+      "name": "Silver Interference",
+      "group": "Harmonic Matter",
+      "tags": [
+        "interference",
+        "top-down"
+      ],
+      "blurb": "Two sources interfere under a near top-down camera: silver ripple contours that never reset.",
+      "palette": "graphite-amber",
+      "flash": false,
+      "cost": 3,
+      "graph": {
+        "buffers": {
+          "scene": {
+            "scale": 0.75
+          },
+          "glowA": {
+            "scale": 0.25
+          },
+          "glowB": {
+            "scale": 0.125
+          }
+        },
+        "passes": [
+          {
+            "src": "styles/silver-interference.glsl",
+            "reads": [],
+            "writes": "scene"
+          },
+          {
+            "src": "styles/_glowA.glsl",
+            "reads": [
+              "scene"
+            ],
+            "writes": "glowA"
+          },
+          {
+            "src": "styles/_glowB.glsl",
+            "reads": [
+              "glowA"
+            ],
+            "writes": "glowB"
+          },
+          {
+            "src": "styles/_out.glsl",
+            "reads": [
+              "scene",
+              "glowA",
+              "glowB"
+            ],
+            "writes": "output"
+          }
+        ]
+      },
+      "params": {
+        "modes": {
+          "type": "int",
+          "label": "Wave modes",
+          "min": 2,
+          "max": 6,
+          "def": 3,
+          "group": "Form",
+          "hint": "Number of superposed standing modes.",
+          "mutate": 0.3
+        },
+        "amp": {
+          "type": "range",
+          "label": "Amplitude",
+          "min": 0.03,
+          "max": 0.35,
+          "def": 0.14,
+          "step": 0.0016,
+          "group": "Form",
+          "hint": "Peak height of the surface in scene units."
+        },
+        "wavelength": {
+          "type": "range",
+          "label": "Wavelength",
+          "min": 0.15,
+          "max": 1.5,
+          "def": 0.3,
+          "step": 0.0068,
+          "group": "Form",
+          "hint": "Base spatial wavelength in scene units.",
+          "log": true
+        },
+        "tilt": {
+          "type": "range",
+          "label": "Camera pitch",
+          "min": 0.15,
+          "max": 1.2,
+          "def": 1.1,
+          "step": 0.0053,
+          "group": "Form",
+          "hint": "Elevation of the camera above the surface, radians."
+        },
+        "nodeWidth": {
+          "type": "range",
+          "label": "Node width",
+          "min": 0.002,
+          "max": 0.03,
+          "def": 0.006,
+          "step": 0.00014,
+          "group": "Material",
+          "hint": "Width of the glowing nodal contours, measured on the surface.",
+          "log": true
+        },
+        "opacity": {
+          "type": "range",
+          "label": "Membrane opacity",
+          "min": 0.05,
+          "max": 0.7,
+          "def": 0.35,
+          "step": 0.0032,
+          "group": "Material",
+          "hint": "How much each thin sheet covers what lies beneath."
+        },
+        "warmth": {
+          "type": "range",
+          "label": "Peak warmth",
+          "min": 0,
+          "max": 1,
+          "def": 0.2,
+          "step": 0.005,
+          "group": "Material",
+          "hint": "Amber light concentrated on the wave peaks."
+        },
+        "density": {
+          "type": "range",
+          "label": "Particle density",
+          "min": 0.1,
+          "max": 1,
+          "def": 0.2,
+          "step": 0.0045,
+          "group": "Particles",
+          "hint": "Fraction of lattice cells that hold a particle."
+        },
+        "particleR": {
+          "type": "range",
+          "label": "Particle radius",
+          "min": 0.001,
+          "max": 0.012,
+          "def": 0.004,
+          "step": 0.000055,
+          "group": "Particles",
+          "hint": "Particle radius in scene units.",
+          "log": true
+        },
+        "drift": {
+          "type": "range",
+          "label": "Particle drift",
+          "min": 0,
+          "max": 0.5,
+          "def": 0.25,
+          "step": 0.0025,
+          "group": "Particles",
+          "hint": "Displacement along the field gradient. Follows the same wave."
+        },
+        "osc": {
+          "type": "int",
+          "label": "Oscillations per loop",
+          "min": 1,
+          "max": 4,
+          "def": 1,
+          "group": "Motion",
+          "hint": "Whole standing-wave cycles per loop.",
+          "mutate": 0
+        },
+        "orbit": {
+          "type": "range",
+          "label": "Camera orbit",
+          "min": 0,
+          "max": 0.3,
+          "def": 0.08,
+          "step": 0.0015,
+          "group": "Motion",
+          "hint": "Closed yaw excursion of the camera."
+        },
+        "keyAngle": {
+          "type": "range",
+          "label": "Key direction",
+          "min": -180,
+          "max": 180,
+          "def": 40,
+          "step": 1,
+          "unit": "°",
+          "group": "Light",
+          "hint": "Direction of the key light in the picture plane, degrees.",
+          "randMax": 180
+        },
+        "exposure": {
+          "type": "range",
+          "label": "Exposure",
+          "min": 0.4,
+          "max": 2.4,
+          "def": 1,
+          "step": 0.01,
+          "unit": "×",
+          "log": true,
+          "group": "Light",
+          "hint": "Linear exposure before the single tone map.",
+          "randMax": 1.4
+        },
+        "bloom": {
+          "type": "range",
+          "label": "Bloom",
+          "min": 0,
+          "max": 1.6,
+          "def": 0.5,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Glow added around emissive light. 0 shows the bare geometry.",
+          "randMax": 0.9
+        },
+        "bloomRadius": {
+          "type": "range",
+          "label": "Bloom radius",
+          "min": 0.4,
+          "max": 2.2,
+          "def": 1,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Width of the glow relative to the frame.",
+          "randMax": 1.5
+        },
+        "lensCA": {
+          "type": "range",
+          "label": "Edge fringe",
+          "min": 0,
+          "max": 0.5,
+          "def": 0.12,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Spectral fringing toward the frame edge.",
+          "randMax": 0.25
+        },
+        "vignette": {
+          "type": "range",
+          "label": "Vignette",
+          "min": 0,
+          "max": 0.8,
+          "def": 0.38,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Darkens the frame edge; never touches the focal area.",
+          "randMax": 0.55
+        },
+        "quality": {
+          "type": "select",
+          "label": "Quality",
+          "options": [
+            {
+              "v": "live",
+              "l": "Live"
+            },
+            {
+              "v": "balanced",
+              "l": "Balanced"
+            },
+            {
+              "v": "export",
+              "l": "Export"
+            }
+          ],
+          "def": "balanced",
+          "mutate": 0,
+          "group": "Quality",
+          "hint": "Sample counts only. Composition, phase and exposure stay the same."
+        }
+      }
+    },
+    {
+      "id": "phase-ribbons",
+      "name": "Phase Ribbons",
+      "group": "Harmonic Matter",
+      "tags": [
+        "ribbons",
+        "traces"
+      ],
+      "blurb": "Rows of luminous traces carry the same wave at staggered phase, with pearls riding each line.",
+      "palette": "navy-silver",
+      "flash": false,
+      "cost": 3,
+      "graph": {
+        "buffers": {
+          "scene": {
+            "scale": 0.75
+          },
+          "glowA": {
+            "scale": 0.25
+          },
+          "glowB": {
+            "scale": 0.125
+          }
+        },
+        "passes": [
+          {
+            "src": "styles/phase-ribbons.glsl",
+            "reads": [],
+            "writes": "scene"
+          },
+          {
+            "src": "styles/_glowA.glsl",
+            "reads": [
+              "scene"
+            ],
+            "writes": "glowA"
+          },
+          {
+            "src": "styles/_glowB.glsl",
+            "reads": [
+              "glowA"
+            ],
+            "writes": "glowB"
+          },
+          {
+            "src": "styles/_out.glsl",
+            "reads": [
+              "scene",
+              "glowA",
+              "glowB"
+            ],
+            "writes": "output"
+          }
+        ]
+      },
+      "params": {
+        "modes": {
+          "type": "int",
+          "label": "Wave modes",
+          "min": 2,
+          "max": 6,
+          "def": 3,
+          "group": "Form",
+          "hint": "Number of superposed standing modes.",
+          "mutate": 0.3
+        },
+        "amp": {
+          "type": "range",
+          "label": "Amplitude",
+          "min": 0.03,
+          "max": 0.35,
+          "def": 0.1,
+          "step": 0.0016,
+          "group": "Form",
+          "hint": "Peak height of the surface in scene units."
+        },
+        "wavelength": {
+          "type": "range",
+          "label": "Wavelength",
+          "min": 0.15,
+          "max": 1.5,
+          "def": 0.7,
+          "step": 0.0068,
+          "group": "Form",
+          "hint": "Base spatial wavelength in scene units.",
+          "log": true
+        },
+        "tilt": {
+          "type": "range",
+          "label": "Camera pitch",
+          "min": 0.15,
+          "max": 1.2,
+          "def": 0.85,
+          "step": 0.0053,
+          "group": "Form",
+          "hint": "Elevation of the camera above the surface, radians."
+        },
+        "nodeWidth": {
+          "type": "range",
+          "label": "Node width",
+          "min": 0.002,
+          "max": 0.03,
+          "def": 0.004,
+          "step": 0.00014,
+          "group": "Material",
+          "hint": "Width of the glowing nodal contours, measured on the surface.",
+          "log": true
+        },
+        "opacity": {
+          "type": "range",
+          "label": "Membrane opacity",
+          "min": 0.05,
+          "max": 0.7,
+          "def": 0.4,
+          "step": 0.0032,
+          "group": "Material",
+          "hint": "How much each thin sheet covers what lies beneath."
+        },
+        "warmth": {
+          "type": "range",
+          "label": "Peak warmth",
+          "min": 0,
+          "max": 1,
+          "def": 0.35,
+          "step": 0.005,
+          "group": "Material",
+          "hint": "Amber light concentrated on the wave peaks."
+        },
+        "density": {
+          "type": "range",
+          "label": "Particle density",
+          "min": 0.1,
+          "max": 1,
+          "def": 0.55,
+          "step": 0.0045,
+          "group": "Particles",
+          "hint": "Fraction of lattice cells that hold a particle."
+        },
+        "particleR": {
+          "type": "range",
+          "label": "Particle radius",
+          "min": 0.001,
+          "max": 0.012,
+          "def": 0.004,
+          "step": 0.000055,
+          "group": "Particles",
+          "hint": "Particle radius in scene units.",
+          "log": true
+        },
+        "drift": {
+          "type": "range",
+          "label": "Particle drift",
+          "min": 0,
+          "max": 0.5,
+          "def": 0.25,
+          "step": 0.0025,
+          "group": "Particles",
+          "hint": "Displacement along the field gradient. Follows the same wave."
+        },
+        "osc": {
+          "type": "int",
+          "label": "Oscillations per loop",
+          "min": 1,
+          "max": 4,
+          "def": 1,
+          "group": "Motion",
+          "hint": "Whole standing-wave cycles per loop.",
+          "mutate": 0
+        },
+        "orbit": {
+          "type": "range",
+          "label": "Camera orbit",
+          "min": 0,
+          "max": 0.3,
+          "def": 0.08,
+          "step": 0.0015,
+          "group": "Motion",
+          "hint": "Closed yaw excursion of the camera."
+        },
+        "keyAngle": {
+          "type": "range",
+          "label": "Key direction",
+          "min": -180,
+          "max": 180,
+          "def": 40,
+          "step": 1,
+          "unit": "°",
+          "group": "Light",
+          "hint": "Direction of the key light in the picture plane, degrees.",
+          "randMax": 180
+        },
+        "exposure": {
+          "type": "range",
+          "label": "Exposure",
+          "min": 0.4,
+          "max": 2.4,
+          "def": 1,
+          "step": 0.01,
+          "unit": "×",
+          "log": true,
+          "group": "Light",
+          "hint": "Linear exposure before the single tone map.",
+          "randMax": 1.4
+        },
+        "bloom": {
+          "type": "range",
+          "label": "Bloom",
+          "min": 0,
+          "max": 1.6,
+          "def": 0.5,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Glow added around emissive light. 0 shows the bare geometry.",
+          "randMax": 0.9
+        },
+        "bloomRadius": {
+          "type": "range",
+          "label": "Bloom radius",
+          "min": 0.4,
+          "max": 2.2,
+          "def": 1,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Width of the glow relative to the frame.",
+          "randMax": 1.5
+        },
+        "lensCA": {
+          "type": "range",
+          "label": "Edge fringe",
+          "min": 0,
+          "max": 0.5,
+          "def": 0.12,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Spectral fringing toward the frame edge.",
+          "randMax": 0.25
+        },
+        "vignette": {
+          "type": "range",
+          "label": "Vignette",
+          "min": 0,
+          "max": 0.8,
+          "def": 0.38,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Darkens the frame edge; never touches the focal area.",
+          "randMax": 0.55
+        },
+        "quality": {
+          "type": "select",
+          "label": "Quality",
+          "options": [
+            {
+              "v": "live",
+              "l": "Live"
+            },
+            {
+              "v": "balanced",
+              "l": "Balanced"
+            },
+            {
+              "v": "export",
+              "l": "Export"
+            }
+          ],
+          "def": "balanced",
+          "mutate": 0,
+          "group": "Quality",
+          "hint": "Sample counts only. Composition, phase and exposure stay the same."
+        }
+      }
+    },
+    {
+      "id": "standing-crest",
+      "name": "Standing Crest",
+      "group": "Harmonic Matter",
+      "tags": [
+        "ridgeline",
+        "crest"
+      ],
+      "blurb": "Layered ridgelines recede into the dark; the crests stand and fall in place.",
+      "palette": "violet-mist",
+      "flash": false,
+      "cost": 3,
+      "graph": {
+        "buffers": {
+          "scene": {
+            "scale": 0.75
+          },
+          "glowA": {
+            "scale": 0.25
+          },
+          "glowB": {
+            "scale": 0.125
+          }
+        },
+        "passes": [
+          {
+            "src": "styles/standing-crest.glsl",
+            "reads": [],
+            "writes": "scene"
+          },
+          {
+            "src": "styles/_glowA.glsl",
+            "reads": [
+              "scene"
+            ],
+            "writes": "glowA"
+          },
+          {
+            "src": "styles/_glowB.glsl",
+            "reads": [
+              "glowA"
+            ],
+            "writes": "glowB"
+          },
+          {
+            "src": "styles/_out.glsl",
+            "reads": [
+              "scene",
+              "glowA",
+              "glowB"
+            ],
+            "writes": "output"
+          }
+        ]
+      },
+      "params": {
+        "modes": {
+          "type": "int",
+          "label": "Wave modes",
+          "min": 2,
+          "max": 6,
+          "def": 3,
+          "group": "Form",
+          "hint": "Number of superposed standing modes.",
+          "mutate": 0.3
+        },
+        "amp": {
+          "type": "range",
+          "label": "Amplitude",
+          "min": 0.03,
+          "max": 0.35,
+          "def": 0.2,
+          "step": 0.0016,
+          "group": "Form",
+          "hint": "Peak height of the surface in scene units."
+        },
+        "wavelength": {
+          "type": "range",
+          "label": "Wavelength",
+          "min": 0.15,
+          "max": 1.5,
+          "def": 0.8,
+          "step": 0.0068,
+          "group": "Form",
+          "hint": "Base spatial wavelength in scene units.",
+          "log": true
+        },
+        "tilt": {
+          "type": "range",
+          "label": "Camera pitch",
+          "min": 0.15,
+          "max": 1.2,
+          "def": 0.85,
+          "step": 0.0053,
+          "group": "Form",
+          "hint": "Elevation of the camera above the surface, radians."
+        },
+        "nodeWidth": {
+          "type": "range",
+          "label": "Node width",
+          "min": 0.002,
+          "max": 0.03,
+          "def": 0.005,
+          "step": 0.00014,
+          "group": "Material",
+          "hint": "Width of the glowing nodal contours, measured on the surface.",
+          "log": true
+        },
+        "opacity": {
+          "type": "range",
+          "label": "Membrane opacity",
+          "min": 0.05,
+          "max": 0.7,
+          "def": 0.35,
+          "step": 0.0032,
+          "group": "Material",
+          "hint": "How much each thin sheet covers what lies beneath."
+        },
+        "warmth": {
+          "type": "range",
+          "label": "Peak warmth",
+          "min": 0,
+          "max": 1,
+          "def": 0.5,
+          "step": 0.005,
+          "group": "Material",
+          "hint": "Amber light concentrated on the wave peaks."
+        },
+        "density": {
+          "type": "range",
+          "label": "Particle density",
+          "min": 0.1,
+          "max": 1,
+          "def": 0.4,
+          "step": 0.0045,
+          "group": "Particles",
+          "hint": "Fraction of lattice cells that hold a particle."
+        },
+        "particleR": {
+          "type": "range",
+          "label": "Particle radius",
+          "min": 0.001,
+          "max": 0.012,
+          "def": 0.004,
+          "step": 0.000055,
+          "group": "Particles",
+          "hint": "Particle radius in scene units.",
+          "log": true
+        },
+        "drift": {
+          "type": "range",
+          "label": "Particle drift",
+          "min": 0,
+          "max": 0.5,
+          "def": 0.25,
+          "step": 0.0025,
+          "group": "Particles",
+          "hint": "Displacement along the field gradient. Follows the same wave."
+        },
+        "osc": {
+          "type": "int",
+          "label": "Oscillations per loop",
+          "min": 1,
+          "max": 4,
+          "def": 1,
+          "group": "Motion",
+          "hint": "Whole standing-wave cycles per loop.",
+          "mutate": 0
+        },
+        "orbit": {
+          "type": "range",
+          "label": "Camera orbit",
+          "min": 0,
+          "max": 0.3,
+          "def": 0.08,
+          "step": 0.0015,
+          "group": "Motion",
+          "hint": "Closed yaw excursion of the camera."
+        },
+        "keyAngle": {
+          "type": "range",
+          "label": "Key direction",
+          "min": -180,
+          "max": 180,
+          "def": 40,
+          "step": 1,
+          "unit": "°",
+          "group": "Light",
+          "hint": "Direction of the key light in the picture plane, degrees.",
+          "randMax": 180
+        },
+        "exposure": {
+          "type": "range",
+          "label": "Exposure",
+          "min": 0.4,
+          "max": 2.4,
+          "def": 1,
+          "step": 0.01,
+          "unit": "×",
+          "log": true,
+          "group": "Light",
+          "hint": "Linear exposure before the single tone map.",
+          "randMax": 1.4
+        },
+        "bloom": {
+          "type": "range",
+          "label": "Bloom",
+          "min": 0,
+          "max": 1.6,
+          "def": 0.5,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Glow added around emissive light. 0 shows the bare geometry.",
+          "randMax": 0.9
+        },
+        "bloomRadius": {
+          "type": "range",
+          "label": "Bloom radius",
+          "min": 0.4,
+          "max": 2.2,
+          "def": 1,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Width of the glow relative to the frame.",
+          "randMax": 1.5
+        },
+        "lensCA": {
+          "type": "range",
+          "label": "Edge fringe",
+          "min": 0,
+          "max": 0.5,
+          "def": 0.12,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Spectral fringing toward the frame edge.",
+          "randMax": 0.25
+        },
+        "vignette": {
+          "type": "range",
+          "label": "Vignette",
+          "min": 0,
+          "max": 0.8,
+          "def": 0.38,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Darkens the frame edge; never touches the focal area.",
+          "randMax": 0.55
+        },
+        "quality": {
+          "type": "select",
+          "label": "Quality",
+          "options": [
+            {
+              "v": "live",
+              "l": "Live"
+            },
+            {
+              "v": "balanced",
+              "l": "Balanced"
+            },
+            {
+              "v": "export",
+              "l": "Export"
+            }
+          ],
+          "def": "balanced",
+          "mutate": 0,
+          "group": "Quality",
+          "hint": "Sample counts only. Composition, phase and exposure stay the same."
+        }
+      }
+    },
+    {
+      "id": "quiet-chladni",
+      "name": "Quiet Chladni",
+      "group": "Harmonic Matter",
+      "tags": [
+        "chladni",
+        "calm"
+      ],
+      "blurb": "Sand on a vibrating plate: grains settle on the nodal lines as the mode slowly morphs.",
+      "palette": "graphite-amber",
+      "flash": false,
+      "cost": 3,
+      "graph": {
+        "buffers": {
+          "scene": {
+            "scale": 0.75
+          },
+          "glowA": {
+            "scale": 0.25
+          },
+          "glowB": {
+            "scale": 0.125
+          }
+        },
+        "passes": [
+          {
+            "src": "styles/quiet-chladni.glsl",
+            "reads": [],
+            "writes": "scene"
+          },
+          {
+            "src": "styles/_glowA.glsl",
+            "reads": [
+              "scene"
+            ],
+            "writes": "glowA"
+          },
+          {
+            "src": "styles/_glowB.glsl",
+            "reads": [
+              "glowA"
+            ],
+            "writes": "glowB"
+          },
+          {
+            "src": "styles/_out.glsl",
+            "reads": [
+              "scene",
+              "glowA",
+              "glowB"
+            ],
+            "writes": "output"
+          }
+        ]
+      },
+      "params": {
+        "modes": {
+          "type": "int",
+          "label": "Wave modes",
+          "min": 2,
+          "max": 6,
+          "def": 3,
+          "group": "Form",
+          "hint": "Number of superposed standing modes.",
+          "mutate": 0.3
+        },
+        "amp": {
+          "type": "range",
+          "label": "Amplitude",
+          "min": 0.03,
+          "max": 0.35,
+          "def": 0.16,
+          "step": 0.0016,
+          "group": "Form",
+          "hint": "Peak height of the surface in scene units."
+        },
+        "wavelength": {
+          "type": "range",
+          "label": "Wavelength",
+          "min": 0.15,
+          "max": 1.5,
+          "def": 0.8,
+          "step": 0.0068,
+          "group": "Form",
+          "hint": "Base spatial wavelength in scene units.",
+          "log": true
+        },
+        "tilt": {
+          "type": "range",
+          "label": "Camera pitch",
+          "min": 0.15,
+          "max": 1.2,
+          "def": 0.85,
+          "step": 0.0053,
+          "group": "Form",
+          "hint": "Elevation of the camera above the surface, radians."
+        },
+        "nodeWidth": {
+          "type": "range",
+          "label": "Node width",
+          "min": 0.002,
+          "max": 0.03,
+          "def": 0.006,
+          "step": 0.00014,
+          "group": "Material",
+          "hint": "Width of the glowing nodal contours, measured on the surface.",
+          "log": true
+        },
+        "opacity": {
+          "type": "range",
+          "label": "Membrane opacity",
+          "min": 0.05,
+          "max": 0.7,
+          "def": 0.28,
+          "step": 0.0032,
+          "group": "Material",
+          "hint": "How much each thin sheet covers what lies beneath."
+        },
+        "warmth": {
+          "type": "range",
+          "label": "Peak warmth",
+          "min": 0,
+          "max": 1,
+          "def": 0.2,
+          "step": 0.005,
+          "group": "Material",
+          "hint": "Amber light concentrated on the wave peaks."
+        },
+        "density": {
+          "type": "range",
+          "label": "Particle density",
+          "min": 0.1,
+          "max": 1,
+          "def": 0.75,
+          "step": 0.0045,
+          "group": "Particles",
+          "hint": "Fraction of lattice cells that hold a particle."
+        },
+        "particleR": {
+          "type": "range",
+          "label": "Particle radius",
+          "min": 0.001,
+          "max": 0.012,
+          "def": 0.0035,
+          "step": 0.000055,
+          "group": "Particles",
+          "hint": "Particle radius in scene units.",
+          "log": true
+        },
+        "drift": {
+          "type": "range",
+          "label": "Particle drift",
+          "min": 0,
+          "max": 0.5,
+          "def": 0.25,
+          "step": 0.0025,
+          "group": "Particles",
+          "hint": "Displacement along the field gradient. Follows the same wave."
+        },
+        "osc": {
+          "type": "int",
+          "label": "Oscillations per loop",
+          "min": 1,
+          "max": 4,
+          "def": 1,
+          "group": "Motion",
+          "hint": "Whole standing-wave cycles per loop.",
+          "mutate": 0
+        },
+        "orbit": {
+          "type": "range",
+          "label": "Camera orbit",
+          "min": 0,
+          "max": 0.3,
+          "def": 0.08,
+          "step": 0.0015,
+          "group": "Motion",
+          "hint": "Closed yaw excursion of the camera."
+        },
+        "keyAngle": {
+          "type": "range",
+          "label": "Key direction",
+          "min": -180,
+          "max": 180,
+          "def": 40,
+          "step": 1,
+          "unit": "°",
+          "group": "Light",
+          "hint": "Direction of the key light in the picture plane, degrees.",
+          "randMax": 180
+        },
+        "exposure": {
+          "type": "range",
+          "label": "Exposure",
+          "min": 0.4,
+          "max": 2.4,
+          "def": 0.95,
+          "step": 0.01,
+          "unit": "×",
+          "log": true,
+          "group": "Light",
+          "hint": "Linear exposure before the single tone map.",
+          "randMax": 1.4
+        },
+        "bloom": {
+          "type": "range",
+          "label": "Bloom",
+          "min": 0,
+          "max": 1.6,
+          "def": 0.3,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Glow added around emissive light. 0 shows the bare geometry.",
+          "randMax": 0.9
+        },
+        "bloomRadius": {
+          "type": "range",
+          "label": "Bloom radius",
+          "min": 0.4,
+          "max": 2.2,
+          "def": 1,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Width of the glow relative to the frame.",
+          "randMax": 1.5
+        },
+        "lensCA": {
+          "type": "range",
+          "label": "Edge fringe",
+          "min": 0,
+          "max": 0.5,
+          "def": 0.12,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Spectral fringing toward the frame edge.",
+          "randMax": 0.25
+        },
+        "vignette": {
+          "type": "range",
+          "label": "Vignette",
+          "min": 0,
+          "max": 0.8,
+          "def": 0.38,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Darkens the frame edge; never touches the focal area.",
+          "randMax": 0.55
+        },
+        "quality": {
+          "type": "select",
+          "label": "Quality",
+          "options": [
+            {
+              "v": "live",
+              "l": "Live"
+            },
+            {
+              "v": "balanced",
+              "l": "Balanced"
+            },
+            {
+              "v": "export",
+              "l": "Export"
+            }
+          ],
+          "def": "balanced",
+          "mutate": 0,
+          "group": "Quality",
+          "hint": "Sample counts only. Composition, phase and exposure stay the same."
+        }
+      }
+    }
+  ]
+}

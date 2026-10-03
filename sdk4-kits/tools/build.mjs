@@ -8,6 +8,18 @@ const only = process.argv.slice(2);
 const ids = fs.readdirSync(path.join(root, 'src')).filter(d => !d.startsWith('_') && fs.existsSync(path.join(root, 'src', d, 'kit.mjs')) && (!only.length || only.includes(d)));
 const shared = n => fs.readFileSync(path.join(root, 'src/_shared', n), 'utf8');
 const { merge } = kitHelpers;
+// Per-style specialisation: blocks between  //@if 1 2 3  and  //@endif  are kept only for those variants (so the SDK's static
+// worst-case loop analysis sees just the code a style runs), and the token VARIANT becomes the variant number.
+function specialise(src, v) {
+  const out = [], stack = [];
+  for (const line of src.split('\n')) {
+    const m = line.match(/^\s*\/\/@if\s+([\d\s]+)$/);
+    if (m) { stack.push(m[1].trim().split(/\s+/).map(Number).includes(v)); continue; }
+    if (/^\s*\/\/@endif/.test(line)) { stack.pop(); continue; }
+    if (stack.every(Boolean)) out.push(line);
+  }
+  return out.join('\n').replace(/\bVARIANT\b/g, String(v));
+}
 
 for (const id of ids) {
   const dir = path.join(root, 'src', id);
@@ -15,12 +27,13 @@ for (const id of ids) {
   const out = path.join(root, 'kits', kit.id); fs.rmSync(out, { recursive: true, force: true }); fs.mkdirSync(path.join(out, 'styles'), { recursive: true });
   const core = fs.readFileSync(path.join(dir, 'core.glsl'), 'utf8');
   const luminous = kit.post === 'luminous';
-  const common = shared('lib.glsl') + '\n// ======================= ' + kit.name + ' core =======================\n' + core;
+  const common = shared('lib.glsl');
   fs.writeFileSync(path.join(out, 'common.glsl'), common);
   if (luminous) for (const f of ['glowA', 'glowB', 'out']) fs.writeFileSync(path.join(out, `styles/_${f}.glsl`), shared(f + '.glsl'));
   const styles = kit.styles.map((s, i) => {
     const file = `styles/${s.id}.glsl`;
-    fs.writeFileSync(path.join(out, file), `// ${kit.name}: ${s.name}. ${s.fingerprint}\nvec4 motif(vec2 uv, vec2 fc) {\n  return ${kit.entry || 'scene_main'}(uv, fc, ${s.variant ?? i});\n}\n`);
+    const vn = s.variant ?? i;
+    fs.writeFileSync(path.join(out, file), `// ${kit.name}: ${s.name}. ${s.fingerprint}\n` + specialise(core, vn) + `\nvec4 motif(vec2 uv, vec2 fc) {\n  return ${kit.entry || 'scene_main'}(uv, fc, ${vn});\n}\n`);
     const e = { id: s.id, name: s.name, group: kit.name, tags: s.tags, blurb: s.blurb, palette: s.palette, flash: !!s.flash, cost: s.cost ?? kit.cost ?? 1.5 };
     if (luminous) e.graph = { buffers: { scene: { scale: kit.sceneScale ?? 0.75 }, glowA: { scale: 0.25 }, glowB: { scale: 0.125 } }, passes: [
       { src: file, reads: [], writes: 'scene' }, { src: 'styles/_glowA.glsl', reads: ['scene'], writes: 'glowA' },
