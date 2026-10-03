@@ -132,6 +132,9 @@ vec4 scene_main(vec2 uv, vec2 fc, int variant) {
     }
     col += mix(u_a0, u_ink, 0.45) * web * 1.3;
   }
+  // one focal region: the brightest, sharpest cells sit off-centre; the rest falls toward the dark channel colour
+  float foc = exp(-dot(uv - vec2(0.06, 0.12), uv - vec2(0.06, 0.12)) * 2.4);
+  col *= 0.50 + 0.80 * foc;
   float rr = length(uv * vec2(1.0, 0.85));
   col = mix(col, u_bg * 0.6 + u_a2 * 0.06, smoothstep(0.55, 1.35, rr) * 0.35);
   if (variant == 7) col *= 1.0;
