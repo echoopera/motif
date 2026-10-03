@@ -1,6 +1,6 @@
 // field-class: exact circle/segment distances and implicit interference curves; aesthetic glow renderer.
 // Golden ratio scales space only. All time rotations use whole circuits; alternate layers counter-rotate so they beat against each other.
-vec3 geometry(vec2 q,float ph,float layer){float phi=1.61803398875;float line=(180.+90.*p_complexity)/p_membrane;
+vec3 geometry(vec2 q,float ph,float layer){float phi=1.61803398875;float line=(180.+90.*p_complexity)/p_membrane;line=min(line,.9/max(length(dFdx(q)),.00001));
 vec2 c=.20*vec2(cos(ph),sin(ph));float da=length(q-c)-.32,db=length(q+c)-.32;float d=abs(max(da,db));float mark=exp(-d*line)+.08*exp(-d*25.);mark+=.2*exp(-abs(length(q)-.52)*line);
 vec3 pigment=kMix(u_a0,u_a1,.18+layer*.19);return (pigment*mark*.82+u_ink*pow(max(mark,0.),3.)*.85)*1.25;}
 vec4 motif(vec2 uv,vec2 fc){float ph=kPhase();float phi=1.61803398875;float fr=dot(uv,uv);vec3 col=u_bg+u_a2*.04*exp(-fr*1.2);

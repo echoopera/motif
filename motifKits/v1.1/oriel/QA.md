@@ -1,27 +1,28 @@
-# Validation evidence: Oriel 1.1.0
+# Validation evidence — Oriel 1.0.0
 
-Run with the AgentMotif toolchain (`am qa`, `motif-kit validate`) against the SDK 4.0 runtime in headless Chromium. Timings are SwiftShader CPU numbers and say nothing about real GPU or phone performance. No flash certification is claimed beyond the `am qa` WCAG audit.
+SDK 4 schema and static shader validation passed for all nine entries. All 36 actual SDK-expanded GLES 3 shader passes compiled and linked in local Mesa EGL. The four-pass graph was rendered into RGBA16F scene/bloom targets.
 
-`motif-kit validate`: ok, 9 styles, 4 palettes, no capabilities. Per-pixel budgets are far below half of every hard limit.
+At 256×144, all nine default renders were nonblank and changed across phases 0, .25, .5 and .75. Phase 0 versus phase 1 had exact zero RGB pixel difference for every entry. Each art control was checked at its min/max at phase .25 and 128×72; all affected the output. Aether quality samples intentionally preserve brightness rather than changing the look. These discrete checks are not a proof of every intermediate phase or parameter combination.
 
-| Style | Seam delta | Pop x (pass <3) | Flashes/s | Quality exposure |
-|---|---:|---:|---:|---:|
-| living-flower | 0 | 1.01 | 0 | n/a |
-| phi-garden | 0 | 1.06 | 0 | n/a |
-| fibonacci-sea | 0 | 1.29 | 0 | n/a |
-| vesica | 0 | 1.12 | 0 | n/a |
-| golden-bloom | 0 | 1.15 | 0 | n/a |
-| torus-choir | 0 | 1.15 | 0 | n/a |
-| stellate | 0 | 1.05 | 0 | n/a |
-| quasicrystal | 0 | 1.03 | 0 | n/a |
-| metatron-field | 0 | 1.02 | 0 | n/a |
+The default first entry was also rendered across 40 phases at 360×202 for the fallback preview film and at 390×520 for portrait inspection. Product pages embed the actual packaged GLSL and unmodified SDK runtime. Their rendered fallback film is accelerated to a 12-second cycle; live view defaults to a 60-second cycle.
 
-## What changed from 1.0.0
+Browser automation was unavailable because the local Chromium binary is absent. No real phone performance, browser integration, flash certification or exhaustive frame-by-frame seam-neighbour derivative testing is claimed. Pending compilation is polled with a 20-second retry affordance; WebGL context restoration is handled in the page.
 
-See README.md. All measurements above are from the 1.1.0 build; 1.0.0 failed the pop gate on three Aether styles (6.2 to 6.9).
+SDK 4 buffers reset every frame. Nacre/Oriel life-like detail is a stateless procedural cyclic approximation, not a persistent Game of Life simulation. The fast-loop safe-mode contrast treatment is implemented but is not certified by a flash-analysis tool.
 
-## Known limits
+## Measurements
 
-- Detail that looks alive is a stateless procedural cycle, not a persistent simulation (SDK 4 buffers reset every frame).
-- Aether `ion-rain` pop is 3.3 (inside the 6 failure line, above the 3 target) and its seam step ratio is 2.97; the seam itself is exact (delta 0).
-- The Aether volume uses per-pixel jitter, so very close inspection of the half-resolution scene shows fine noise instead of the earlier stripes.
+| Style | Endpoint RGB difference | Four-phase motion RGB difference |
+|---|---:|---:|
+
+Near-seam samples at phases .999 and .001 were also rendered for all entries at 128×72. Changes were small or comparable to same-width mid-cycle samples (.499/.501), consistent with continuous loop closure. The page script passed a mocked-DOM smoke check using the real SDK validator: all nine selections, parameter creation, palette data, pause/reset and graphics context restoration. This checks integration logic, not real browser rendering.
+
+| living-flower | 0.000 | 17.143 |
+| phi-garden | 0.000 | 9.434 |
+| fibonacci-sea | 0.000 | 2.190 |
+| vesica | 0.000 | 2.436 |
+| golden-bloom | 0.000 | 1.813 |
+| torus-choir | 0.000 | 9.194 |
+| stellate | 0.000 | 4.458 |
+| quasicrystal | 0.000 | 13.542 |
+| metatron-field | 0.000 | 6.695 |

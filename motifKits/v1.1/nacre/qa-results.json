@@ -3,8 +3,8 @@
     "kit": "nacre",
     "id": "cellsea",
     "seamDelta": 0.0,
-    "motion": 15.88,
-    "pop": 1.26,
+    "motion": 14.59,
+    "pop": 1.29,
     "flashesPerSec": 0.0,
     "qualityExposure": null
   },
@@ -12,8 +12,8 @@
     "kit": "nacre",
     "id": "symbiosis",
     "seamDelta": 0.0,
-    "motion": 12.97,
-    "pop": 2.07,
+    "motion": 11.75,
+    "pop": 2.23,
     "flashesPerSec": 0.0,
     "qualityExposure": null
   },
@@ -21,8 +21,8 @@
     "kit": "nacre",
     "id": "colony-bloom",
     "seamDelta": 0.0,
-    "motion": 14.98,
-    "pop": 1.51,
+    "motion": 14.59,
+    "pop": 1.59,
     "flashesPerSec": 0.0,
     "qualityExposure": null
   },
@@ -30,8 +30,8 @@
     "kit": "nacre",
     "id": "membrane-choir",
     "seamDelta": 0.0,
-    "motion": 16.99,
-    "pop": 1.46,
+    "motion": 15.76,
+    "pop": 1.51,
     "flashesPerSec": 0.0,
     "qualityExposure": null
   },
@@ -39,8 +39,8 @@
     "kit": "nacre",
     "id": "tide-organism",
     "seamDelta": 0.0,
-    "motion": 15.4,
-    "pop": 1.79,
+    "motion": 14.72,
+    "pop": 1.84,
     "flashesPerSec": 0.0,
     "qualityExposure": null
   },
@@ -48,8 +48,8 @@
     "kit": "nacre",
     "id": "biolume",
     "seamDelta": 0.0,
-    "motion": 13.46,
-    "pop": 1.48,
+    "motion": 14.22,
+    "pop": 1.43,
     "flashesPerSec": 0.0,
     "qualityExposure": null
   },
@@ -57,8 +57,8 @@
     "kit": "nacre",
     "id": "mitosis",
     "seamDelta": 0.0,
-    "motion": 9.17,
-    "pop": 2.34,
+    "motion": 8.13,
+    "pop": 2.57,
     "flashesPerSec": 0.0,
     "qualityExposure": null
   },
@@ -66,8 +66,8 @@
     "kit": "nacre",
     "id": "polyp-garden",
     "seamDelta": 0.0,
-    "motion": 10.48,
-    "pop": 1.87,
+    "motion": 10.13,
+    "pop": 1.86,
     "flashesPerSec": 0.0,
     "qualityExposure": null
   },
@@ -75,8 +75,8 @@
     "kit": "nacre",
     "id": "hollow-moon",
     "seamDelta": 0.0,
-    "motion": 15.92,
-    "pop": 1.45,
+    "motion": 14.49,
+    "pop": 1.6,
     "flashesPerSec": 0.0,
     "qualityExposure": null
   }

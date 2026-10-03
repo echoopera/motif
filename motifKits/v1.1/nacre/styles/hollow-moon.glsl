@@ -1,6 +1,6 @@
 // field-class: implicit membrane contours with analytic surface shading and heuristic glow.
 // Stateless ecology: seeded cyclic birth, division and drift. No persistent reaction-diffusion claim.
-vec3 organism(vec2 q,float ph,float salt){float r=length(q),a=atan(q.y,q.x);
+vec3 organism(vec2 q,float ph,float salt){kPq=length(dFdx(q));float r=length(q),a=atan(q.y,q.x);
 float shape=1.+.08*p_complexity*sin(a*4.-ph);float rim=kBell(r-shape,.035*p_membrane)+.55*kBell(r-.63,.032*p_membrane);float body=(1.-smoothstep(.96,1.04,r))*smoothstep(.35,.65,r);float core=kBell(length(q-vec2(.25,.1))-.20,.04);
 float fold=pow(.5+.5*sin(a*(5.+floor(p_complexity*5.))+r*8.-ph+salt),4.)*body;
 float dome=sqrt(max(0.,1.-r*r));vec3 normal=normalize(vec3(q*.55,dome+.3));float key=.3+.7*max(dot(normal,normalize(vec3(-.5,.7,1.))),0.);

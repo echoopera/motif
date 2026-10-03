@@ -3,7 +3,7 @@
     "kit": "aether",
     "id": "cloudwake",
     "seamDelta": 0.0,
-    "motion": 4.47,
+    "motion": 4.46,
     "pop": 1.45,
     "flashesPerSec": 0.0,
     "qualityExposure": 1.0
@@ -30,8 +30,8 @@
     "kit": "aether",
     "id": "duskfront",
     "seamDelta": 0.0,
-    "motion": 3.05,
-    "pop": 1.55,
+    "motion": 3.04,
+    "pop": 1.56,
     "flashesPerSec": 0.0,
     "qualityExposure": 1.0
   },
@@ -39,8 +39,8 @@
     "kit": "aether",
     "id": "high-tide",
     "seamDelta": 0.0,
-    "motion": 3.7,
-    "pop": 2.2,
+    "motion": 3.69,
+    "pop": 2.21,
     "flashesPerSec": 0.0,
     "qualityExposure": 1.0
   },
@@ -58,7 +58,7 @@
     "id": "lightwell",
     "seamDelta": 0.0,
     "motion": 2.5,
-    "pop": 1.66,
+    "pop": 1.67,
     "flashesPerSec": 0.0,
     "qualityExposure": 1.0
   },
@@ -67,7 +67,7 @@
     "id": "cirrus-garden",
     "seamDelta": 0.0,
     "motion": 2.55,
-    "pop": 1.73,
+    "pop": 1.72,
     "flashesPerSec": 0.0,
     "qualityExposure": 1.0
   },

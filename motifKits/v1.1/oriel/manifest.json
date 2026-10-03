@@ -71,7 +71,7 @@
       "graph": {
         "buffers": {
           "scene": {
-            "scale": 0.75
+            "scale": 1.0
           },
           "bright": {
             "scale": 0.25
@@ -274,7 +274,7 @@
       "graph": {
         "buffers": {
           "scene": {
-            "scale": 0.75
+            "scale": 1.0
           },
           "bright": {
             "scale": 0.25
@@ -477,7 +477,7 @@
       "graph": {
         "buffers": {
           "scene": {
-            "scale": 0.75
+            "scale": 1.0
           },
           "bright": {
             "scale": 0.25
@@ -680,7 +680,7 @@
       "graph": {
         "buffers": {
           "scene": {
-            "scale": 0.75
+            "scale": 1.0
           },
           "bright": {
             "scale": 0.25
@@ -883,7 +883,7 @@
       "graph": {
         "buffers": {
           "scene": {
-            "scale": 0.75
+            "scale": 1.0
           },
           "bright": {
             "scale": 0.25
@@ -1086,7 +1086,7 @@
       "graph": {
         "buffers": {
           "scene": {
-            "scale": 0.75
+            "scale": 1.0
           },
           "bright": {
             "scale": 0.25
@@ -1289,7 +1289,7 @@
       "graph": {
         "buffers": {
           "scene": {
-            "scale": 0.75
+            "scale": 1.0
           },
           "bright": {
             "scale": 0.25
@@ -1492,7 +1492,7 @@
       "graph": {
         "buffers": {
           "scene": {
-            "scale": 0.75
+            "scale": 1.0
           },
           "bright": {
             "scale": 0.25
@@ -1695,7 +1695,7 @@
       "graph": {
         "buffers": {
           "scene": {
-            "scale": 0.75
+            "scale": 1.0
           },
           "bright": {
             "scale": 0.25
