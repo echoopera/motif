@@ -1,0 +1,1571 @@
+{
+  "format": "motif-kit@4",
+  "id": "astral",
+  "name": "Astral",
+  "version": "1.2.0",
+  "author": "Echo Opera",
+  "description": "Twelve living light fields with continuous circulation, traveling folds and seamless forward loops.",
+  "accent": "#B9E9CD",
+  "common": "common.glsl",
+  "capabilities": [],
+  "palettes": [
+    {
+      "id": "ion",
+      "name": "Ion",
+      "bg": "#020609",
+      "ink": "#EEFFF6",
+      "a": [
+        "#75DBCE",
+        "#D6F4A5",
+        "#658CDD"
+      ]
+    },
+    {
+      "id": "opal",
+      "name": "Opal",
+      "bg": "#06040D",
+      "ink": "#F9EEFF",
+      "a": [
+        "#A997EE",
+        "#64CBDE",
+        "#F0C0C6"
+      ]
+    },
+    {
+      "id": "lichen",
+      "name": "Lichen",
+      "bg": "#030705",
+      "ink": "#F5FFE5",
+      "a": [
+        "#A9DE85",
+        "#4CAFA8",
+        "#EACC96"
+      ]
+    },
+    {
+      "id": "ember",
+      "name": "Ember",
+      "bg": "#07040B",
+      "ink": "#FFF4E7",
+      "a": [
+        "#EDBE83",
+        "#D17D9E",
+        "#7197D9"
+      ]
+    }
+  ],
+  "styles": [
+    {
+      "id": "filament",
+      "name": "Filament",
+      "group": "Astral",
+      "palette": "ion",
+      "tags": [
+        "volumetric",
+        "ambient",
+        "light"
+      ],
+      "blurb": "Luminous threads fold into an immersive passage.",
+      "flash": false,
+      "cost": 3,
+      "params": {
+        "distortion": {
+          "type": "range",
+          "label": "Distortion",
+          "min": 0,
+          "max": 1.8,
+          "def": 1,
+          "step": 0.01,
+          "group": "Form",
+          "hint": "How strongly the folds bend the light field."
+        },
+        "foldBias": {
+          "type": "range",
+          "label": "Fold",
+          "min": 0.35,
+          "max": 0.85,
+          "def": 0.68,
+          "step": 0.01,
+          "group": "Form",
+          "hint": "Where the folds crease; higher is sharper."
+        },
+        "width": {
+          "type": "range",
+          "label": "Thickness",
+          "min": 0.35,
+          "max": 2,
+          "def": 1,
+          "step": 0.01,
+          "group": "Form",
+          "hint": "Thickness of the light filaments."
+        },
+        "detail": {
+          "type": "int",
+          "label": "Detail",
+          "min": 2,
+          "max": 5,
+          "def": 4,
+          "group": "Form",
+          "hint": "Number of fold layers; more is finer and slower."
+        },
+        "breath": {
+          "type": "range",
+          "label": "Traveling pulse",
+          "min": 0,
+          "max": 1,
+          "def": 0.4,
+          "step": 0.01,
+          "group": "Motion",
+          "hint": "Strength of the pulse travelling along the light."
+        },
+        "twist": {
+          "type": "range",
+          "label": "Spatial twist",
+          "min": 0,
+          "max": 1.8,
+          "def": 0.6,
+          "step": 0.01,
+          "group": "Motion",
+          "hint": "How much the field spirals with depth."
+        },
+        "radiance": {
+          "type": "range",
+          "label": "Radiance",
+          "min": 0.2,
+          "max": 2,
+          "def": 1,
+          "step": 0.01,
+          "group": "Light",
+          "hint": "Brightness of the light.",
+          "randMax": 1.5
+        },
+        "depth": {
+          "type": "range",
+          "label": "Depth fade",
+          "min": 0.02,
+          "max": 0.3,
+          "def": 0.1,
+          "step": 0.01,
+          "group": "Light",
+          "hint": "How fast far light fades into the dark."
+        },
+        "samples": {
+          "type": "int",
+          "label": "Ray samples",
+          "min": 32,
+          "max": 96,
+          "def": 64,
+          "group": "Quality",
+          "mutate": 0,
+          "hint": "Ray samples per pixel. Higher is smoother; exposure and reach stay constant."
+        }
+      },
+      "graph": {
+        "buffers": {
+          "scene": {
+            "scale": 0.75
+          }
+        },
+        "passes": [
+          {
+            "src": "styles/filament.glsl",
+            "writes": "scene"
+          },
+          {
+            "src": "post/output.glsl",
+            "reads": [
+              "scene"
+            ],
+            "writes": "output"
+          }
+        ]
+      }
+    },
+    {
+      "id": "veil",
+      "name": "Veil",
+      "group": "Astral",
+      "palette": "opal",
+      "tags": [
+        "volumetric",
+        "ambient",
+        "light"
+      ],
+      "blurb": "Translucent membranes unfold in a suspended atmosphere.",
+      "flash": false,
+      "cost": 3,
+      "params": {
+        "distortion": {
+          "type": "range",
+          "label": "Distortion",
+          "min": 0,
+          "max": 1.8,
+          "def": 0.75,
+          "step": 0.01,
+          "group": "Form",
+          "hint": "How strongly the folds bend the light field."
+        },
+        "foldBias": {
+          "type": "range",
+          "label": "Fold",
+          "min": 0.35,
+          "max": 0.85,
+          "def": 0.68,
+          "step": 0.01,
+          "group": "Form",
+          "hint": "Where the folds crease; higher is sharper."
+        },
+        "width": {
+          "type": "range",
+          "label": "Thickness",
+          "min": 0.35,
+          "max": 2,
+          "def": 1,
+          "step": 0.01,
+          "group": "Form",
+          "hint": "Thickness of the light filaments."
+        },
+        "detail": {
+          "type": "int",
+          "label": "Detail",
+          "min": 2,
+          "max": 5,
+          "def": 4,
+          "group": "Form",
+          "hint": "Number of fold layers; more is finer and slower."
+        },
+        "breath": {
+          "type": "range",
+          "label": "Traveling pulse",
+          "min": 0,
+          "max": 1,
+          "def": 0.4,
+          "step": 0.01,
+          "group": "Motion",
+          "hint": "Strength of the pulse travelling along the light."
+        },
+        "twist": {
+          "type": "range",
+          "label": "Spatial twist",
+          "min": 0,
+          "max": 1.8,
+          "def": 0.3,
+          "step": 0.01,
+          "group": "Motion",
+          "hint": "How much the field spirals with depth."
+        },
+        "radiance": {
+          "type": "range",
+          "label": "Radiance",
+          "min": 0.2,
+          "max": 2,
+          "def": 1,
+          "step": 0.01,
+          "group": "Light",
+          "hint": "Brightness of the light.",
+          "randMax": 1.5
+        },
+        "depth": {
+          "type": "range",
+          "label": "Depth fade",
+          "min": 0.02,
+          "max": 0.3,
+          "def": 0.1,
+          "step": 0.01,
+          "group": "Light",
+          "hint": "How fast far light fades into the dark."
+        },
+        "samples": {
+          "type": "int",
+          "label": "Ray samples",
+          "min": 32,
+          "max": 96,
+          "def": 64,
+          "group": "Quality",
+          "mutate": 0,
+          "hint": "Ray samples per pixel. Higher is smoother; exposure and reach stay constant."
+        }
+      },
+      "graph": {
+        "buffers": {
+          "scene": {
+            "scale": 0.75
+          }
+        },
+        "passes": [
+          {
+            "src": "styles/veil.glsl",
+            "writes": "scene"
+          },
+          {
+            "src": "post/output.glsl",
+            "reads": [
+              "scene"
+            ],
+            "writes": "output"
+          }
+        ]
+      }
+    },
+    {
+      "id": "rootlight",
+      "name": "Rootlight",
+      "group": "Astral",
+      "palette": "lichen",
+      "tags": [
+        "volumetric",
+        "ambient",
+        "light"
+      ],
+      "blurb": "Braided organic paths glow around deep cavities.",
+      "flash": false,
+      "cost": 3,
+      "params": {
+        "distortion": {
+          "type": "range",
+          "label": "Distortion",
+          "min": 0,
+          "max": 1.8,
+          "def": 1.2,
+          "step": 0.01,
+          "group": "Form",
+          "hint": "How strongly the folds bend the light field."
+        },
+        "foldBias": {
+          "type": "range",
+          "label": "Fold",
+          "min": 0.35,
+          "max": 0.85,
+          "def": 0.68,
+          "step": 0.01,
+          "group": "Form",
+          "hint": "Where the folds crease; higher is sharper."
+        },
+        "width": {
+          "type": "range",
+          "label": "Thickness",
+          "min": 0.35,
+          "max": 2,
+          "def": 1,
+          "step": 0.01,
+          "group": "Form",
+          "hint": "Thickness of the light filaments."
+        },
+        "detail": {
+          "type": "int",
+          "label": "Detail",
+          "min": 2,
+          "max": 5,
+          "def": 4,
+          "group": "Form",
+          "hint": "Number of fold layers; more is finer and slower."
+        },
+        "breath": {
+          "type": "range",
+          "label": "Traveling pulse",
+          "min": 0,
+          "max": 1,
+          "def": 0.4,
+          "step": 0.01,
+          "group": "Motion",
+          "hint": "Strength of the pulse travelling along the light."
+        },
+        "twist": {
+          "type": "range",
+          "label": "Spatial twist",
+          "min": 0,
+          "max": 1.8,
+          "def": 0.85,
+          "step": 0.01,
+          "group": "Motion",
+          "hint": "How much the field spirals with depth."
+        },
+        "radiance": {
+          "type": "range",
+          "label": "Radiance",
+          "min": 0.2,
+          "max": 2,
+          "def": 1,
+          "step": 0.01,
+          "group": "Light",
+          "hint": "Brightness of the light.",
+          "randMax": 1.5
+        },
+        "depth": {
+          "type": "range",
+          "label": "Depth fade",
+          "min": 0.02,
+          "max": 0.3,
+          "def": 0.1,
+          "step": 0.01,
+          "group": "Light",
+          "hint": "How fast far light fades into the dark."
+        },
+        "samples": {
+          "type": "int",
+          "label": "Ray samples",
+          "min": 32,
+          "max": 96,
+          "def": 64,
+          "group": "Quality",
+          "mutate": 0,
+          "hint": "Ray samples per pixel. Higher is smoother; exposure and reach stay constant."
+        }
+      },
+      "graph": {
+        "buffers": {
+          "scene": {
+            "scale": 0.75
+          }
+        },
+        "passes": [
+          {
+            "src": "styles/rootlight.glsl",
+            "writes": "scene"
+          },
+          {
+            "src": "post/output.glsl",
+            "reads": [
+              "scene"
+            ],
+            "writes": "output"
+          }
+        ]
+      }
+    },
+    {
+      "id": "cathedral",
+      "name": "Cathedral",
+      "group": "Astral",
+      "palette": "ion",
+      "tags": [
+        "volumetric",
+        "ambient",
+        "light"
+      ],
+      "blurb": "Monumental columns and vaulted arches in a luminous nave.",
+      "flash": false,
+      "cost": 3,
+      "params": {
+        "distortion": {
+          "type": "range",
+          "label": "Distortion",
+          "min": 0,
+          "max": 1.8,
+          "def": 0.55,
+          "step": 0.01,
+          "group": "Form",
+          "hint": "How strongly the folds bend the light field."
+        },
+        "foldBias": {
+          "type": "range",
+          "label": "Fold",
+          "min": 0.35,
+          "max": 0.85,
+          "def": 0.68,
+          "step": 0.01,
+          "group": "Form",
+          "hint": "Where the folds crease; higher is sharper."
+        },
+        "width": {
+          "type": "range",
+          "label": "Thickness",
+          "min": 0.35,
+          "max": 2,
+          "def": 1,
+          "step": 0.01,
+          "group": "Form",
+          "hint": "Thickness of the light filaments."
+        },
+        "detail": {
+          "type": "int",
+          "label": "Detail",
+          "min": 2,
+          "max": 5,
+          "def": 4,
+          "group": "Form",
+          "hint": "Number of fold layers; more is finer and slower."
+        },
+        "breath": {
+          "type": "range",
+          "label": "Traveling pulse",
+          "min": 0,
+          "max": 1,
+          "def": 0.4,
+          "step": 0.01,
+          "group": "Motion",
+          "hint": "Strength of the pulse travelling along the light."
+        },
+        "twist": {
+          "type": "range",
+          "label": "Spatial twist",
+          "min": 0,
+          "max": 1.8,
+          "def": 0.22,
+          "step": 0.01,
+          "group": "Motion",
+          "hint": "How much the field spirals with depth."
+        },
+        "radiance": {
+          "type": "range",
+          "label": "Radiance",
+          "min": 0.2,
+          "max": 2,
+          "def": 1,
+          "step": 0.01,
+          "group": "Light",
+          "hint": "Brightness of the light.",
+          "randMax": 1.5
+        },
+        "depth": {
+          "type": "range",
+          "label": "Depth fade",
+          "min": 0.02,
+          "max": 0.3,
+          "def": 0.1,
+          "step": 0.01,
+          "group": "Light",
+          "hint": "How fast far light fades into the dark."
+        },
+        "samples": {
+          "type": "int",
+          "label": "Ray samples",
+          "min": 32,
+          "max": 96,
+          "def": 64,
+          "group": "Quality",
+          "mutate": 0,
+          "hint": "Ray samples per pixel. Higher is smoother; exposure and reach stay constant."
+        }
+      },
+      "graph": {
+        "buffers": {
+          "scene": {
+            "scale": 0.75
+          }
+        },
+        "passes": [
+          {
+            "src": "styles/cathedral.glsl",
+            "writes": "scene"
+          },
+          {
+            "src": "post/output.glsl",
+            "reads": [
+              "scene"
+            ],
+            "writes": "output"
+          }
+        ]
+      }
+    },
+    {
+      "id": "halo",
+      "name": "Halo",
+      "group": "Astral",
+      "palette": "opal",
+      "tags": [
+        "volumetric",
+        "ambient",
+        "light"
+      ],
+      "blurb": "Nested rings turn gently through a deep field of light.",
+      "flash": false,
+      "cost": 3,
+      "params": {
+        "distortion": {
+          "type": "range",
+          "label": "Distortion",
+          "min": 0,
+          "max": 1.8,
+          "def": 0.45,
+          "step": 0.01,
+          "group": "Form",
+          "hint": "How strongly the folds bend the light field."
+        },
+        "foldBias": {
+          "type": "range",
+          "label": "Fold",
+          "min": 0.35,
+          "max": 0.85,
+          "def": 0.68,
+          "step": 0.01,
+          "group": "Form",
+          "hint": "Where the folds crease; higher is sharper."
+        },
+        "width": {
+          "type": "range",
+          "label": "Thickness",
+          "min": 0.35,
+          "max": 2,
+          "def": 1,
+          "step": 0.01,
+          "group": "Form",
+          "hint": "Thickness of the light filaments."
+        },
+        "detail": {
+          "type": "int",
+          "label": "Detail",
+          "min": 2,
+          "max": 5,
+          "def": 4,
+          "group": "Form",
+          "hint": "Number of fold layers; more is finer and slower."
+        },
+        "breath": {
+          "type": "range",
+          "label": "Traveling pulse",
+          "min": 0,
+          "max": 1,
+          "def": 0.4,
+          "step": 0.01,
+          "group": "Motion",
+          "hint": "Strength of the pulse travelling along the light."
+        },
+        "twist": {
+          "type": "range",
+          "label": "Spatial twist",
+          "min": 0,
+          "max": 1.8,
+          "def": 0.65,
+          "step": 0.01,
+          "group": "Motion",
+          "hint": "How much the field spirals with depth."
+        },
+        "radiance": {
+          "type": "range",
+          "label": "Radiance",
+          "min": 0.2,
+          "max": 2,
+          "def": 1,
+          "step": 0.01,
+          "group": "Light",
+          "hint": "Brightness of the light.",
+          "randMax": 1.5
+        },
+        "depth": {
+          "type": "range",
+          "label": "Depth fade",
+          "min": 0.02,
+          "max": 0.3,
+          "def": 0.1,
+          "step": 0.01,
+          "group": "Light",
+          "hint": "How fast far light fades into the dark."
+        },
+        "samples": {
+          "type": "int",
+          "label": "Ray samples",
+          "min": 32,
+          "max": 96,
+          "def": 64,
+          "group": "Quality",
+          "mutate": 0,
+          "hint": "Ray samples per pixel. Higher is smoother; exposure and reach stay constant."
+        }
+      },
+      "graph": {
+        "buffers": {
+          "scene": {
+            "scale": 0.75
+          }
+        },
+        "passes": [
+          {
+            "src": "styles/halo.glsl",
+            "writes": "scene"
+          },
+          {
+            "src": "post/output.glsl",
+            "reads": [
+              "scene"
+            ],
+            "writes": "output"
+          }
+        ]
+      }
+    },
+    {
+      "id": "chrysalis",
+      "name": "Chrysalis",
+      "group": "Astral",
+      "palette": "lichen",
+      "tags": [
+        "volumetric",
+        "ambient",
+        "light"
+      ],
+      "blurb": "A breathing luminous shell shelters a suspended inner core.",
+      "flash": false,
+      "cost": 3,
+      "params": {
+        "distortion": {
+          "type": "range",
+          "label": "Distortion",
+          "min": 0,
+          "max": 1.8,
+          "def": 0.45,
+          "step": 0.01,
+          "group": "Form",
+          "hint": "How strongly the folds bend the light field."
+        },
+        "foldBias": {
+          "type": "range",
+          "label": "Fold",
+          "min": 0.35,
+          "max": 0.85,
+          "def": 0.68,
+          "step": 0.01,
+          "group": "Form",
+          "hint": "Where the folds crease; higher is sharper."
+        },
+        "width": {
+          "type": "range",
+          "label": "Thickness",
+          "min": 0.35,
+          "max": 2,
+          "def": 1,
+          "step": 0.01,
+          "group": "Form",
+          "hint": "Thickness of the light filaments."
+        },
+        "detail": {
+          "type": "int",
+          "label": "Detail",
+          "min": 2,
+          "max": 5,
+          "def": 4,
+          "group": "Form",
+          "hint": "Number of fold layers; more is finer and slower."
+        },
+        "breath": {
+          "type": "range",
+          "label": "Traveling pulse",
+          "min": 0,
+          "max": 1,
+          "def": 0.4,
+          "step": 0.01,
+          "group": "Motion",
+          "hint": "Strength of the pulse travelling along the light."
+        },
+        "twist": {
+          "type": "range",
+          "label": "Spatial twist",
+          "min": 0,
+          "max": 1.8,
+          "def": 0.4,
+          "step": 0.01,
+          "group": "Motion",
+          "hint": "How much the field spirals with depth."
+        },
+        "radiance": {
+          "type": "range",
+          "label": "Radiance",
+          "min": 0.2,
+          "max": 2,
+          "def": 1,
+          "step": 0.01,
+          "group": "Light",
+          "hint": "Brightness of the light.",
+          "randMax": 1.5
+        },
+        "depth": {
+          "type": "range",
+          "label": "Depth fade",
+          "min": 0.02,
+          "max": 0.3,
+          "def": 0.1,
+          "step": 0.01,
+          "group": "Light",
+          "hint": "How fast far light fades into the dark."
+        },
+        "samples": {
+          "type": "int",
+          "label": "Ray samples",
+          "min": 32,
+          "max": 96,
+          "def": 64,
+          "group": "Quality",
+          "mutate": 0,
+          "hint": "Ray samples per pixel. Higher is smoother; exposure and reach stay constant."
+        }
+      },
+      "graph": {
+        "buffers": {
+          "scene": {
+            "scale": 0.75
+          }
+        },
+        "passes": [
+          {
+            "src": "styles/chrysalis.glsl",
+            "writes": "scene"
+          },
+          {
+            "src": "post/output.glsl",
+            "reads": [
+              "scene"
+            ],
+            "writes": "output"
+          }
+        ]
+      }
+    },
+    {
+      "id": "estuary",
+      "name": "Estuary",
+      "group": "Astral",
+      "palette": "ion",
+      "tags": [
+        "volumetric",
+        "ambient",
+        "light"
+      ],
+      "blurb": "Three braided currents converge through a luminous channel.",
+      "flash": false,
+      "cost": 3,
+      "params": {
+        "distortion": {
+          "type": "range",
+          "label": "Distortion",
+          "min": 0,
+          "max": 1.8,
+          "def": 0.6,
+          "step": 0.01,
+          "group": "Form",
+          "hint": "How strongly the folds bend the light field."
+        },
+        "foldBias": {
+          "type": "range",
+          "label": "Fold",
+          "min": 0.35,
+          "max": 0.85,
+          "def": 0.68,
+          "step": 0.01,
+          "group": "Form",
+          "hint": "Where the folds crease; higher is sharper."
+        },
+        "width": {
+          "type": "range",
+          "label": "Thickness",
+          "min": 0.35,
+          "max": 2,
+          "def": 1,
+          "step": 0.01,
+          "group": "Form",
+          "hint": "Thickness of the light filaments."
+        },
+        "detail": {
+          "type": "int",
+          "label": "Detail",
+          "min": 2,
+          "max": 5,
+          "def": 4,
+          "group": "Form",
+          "hint": "Number of fold layers; more is finer and slower."
+        },
+        "breath": {
+          "type": "range",
+          "label": "Traveling pulse",
+          "min": 0,
+          "max": 1,
+          "def": 0.4,
+          "step": 0.01,
+          "group": "Motion",
+          "hint": "Strength of the pulse travelling along the light."
+        },
+        "twist": {
+          "type": "range",
+          "label": "Spatial twist",
+          "min": 0,
+          "max": 1.8,
+          "def": 0.25,
+          "step": 0.01,
+          "group": "Motion",
+          "hint": "How much the field spirals with depth."
+        },
+        "radiance": {
+          "type": "range",
+          "label": "Radiance",
+          "min": 0.2,
+          "max": 2,
+          "def": 1,
+          "step": 0.01,
+          "group": "Light",
+          "hint": "Brightness of the light.",
+          "randMax": 1.5
+        },
+        "depth": {
+          "type": "range",
+          "label": "Depth fade",
+          "min": 0.02,
+          "max": 0.3,
+          "def": 0.1,
+          "step": 0.01,
+          "group": "Light",
+          "hint": "How fast far light fades into the dark."
+        },
+        "samples": {
+          "type": "int",
+          "label": "Ray samples",
+          "min": 32,
+          "max": 96,
+          "def": 64,
+          "group": "Quality",
+          "mutate": 0,
+          "hint": "Ray samples per pixel. Higher is smoother; exposure and reach stay constant."
+        }
+      },
+      "graph": {
+        "buffers": {
+          "scene": {
+            "scale": 0.75
+          }
+        },
+        "passes": [
+          {
+            "src": "styles/estuary.glsl",
+            "writes": "scene"
+          },
+          {
+            "src": "post/output.glsl",
+            "reads": [
+              "scene"
+            ],
+            "writes": "output"
+          }
+        ]
+      }
+    },
+    {
+      "id": "synapse",
+      "name": "Synapse",
+      "group": "Astral",
+      "palette": "opal",
+      "tags": [
+        "volumetric",
+        "ambient",
+        "light"
+      ],
+      "blurb": "Glowing junctions and connecting paths revealed by slow pulses.",
+      "flash": false,
+      "cost": 3,
+      "params": {
+        "distortion": {
+          "type": "range",
+          "label": "Distortion",
+          "min": 0,
+          "max": 1.8,
+          "def": 0.45,
+          "step": 0.01,
+          "group": "Form",
+          "hint": "How strongly the folds bend the light field."
+        },
+        "foldBias": {
+          "type": "range",
+          "label": "Fold",
+          "min": 0.35,
+          "max": 0.85,
+          "def": 0.68,
+          "step": 0.01,
+          "group": "Form",
+          "hint": "Where the folds crease; higher is sharper."
+        },
+        "width": {
+          "type": "range",
+          "label": "Thickness",
+          "min": 0.35,
+          "max": 2,
+          "def": 1,
+          "step": 0.01,
+          "group": "Form",
+          "hint": "Thickness of the light filaments."
+        },
+        "detail": {
+          "type": "int",
+          "label": "Detail",
+          "min": 2,
+          "max": 5,
+          "def": 4,
+          "group": "Form",
+          "hint": "Number of fold layers; more is finer and slower."
+        },
+        "breath": {
+          "type": "range",
+          "label": "Traveling pulse",
+          "min": 0,
+          "max": 1,
+          "def": 0.4,
+          "step": 0.01,
+          "group": "Motion",
+          "hint": "Strength of the pulse travelling along the light."
+        },
+        "twist": {
+          "type": "range",
+          "label": "Spatial twist",
+          "min": 0,
+          "max": 1.8,
+          "def": 0.4,
+          "step": 0.01,
+          "group": "Motion",
+          "hint": "How much the field spirals with depth."
+        },
+        "radiance": {
+          "type": "range",
+          "label": "Radiance",
+          "min": 0.2,
+          "max": 2,
+          "def": 1,
+          "step": 0.01,
+          "group": "Light",
+          "hint": "Brightness of the light.",
+          "randMax": 1.5
+        },
+        "depth": {
+          "type": "range",
+          "label": "Depth fade",
+          "min": 0.02,
+          "max": 0.3,
+          "def": 0.1,
+          "step": 0.01,
+          "group": "Light",
+          "hint": "How fast far light fades into the dark."
+        },
+        "samples": {
+          "type": "int",
+          "label": "Ray samples",
+          "min": 32,
+          "max": 96,
+          "def": 64,
+          "group": "Quality",
+          "mutate": 0,
+          "hint": "Ray samples per pixel. Higher is smoother; exposure and reach stay constant."
+        }
+      },
+      "graph": {
+        "buffers": {
+          "scene": {
+            "scale": 0.75
+          }
+        },
+        "passes": [
+          {
+            "src": "styles/synapse.glsl",
+            "writes": "scene"
+          },
+          {
+            "src": "post/output.glsl",
+            "reads": [
+              "scene"
+            ],
+            "writes": "output"
+          }
+        ]
+      }
+    },
+    {
+      "id": "aurora-fold",
+      "name": "Aurora Fold",
+      "group": "Astral",
+      "palette": "opal",
+      "tags": [
+        "volumetric",
+        "ambient",
+        "light"
+      ],
+      "blurb": "Broad curtains of color roll across finely folded surfaces.",
+      "flash": false,
+      "cost": 3,
+      "params": {
+        "distortion": {
+          "type": "range",
+          "label": "Distortion",
+          "min": 0,
+          "max": 1.8,
+          "def": 0.5,
+          "step": 0.01,
+          "group": "Form",
+          "hint": "How strongly the folds bend the light field."
+        },
+        "foldBias": {
+          "type": "range",
+          "label": "Fold",
+          "min": 0.35,
+          "max": 0.85,
+          "def": 0.68,
+          "step": 0.01,
+          "group": "Form",
+          "hint": "Where the folds crease; higher is sharper."
+        },
+        "width": {
+          "type": "range",
+          "label": "Thickness",
+          "min": 0.35,
+          "max": 2,
+          "def": 1,
+          "step": 0.01,
+          "group": "Form",
+          "hint": "Thickness of the light filaments."
+        },
+        "detail": {
+          "type": "int",
+          "label": "Detail",
+          "min": 2,
+          "max": 5,
+          "def": 4,
+          "group": "Form",
+          "hint": "Number of fold layers; more is finer and slower."
+        },
+        "breath": {
+          "type": "range",
+          "label": "Traveling pulse",
+          "min": 0,
+          "max": 1,
+          "def": 0.4,
+          "step": 0.01,
+          "group": "Motion",
+          "hint": "Strength of the pulse travelling along the light."
+        },
+        "twist": {
+          "type": "range",
+          "label": "Spatial twist",
+          "min": 0,
+          "max": 1.8,
+          "def": 0.2,
+          "step": 0.01,
+          "group": "Motion",
+          "hint": "How much the field spirals with depth."
+        },
+        "radiance": {
+          "type": "range",
+          "label": "Radiance",
+          "min": 0.2,
+          "max": 2,
+          "def": 1,
+          "step": 0.01,
+          "group": "Light",
+          "hint": "Brightness of the light.",
+          "randMax": 1.5
+        },
+        "depth": {
+          "type": "range",
+          "label": "Depth fade",
+          "min": 0.02,
+          "max": 0.3,
+          "def": 0.1,
+          "step": 0.01,
+          "group": "Light",
+          "hint": "How fast far light fades into the dark."
+        },
+        "samples": {
+          "type": "int",
+          "label": "Ray samples",
+          "min": 32,
+          "max": 96,
+          "def": 64,
+          "group": "Quality",
+          "mutate": 0,
+          "hint": "Ray samples per pixel. Higher is smoother; exposure and reach stay constant."
+        }
+      },
+      "graph": {
+        "buffers": {
+          "scene": {
+            "scale": 0.75
+          }
+        },
+        "passes": [
+          {
+            "src": "styles/aurora-fold.glsl",
+            "writes": "scene"
+          },
+          {
+            "src": "post/output.glsl",
+            "reads": [
+              "scene"
+            ],
+            "writes": "output"
+          }
+        ]
+      }
+    },
+    {
+      "id": "relic",
+      "name": "Relic",
+      "group": "Astral",
+      "palette": "ember",
+      "tags": [
+        "volumetric",
+        "ambient",
+        "light"
+      ],
+      "blurb": "An isolated toroidal sculpture turns in quiet negative space.",
+      "flash": false,
+      "cost": 3,
+      "params": {
+        "distortion": {
+          "type": "range",
+          "label": "Distortion",
+          "min": 0,
+          "max": 1.8,
+          "def": 0.45,
+          "step": 0.01,
+          "group": "Form",
+          "hint": "How strongly the folds bend the light field."
+        },
+        "foldBias": {
+          "type": "range",
+          "label": "Fold",
+          "min": 0.35,
+          "max": 0.85,
+          "def": 0.68,
+          "step": 0.01,
+          "group": "Form",
+          "hint": "Where the folds crease; higher is sharper."
+        },
+        "width": {
+          "type": "range",
+          "label": "Thickness",
+          "min": 0.35,
+          "max": 2,
+          "def": 1,
+          "step": 0.01,
+          "group": "Form",
+          "hint": "Thickness of the light filaments."
+        },
+        "detail": {
+          "type": "int",
+          "label": "Detail",
+          "min": 2,
+          "max": 5,
+          "def": 4,
+          "group": "Form",
+          "hint": "Number of fold layers; more is finer and slower."
+        },
+        "breath": {
+          "type": "range",
+          "label": "Traveling pulse",
+          "min": 0,
+          "max": 1,
+          "def": 0.4,
+          "step": 0.01,
+          "group": "Motion",
+          "hint": "Strength of the pulse travelling along the light."
+        },
+        "twist": {
+          "type": "range",
+          "label": "Spatial twist",
+          "min": 0,
+          "max": 1.8,
+          "def": 0.35,
+          "step": 0.01,
+          "group": "Motion",
+          "hint": "How much the field spirals with depth."
+        },
+        "radiance": {
+          "type": "range",
+          "label": "Radiance",
+          "min": 0.2,
+          "max": 2,
+          "def": 1,
+          "step": 0.01,
+          "group": "Light",
+          "hint": "Brightness of the light.",
+          "randMax": 1.5
+        },
+        "depth": {
+          "type": "range",
+          "label": "Depth fade",
+          "min": 0.02,
+          "max": 0.3,
+          "def": 0.1,
+          "step": 0.01,
+          "group": "Light",
+          "hint": "How fast far light fades into the dark."
+        },
+        "samples": {
+          "type": "int",
+          "label": "Ray samples",
+          "min": 32,
+          "max": 96,
+          "def": 64,
+          "group": "Quality",
+          "mutate": 0,
+          "hint": "Ray samples per pixel. Higher is smoother; exposure and reach stay constant."
+        }
+      },
+      "graph": {
+        "buffers": {
+          "scene": {
+            "scale": 0.75
+          }
+        },
+        "passes": [
+          {
+            "src": "styles/relic.glsl",
+            "writes": "scene"
+          },
+          {
+            "src": "post/output.glsl",
+            "reads": [
+              "scene"
+            ],
+            "writes": "output"
+          }
+        ]
+      }
+    },
+    {
+      "id": "threshold",
+      "name": "Threshold",
+      "group": "Astral",
+      "palette": "ember",
+      "tags": [
+        "volumetric",
+        "ambient",
+        "light"
+      ],
+      "blurb": "A luminous portal opens into intricate folded darkness.",
+      "flash": false,
+      "cost": 3,
+      "params": {
+        "distortion": {
+          "type": "range",
+          "label": "Distortion",
+          "min": 0,
+          "max": 1.8,
+          "def": 0.55,
+          "step": 0.01,
+          "group": "Form",
+          "hint": "How strongly the folds bend the light field."
+        },
+        "foldBias": {
+          "type": "range",
+          "label": "Fold",
+          "min": 0.35,
+          "max": 0.85,
+          "def": 0.68,
+          "step": 0.01,
+          "group": "Form",
+          "hint": "Where the folds crease; higher is sharper."
+        },
+        "width": {
+          "type": "range",
+          "label": "Thickness",
+          "min": 0.35,
+          "max": 2,
+          "def": 1,
+          "step": 0.01,
+          "group": "Form",
+          "hint": "Thickness of the light filaments."
+        },
+        "detail": {
+          "type": "int",
+          "label": "Detail",
+          "min": 2,
+          "max": 5,
+          "def": 4,
+          "group": "Form",
+          "hint": "Number of fold layers; more is finer and slower."
+        },
+        "breath": {
+          "type": "range",
+          "label": "Traveling pulse",
+          "min": 0,
+          "max": 1,
+          "def": 0.4,
+          "step": 0.01,
+          "group": "Motion",
+          "hint": "Strength of the pulse travelling along the light."
+        },
+        "twist": {
+          "type": "range",
+          "label": "Spatial twist",
+          "min": 0,
+          "max": 1.8,
+          "def": 0.45,
+          "step": 0.01,
+          "group": "Motion",
+          "hint": "How much the field spirals with depth."
+        },
+        "radiance": {
+          "type": "range",
+          "label": "Radiance",
+          "min": 0.2,
+          "max": 2,
+          "def": 1,
+          "step": 0.01,
+          "group": "Light",
+          "hint": "Brightness of the light.",
+          "randMax": 1.5
+        },
+        "depth": {
+          "type": "range",
+          "label": "Depth fade",
+          "min": 0.02,
+          "max": 0.3,
+          "def": 0.1,
+          "step": 0.01,
+          "group": "Light",
+          "hint": "How fast far light fades into the dark."
+        },
+        "samples": {
+          "type": "int",
+          "label": "Ray samples",
+          "min": 32,
+          "max": 96,
+          "def": 64,
+          "group": "Quality",
+          "mutate": 0,
+          "hint": "Ray samples per pixel. Higher is smoother; exposure and reach stay constant."
+        }
+      },
+      "graph": {
+        "buffers": {
+          "scene": {
+            "scale": 0.75
+          }
+        },
+        "passes": [
+          {
+            "src": "styles/threshold.glsl",
+            "writes": "scene"
+          },
+          {
+            "src": "post/output.glsl",
+            "reads": [
+              "scene"
+            ],
+            "writes": "output"
+          }
+        ]
+      }
+    },
+    {
+      "id": "stillfield",
+      "name": "Stillfield",
+      "group": "Astral",
+      "palette": "ion",
+      "tags": [
+        "volumetric",
+        "ambient",
+        "light"
+      ],
+      "blurb": "Sparse threads and suspended shells with almost imperceptible drift.",
+      "flash": false,
+      "cost": 3,
+      "params": {
+        "distortion": {
+          "type": "range",
+          "label": "Distortion",
+          "min": 0,
+          "max": 1.8,
+          "def": 0.3,
+          "step": 0.01,
+          "group": "Form",
+          "hint": "How strongly the folds bend the light field."
+        },
+        "foldBias": {
+          "type": "range",
+          "label": "Fold",
+          "min": 0.35,
+          "max": 0.85,
+          "def": 0.68,
+          "step": 0.01,
+          "group": "Form",
+          "hint": "Where the folds crease; higher is sharper."
+        },
+        "width": {
+          "type": "range",
+          "label": "Thickness",
+          "min": 0.35,
+          "max": 2,
+          "def": 1,
+          "step": 0.01,
+          "group": "Form",
+          "hint": "Thickness of the light filaments."
+        },
+        "detail": {
+          "type": "int",
+          "label": "Detail",
+          "min": 2,
+          "max": 5,
+          "def": 4,
+          "group": "Form",
+          "hint": "Number of fold layers; more is finer and slower."
+        },
+        "breath": {
+          "type": "range",
+          "label": "Traveling pulse",
+          "min": 0,
+          "max": 1,
+          "def": 0.1,
+          "step": 0.01,
+          "group": "Motion",
+          "hint": "Strength of the pulse travelling along the light."
+        },
+        "twist": {
+          "type": "range",
+          "label": "Spatial twist",
+          "min": 0,
+          "max": 1.8,
+          "def": 0.08,
+          "step": 0.01,
+          "group": "Motion",
+          "hint": "How much the field spirals with depth."
+        },
+        "radiance": {
+          "type": "range",
+          "label": "Radiance",
+          "min": 0.2,
+          "max": 2,
+          "def": 1,
+          "step": 0.01,
+          "group": "Light",
+          "hint": "Brightness of the light.",
+          "randMax": 1.5
+        },
+        "depth": {
+          "type": "range",
+          "label": "Depth fade",
+          "min": 0.02,
+          "max": 0.3,
+          "def": 0.1,
+          "step": 0.01,
+          "group": "Light",
+          "hint": "How fast far light fades into the dark."
+        },
+        "samples": {
+          "type": "int",
+          "label": "Ray samples",
+          "min": 32,
+          "max": 96,
+          "def": 64,
+          "group": "Quality",
+          "mutate": 0,
+          "hint": "Ray samples per pixel. Higher is smoother; exposure and reach stay constant."
+        }
+      },
+      "graph": {
+        "buffers": {
+          "scene": {
+            "scale": 0.75
+          }
+        },
+        "passes": [
+          {
+            "src": "styles/stillfield.glsl",
+            "writes": "scene"
+          },
+          {
+            "src": "post/output.glsl",
+            "reads": [
+              "scene"
+            ],
+            "writes": "output"
+          }
+        ]
+      }
+    }
+  ]
+}
