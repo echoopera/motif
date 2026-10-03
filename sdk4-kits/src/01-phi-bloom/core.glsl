@@ -278,7 +278,7 @@ vec4 scene_main(vec2 uv, vec2 fc, int variant) {
       mat2 sq = mat2(cos(sa), sin(sa), -sin(sa), cos(sa));
       vec2 q = sq * pm; q.y /= (0.50 + 0.45 * kk * (0.5 + 0.5 * cos(th * 1.0 + float(k)))); q = transpose(sq) * q;
       float dir = (k % 2 == 0) ? 1.0 : -1.0;
-      float rk = 0.16 + 0.34 * kk;
+      float rk = (0.16 + 0.34 * kk) * (1.0 + (kk - 0.5) * ds * 3.0);   // depth spacing spreads the rings in depth
       vec4 R = ringLayer(q, rk, 10 + 4 * k, TAU * float(max(p_turns, 1)) * k_phase() * dir + float(k) * 0.9, lenK * 1.9, lenK * 0.62, taper, px * 1.2, float(k) * 7.0, 0.0, 0.8 - 0.8 * kk, champ, copper, 1.0);
       col = mix(col, R.rgb, R.a);
     }
