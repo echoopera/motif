@@ -1,0 +1,2229 @@
+{
+  "format": "motif-kit@4",
+  "id": "astral-threshold",
+  "name": "Astral Threshold",
+  "version": "1.0.0",
+  "author": "Motif",
+  "description": "Violet and ice-blue volumetric membranes: foreground curtains, middle sheets and a distant aperture. Step-normalised volume rendering. Nine seamless infinite loops.",
+  "license": "",
+  "accent": "#8A4DFF",
+  "common": "common.glsl",
+  "palettes": [
+    {
+      "id": "violet-ice",
+      "name": "Violet Ice",
+      "bg": "#040110",
+      "ink": "#EAF3FF",
+      "a": [
+        "#7A2CF5",
+        "#3FA5FF",
+        "#2A0E6E"
+      ]
+    },
+    {
+      "id": "aurora",
+      "name": "Aurora",
+      "bg": "#010A0C",
+      "ink": "#E8FFF6",
+      "a": [
+        "#2BC7A0",
+        "#6A7BFF",
+        "#0B3A52"
+      ]
+    },
+    {
+      "id": "ember-veil",
+      "name": "Ember Veil",
+      "bg": "#0C0306",
+      "ink": "#FFF0E6",
+      "a": [
+        "#E24C7A",
+        "#FFB05C",
+        "#4A1030"
+      ]
+    },
+    {
+      "id": "mono-ice",
+      "name": "Mono Ice",
+      "bg": "#02050A",
+      "ink": "#F2F7FF",
+      "a": [
+        "#8FA8D6",
+        "#C9E0FF",
+        "#1B2A48"
+      ]
+    }
+  ],
+  "styles": [
+    {
+      "id": "astral-threshold-hero",
+      "name": "Astral Threshold Hero",
+      "group": "Astral Threshold",
+      "tags": [
+        "flagship",
+        "volume",
+        "aperture"
+      ],
+      "blurb": "Seven offset membranes recede to a distant aperture; the camera leans in and returns.",
+      "palette": "violet-ice",
+      "flash": false,
+      "cost": 3,
+      "graph": {
+        "buffers": {
+          "scene": {
+            "scale": 0.6
+          },
+          "glowA": {
+            "scale": 0.25
+          },
+          "glowB": {
+            "scale": 0.125
+          }
+        },
+        "passes": [
+          {
+            "src": "styles/astral-threshold-hero.glsl",
+            "reads": [],
+            "writes": "scene"
+          },
+          {
+            "src": "styles/_glowA.glsl",
+            "reads": [
+              "scene"
+            ],
+            "writes": "glowA"
+          },
+          {
+            "src": "styles/_glowB.glsl",
+            "reads": [
+              "glowA"
+            ],
+            "writes": "glowB"
+          },
+          {
+            "src": "styles/_out.glsl",
+            "reads": [
+              "scene",
+              "glowA",
+              "glowB"
+            ],
+            "writes": "output"
+          }
+        ]
+      },
+      "params": {
+        "layers": {
+          "type": "int",
+          "label": "Membrane layers",
+          "min": 3,
+          "max": 12,
+          "def": 7,
+          "group": "Form",
+          "hint": "Number of nested membrane shells.",
+          "mutate": 0.3
+        },
+        "aperture": {
+          "type": "range",
+          "label": "Aperture radius",
+          "min": 0.08,
+          "max": 0.45,
+          "def": 0.2,
+          "step": 0.0019,
+          "group": "Form",
+          "hint": "Radius of the innermost shell and the distant aperture."
+        },
+        "filament": {
+          "type": "range",
+          "label": "Filament scale",
+          "min": 0.02,
+          "max": 0.3,
+          "def": 0.09,
+          "step": 0.0014,
+          "group": "Form",
+          "hint": "Spacing of the fine filaments on each membrane. Smaller = more filaments.",
+          "log": true
+        },
+        "warp": {
+          "type": "range",
+          "label": "Warp amplitude",
+          "min": 0,
+          "max": 0.25,
+          "def": 0.08,
+          "step": 0.0013,
+          "group": "Form",
+          "hint": "How far each membrane folds away from a circle."
+        },
+        "density": {
+          "type": "range",
+          "label": "Density",
+          "min": 0.1,
+          "max": 2,
+          "def": 0.8,
+          "step": 0.0095,
+          "group": "Material",
+          "hint": "Overall membrane density."
+        },
+        "absorb": {
+          "type": "range",
+          "label": "Absorption",
+          "min": 0.1,
+          "max": 3,
+          "def": 1.6,
+          "step": 0.014,
+          "group": "Material",
+          "hint": "How strongly membranes block what lies behind them."
+        },
+        "emission": {
+          "type": "range",
+          "label": "Emission",
+          "min": 0.1,
+          "max": 5,
+          "def": 1.4,
+          "step": 0.025,
+          "group": "Light",
+          "hint": "Light emitted by the membranes.",
+          "randMax": 3
+        },
+        "travel": {
+          "type": "range",
+          "label": "Depth travel",
+          "min": 0,
+          "max": 0.4,
+          "def": 0.12,
+          "step": 0.002,
+          "group": "Motion",
+          "hint": "Closed camera excursion into the passage and back."
+        },
+        "advect": {
+          "type": "int",
+          "label": "Advection cycles per loop",
+          "min": 1,
+          "max": 3,
+          "def": 1,
+          "group": "Motion",
+          "hint": "Whole cycles the filaments slide along the membranes per loop.",
+          "mutate": 0
+        },
+        "keyAngle": {
+          "type": "range",
+          "label": "Key direction",
+          "min": -180,
+          "max": 180,
+          "def": 90,
+          "step": 1,
+          "unit": "°",
+          "group": "Light",
+          "hint": "Direction of the key light in the picture plane, degrees.",
+          "randMax": 180
+        },
+        "exposure": {
+          "type": "range",
+          "label": "Exposure",
+          "min": 0.4,
+          "max": 2.4,
+          "def": 1,
+          "step": 0.01,
+          "unit": "×",
+          "log": true,
+          "group": "Light",
+          "hint": "Linear exposure before the single tone map.",
+          "randMax": 1.4
+        },
+        "bloom": {
+          "type": "range",
+          "label": "Bloom",
+          "min": 0,
+          "max": 1.6,
+          "def": 0.6,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Glow added around emissive light. 0 shows the bare geometry.",
+          "randMax": 0.9
+        },
+        "bloomRadius": {
+          "type": "range",
+          "label": "Bloom radius",
+          "min": 0.4,
+          "max": 2.2,
+          "def": 1,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Width of the glow relative to the frame.",
+          "randMax": 1.5
+        },
+        "lensCA": {
+          "type": "range",
+          "label": "Edge fringe",
+          "min": 0,
+          "max": 0.5,
+          "def": 0.12,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Spectral fringing toward the frame edge.",
+          "randMax": 0.25
+        },
+        "vignette": {
+          "type": "range",
+          "label": "Vignette",
+          "min": 0,
+          "max": 0.8,
+          "def": 0.38,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Darkens the frame edge; never touches the focal area.",
+          "randMax": 0.55
+        },
+        "quality": {
+          "type": "select",
+          "label": "Quality",
+          "options": [
+            {
+              "v": "live",
+              "l": "Live"
+            },
+            {
+              "v": "balanced",
+              "l": "Balanced"
+            },
+            {
+              "v": "export",
+              "l": "Export"
+            }
+          ],
+          "def": "balanced",
+          "mutate": 0,
+          "group": "Quality",
+          "hint": "Sample counts only. Composition, phase and exposure stay the same."
+        }
+      }
+    },
+    {
+      "id": "violet-passage",
+      "name": "Violet Passage",
+      "group": "Astral Threshold",
+      "tags": [
+        "tunnel",
+        "deep"
+      ],
+      "blurb": "A longer, tighter passage: more layers and a deeper lean into the dark.",
+      "palette": "violet-ice",
+      "flash": false,
+      "cost": 3,
+      "graph": {
+        "buffers": {
+          "scene": {
+            "scale": 0.6
+          },
+          "glowA": {
+            "scale": 0.25
+          },
+          "glowB": {
+            "scale": 0.125
+          }
+        },
+        "passes": [
+          {
+            "src": "styles/violet-passage.glsl",
+            "reads": [],
+            "writes": "scene"
+          },
+          {
+            "src": "styles/_glowA.glsl",
+            "reads": [
+              "scene"
+            ],
+            "writes": "glowA"
+          },
+          {
+            "src": "styles/_glowB.glsl",
+            "reads": [
+              "glowA"
+            ],
+            "writes": "glowB"
+          },
+          {
+            "src": "styles/_out.glsl",
+            "reads": [
+              "scene",
+              "glowA",
+              "glowB"
+            ],
+            "writes": "output"
+          }
+        ]
+      },
+      "params": {
+        "layers": {
+          "type": "int",
+          "label": "Membrane layers",
+          "min": 3,
+          "max": 12,
+          "def": 10,
+          "group": "Form",
+          "hint": "Number of nested membrane shells.",
+          "mutate": 0.3
+        },
+        "aperture": {
+          "type": "range",
+          "label": "Aperture radius",
+          "min": 0.08,
+          "max": 0.45,
+          "def": 0.13,
+          "step": 0.0019,
+          "group": "Form",
+          "hint": "Radius of the innermost shell and the distant aperture."
+        },
+        "filament": {
+          "type": "range",
+          "label": "Filament scale",
+          "min": 0.02,
+          "max": 0.3,
+          "def": 0.09,
+          "step": 0.0014,
+          "group": "Form",
+          "hint": "Spacing of the fine filaments on each membrane. Smaller = more filaments.",
+          "log": true
+        },
+        "warp": {
+          "type": "range",
+          "label": "Warp amplitude",
+          "min": 0,
+          "max": 0.25,
+          "def": 0.08,
+          "step": 0.0013,
+          "group": "Form",
+          "hint": "How far each membrane folds away from a circle."
+        },
+        "density": {
+          "type": "range",
+          "label": "Density",
+          "min": 0.1,
+          "max": 2,
+          "def": 0.8,
+          "step": 0.0095,
+          "group": "Material",
+          "hint": "Overall membrane density."
+        },
+        "absorb": {
+          "type": "range",
+          "label": "Absorption",
+          "min": 0.1,
+          "max": 3,
+          "def": 1.6,
+          "step": 0.014,
+          "group": "Material",
+          "hint": "How strongly membranes block what lies behind them."
+        },
+        "emission": {
+          "type": "range",
+          "label": "Emission",
+          "min": 0.1,
+          "max": 5,
+          "def": 1.6,
+          "step": 0.025,
+          "group": "Light",
+          "hint": "Light emitted by the membranes.",
+          "randMax": 3
+        },
+        "travel": {
+          "type": "range",
+          "label": "Depth travel",
+          "min": 0,
+          "max": 0.4,
+          "def": 0.32,
+          "step": 0.002,
+          "group": "Motion",
+          "hint": "Closed camera excursion into the passage and back."
+        },
+        "advect": {
+          "type": "int",
+          "label": "Advection cycles per loop",
+          "min": 1,
+          "max": 3,
+          "def": 1,
+          "group": "Motion",
+          "hint": "Whole cycles the filaments slide along the membranes per loop.",
+          "mutate": 0
+        },
+        "keyAngle": {
+          "type": "range",
+          "label": "Key direction",
+          "min": -180,
+          "max": 180,
+          "def": 90,
+          "step": 1,
+          "unit": "°",
+          "group": "Light",
+          "hint": "Direction of the key light in the picture plane, degrees.",
+          "randMax": 180
+        },
+        "exposure": {
+          "type": "range",
+          "label": "Exposure",
+          "min": 0.4,
+          "max": 2.4,
+          "def": 1,
+          "step": 0.01,
+          "unit": "×",
+          "log": true,
+          "group": "Light",
+          "hint": "Linear exposure before the single tone map.",
+          "randMax": 1.4
+        },
+        "bloom": {
+          "type": "range",
+          "label": "Bloom",
+          "min": 0,
+          "max": 1.6,
+          "def": 0.6,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Glow added around emissive light. 0 shows the bare geometry.",
+          "randMax": 0.9
+        },
+        "bloomRadius": {
+          "type": "range",
+          "label": "Bloom radius",
+          "min": 0.4,
+          "max": 2.2,
+          "def": 1,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Width of the glow relative to the frame.",
+          "randMax": 1.5
+        },
+        "lensCA": {
+          "type": "range",
+          "label": "Edge fringe",
+          "min": 0,
+          "max": 0.5,
+          "def": 0.12,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Spectral fringing toward the frame edge.",
+          "randMax": 0.25
+        },
+        "vignette": {
+          "type": "range",
+          "label": "Vignette",
+          "min": 0,
+          "max": 0.8,
+          "def": 0.38,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Darkens the frame edge; never touches the focal area.",
+          "randMax": 0.55
+        },
+        "quality": {
+          "type": "select",
+          "label": "Quality",
+          "options": [
+            {
+              "v": "live",
+              "l": "Live"
+            },
+            {
+              "v": "balanced",
+              "l": "Balanced"
+            },
+            {
+              "v": "export",
+              "l": "Export"
+            }
+          ],
+          "def": "balanced",
+          "mutate": 0,
+          "group": "Quality",
+          "hint": "Sample counts only. Composition, phase and exposure stay the same."
+        }
+      }
+    },
+    {
+      "id": "blue-veil",
+      "name": "Blue Veil",
+      "group": "Astral Threshold",
+      "tags": [
+        "veil",
+        "cool"
+      ],
+      "blurb": "Wide, thin, cool veils: low emission and soft thickness, an airy threshold.",
+      "palette": "mono-ice",
+      "flash": false,
+      "cost": 3,
+      "graph": {
+        "buffers": {
+          "scene": {
+            "scale": 0.6
+          },
+          "glowA": {
+            "scale": 0.25
+          },
+          "glowB": {
+            "scale": 0.125
+          }
+        },
+        "passes": [
+          {
+            "src": "styles/blue-veil.glsl",
+            "reads": [],
+            "writes": "scene"
+          },
+          {
+            "src": "styles/_glowA.glsl",
+            "reads": [
+              "scene"
+            ],
+            "writes": "glowA"
+          },
+          {
+            "src": "styles/_glowB.glsl",
+            "reads": [
+              "glowA"
+            ],
+            "writes": "glowB"
+          },
+          {
+            "src": "styles/_out.glsl",
+            "reads": [
+              "scene",
+              "glowA",
+              "glowB"
+            ],
+            "writes": "output"
+          }
+        ]
+      },
+      "params": {
+        "layers": {
+          "type": "int",
+          "label": "Membrane layers",
+          "min": 3,
+          "max": 12,
+          "def": 6,
+          "group": "Form",
+          "hint": "Number of nested membrane shells.",
+          "mutate": 0.3
+        },
+        "aperture": {
+          "type": "range",
+          "label": "Aperture radius",
+          "min": 0.08,
+          "max": 0.45,
+          "def": 0.32,
+          "step": 0.0019,
+          "group": "Form",
+          "hint": "Radius of the innermost shell and the distant aperture."
+        },
+        "filament": {
+          "type": "range",
+          "label": "Filament scale",
+          "min": 0.02,
+          "max": 0.3,
+          "def": 0.09,
+          "step": 0.0014,
+          "group": "Form",
+          "hint": "Spacing of the fine filaments on each membrane. Smaller = more filaments.",
+          "log": true
+        },
+        "warp": {
+          "type": "range",
+          "label": "Warp amplitude",
+          "min": 0,
+          "max": 0.25,
+          "def": 0.05,
+          "step": 0.0013,
+          "group": "Form",
+          "hint": "How far each membrane folds away from a circle."
+        },
+        "density": {
+          "type": "range",
+          "label": "Density",
+          "min": 0.1,
+          "max": 2,
+          "def": 0.5,
+          "step": 0.0095,
+          "group": "Material",
+          "hint": "Overall membrane density."
+        },
+        "absorb": {
+          "type": "range",
+          "label": "Absorption",
+          "min": 0.1,
+          "max": 3,
+          "def": 1.6,
+          "step": 0.014,
+          "group": "Material",
+          "hint": "How strongly membranes block what lies behind them."
+        },
+        "emission": {
+          "type": "range",
+          "label": "Emission",
+          "min": 0.1,
+          "max": 5,
+          "def": 0.9,
+          "step": 0.025,
+          "group": "Light",
+          "hint": "Light emitted by the membranes.",
+          "randMax": 3
+        },
+        "travel": {
+          "type": "range",
+          "label": "Depth travel",
+          "min": 0,
+          "max": 0.4,
+          "def": 0.08,
+          "step": 0.002,
+          "group": "Motion",
+          "hint": "Closed camera excursion into the passage and back."
+        },
+        "advect": {
+          "type": "int",
+          "label": "Advection cycles per loop",
+          "min": 1,
+          "max": 3,
+          "def": 1,
+          "group": "Motion",
+          "hint": "Whole cycles the filaments slide along the membranes per loop.",
+          "mutate": 0
+        },
+        "keyAngle": {
+          "type": "range",
+          "label": "Key direction",
+          "min": -180,
+          "max": 180,
+          "def": 90,
+          "step": 1,
+          "unit": "°",
+          "group": "Light",
+          "hint": "Direction of the key light in the picture plane, degrees.",
+          "randMax": 180
+        },
+        "exposure": {
+          "type": "range",
+          "label": "Exposure",
+          "min": 0.4,
+          "max": 2.4,
+          "def": 1,
+          "step": 0.01,
+          "unit": "×",
+          "log": true,
+          "group": "Light",
+          "hint": "Linear exposure before the single tone map.",
+          "randMax": 1.4
+        },
+        "bloom": {
+          "type": "range",
+          "label": "Bloom",
+          "min": 0,
+          "max": 1.6,
+          "def": 0.5,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Glow added around emissive light. 0 shows the bare geometry.",
+          "randMax": 0.9
+        },
+        "bloomRadius": {
+          "type": "range",
+          "label": "Bloom radius",
+          "min": 0.4,
+          "max": 2.2,
+          "def": 1,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Width of the glow relative to the frame.",
+          "randMax": 1.5
+        },
+        "lensCA": {
+          "type": "range",
+          "label": "Edge fringe",
+          "min": 0,
+          "max": 0.5,
+          "def": 0.12,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Spectral fringing toward the frame edge.",
+          "randMax": 0.25
+        },
+        "vignette": {
+          "type": "range",
+          "label": "Vignette",
+          "min": 0,
+          "max": 0.8,
+          "def": 0.38,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Darkens the frame edge; never touches the focal area.",
+          "randMax": 0.55
+        },
+        "quality": {
+          "type": "select",
+          "label": "Quality",
+          "options": [
+            {
+              "v": "live",
+              "l": "Live"
+            },
+            {
+              "v": "balanced",
+              "l": "Balanced"
+            },
+            {
+              "v": "export",
+              "l": "Export"
+            }
+          ],
+          "def": "balanced",
+          "mutate": 0,
+          "group": "Quality",
+          "hint": "Sample counts only. Composition, phase and exposure stay the same."
+        }
+      }
+    },
+    {
+      "id": "folded-ether",
+      "name": "Folded Ether",
+      "group": "Astral Threshold",
+      "tags": [
+        "folds",
+        "creased"
+      ],
+      "blurb": "Sheets crease and fold like paper in light; glowing ridges follow the folds.",
+      "palette": "ember-veil",
+      "flash": false,
+      "cost": 3,
+      "graph": {
+        "buffers": {
+          "scene": {
+            "scale": 0.6
+          },
+          "glowA": {
+            "scale": 0.25
+          },
+          "glowB": {
+            "scale": 0.125
+          }
+        },
+        "passes": [
+          {
+            "src": "styles/folded-ether.glsl",
+            "reads": [],
+            "writes": "scene"
+          },
+          {
+            "src": "styles/_glowA.glsl",
+            "reads": [
+              "scene"
+            ],
+            "writes": "glowA"
+          },
+          {
+            "src": "styles/_glowB.glsl",
+            "reads": [
+              "glowA"
+            ],
+            "writes": "glowB"
+          },
+          {
+            "src": "styles/_out.glsl",
+            "reads": [
+              "scene",
+              "glowA",
+              "glowB"
+            ],
+            "writes": "output"
+          }
+        ]
+      },
+      "params": {
+        "layers": {
+          "type": "int",
+          "label": "Membrane layers",
+          "min": 3,
+          "max": 12,
+          "def": 7,
+          "group": "Form",
+          "hint": "Number of nested membrane shells.",
+          "mutate": 0.3
+        },
+        "aperture": {
+          "type": "range",
+          "label": "Aperture radius",
+          "min": 0.08,
+          "max": 0.45,
+          "def": 0.2,
+          "step": 0.0019,
+          "group": "Form",
+          "hint": "Radius of the innermost shell and the distant aperture."
+        },
+        "filament": {
+          "type": "range",
+          "label": "Filament scale",
+          "min": 0.02,
+          "max": 0.3,
+          "def": 0.07,
+          "step": 0.0014,
+          "group": "Form",
+          "hint": "Spacing of the fine filaments on each membrane. Smaller = more filaments.",
+          "log": true
+        },
+        "warp": {
+          "type": "range",
+          "label": "Warp amplitude",
+          "min": 0,
+          "max": 0.25,
+          "def": 0.2,
+          "step": 0.0013,
+          "group": "Form",
+          "hint": "How far each membrane folds away from a circle."
+        },
+        "density": {
+          "type": "range",
+          "label": "Density",
+          "min": 0.1,
+          "max": 2,
+          "def": 0.8,
+          "step": 0.0095,
+          "group": "Material",
+          "hint": "Overall membrane density."
+        },
+        "absorb": {
+          "type": "range",
+          "label": "Absorption",
+          "min": 0.1,
+          "max": 3,
+          "def": 1.4,
+          "step": 0.014,
+          "group": "Material",
+          "hint": "How strongly membranes block what lies behind them."
+        },
+        "emission": {
+          "type": "range",
+          "label": "Emission",
+          "min": 0.1,
+          "max": 5,
+          "def": 1.8,
+          "step": 0.025,
+          "group": "Light",
+          "hint": "Light emitted by the membranes.",
+          "randMax": 3
+        },
+        "travel": {
+          "type": "range",
+          "label": "Depth travel",
+          "min": 0,
+          "max": 0.4,
+          "def": 0.12,
+          "step": 0.002,
+          "group": "Motion",
+          "hint": "Closed camera excursion into the passage and back."
+        },
+        "advect": {
+          "type": "int",
+          "label": "Advection cycles per loop",
+          "min": 1,
+          "max": 3,
+          "def": 1,
+          "group": "Motion",
+          "hint": "Whole cycles the filaments slide along the membranes per loop.",
+          "mutate": 0
+        },
+        "keyAngle": {
+          "type": "range",
+          "label": "Key direction",
+          "min": -180,
+          "max": 180,
+          "def": 90,
+          "step": 1,
+          "unit": "°",
+          "group": "Light",
+          "hint": "Direction of the key light in the picture plane, degrees.",
+          "randMax": 180
+        },
+        "exposure": {
+          "type": "range",
+          "label": "Exposure",
+          "min": 0.4,
+          "max": 2.4,
+          "def": 1,
+          "step": 0.01,
+          "unit": "×",
+          "log": true,
+          "group": "Light",
+          "hint": "Linear exposure before the single tone map.",
+          "randMax": 1.4
+        },
+        "bloom": {
+          "type": "range",
+          "label": "Bloom",
+          "min": 0,
+          "max": 1.6,
+          "def": 0.6,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Glow added around emissive light. 0 shows the bare geometry.",
+          "randMax": 0.9
+        },
+        "bloomRadius": {
+          "type": "range",
+          "label": "Bloom radius",
+          "min": 0.4,
+          "max": 2.2,
+          "def": 1,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Width of the glow relative to the frame.",
+          "randMax": 1.5
+        },
+        "lensCA": {
+          "type": "range",
+          "label": "Edge fringe",
+          "min": 0,
+          "max": 0.5,
+          "def": 0.12,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Spectral fringing toward the frame edge.",
+          "randMax": 0.25
+        },
+        "vignette": {
+          "type": "range",
+          "label": "Vignette",
+          "min": 0,
+          "max": 0.8,
+          "def": 0.38,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Darkens the frame edge; never touches the focal area.",
+          "randMax": 0.55
+        },
+        "quality": {
+          "type": "select",
+          "label": "Quality",
+          "options": [
+            {
+              "v": "live",
+              "l": "Live"
+            },
+            {
+              "v": "balanced",
+              "l": "Balanced"
+            },
+            {
+              "v": "export",
+              "l": "Export"
+            }
+          ],
+          "def": "balanced",
+          "mutate": 0,
+          "group": "Quality",
+          "hint": "Sample counts only. Composition, phase and exposure stay the same."
+        }
+      }
+    },
+    {
+      "id": "filament-gate",
+      "name": "Filament Gate",
+      "group": "Astral Threshold",
+      "tags": [
+        "filaments",
+        "gate"
+      ],
+      "blurb": "The structure is the strands: sparse long filaments streak toward a bright gate.",
+      "palette": "aurora",
+      "flash": false,
+      "cost": 3,
+      "graph": {
+        "buffers": {
+          "scene": {
+            "scale": 0.6
+          },
+          "glowA": {
+            "scale": 0.25
+          },
+          "glowB": {
+            "scale": 0.125
+          }
+        },
+        "passes": [
+          {
+            "src": "styles/filament-gate.glsl",
+            "reads": [],
+            "writes": "scene"
+          },
+          {
+            "src": "styles/_glowA.glsl",
+            "reads": [
+              "scene"
+            ],
+            "writes": "glowA"
+          },
+          {
+            "src": "styles/_glowB.glsl",
+            "reads": [
+              "glowA"
+            ],
+            "writes": "glowB"
+          },
+          {
+            "src": "styles/_out.glsl",
+            "reads": [
+              "scene",
+              "glowA",
+              "glowB"
+            ],
+            "writes": "output"
+          }
+        ]
+      },
+      "params": {
+        "layers": {
+          "type": "int",
+          "label": "Membrane layers",
+          "min": 3,
+          "max": 12,
+          "def": 8,
+          "group": "Form",
+          "hint": "Number of nested membrane shells.",
+          "mutate": 0.3
+        },
+        "aperture": {
+          "type": "range",
+          "label": "Aperture radius",
+          "min": 0.08,
+          "max": 0.45,
+          "def": 0.2,
+          "step": 0.0019,
+          "group": "Form",
+          "hint": "Radius of the innermost shell and the distant aperture."
+        },
+        "filament": {
+          "type": "range",
+          "label": "Filament scale",
+          "min": 0.02,
+          "max": 0.3,
+          "def": 0.05,
+          "step": 0.0014,
+          "group": "Form",
+          "hint": "Spacing of the fine filaments on each membrane. Smaller = more filaments.",
+          "log": true
+        },
+        "warp": {
+          "type": "range",
+          "label": "Warp amplitude",
+          "min": 0,
+          "max": 0.25,
+          "def": 0.1,
+          "step": 0.0013,
+          "group": "Form",
+          "hint": "How far each membrane folds away from a circle."
+        },
+        "density": {
+          "type": "range",
+          "label": "Density",
+          "min": 0.1,
+          "max": 2,
+          "def": 0.4,
+          "step": 0.0095,
+          "group": "Material",
+          "hint": "Overall membrane density."
+        },
+        "absorb": {
+          "type": "range",
+          "label": "Absorption",
+          "min": 0.1,
+          "max": 3,
+          "def": 0.8,
+          "step": 0.014,
+          "group": "Material",
+          "hint": "How strongly membranes block what lies behind them."
+        },
+        "emission": {
+          "type": "range",
+          "label": "Emission",
+          "min": 0.1,
+          "max": 5,
+          "def": 2.6,
+          "step": 0.025,
+          "group": "Light",
+          "hint": "Light emitted by the membranes.",
+          "randMax": 3
+        },
+        "travel": {
+          "type": "range",
+          "label": "Depth travel",
+          "min": 0,
+          "max": 0.4,
+          "def": 0.12,
+          "step": 0.002,
+          "group": "Motion",
+          "hint": "Closed camera excursion into the passage and back."
+        },
+        "advect": {
+          "type": "int",
+          "label": "Advection cycles per loop",
+          "min": 1,
+          "max": 3,
+          "def": 2,
+          "group": "Motion",
+          "hint": "Whole cycles the filaments slide along the membranes per loop.",
+          "mutate": 0
+        },
+        "keyAngle": {
+          "type": "range",
+          "label": "Key direction",
+          "min": -180,
+          "max": 180,
+          "def": 90,
+          "step": 1,
+          "unit": "°",
+          "group": "Light",
+          "hint": "Direction of the key light in the picture plane, degrees.",
+          "randMax": 180
+        },
+        "exposure": {
+          "type": "range",
+          "label": "Exposure",
+          "min": 0.4,
+          "max": 2.4,
+          "def": 1,
+          "step": 0.01,
+          "unit": "×",
+          "log": true,
+          "group": "Light",
+          "hint": "Linear exposure before the single tone map.",
+          "randMax": 1.4
+        },
+        "bloom": {
+          "type": "range",
+          "label": "Bloom",
+          "min": 0,
+          "max": 1.6,
+          "def": 0.6,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Glow added around emissive light. 0 shows the bare geometry.",
+          "randMax": 0.9
+        },
+        "bloomRadius": {
+          "type": "range",
+          "label": "Bloom radius",
+          "min": 0.4,
+          "max": 2.2,
+          "def": 1,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Width of the glow relative to the frame.",
+          "randMax": 1.5
+        },
+        "lensCA": {
+          "type": "range",
+          "label": "Edge fringe",
+          "min": 0,
+          "max": 0.5,
+          "def": 0.12,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Spectral fringing toward the frame edge.",
+          "randMax": 0.25
+        },
+        "vignette": {
+          "type": "range",
+          "label": "Vignette",
+          "min": 0,
+          "max": 0.8,
+          "def": 0.38,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Darkens the frame edge; never touches the focal area.",
+          "randMax": 0.55
+        },
+        "quality": {
+          "type": "select",
+          "label": "Quality",
+          "options": [
+            {
+              "v": "live",
+              "l": "Live"
+            },
+            {
+              "v": "balanced",
+              "l": "Balanced"
+            },
+            {
+              "v": "export",
+              "l": "Export"
+            }
+          ],
+          "def": "balanced",
+          "mutate": 0,
+          "group": "Quality",
+          "hint": "Sample counts only. Composition, phase and exposure stay the same."
+        }
+      }
+    },
+    {
+      "id": "luminous-expanse",
+      "name": "Luminous Expanse",
+      "group": "Astral Threshold",
+      "tags": [
+        "expanse",
+        "horizontal"
+      ],
+      "blurb": "The tunnel opens into stacked horizontal curtains over a dark horizon, like a slow aurora.",
+      "palette": "aurora",
+      "flash": false,
+      "cost": 3,
+      "graph": {
+        "buffers": {
+          "scene": {
+            "scale": 0.6
+          },
+          "glowA": {
+            "scale": 0.25
+          },
+          "glowB": {
+            "scale": 0.125
+          }
+        },
+        "passes": [
+          {
+            "src": "styles/luminous-expanse.glsl",
+            "reads": [],
+            "writes": "scene"
+          },
+          {
+            "src": "styles/_glowA.glsl",
+            "reads": [
+              "scene"
+            ],
+            "writes": "glowA"
+          },
+          {
+            "src": "styles/_glowB.glsl",
+            "reads": [
+              "glowA"
+            ],
+            "writes": "glowB"
+          },
+          {
+            "src": "styles/_out.glsl",
+            "reads": [
+              "scene",
+              "glowA",
+              "glowB"
+            ],
+            "writes": "output"
+          }
+        ]
+      },
+      "params": {
+        "layers": {
+          "type": "int",
+          "label": "Membrane layers",
+          "min": 3,
+          "max": 12,
+          "def": 8,
+          "group": "Form",
+          "hint": "Number of nested membrane shells.",
+          "mutate": 0.3
+        },
+        "aperture": {
+          "type": "range",
+          "label": "Aperture radius",
+          "min": 0.08,
+          "max": 0.45,
+          "def": 0.25,
+          "step": 0.0019,
+          "group": "Form",
+          "hint": "Radius of the innermost shell and the distant aperture."
+        },
+        "filament": {
+          "type": "range",
+          "label": "Filament scale",
+          "min": 0.02,
+          "max": 0.3,
+          "def": 0.09,
+          "step": 0.0014,
+          "group": "Form",
+          "hint": "Spacing of the fine filaments on each membrane. Smaller = more filaments.",
+          "log": true
+        },
+        "warp": {
+          "type": "range",
+          "label": "Warp amplitude",
+          "min": 0,
+          "max": 0.25,
+          "def": 0.14,
+          "step": 0.0013,
+          "group": "Form",
+          "hint": "How far each membrane folds away from a circle."
+        },
+        "density": {
+          "type": "range",
+          "label": "Density",
+          "min": 0.1,
+          "max": 2,
+          "def": 0.7,
+          "step": 0.0095,
+          "group": "Material",
+          "hint": "Overall membrane density."
+        },
+        "absorb": {
+          "type": "range",
+          "label": "Absorption",
+          "min": 0.1,
+          "max": 3,
+          "def": 1.6,
+          "step": 0.014,
+          "group": "Material",
+          "hint": "How strongly membranes block what lies behind them."
+        },
+        "emission": {
+          "type": "range",
+          "label": "Emission",
+          "min": 0.1,
+          "max": 5,
+          "def": 1.8,
+          "step": 0.025,
+          "group": "Light",
+          "hint": "Light emitted by the membranes.",
+          "randMax": 3
+        },
+        "travel": {
+          "type": "range",
+          "label": "Depth travel",
+          "min": 0,
+          "max": 0.4,
+          "def": 0.06,
+          "step": 0.002,
+          "group": "Motion",
+          "hint": "Closed camera excursion into the passage and back."
+        },
+        "advect": {
+          "type": "int",
+          "label": "Advection cycles per loop",
+          "min": 1,
+          "max": 3,
+          "def": 1,
+          "group": "Motion",
+          "hint": "Whole cycles the filaments slide along the membranes per loop.",
+          "mutate": 0
+        },
+        "keyAngle": {
+          "type": "range",
+          "label": "Key direction",
+          "min": -180,
+          "max": 180,
+          "def": 90,
+          "step": 1,
+          "unit": "°",
+          "group": "Light",
+          "hint": "Direction of the key light in the picture plane, degrees.",
+          "randMax": 180
+        },
+        "exposure": {
+          "type": "range",
+          "label": "Exposure",
+          "min": 0.4,
+          "max": 2.4,
+          "def": 1,
+          "step": 0.01,
+          "unit": "×",
+          "log": true,
+          "group": "Light",
+          "hint": "Linear exposure before the single tone map.",
+          "randMax": 1.4
+        },
+        "bloom": {
+          "type": "range",
+          "label": "Bloom",
+          "min": 0,
+          "max": 1.6,
+          "def": 0.6,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Glow added around emissive light. 0 shows the bare geometry.",
+          "randMax": 0.9
+        },
+        "bloomRadius": {
+          "type": "range",
+          "label": "Bloom radius",
+          "min": 0.4,
+          "max": 2.2,
+          "def": 1,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Width of the glow relative to the frame.",
+          "randMax": 1.5
+        },
+        "lensCA": {
+          "type": "range",
+          "label": "Edge fringe",
+          "min": 0,
+          "max": 0.5,
+          "def": 0.12,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Spectral fringing toward the frame edge.",
+          "randMax": 0.25
+        },
+        "vignette": {
+          "type": "range",
+          "label": "Vignette",
+          "min": 0,
+          "max": 0.8,
+          "def": 0.38,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Darkens the frame edge; never touches the focal area.",
+          "randMax": 0.55
+        },
+        "quality": {
+          "type": "select",
+          "label": "Quality",
+          "options": [
+            {
+              "v": "live",
+              "l": "Live"
+            },
+            {
+              "v": "balanced",
+              "l": "Balanced"
+            },
+            {
+              "v": "export",
+              "l": "Export"
+            }
+          ],
+          "def": "balanced",
+          "mutate": 0,
+          "group": "Quality",
+          "hint": "Sample counts only. Composition, phase and exposure stay the same."
+        }
+      }
+    },
+    {
+      "id": "membrane-drift",
+      "name": "Membrane Drift",
+      "group": "Astral Threshold",
+      "tags": [
+        "drift",
+        "sway"
+      ],
+      "blurb": "The camera holds still while the membranes sway on closed orbits around each other.",
+      "palette": "violet-ice",
+      "flash": false,
+      "cost": 3,
+      "graph": {
+        "buffers": {
+          "scene": {
+            "scale": 0.6
+          },
+          "glowA": {
+            "scale": 0.25
+          },
+          "glowB": {
+            "scale": 0.125
+          }
+        },
+        "passes": [
+          {
+            "src": "styles/membrane-drift.glsl",
+            "reads": [],
+            "writes": "scene"
+          },
+          {
+            "src": "styles/_glowA.glsl",
+            "reads": [
+              "scene"
+            ],
+            "writes": "glowA"
+          },
+          {
+            "src": "styles/_glowB.glsl",
+            "reads": [
+              "glowA"
+            ],
+            "writes": "glowB"
+          },
+          {
+            "src": "styles/_out.glsl",
+            "reads": [
+              "scene",
+              "glowA",
+              "glowB"
+            ],
+            "writes": "output"
+          }
+        ]
+      },
+      "params": {
+        "layers": {
+          "type": "int",
+          "label": "Membrane layers",
+          "min": 3,
+          "max": 12,
+          "def": 7,
+          "group": "Form",
+          "hint": "Number of nested membrane shells.",
+          "mutate": 0.3
+        },
+        "aperture": {
+          "type": "range",
+          "label": "Aperture radius",
+          "min": 0.08,
+          "max": 0.45,
+          "def": 0.2,
+          "step": 0.0019,
+          "group": "Form",
+          "hint": "Radius of the innermost shell and the distant aperture."
+        },
+        "filament": {
+          "type": "range",
+          "label": "Filament scale",
+          "min": 0.02,
+          "max": 0.3,
+          "def": 0.09,
+          "step": 0.0014,
+          "group": "Form",
+          "hint": "Spacing of the fine filaments on each membrane. Smaller = more filaments.",
+          "log": true
+        },
+        "warp": {
+          "type": "range",
+          "label": "Warp amplitude",
+          "min": 0,
+          "max": 0.25,
+          "def": 0.1,
+          "step": 0.0013,
+          "group": "Form",
+          "hint": "How far each membrane folds away from a circle."
+        },
+        "density": {
+          "type": "range",
+          "label": "Density",
+          "min": 0.1,
+          "max": 2,
+          "def": 0.8,
+          "step": 0.0095,
+          "group": "Material",
+          "hint": "Overall membrane density."
+        },
+        "absorb": {
+          "type": "range",
+          "label": "Absorption",
+          "min": 0.1,
+          "max": 3,
+          "def": 1.6,
+          "step": 0.014,
+          "group": "Material",
+          "hint": "How strongly membranes block what lies behind them."
+        },
+        "emission": {
+          "type": "range",
+          "label": "Emission",
+          "min": 0.1,
+          "max": 5,
+          "def": 1.3,
+          "step": 0.025,
+          "group": "Light",
+          "hint": "Light emitted by the membranes.",
+          "randMax": 3
+        },
+        "travel": {
+          "type": "range",
+          "label": "Depth travel",
+          "min": 0,
+          "max": 0.4,
+          "def": 0.03,
+          "step": 0.002,
+          "group": "Motion",
+          "hint": "Closed camera excursion into the passage and back."
+        },
+        "advect": {
+          "type": "int",
+          "label": "Advection cycles per loop",
+          "min": 1,
+          "max": 3,
+          "def": 1,
+          "group": "Motion",
+          "hint": "Whole cycles the filaments slide along the membranes per loop.",
+          "mutate": 0
+        },
+        "keyAngle": {
+          "type": "range",
+          "label": "Key direction",
+          "min": -180,
+          "max": 180,
+          "def": 90,
+          "step": 1,
+          "unit": "°",
+          "group": "Light",
+          "hint": "Direction of the key light in the picture plane, degrees.",
+          "randMax": 180
+        },
+        "exposure": {
+          "type": "range",
+          "label": "Exposure",
+          "min": 0.4,
+          "max": 2.4,
+          "def": 1,
+          "step": 0.01,
+          "unit": "×",
+          "log": true,
+          "group": "Light",
+          "hint": "Linear exposure before the single tone map.",
+          "randMax": 1.4
+        },
+        "bloom": {
+          "type": "range",
+          "label": "Bloom",
+          "min": 0,
+          "max": 1.6,
+          "def": 0.6,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Glow added around emissive light. 0 shows the bare geometry.",
+          "randMax": 0.9
+        },
+        "bloomRadius": {
+          "type": "range",
+          "label": "Bloom radius",
+          "min": 0.4,
+          "max": 2.2,
+          "def": 1,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Width of the glow relative to the frame.",
+          "randMax": 1.5
+        },
+        "lensCA": {
+          "type": "range",
+          "label": "Edge fringe",
+          "min": 0,
+          "max": 0.5,
+          "def": 0.12,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Spectral fringing toward the frame edge.",
+          "randMax": 0.25
+        },
+        "vignette": {
+          "type": "range",
+          "label": "Vignette",
+          "min": 0,
+          "max": 0.8,
+          "def": 0.38,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Darkens the frame edge; never touches the focal area.",
+          "randMax": 0.55
+        },
+        "quality": {
+          "type": "select",
+          "label": "Quality",
+          "options": [
+            {
+              "v": "live",
+              "l": "Live"
+            },
+            {
+              "v": "balanced",
+              "l": "Balanced"
+            },
+            {
+              "v": "export",
+              "l": "Export"
+            }
+          ],
+          "def": "balanced",
+          "mutate": 0,
+          "group": "Quality",
+          "hint": "Sample counts only. Composition, phase and exposure stay the same."
+        }
+      }
+    },
+    {
+      "id": "deep-aperture",
+      "name": "Deep Aperture",
+      "group": "Astral Threshold",
+      "tags": [
+        "high-contrast",
+        "distance"
+      ],
+      "blurb": "Few membranes, almost black, one small brilliant aperture a long way off.",
+      "palette": "mono-ice",
+      "flash": false,
+      "cost": 3,
+      "graph": {
+        "buffers": {
+          "scene": {
+            "scale": 0.6
+          },
+          "glowA": {
+            "scale": 0.25
+          },
+          "glowB": {
+            "scale": 0.125
+          }
+        },
+        "passes": [
+          {
+            "src": "styles/deep-aperture.glsl",
+            "reads": [],
+            "writes": "scene"
+          },
+          {
+            "src": "styles/_glowA.glsl",
+            "reads": [
+              "scene"
+            ],
+            "writes": "glowA"
+          },
+          {
+            "src": "styles/_glowB.glsl",
+            "reads": [
+              "glowA"
+            ],
+            "writes": "glowB"
+          },
+          {
+            "src": "styles/_out.glsl",
+            "reads": [
+              "scene",
+              "glowA",
+              "glowB"
+            ],
+            "writes": "output"
+          }
+        ]
+      },
+      "params": {
+        "layers": {
+          "type": "int",
+          "label": "Membrane layers",
+          "min": 3,
+          "max": 12,
+          "def": 4,
+          "group": "Form",
+          "hint": "Number of nested membrane shells.",
+          "mutate": 0.3
+        },
+        "aperture": {
+          "type": "range",
+          "label": "Aperture radius",
+          "min": 0.08,
+          "max": 0.45,
+          "def": 0.1,
+          "step": 0.0019,
+          "group": "Form",
+          "hint": "Radius of the innermost shell and the distant aperture."
+        },
+        "filament": {
+          "type": "range",
+          "label": "Filament scale",
+          "min": 0.02,
+          "max": 0.3,
+          "def": 0.09,
+          "step": 0.0014,
+          "group": "Form",
+          "hint": "Spacing of the fine filaments on each membrane. Smaller = more filaments.",
+          "log": true
+        },
+        "warp": {
+          "type": "range",
+          "label": "Warp amplitude",
+          "min": 0,
+          "max": 0.25,
+          "def": 0.08,
+          "step": 0.0013,
+          "group": "Form",
+          "hint": "How far each membrane folds away from a circle."
+        },
+        "density": {
+          "type": "range",
+          "label": "Density",
+          "min": 0.1,
+          "max": 2,
+          "def": 0.35,
+          "step": 0.0095,
+          "group": "Material",
+          "hint": "Overall membrane density."
+        },
+        "absorb": {
+          "type": "range",
+          "label": "Absorption",
+          "min": 0.1,
+          "max": 3,
+          "def": 1.6,
+          "step": 0.014,
+          "group": "Material",
+          "hint": "How strongly membranes block what lies behind them."
+        },
+        "emission": {
+          "type": "range",
+          "label": "Emission",
+          "min": 0.1,
+          "max": 5,
+          "def": 1,
+          "step": 0.025,
+          "group": "Light",
+          "hint": "Light emitted by the membranes.",
+          "randMax": 3
+        },
+        "travel": {
+          "type": "range",
+          "label": "Depth travel",
+          "min": 0,
+          "max": 0.4,
+          "def": 0.38,
+          "step": 0.002,
+          "group": "Motion",
+          "hint": "Closed camera excursion into the passage and back."
+        },
+        "advect": {
+          "type": "int",
+          "label": "Advection cycles per loop",
+          "min": 1,
+          "max": 3,
+          "def": 1,
+          "group": "Motion",
+          "hint": "Whole cycles the filaments slide along the membranes per loop.",
+          "mutate": 0
+        },
+        "keyAngle": {
+          "type": "range",
+          "label": "Key direction",
+          "min": -180,
+          "max": 180,
+          "def": 90,
+          "step": 1,
+          "unit": "°",
+          "group": "Light",
+          "hint": "Direction of the key light in the picture plane, degrees.",
+          "randMax": 180
+        },
+        "exposure": {
+          "type": "range",
+          "label": "Exposure",
+          "min": 0.4,
+          "max": 2.4,
+          "def": 1,
+          "step": 0.01,
+          "unit": "×",
+          "log": true,
+          "group": "Light",
+          "hint": "Linear exposure before the single tone map.",
+          "randMax": 1.4
+        },
+        "bloom": {
+          "type": "range",
+          "label": "Bloom",
+          "min": 0,
+          "max": 1.6,
+          "def": 0.8,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Glow added around emissive light. 0 shows the bare geometry.",
+          "randMax": 0.9
+        },
+        "bloomRadius": {
+          "type": "range",
+          "label": "Bloom radius",
+          "min": 0.4,
+          "max": 2.2,
+          "def": 1,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Width of the glow relative to the frame.",
+          "randMax": 1.5
+        },
+        "lensCA": {
+          "type": "range",
+          "label": "Edge fringe",
+          "min": 0,
+          "max": 0.5,
+          "def": 0.12,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Spectral fringing toward the frame edge.",
+          "randMax": 0.25
+        },
+        "vignette": {
+          "type": "range",
+          "label": "Vignette",
+          "min": 0,
+          "max": 0.8,
+          "def": 0.55,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Darkens the frame edge; never touches the focal area.",
+          "randMax": 0.55
+        },
+        "quality": {
+          "type": "select",
+          "label": "Quality",
+          "options": [
+            {
+              "v": "live",
+              "l": "Live"
+            },
+            {
+              "v": "balanced",
+              "l": "Balanced"
+            },
+            {
+              "v": "export",
+              "l": "Export"
+            }
+          ],
+          "def": "balanced",
+          "mutate": 0,
+          "group": "Quality",
+          "hint": "Sample counts only. Composition, phase and exposure stay the same."
+        }
+      }
+    },
+    {
+      "id": "quiet-transit",
+      "name": "Quiet Transit",
+      "group": "Astral Threshold",
+      "tags": [
+        "calm",
+        "ambient"
+      ],
+      "blurb": "The softest crossing: low emission, small warp, slow pass. Made for text-safe backgrounds.",
+      "palette": "violet-ice",
+      "flash": false,
+      "cost": 3,
+      "graph": {
+        "buffers": {
+          "scene": {
+            "scale": 0.6
+          },
+          "glowA": {
+            "scale": 0.25
+          },
+          "glowB": {
+            "scale": 0.125
+          }
+        },
+        "passes": [
+          {
+            "src": "styles/quiet-transit.glsl",
+            "reads": [],
+            "writes": "scene"
+          },
+          {
+            "src": "styles/_glowA.glsl",
+            "reads": [
+              "scene"
+            ],
+            "writes": "glowA"
+          },
+          {
+            "src": "styles/_glowB.glsl",
+            "reads": [
+              "glowA"
+            ],
+            "writes": "glowB"
+          },
+          {
+            "src": "styles/_out.glsl",
+            "reads": [
+              "scene",
+              "glowA",
+              "glowB"
+            ],
+            "writes": "output"
+          }
+        ]
+      },
+      "params": {
+        "layers": {
+          "type": "int",
+          "label": "Membrane layers",
+          "min": 3,
+          "max": 12,
+          "def": 5,
+          "group": "Form",
+          "hint": "Number of nested membrane shells.",
+          "mutate": 0.3
+        },
+        "aperture": {
+          "type": "range",
+          "label": "Aperture radius",
+          "min": 0.08,
+          "max": 0.45,
+          "def": 0.2,
+          "step": 0.0019,
+          "group": "Form",
+          "hint": "Radius of the innermost shell and the distant aperture."
+        },
+        "filament": {
+          "type": "range",
+          "label": "Filament scale",
+          "min": 0.02,
+          "max": 0.3,
+          "def": 0.09,
+          "step": 0.0014,
+          "group": "Form",
+          "hint": "Spacing of the fine filaments on each membrane. Smaller = more filaments.",
+          "log": true
+        },
+        "warp": {
+          "type": "range",
+          "label": "Warp amplitude",
+          "min": 0,
+          "max": 0.25,
+          "def": 0.04,
+          "step": 0.0013,
+          "group": "Form",
+          "hint": "How far each membrane folds away from a circle."
+        },
+        "density": {
+          "type": "range",
+          "label": "Density",
+          "min": 0.1,
+          "max": 2,
+          "def": 0.5,
+          "step": 0.0095,
+          "group": "Material",
+          "hint": "Overall membrane density."
+        },
+        "absorb": {
+          "type": "range",
+          "label": "Absorption",
+          "min": 0.1,
+          "max": 3,
+          "def": 1.6,
+          "step": 0.014,
+          "group": "Material",
+          "hint": "How strongly membranes block what lies behind them."
+        },
+        "emission": {
+          "type": "range",
+          "label": "Emission",
+          "min": 0.1,
+          "max": 5,
+          "def": 0.8,
+          "step": 0.025,
+          "group": "Light",
+          "hint": "Light emitted by the membranes.",
+          "randMax": 3
+        },
+        "travel": {
+          "type": "range",
+          "label": "Depth travel",
+          "min": 0,
+          "max": 0.4,
+          "def": 0.06,
+          "step": 0.002,
+          "group": "Motion",
+          "hint": "Closed camera excursion into the passage and back."
+        },
+        "advect": {
+          "type": "int",
+          "label": "Advection cycles per loop",
+          "min": 1,
+          "max": 3,
+          "def": 1,
+          "group": "Motion",
+          "hint": "Whole cycles the filaments slide along the membranes per loop.",
+          "mutate": 0
+        },
+        "keyAngle": {
+          "type": "range",
+          "label": "Key direction",
+          "min": -180,
+          "max": 180,
+          "def": 90,
+          "step": 1,
+          "unit": "°",
+          "group": "Light",
+          "hint": "Direction of the key light in the picture plane, degrees.",
+          "randMax": 180
+        },
+        "exposure": {
+          "type": "range",
+          "label": "Exposure",
+          "min": 0.4,
+          "max": 2.4,
+          "def": 0.9,
+          "step": 0.01,
+          "unit": "×",
+          "log": true,
+          "group": "Light",
+          "hint": "Linear exposure before the single tone map.",
+          "randMax": 1.4
+        },
+        "bloom": {
+          "type": "range",
+          "label": "Bloom",
+          "min": 0,
+          "max": 1.6,
+          "def": 0.35,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Glow added around emissive light. 0 shows the bare geometry.",
+          "randMax": 0.9
+        },
+        "bloomRadius": {
+          "type": "range",
+          "label": "Bloom radius",
+          "min": 0.4,
+          "max": 2.2,
+          "def": 1,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Width of the glow relative to the frame.",
+          "randMax": 1.5
+        },
+        "lensCA": {
+          "type": "range",
+          "label": "Edge fringe",
+          "min": 0,
+          "max": 0.5,
+          "def": 0.12,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Spectral fringing toward the frame edge.",
+          "randMax": 0.25
+        },
+        "vignette": {
+          "type": "range",
+          "label": "Vignette",
+          "min": 0,
+          "max": 0.8,
+          "def": 0.5,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Darkens the frame edge; never touches the focal area.",
+          "randMax": 0.55
+        },
+        "quality": {
+          "type": "select",
+          "label": "Quality",
+          "options": [
+            {
+              "v": "live",
+              "l": "Live"
+            },
+            {
+              "v": "balanced",
+              "l": "Balanced"
+            },
+            {
+              "v": "export",
+              "l": "Export"
+            }
+          ],
+          "def": "balanced",
+          "mutate": 0,
+          "group": "Quality",
+          "hint": "Sample counts only. Composition, phase and exposure stay the same."
+        }
+      }
+    }
+  ]
+}
