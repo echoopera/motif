@@ -1,0 +1,13 @@
+{
+  "format": "motif-seq@1",
+  "id": "beat-reel",
+  "name": "Beat Reel",
+  "description": "Cues placed in beats at 120 bpm over an 8 second loop: a four-on-the-floor pulse with a rolling accent.",
+  "loop": 8,
+  "bpm": 120,
+  "cues": [
+    { "id": "pulse", "style": "grid",  "at": "0b", "len": "2b", "cycles": 2, "repeat": { "every": "2b", "count": 8 }, "fadeIn": 0.15, "fadeOut": 0.4, "opacity": 0.85 },
+    { "id": "roll",  "style": "bars",  "at": "6b", "len": "2b", "lane": 1, "cycles": 2, "dir": "pingpong", "blend": "add", "repeat": { "every": "8b", "count": 2 } },
+    { "id": "tail",  "style": "swirl", "at": "12b", "len": "4b", "lane": 2, "cycles": 1, "dir": "backward", "blend": "screen" }
+  ]
+}

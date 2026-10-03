@@ -1,5 +1,14 @@
 # Changelog
 
+## SDK 1.2.5 — vector + type, layer stacks, speed/direction, sequencer
+- Opt-in with `"sdk": "1.2.5"`; kits without it compile exactly as before (all shipped kits verified).
+- Vector graphics and typography: SDF shape library and `vpaint` in GLSL; `svg` and `text` inputs baked to distance fields (`vec_<id>(uv)`), bundled fonts, generated controls.
+- Layer stacks: `"stack": { "layers": 3 }` gives three media layers with 12 blend modes, opacity, offset, scale, rotation, edge mode and motion each.
+- Speed and direction: whole cycles per loop plus forward / backward / ping-pong / random, loop-exact; shader and JS playheads match; `stackPlayheads` drives video layers.
+- Sequencer: `motif-seq@1` cues invoke library styles at points of the loop (lanes, fades, blends, cycles, direction, repeat, chance, up to 64 cues, 4 concurrent); planner, analyzer, compositor, kit-shipped sequences.
+- SDK: `new --example`, `seq`, richer `preview` (stack/vector/type inputs, motion-seam test in all four play modes, sequence rendering), test suite, reference kits `stack-lab`, `vector-type`, `sequence-demo`.
+- App UI for the new controls and the Sequencer layer is the next step: see `docs/HOST-INTEGRATION-1.2.5.md`.
+
 ## 3.2.1 — MP4 audio + viewer fit
 - Audio encoder errors are no longer swallowed: a failed AAC encode now stops the export with a clear message instead of writing a silent MP4.
 - AAC is requested as raw frames; ADTS output (Safari) is unwrapped and a missing decoder description is supplied, so the track muxes into H.264 MP4.

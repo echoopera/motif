@@ -1,7 +1,7 @@
 {
   "name": "motif-kit-sdk",
-  "version": "1.2.0",
-  "description": "Build, validate, preview and pack Motif kits (motif-kit@1). SDK 1.2 adds custom parameters (colour, XY pad, groups, conditional controls); 1.1 added media inputs.",
+  "version": "1.2.5",
+  "description": "Build, validate, preview and pack Motif kits (motif-kit@1). SDK 1.2.5 adds vector graphics and typography, layer stacks, speed/direction playheads and the motif-seq sequencer; 1.2 added custom parameters; 1.1 media inputs.",
   "type": "module",
   "bin": {
     "motif-kit": "bin/motif-kit.mjs"
@@ -13,5 +13,16 @@
     "playwright": "^1.47.0"
   },
   "license": "UNLICENSED",
-  "private": true
+  "private": true,
+  "scripts": {
+    "test": "node test/run.mjs"
+  },
+  "files": [
+    "bin",
+    "lib",
+    "template",
+    "examples",
+    "test",
+    "README.md"
+  ]
 }

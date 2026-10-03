@@ -13,8 +13,8 @@ Motif3/
     cyberpunk / neuro / quantum .motifkit.json   bundled kit sources (3.0)
     source/kinetic-subdivision/, source/param-lab/   editable kit sources
   sdk/
-    motif-kit-sdk/                       Motif Kit SDK 1.2 (CLI, runtime, template, examples, docs)
-    motif-kit-sdk-1.2.0.zip              same, zipped
+    motif-kit-sdk/                       Motif Kit SDK 1.2.5 (CLI, runtime, template, examples, tests, docs)
+    motif-kit-sdk-1.2.5.zip              same, zipped (1.2.0 zip kept)
   src/                                   app build sources
     build.py                             python3 src/build.py  →  rebuilds ../Motif3.html
     motif-2.1-base.html, catalog.json, parts/

@@ -1,0 +1,32 @@
+{
+  "format": "motif-kit@1",
+  "sdk": "1.2.5",
+  "id": "sequence-demo",
+  "name": "Sequence Demo",
+  "version": "0.1.0",
+  "author": "Motif SDK",
+  "description": "Reference kit for the SDK 1.2.5 sequencer: six small styles and two ready-made sequences that call them at points of the loop.",
+  "license": "MIT",
+  "accent": "#4FD1C5",
+  "palettes": [
+    { "id": "lagoon", "name": "Lagoon", "bg": "#04090D", "ink": "#EAF7F5", "a": ["#4FD1C5", "#F78FB3", "#F9D56E"] }
+  ],
+  "styles": [
+    { "id": "rings", "name": "Rings", "group": "Cues", "palette": "lagoon", "tags": ["example", "cue"], "blurb": "Expanding rings.", "passes": [{ "src": "styles/rings.glsl" }],
+      "params": { "count": { "type": "int", "label": "Rings", "min": 1, "max": 6, "def": 4 }, "speed": { "type": "int", "label": "Waves / loop", "min": 1, "max": 4, "def": 1 }, "width": { "type": "range", "label": "Width", "min": 0.3, "max": 3, "def": 1 }, "glow": { "type": "range", "label": "Glow", "min": 0, "max": 2, "def": 1 } } },
+    { "id": "bars", "name": "Bars", "group": "Cues", "palette": "lagoon", "tags": ["example", "cue"], "blurb": "A looping equaliser.", "passes": [{ "src": "styles/bars.glsl" }],
+      "params": { "bars": { "type": "int", "label": "Bars", "min": 4, "max": 40, "def": 18 }, "speed": { "type": "int", "label": "Cycles / loop", "min": 1, "max": 4, "def": 2 }, "gap": { "type": "range", "label": "Gap", "min": 0.05, "max": 0.7, "def": 0.25 }, "glow": { "type": "range", "label": "Glow", "min": 0, "max": 2, "def": 0.8 } } },
+    { "id": "grid", "name": "Pulse Grid", "group": "Cues", "palette": "lagoon", "tags": ["example", "cue"], "blurb": "A grid of pulsing dots.", "passes": [{ "src": "styles/grid.glsl" }],
+      "params": { "cells": { "type": "int", "label": "Cells", "min": 3, "max": 24, "def": 10 }, "speed": { "type": "int", "label": "Pulses / loop", "min": 1, "max": 4, "def": 1 }, "size": { "type": "range", "label": "Size", "min": 0.1, "max": 0.9, "def": 0.5 }, "glow": { "type": "range", "label": "Glow", "min": 0, "max": 2, "def": 0.6 } } },
+    { "id": "swirl", "name": "Swirl", "group": "Cues", "palette": "lagoon", "tags": ["example", "cue"], "blurb": "A rotating spiral.", "passes": [{ "src": "styles/swirl.glsl" }],
+      "params": { "arms": { "type": "int", "label": "Arms", "min": 1, "max": 8, "def": 3 }, "twist": { "type": "range", "label": "Twist", "min": 0, "max": 12, "def": 5 }, "speed": { "type": "int", "label": "Turns / loop", "min": 1, "max": 4, "def": 1 }, "glow": { "type": "range", "label": "Glow", "min": 0, "max": 2, "def": 0.7 } } },
+    { "id": "dots", "name": "Orbit Dots", "group": "Cues", "palette": "lagoon", "tags": ["example", "cue"], "blurb": "Dots on orbits.", "passes": [{ "src": "styles/dots.glsl" }],
+      "params": { "count": { "type": "int", "label": "Dots", "min": 3, "max": 24, "def": 9 }, "speed": { "type": "int", "label": "Turns / loop", "min": 1, "max": 4, "def": 1 }, "radius": { "type": "range", "label": "Radius", "min": 0.1, "max": 0.45, "def": 0.3 }, "glow": { "type": "range", "label": "Glow", "min": 0, "max": 2, "def": 1 } } },
+    { "id": "scan", "name": "Scan", "group": "Cues", "palette": "lagoon", "tags": ["example", "cue"], "blurb": "A scan line sweeping the frame.", "passes": [{ "src": "styles/scan.glsl" }],
+      "params": { "lines": { "type": "int", "label": "Lines", "min": 1, "max": 6, "def": 2 }, "speed": { "type": "int", "label": "Sweeps / loop", "min": 1, "max": 4, "def": 1 }, "width": { "type": "range", "label": "Width", "min": 0.2, "max": 3, "def": 1 }, "glow": { "type": "range", "label": "Glow", "min": 0, "max": 2, "def": 1 } } }
+  ],
+  "sequences": [
+    { "id": "showcase", "name": "Showcase", "file": "sequences/showcase.json" },
+    { "id": "beat-reel", "name": "Beat Reel", "file": "sequences/beat-reel.json" }
+  ]
+}

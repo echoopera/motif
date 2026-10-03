@@ -1,0 +1,52 @@
+{
+  "format": "motif-kit@1",
+  "sdk": "1.2.5",
+  "id": "stack-lab",
+  "name": "Stack Lab",
+  "version": "0.1.0",
+  "author": "Motif SDK",
+  "description": "Reference kit for SDK 1.2.5 layer stacks: up to three images or clips with blend modes, opacity, and independent motion, speed and direction.",
+  "license": "MIT",
+  "accent": "#7C9CFF",
+  "palettes": [
+    { "id": "dusk", "name": "Dusk", "bg": "#0B0D14", "ink": "#F3F1EA", "a": ["#7C9CFF", "#FF7AB6", "#FFC857"] }
+  ],
+  "styles": [
+    {
+      "id": "image-stack",
+      "name": "Image Stack",
+      "group": "SDK 1.2.5",
+      "palette": "dusk",
+      "tags": ["example", "layers", "media", "blend"],
+      "blurb": "Three media layers over a soft procedural base. Each layer has its own blend mode, opacity, offset, scale, rotation, speed and direction.",
+      "stack": {
+        "layers": 3,
+        "labels": ["Back", "Middle", "Front"],
+        "defaults": [{ "blend": "normal" }, { "blend": "screen" }, { "blend": "overlay" }]
+      },
+      "passes": [{ "src": "styles/image-stack.glsl" }],
+      "params": {
+        "haze":    { "type": "range", "label": "Haze", "min": 0, "max": 1, "def": 0.5, "group": "Base", "hint": "Looping noise behind the layers." },
+        "tint":    { "type": "color", "label": "Tint", "def": "#7C9CFF", "group": "Base" },
+        "tintMix": { "type": "range", "label": "Tint amount", "min": 0, "max": 1, "def": 0.25, "group": "Base" },
+        "vignette":{ "type": "range", "label": "Vignette", "min": 0, "max": 1, "def": 0.4, "group": "Finish" }
+      }
+    },
+    {
+      "id": "tri-channel",
+      "name": "Tri-Channel",
+      "group": "SDK 1.2.5",
+      "palette": "dusk",
+      "tags": ["example", "layers", "media", "per-layer"],
+      "blurb": "Reads each stack layer on its own: layer 1 drives red, 2 green, 3 blue. Different speeds and directions pull the channels apart and back together.",
+      "stack": { "layers": 3, "labels": ["Red", "Green", "Blue"] },
+      "passes": [{ "src": "styles/tri-channel.glsl" }],
+      "params": {
+        "mix":     { "type": "range", "label": "Channel mix", "min": 0, "max": 1, "def": 1 },
+        "gain":    { "type": "range", "label": "Gain", "min": 0.5, "max": 2.5, "def": 1.2 },
+        "base":    { "type": "range", "label": "Base glow", "min": 0, "max": 1, "def": 0.3 },
+        "grain":   { "type": "range", "label": "Grain", "min": 0, "max": 1, "def": 0.2 }
+      }
+    }
+  ]
+}

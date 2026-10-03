@@ -1,4 +1,4 @@
-# Motif Kit SDK 1.2 (`motif-kit@1`)
+# Motif Kit SDK 1.2.5 (`motif-kit@1`)
 
 A kit is a set of shader styles packaged as a single `.motifkit` file. When you drop one on Motif 3.2, its styles show up in the library alongside the 25 built-ins and work the same way: layers, blend modes and masks, keyframes on any parameter, Mutate, Evolve, Randomize, audio-band mapping, the finishing stack, and every export format.
 
@@ -11,13 +11,168 @@ motif-kit preview my-kit --media a.jpg # feed an image to styles with media inpu
 motif-kit validate my-kit              # schema and static checks
 motif-kit pack my-kit --out dist       # writes dist/my-kit-0.1.0.motifkit
 motif-kit prelude                      # prints the GLSL prelude every pass is compiled with
+motif-kit new my-kit --example stack   # start from a 1.2.5 reference: stack, vector or sequence
+motif-kit seq my-kit                   # validate sequences and print which cues play when
+npm test                               # SDK test suite (validator, playhead, sequencer, shader/JS parity)
 ```
 
 Setup: `npm i` in this folder. For `preview`, also run `npm i -D playwright && npx playwright install chromium`, or point `MOTIF_CHROMIUM` at an existing Chromium.
 
+**New in 1.2.5:** four things, all opt-in with `"sdk": "1.2.5"` in the manifest. Kits without it compile byte-for-byte as before.
+
+| | |
+| --- | --- |
+| [Vector graphics and typography](#vector-graphics-and-typography) | SDF shape library in GLSL, plus `svg` and `text` inputs the host bakes to distance fields: crisp at any scale, outline/glow/echo for free, bundled fonts |
+| [Layer stacks](#layer-stacks) | `"stack": { "layers": 3 }`: up to three images or clips inside one shader, each with a blend mode, opacity, offset, scale, rotation and its own motion |
+| [Speed and direction](#speed-and-direction) | Per-layer cycles per loop and forward / backward / ping-pong / random, loop-exact, with a JS twin so the host can drive video the same way |
+| [Sequencer](#sequencer) | `motif-seq@1`: cues that invoke styles from a library at points of the loop, past the 4-layer limit, with fades, blends and a hard cap on simultaneous shaders |
+
 **New in 1.2:** custom parameters. Up to 32 per style, colour pickers, XY pads, grouped sections, hints, controls that show only when another control has a given value, and log sliders. See [Parameters](#parameters). Existing kits are unchanged.
 
 **New in 1.1:** media inputs. A style can declare an image or video input; the user attaches a file to the layer in Motif and the shader samples it. See [Media inputs](#media-inputs). Kits without `inputs` are unchanged.
+
+## Vector graphics and typography
+
+Two layers, so a kit can use whichever fits.
+
+### Shapes in GLSL (no host support needed)
+
+Every function returns a **signed distance in uv units** (negative inside). Combine distances, then paint once.
+
+| Helper | |
+| --- | --- |
+| `sdCircle sdRoundBox sdRing(p, r, w) sdNgon(p, r, n) sdTriangle sdStar(p, r, n, m) sdArc sdBezier(p, A, B, C)` | Primitives. `sdBezier` is unsigned: stroke it with `d - w/2`. `sdSeg`, `sdBox` already exist |
+| `opUnion opSub opInter opRound opOnion smin smax` | Combine, round, hollow out |
+| `vfill(d)`, `vstroke(d, w)`, `vglow(d, w)` | Anti-aliased (1.5 px) coverage, outline and glow |
+| `vpaint(d, fill, line, lineW, glowColour, glowW)` | Fill + outline + glow in one call, premultiplied linear |
+
+```glsl
+float d = opSub(sdRoundBox(uv, vec2(0.3, 0.12), 0.04), sdCircle(uv, 0.08));
+return vpaint(d, u_a0, u_ink, 0.008, u_a1, 0.05);
+```
+
+### SVG and text inputs
+
+Declare them in `inputs` (kit-level or per style). The host bakes each into a distance-field texture; the shader reads it with `vec_<id>(uv)`.
+
+```json
+"inputs": [
+  { "id": "mark",  "type": "svg",  "src": "assets/mark.svg", "margin": 0.12 },
+  { "id": "title", "type": "text", "def": "MOTIF", "font": "sans", "size": 0.16, "weight": 800 }
+]
+```
+
+| Field | Rules |
+| --- | --- |
+| `id` | camelCase, up to 16 characters. At most 2 svg and 2 text inputs per style |
+| `svg.src` | Optional default file in the kit (up to 64 KB). The user can replace it with their own `.svg`. Supported: `path`, `rect`, `circle`, `ellipse`, `line`, `polyline`, `polygon`, `g`, `transform`, `fill`, `stroke`, `fill-rule="evenodd"` (use it for holes). Colours are ignored (a shape is a mask). `<text>`, `<use>`, gradients, masks, filters, scripts and external references are not allowed or ignored |
+| `svg.margin` | 0–0.4, fraction of the frame kept clear (default 0.08) |
+| `text.def`, `size`, `weight`, `font` | Default string (up to 120 characters, `\\n` breaks lines), cap height as a fraction of frame height, weight 100–900, and `sans`, `serif`, `mono`, `rounded` or the id of a bundled font |
+| `spread` | 8–64 px of distance stored around the edge (default 24). Raise it for wide glows |
+| `controls` | `false` to skip the generated controls and drive everything yourself |
+
+In GLSL, for input `title`:
+
+| Name | Meaning |
+| --- | --- |
+| `vec_title(uv)` | Signed distance in uv units with the Title section's offset, scale, rotation, speed and direction applied. `1e3` when empty |
+| `vecA_title(uv)` | `vfill(vec_title(uv)) * opacity` |
+| `u_titleOn`, `u_titleSpread`, `u_titleSize` | Attached flag, stored spread in uv units, baked size |
+| `m_title(q)` | The raw texture (`.r` = distance encoded as `0.5 + d / (2 * spread)`, `.g` = coverage) |
+
+Outlines, echoes, glows and masks are all distance arithmetic, so they stay exact when you scale type up 10×:
+
+```glsl
+float d = vec_title(uv);
+c = over(vpaint(d, u_ink, u_a2, 0.006, u_a0, 0.04), c);
+c = over(solid(u_a1, vstroke(vec_title(uv - vec2(0.03, -0.02)), 0.004)), c);   // an echo
+```
+
+**Generated controls** (not counted against the 32-param limit): for text, `Text`, `Font`, `Size`, `Weight`, `Tracking`, `Line height`, `Align`; for svg, `Margin`; for both, `Opacity`, `Offset`, `Scale`, `Rotate`, `Cycles / loop`, `Direction`, `Travel`. The ones that change the baked texture are marked `bake: true`: the host rebakes when they change and does not keyframe them (animate with Scale, Offset and Rotate instead).
+
+**Bundled fonts** make type identical on every machine. Add up to 2 (woff2, woff, ttf or otf, 1.5 MB each, subset them) and name them in the manifest; use fonts whose licence allows embedding.
+
+```json
+"fonts": [{ "id": "display", "file": "fonts/Display-Bold.woff2", "weight": 700, "license": "OFL" }]
+```
+
+Without bundled fonts, `sans`/`serif`/`mono`/`rounded` resolve to the system's fonts, so glyph shapes differ between machines and exports are not byte-identical across them.
+
+## Layer stacks
+
+```json
+"stack": { "layers": 3, "labels": ["Back", "Middle", "Front"], "fit": "fill",
+           "defaults": [{ "blend": "normal" }, { "blend": "screen" }, { "blend": "overlay" }] }
+```
+
+The runtime adds inputs `layer1`…`layer3` and a block of controls for each (generated, so no limit cost): **Opacity**, **Blend** (normal, multiply, screen, overlay, soft light, hard light, add, darken, lighten, difference, exclusion, colour dodge), **Offset** (XY pad), **Scale**, **Rotate**, **Edges** (clip, repeat, mirror, extend), **Cycles / loop**, **Direction**, **Travel**. Every control is an ordinary channel: keyframes, locks, Mutate, audio mapping and presets work.
+
+| GLSL | |
+| --- | --- |
+| `L_stack(base, uv)` | Composite all layers over `base` (layer 3 on top), each with its own blend and opacity |
+| `L_over(uv)` | The stack over transparent |
+| `L_get1(uv)`…, `L_get(i, uv)` | One transformed layer, premultiplied linear, transparent when nothing is attached |
+| `L_opacity(i)`, `u_layer1On` | Control values for custom treatment |
+| `blendOver(mode, base, src, opacity)`, `BM_*` | The blend used internally, for your own compositing |
+
+Blend maths follows the W3C compositing spec on display-referred colour (so Overlay and Soft light look like they do elsewhere); Add works in linear light. A layer with nothing attached is transparent, so always give the style a procedural base. See `examples/stack-lab`.
+
+## Speed and direction
+
+Every generated block (layer, svg, text) has **Cycles / loop** (a whole number, 0 holds still) and **Direction**:
+
+| Direction | Playhead (cycles) |
+| --- | --- |
+| Forward / Backward | `±k·phase`. With Travel in whole tiles the image scrolls and wraps, so the loop closes |
+| Ping-pong | `0 → 1 → 0`, `k` round trips per loop |
+| Random | Like ping-pong, but each round trip goes out the forward or the backward way, chosen by a seeded hash |
+
+Because every kind returns to where it started (or advances by whole tiles), the loop always closes. Forward and backward travel snaps to whole tiles; ping-pong and random use any distance.
+
+For your own motion: `M_playhead(k, mode, salt)`, `M_playheadAt(phase, k, mode, salt)`, `M_clip(pos)`, with `PM_FORWARD`/`PM_BACKWARD`/`PM_PINGPONG`/`PM_RANDOM`. The JS twin `KG.playhead(k, mode, salt, phase, seed)` returns the same value (tested against the shader), and `KG.stackPlayheads(style, params, p, seed)` gives each layer's clip position, so the host seeks a video layer to `clipPos * duration` and forwards, backwards and random playback stay frame-exact on export.
+
+**Why whole cycles?** A loop is only seamless if time enters as a periodic function with integer frequency. A free fractional speed would break the seam, so speed is "cycles per loop" and slower motion comes from a longer loop or lower tempo.
+
+## Sequencer
+
+A sequence is a list of **cues**. Each cue invokes a style from the user's library for part of the loop, then ends. Layers are cheap to describe and expensive to run, so the sequencer lets a clip use dozens of styles while never running more than `maxActive` (default and maximum 4) at once. Build it in the app's Sequencer layer, or ship ready-made ones in a kit.
+
+```json
+{ "format": "motif-seq@1", "id": "showcase", "name": "Showcase", "loop": 12, "bpm": 120, "maxActive": 3,
+  "cues": [
+    { "id": "bed",   "style": "swirl", "at": 0,    "len": "6s", "lane": 0, "cycles": 1 },
+    { "id": "rings", "style": "rings", "at": "1s", "len": "3s", "lane": 1, "cycles": 2, "blend": "screen" },
+    { "id": "scan",  "style": "scan",  "at": "2s", "len": "1.5s", "lane": 2, "repeat": { "every": "5s", "count": 2 } }
+  ] }
+```
+
+| Cue field | Rules |
+| --- | --- |
+| `style` | `"kit/style"`, or a style id from the same kit |
+| `at`, `len` | A fraction of the loop, or `"3/16"`, `"25%"`, `"1.5s"`, `"2b"` (seconds and beats use the sequence's `loop` and `bpm`). A cue past the end wraps to the start |
+| `lane` | 0–7. Higher lanes draw on top |
+| `cycles` | Whole number 1–8. The style loops this many times during the cue, so it closes on itself |
+| `dir` | `forward`, `backward`, `pingpong`, `random` (the same playhead as above) |
+| `fadeIn`, `fadeOut` | 0–0.5 of the cue (default 0.1). Cues start and end invisible, so there are no pops |
+| `blend`, `opacity` | Blend mode (as for layers) and 0–1 |
+| `params`, `palette`, `seed` | Overrides for the style's controls, palette and seed |
+| `chance` | 0–1. Whether the cue plays is decided by the seed, so a render is still deterministic. Evolve and Randomize can vary it |
+| `repeat` | `{ "every": time, "count": 2–16 }` expands to several cues |
+| `mute` | Skip the cue |
+
+Rules checked on validate: at most 64 cues, 8 lanes, `maxActive` overlapping at any point of the loop, known style ids, and sequences list gaps where nothing plays.
+
+In code: `KG.planSequence(seq, phase, { L, seed })` returns the active cues with their inner phase, the loop length to give the photosensitive limiter, and fade alpha. `KG.createSequencer(rt, resolve)` renders a plan: it calls `resolve(styleRef, cue)` for `{ key, def, spec, defaults, media }`, draws each active cue with the GL runtime and composites it with its blend mode. `warm(seq)` starts compiling every style the sequence uses so cues never stall. `motif-kit seq` prints a plan and `motif-kit preview` renders each sequence and loop-tests it.
+
+Kits list sequences in the manifest (`"sequences": [{ "id": "showcase", "file": "sequences/showcase.json" }]`, up to 8) and the app shows them as library items. A sequence may call styles from other kits; the kit's `requires` list names them.
+
+**In-shader cues.** To sequence inside a single style, `cueP(at, len)` returns the local phase of a window (or -1) and `cueEnv(at, len, fadeIn, fadeOut)` the envelope.
+
+**Photosensitive safety.** A cue's inner loop is shorter than the sequence's loop, and ping-pong and random move twice as fast. The planner hands the style the true inner loop length (`innerL`), so `tslot`, `strobe` and the limiter see the real rate.
+
+## Host integration (for the Motif app)
+
+`docs/HOST-INTEGRATION-1.2.5.md` in the Motif repository lists what the host does: pass `sdk` to `compile`, bake svg and text inputs with `createInputBaker`, drive video layers from `stackPlayheads`, render sequences with `createSequencer`, and show generated blocks and the Sequencer layer in the UI.
 
 ## Package layout
 
@@ -40,7 +195,10 @@ A `.motifkit` file is a zip of this folder with `manifest.json` at the root. The
 | `name`, `version` | Display name (up to 32 characters) and a semver version such as `1.2.0` |
 | `author`, `description`, `license`, `accent` | Optional. `accent` is a `#RRGGBB` colour used for the kit's chip and badges. |
 | `common` | Optional path to shared GLSL |
-| `inputs[]` | Optional, SDK 1.1. Media inputs every style inherits unless it declares its own. See [Media inputs](#media-inputs). |
+| `sdk` | Minimum SDK the kit needs, e.g. `"1.2.5"`. Required for layer stacks, svg/text inputs, fonts and sequences. Kits without it get the 1.2.0 prelude exactly |
+| `inputs[]` | Optional, SDK 1.1. Media inputs every style inherits unless it declares its own (1.2.5: also `svg` and `text`). See [Media inputs](#media-inputs) |
+| `fonts[]` | Optional, 1.2.5. Up to 2 bundled fonts for text inputs |
+| `sequences[]` | Optional, 1.2.5. Up to 8 `motif-seq@1` sequences, inline or `{ id, file }` |
 | `palettes[]` | Up to 8 palettes: `{ id, name, bg, ink, a: [3 accents] }`, all `#RRGGBB`. They become `<kit>.<id>` in the palette picker. |
 | `styles[]` | 1–40 styles (see below) |
 
@@ -54,7 +212,8 @@ A `.motifkit` file is a zip of this folder with `manifest.json` at the root. The
 | `flash` | Set this to `true` if the style can flash or strobe. It marks the style ⚡ in the library. |
 | `passes[]` | 1–4 passes: `{ "src": "styles/x.glsl", "scale": 0.5 }`. `scale` (0.125–1) sets the render size of an intermediate pass; the last pass always renders at full size. Pass *n* can sample earlier passes as `u_buf0` … `u_buf3`. |
 | `inputs[]` | Optional, SDK 1.1. Overrides the kit-level list; `[]` opts the style out. |
-| `params` | Up to 32 parameters (SDK 1.2; was 16). Use 4 or more, or Mutate and Evolve have little to work with. |
+| `stack` | Optional, 1.2.5. `{ layers: 1–3, id, labels, fit, defaults }`. See [Layer stacks](#layer-stacks) |
+| `params` | Up to 32 declared parameters (SDK 1.2; was 16). Generated block controls (1.2.5) are extra, and up to 128 uniforms in total. Use 4 or more, or Mutate and Evolve have little to work with. |
 
 ### Parameters
 
@@ -203,6 +362,7 @@ Before a kit installs, the app and `motif-kit validate` check the following:
 - Format, ids, semver, colours
 - Unique style ids and the limits: 40 styles, 32 params (48 uniforms after colour/point expansion), 4 passes, 96 KB per GLSL file, 3 MB per kit
 - Parameter types, ranges and defaults, and reserved names
+- SDK 1.2.5: `sdk` is declared when 1.2.5 features are used and is not newer than the runtime; generated controls do not clash with yours; svg files are safe (no script, image, foreignObject or external reference); fonts exist and look like fonts; at most 9 textures per style; sequences are valid, reference known styles and never exceed `maxActive`
 - `show` conditions (SDK 1.2): the controlling param must exist in the same style and be a range, int, toggle or select
 - Each pass defines `vec4 motif(vec2, vec2)` and does not define `main()`
 - Media inputs (SDK 1.1): at most 2 per style, valid ids, type `image`/`video`/`media`, fit `fill`/`fit`/`stretch`
