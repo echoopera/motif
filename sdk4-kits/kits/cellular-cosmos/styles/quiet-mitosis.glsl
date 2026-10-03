@@ -8,6 +8,7 @@
 // (division), migrates, and rejoins (reintegration) on a closed schedule k * theta + seeded phase. IDs come from the grid cell, never from time;
 // the child's territory weight reaches zero before it coincides with the parent, so appearance and disappearance are smooth.
 
+#define Q_QUALITY 1
 struct Site { vec2 pos; float w; float id; float sib; float sc; float ph; };
 
 float cellSize() { return 0.86 * sqrt(1.78 / float(p_count)); }
@@ -69,7 +70,7 @@ vec3 cellBody(vec2 l, float F1, float F2, Site S, float species, float th, float
   float od = 0.0;
   for (int k = 0; k < 7; k++) {
     if (float(k) >= p_organelles * 7.0) break;
-    if (k_q() == 0 && k >= 3) break;                                        // live: fewer organelle points
+    if (Q_QUALITY == 0 && k >= 3) break;                                        // live: fewer organelle points
     float fk = float(k);
     float rk = (0.07 + 0.19 * h11(fk * 3.7 + S.id * 50.0)) * cs;
     float ak = TAU * h11(fk * 5.1 + S.id * 70.0) + dirA * th * (1.0 + mod(fk, 2.0));

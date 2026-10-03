@@ -8,6 +8,7 @@
 // (division), migrates, and rejoins (reintegration) on a closed schedule k * theta + seeded phase. IDs come from the grid cell, never from time;
 // the child's territory weight reaches zero before it coincides with the parent, so appearance and disappearance are smooth.
 
+#define Q_QUALITY p_quality
 struct Site { vec2 pos; float w; float id; float sib; float sc; float ph; };
 
 float cellSize() { return 0.86 * sqrt(1.78 / float(p_count)); }
