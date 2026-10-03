@@ -1,0 +1,69 @@
+{
+  "kit": "deconstruct-field",
+  "version": "1.0.0",
+  "size": [
+    90,
+    160
+  ],
+  "renderer": "SwiftShader (software GL, headless Chromium)",
+  "note": "Metric definitions in tools/qa.mjs. Software timings and metrics are relative diagnostics, not device performance.",
+  "results": [
+    {
+      "id": "plane-argument",
+      "delta0_p1": 0,
+      "seamStep": 1.079,
+      "seamStepAfter": 1.088,
+      "velMedian": 0.388,
+      "velMax": 1.157,
+      "seamRatio": 2.81,
+      "popRatio": 2.98,
+      "exposureByQuality": [
+        0.3443,
+        0.3348,
+        0.3348
+      ],
+      "exposureSpread": 0.028,
+      "meanLuma": 0.3348,
+      "flashTilesOver3": 0,
+      "flashPairsMaxPerSec": 0
+    },
+    {
+      "id": "red-interruption",
+      "delta0_p1": 0,
+      "seamStep": 0.523,
+      "seamStepAfter": 0.51,
+      "velMedian": 0.359,
+      "velMax": 0.692,
+      "seamRatio": 1.46,
+      "popRatio": 1.93,
+      "exposureByQuality": [
+        0.5864,
+        0.555,
+        0.555
+      ],
+      "exposureSpread": 0.057,
+      "meanLuma": 0.555,
+      "flashTilesOver3": 0,
+      "flashPairsMaxPerSec": 0
+    },
+    {
+      "id": "deconstruct-field-hero",
+      "delta0_p1": 0,
+      "seamStep": 0.445,
+      "seamStepAfter": 0.446,
+      "velMedian": 0.272,
+      "velMax": 0.506,
+      "seamRatio": 1.64,
+      "popRatio": 1.86,
+      "exposureByQuality": [
+        0.5487,
+        0.5181,
+        0.5181
+      ],
+      "exposureSpread": 0.059,
+      "meanLuma": 0.5181,
+      "flashTilesOver3": 0,
+      "flashPairsMaxPerSec": 0
+    }
+  ]
+}

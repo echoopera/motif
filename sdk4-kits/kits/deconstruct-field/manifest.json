@@ -1,0 +1,1572 @@
+{
+  "format": "motif-kit@4",
+  "id": "deconstruct-field",
+  "name": "Deconstruct Field",
+  "version": "1.0.0",
+  "author": "Motif",
+  "description": "Cream ground, black structure, cobalt arcs and vermilion accents: asymmetric planes and grids that slide, rotate and return on staggered in-hold-out schedules. Nine seamless infinite loops.",
+  "license": "",
+  "accent": "#1B3FD6",
+  "common": "common.glsl",
+  "palettes": [
+    {
+      "id": "cream-cobalt",
+      "name": "Cream Cobalt",
+      "bg": "#E8E2D0",
+      "ink": "#0B0C10",
+      "a": [
+        "#1B3FD6",
+        "#E4331B",
+        "#8E8671"
+      ]
+    },
+    {
+      "id": "bone-ink",
+      "name": "Bone Ink",
+      "bg": "#EDEAE2",
+      "ink": "#14151A",
+      "a": [
+        "#27408B",
+        "#D9482B",
+        "#9A9788"
+      ]
+    },
+    {
+      "id": "sand-teal",
+      "name": "Sand Teal",
+      "bg": "#E2D8BF",
+      "ink": "#10201F",
+      "a": [
+        "#0E6C6C",
+        "#E0552B",
+        "#8C8268"
+      ]
+    },
+    {
+      "id": "night-paper",
+      "name": "Night Paper",
+      "bg": "#15161B",
+      "ink": "#ECE7D8",
+      "a": [
+        "#4F73F0",
+        "#FF5A3C",
+        "#6A6A72"
+      ]
+    }
+  ],
+  "styles": [
+    {
+      "id": "deconstruct-field-hero",
+      "name": "Deconstruct Field Hero",
+      "group": "Deconstruct Field",
+      "tags": [
+        "flagship",
+        "graphic",
+        "planes"
+      ],
+      "blurb": "Fourteen planes, a cobalt arc and hairline grids slide out of place and return, each on its own schedule.",
+      "palette": "cream-cobalt",
+      "flash": false,
+      "cost": 1,
+      "passes": [
+        {
+          "src": "styles/deconstruct-field-hero.glsl"
+        }
+      ],
+      "params": {
+        "planes": {
+          "type": "int",
+          "label": "Plane count",
+          "min": 6,
+          "max": 28,
+          "def": 14,
+          "group": "Form",
+          "hint": "Number of planes in the composition. Most are small; a few dominate.",
+          "mutate": 0.3
+        },
+        "arcR": {
+          "type": "range",
+          "label": "Arc radius",
+          "min": 0.1,
+          "max": 0.65,
+          "def": 0.35,
+          "step": 0.0028,
+          "group": "Form",
+          "hint": "Radius of the principal cobalt arc in scene units."
+        },
+        "grid": {
+          "type": "range",
+          "label": "Grid spacing",
+          "min": 0.015,
+          "max": 0.12,
+          "def": 0.04,
+          "step": 0.00052,
+          "group": "Form",
+          "hint": "Spacing of the hairline grids that ride on the planes.",
+          "log": true
+        },
+        "lineW": {
+          "type": "range",
+          "label": "Line width",
+          "min": 0.7,
+          "max": 3,
+          "def": 1.2,
+          "step": 0.05,
+          "group": "Material",
+          "unit": "px",
+          "hint": "Hairline width in screen pixels."
+        },
+        "sep": {
+          "type": "range",
+          "label": "Layer separation",
+          "min": 0,
+          "max": 0.15,
+          "def": 0.05,
+          "step": 0.00075,
+          "group": "Light",
+          "hint": "Soft shadow offset between layers. 0 prints everything flat."
+        },
+        "offset": {
+          "type": "range",
+          "label": "Offset amplitude",
+          "min": 0,
+          "max": 0.35,
+          "def": 0.12,
+          "step": 0.0017,
+          "group": "Motion",
+          "hint": "How far planes travel on their moves."
+        },
+        "rot": {
+          "type": "range",
+          "label": "Rotation amplitude",
+          "min": 0,
+          "max": 0.5,
+          "def": 0.12,
+          "step": 0.0025,
+          "group": "Motion",
+          "hint": "How far planes rotate on their moves, radians."
+        },
+        "hold": {
+          "type": "range",
+          "label": "Hold fraction",
+          "min": 0.1,
+          "max": 0.6,
+          "def": 0.3,
+          "step": 0.0025,
+          "group": "Motion",
+          "hint": "Share of each half cycle spent at rest."
+        },
+        "recomp": {
+          "type": "int",
+          "label": "Recompositions per loop",
+          "min": 1,
+          "max": 3,
+          "def": 1,
+          "group": "Motion",
+          "hint": "Whole in-hold-out-return cycles per loop.",
+          "mutate": 0
+        },
+        "keyAngle": {
+          "type": "range",
+          "label": "Shadow direction",
+          "min": -180,
+          "max": 180,
+          "def": -45,
+          "step": 1,
+          "unit": "°",
+          "group": "Light",
+          "hint": "Direction the soft layer shadow falls, degrees.",
+          "randMax": 180
+        },
+        "exposure": {
+          "type": "range",
+          "label": "Exposure",
+          "min": 0.7,
+          "max": 1.4,
+          "def": 1,
+          "step": 0.01,
+          "unit": "×",
+          "group": "Light",
+          "hint": "Overall level of the printed colours."
+        },
+        "vignette": {
+          "type": "range",
+          "label": "Vignette",
+          "min": 0,
+          "max": 0.5,
+          "def": 0,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Darkens the frame edge. Off by default for graphic work.",
+          "randMax": 0.2
+        },
+        "quality": {
+          "type": "select",
+          "label": "Quality",
+          "options": [
+            {
+              "v": "live",
+              "l": "Live"
+            },
+            {
+              "v": "balanced",
+              "l": "Balanced"
+            },
+            {
+              "v": "export",
+              "l": "Export"
+            }
+          ],
+          "def": "balanced",
+          "mutate": 0,
+          "group": "Quality",
+          "hint": "Sample counts only. Composition, phase and exposure stay the same."
+        }
+      }
+    },
+    {
+      "id": "broken-axis",
+      "name": "Broken Axis",
+      "group": "Deconstruct Field",
+      "tags": [
+        "axis",
+        "vertical"
+      ],
+      "blurb": "A vertical axis of narrow bars, each shearing off the line in turn and coming back.",
+      "palette": "bone-ink",
+      "flash": false,
+      "cost": 1,
+      "passes": [
+        {
+          "src": "styles/broken-axis.glsl"
+        }
+      ],
+      "params": {
+        "planes": {
+          "type": "int",
+          "label": "Plane count",
+          "min": 6,
+          "max": 28,
+          "def": 18,
+          "group": "Form",
+          "hint": "Number of planes in the composition. Most are small; a few dominate.",
+          "mutate": 0.3
+        },
+        "arcR": {
+          "type": "range",
+          "label": "Arc radius",
+          "min": 0.1,
+          "max": 0.65,
+          "def": 0.2,
+          "step": 0.0028,
+          "group": "Form",
+          "hint": "Radius of the principal cobalt arc in scene units."
+        },
+        "grid": {
+          "type": "range",
+          "label": "Grid spacing",
+          "min": 0.015,
+          "max": 0.12,
+          "def": 0.03,
+          "step": 0.00052,
+          "group": "Form",
+          "hint": "Spacing of the hairline grids that ride on the planes.",
+          "log": true
+        },
+        "lineW": {
+          "type": "range",
+          "label": "Line width",
+          "min": 0.7,
+          "max": 3,
+          "def": 1.2,
+          "step": 0.05,
+          "group": "Material",
+          "unit": "px",
+          "hint": "Hairline width in screen pixels."
+        },
+        "sep": {
+          "type": "range",
+          "label": "Layer separation",
+          "min": 0,
+          "max": 0.15,
+          "def": 0.05,
+          "step": 0.00075,
+          "group": "Light",
+          "hint": "Soft shadow offset between layers. 0 prints everything flat."
+        },
+        "offset": {
+          "type": "range",
+          "label": "Offset amplitude",
+          "min": 0,
+          "max": 0.35,
+          "def": 0.2,
+          "step": 0.0017,
+          "group": "Motion",
+          "hint": "How far planes travel on their moves."
+        },
+        "rot": {
+          "type": "range",
+          "label": "Rotation amplitude",
+          "min": 0,
+          "max": 0.5,
+          "def": 0.12,
+          "step": 0.0025,
+          "group": "Motion",
+          "hint": "How far planes rotate on their moves, radians."
+        },
+        "hold": {
+          "type": "range",
+          "label": "Hold fraction",
+          "min": 0.1,
+          "max": 0.6,
+          "def": 0.3,
+          "step": 0.0025,
+          "group": "Motion",
+          "hint": "Share of each half cycle spent at rest."
+        },
+        "recomp": {
+          "type": "int",
+          "label": "Recompositions per loop",
+          "min": 1,
+          "max": 3,
+          "def": 1,
+          "group": "Motion",
+          "hint": "Whole in-hold-out-return cycles per loop.",
+          "mutate": 0
+        },
+        "keyAngle": {
+          "type": "range",
+          "label": "Shadow direction",
+          "min": -180,
+          "max": 180,
+          "def": -45,
+          "step": 1,
+          "unit": "°",
+          "group": "Light",
+          "hint": "Direction the soft layer shadow falls, degrees.",
+          "randMax": 180
+        },
+        "exposure": {
+          "type": "range",
+          "label": "Exposure",
+          "min": 0.7,
+          "max": 1.4,
+          "def": 1,
+          "step": 0.01,
+          "unit": "×",
+          "group": "Light",
+          "hint": "Overall level of the printed colours."
+        },
+        "vignette": {
+          "type": "range",
+          "label": "Vignette",
+          "min": 0,
+          "max": 0.5,
+          "def": 0,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Darkens the frame edge. Off by default for graphic work.",
+          "randMax": 0.2
+        },
+        "quality": {
+          "type": "select",
+          "label": "Quality",
+          "options": [
+            {
+              "v": "live",
+              "l": "Live"
+            },
+            {
+              "v": "balanced",
+              "l": "Balanced"
+            },
+            {
+              "v": "export",
+              "l": "Export"
+            }
+          ],
+          "def": "balanced",
+          "mutate": 0,
+          "group": "Quality",
+          "hint": "Sample counts only. Composition, phase and exposure stay the same."
+        }
+      }
+    },
+    {
+      "id": "cobalt-cut",
+      "name": "Cobalt Cut",
+      "group": "Deconstruct Field",
+      "tags": [
+        "cobalt",
+        "cut-outs"
+      ],
+      "blurb": "Cobalt leads: large blue planes bitten by circular cuts, with black bars for structure.",
+      "palette": "cream-cobalt",
+      "flash": false,
+      "cost": 1,
+      "passes": [
+        {
+          "src": "styles/cobalt-cut.glsl"
+        }
+      ],
+      "params": {
+        "planes": {
+          "type": "int",
+          "label": "Plane count",
+          "min": 6,
+          "max": 28,
+          "def": 12,
+          "group": "Form",
+          "hint": "Number of planes in the composition. Most are small; a few dominate.",
+          "mutate": 0.3
+        },
+        "arcR": {
+          "type": "range",
+          "label": "Arc radius",
+          "min": 0.1,
+          "max": 0.65,
+          "def": 0.42,
+          "step": 0.0028,
+          "group": "Form",
+          "hint": "Radius of the principal cobalt arc in scene units."
+        },
+        "grid": {
+          "type": "range",
+          "label": "Grid spacing",
+          "min": 0.015,
+          "max": 0.12,
+          "def": 0.05,
+          "step": 0.00052,
+          "group": "Form",
+          "hint": "Spacing of the hairline grids that ride on the planes.",
+          "log": true
+        },
+        "lineW": {
+          "type": "range",
+          "label": "Line width",
+          "min": 0.7,
+          "max": 3,
+          "def": 1.2,
+          "step": 0.05,
+          "group": "Material",
+          "unit": "px",
+          "hint": "Hairline width in screen pixels."
+        },
+        "sep": {
+          "type": "range",
+          "label": "Layer separation",
+          "min": 0,
+          "max": 0.15,
+          "def": 0.05,
+          "step": 0.00075,
+          "group": "Light",
+          "hint": "Soft shadow offset between layers. 0 prints everything flat."
+        },
+        "offset": {
+          "type": "range",
+          "label": "Offset amplitude",
+          "min": 0,
+          "max": 0.35,
+          "def": 0.12,
+          "step": 0.0017,
+          "group": "Motion",
+          "hint": "How far planes travel on their moves."
+        },
+        "rot": {
+          "type": "range",
+          "label": "Rotation amplitude",
+          "min": 0,
+          "max": 0.5,
+          "def": 0.08,
+          "step": 0.0025,
+          "group": "Motion",
+          "hint": "How far planes rotate on their moves, radians."
+        },
+        "hold": {
+          "type": "range",
+          "label": "Hold fraction",
+          "min": 0.1,
+          "max": 0.6,
+          "def": 0.3,
+          "step": 0.0025,
+          "group": "Motion",
+          "hint": "Share of each half cycle spent at rest."
+        },
+        "recomp": {
+          "type": "int",
+          "label": "Recompositions per loop",
+          "min": 1,
+          "max": 3,
+          "def": 1,
+          "group": "Motion",
+          "hint": "Whole in-hold-out-return cycles per loop.",
+          "mutate": 0
+        },
+        "keyAngle": {
+          "type": "range",
+          "label": "Shadow direction",
+          "min": -180,
+          "max": 180,
+          "def": -45,
+          "step": 1,
+          "unit": "°",
+          "group": "Light",
+          "hint": "Direction the soft layer shadow falls, degrees.",
+          "randMax": 180
+        },
+        "exposure": {
+          "type": "range",
+          "label": "Exposure",
+          "min": 0.7,
+          "max": 1.4,
+          "def": 1,
+          "step": 0.01,
+          "unit": "×",
+          "group": "Light",
+          "hint": "Overall level of the printed colours."
+        },
+        "vignette": {
+          "type": "range",
+          "label": "Vignette",
+          "min": 0,
+          "max": 0.5,
+          "def": 0,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Darkens the frame edge. Off by default for graphic work.",
+          "randMax": 0.2
+        },
+        "quality": {
+          "type": "select",
+          "label": "Quality",
+          "options": [
+            {
+              "v": "live",
+              "l": "Live"
+            },
+            {
+              "v": "balanced",
+              "l": "Balanced"
+            },
+            {
+              "v": "export",
+              "l": "Export"
+            }
+          ],
+          "def": "balanced",
+          "mutate": 0,
+          "group": "Quality",
+          "hint": "Sample counts only. Composition, phase and exposure stay the same."
+        }
+      }
+    },
+    {
+      "id": "offset-scaffold",
+      "name": "Offset Scaffold",
+      "group": "Deconstruct Field",
+      "tags": [
+        "outline",
+        "registration"
+      ],
+      "blurb": "Outline-only planes with a registration ghost sliding behind each, like a misprinted plan.",
+      "palette": "bone-ink",
+      "flash": false,
+      "cost": 1,
+      "passes": [
+        {
+          "src": "styles/offset-scaffold.glsl"
+        }
+      ],
+      "params": {
+        "planes": {
+          "type": "int",
+          "label": "Plane count",
+          "min": 6,
+          "max": 28,
+          "def": 16,
+          "group": "Form",
+          "hint": "Number of planes in the composition. Most are small; a few dominate.",
+          "mutate": 0.3
+        },
+        "arcR": {
+          "type": "range",
+          "label": "Arc radius",
+          "min": 0.1,
+          "max": 0.65,
+          "def": 0.35,
+          "step": 0.0028,
+          "group": "Form",
+          "hint": "Radius of the principal cobalt arc in scene units."
+        },
+        "grid": {
+          "type": "range",
+          "label": "Grid spacing",
+          "min": 0.015,
+          "max": 0.12,
+          "def": 0.03,
+          "step": 0.00052,
+          "group": "Form",
+          "hint": "Spacing of the hairline grids that ride on the planes.",
+          "log": true
+        },
+        "lineW": {
+          "type": "range",
+          "label": "Line width",
+          "min": 0.7,
+          "max": 3,
+          "def": 1.5,
+          "step": 0.05,
+          "group": "Material",
+          "unit": "px",
+          "hint": "Hairline width in screen pixels."
+        },
+        "sep": {
+          "type": "range",
+          "label": "Layer separation",
+          "min": 0,
+          "max": 0.15,
+          "def": 0,
+          "step": 0.00075,
+          "group": "Light",
+          "hint": "Soft shadow offset between layers. 0 prints everything flat."
+        },
+        "offset": {
+          "type": "range",
+          "label": "Offset amplitude",
+          "min": 0,
+          "max": 0.35,
+          "def": 0.12,
+          "step": 0.0017,
+          "group": "Motion",
+          "hint": "How far planes travel on their moves."
+        },
+        "rot": {
+          "type": "range",
+          "label": "Rotation amplitude",
+          "min": 0,
+          "max": 0.5,
+          "def": 0.09,
+          "step": 0.0025,
+          "group": "Motion",
+          "hint": "How far planes rotate on their moves, radians."
+        },
+        "hold": {
+          "type": "range",
+          "label": "Hold fraction",
+          "min": 0.1,
+          "max": 0.6,
+          "def": 0.3,
+          "step": 0.0025,
+          "group": "Motion",
+          "hint": "Share of each half cycle spent at rest."
+        },
+        "recomp": {
+          "type": "int",
+          "label": "Recompositions per loop",
+          "min": 1,
+          "max": 3,
+          "def": 1,
+          "group": "Motion",
+          "hint": "Whole in-hold-out-return cycles per loop.",
+          "mutate": 0
+        },
+        "keyAngle": {
+          "type": "range",
+          "label": "Shadow direction",
+          "min": -180,
+          "max": 180,
+          "def": -45,
+          "step": 1,
+          "unit": "°",
+          "group": "Light",
+          "hint": "Direction the soft layer shadow falls, degrees.",
+          "randMax": 180
+        },
+        "exposure": {
+          "type": "range",
+          "label": "Exposure",
+          "min": 0.7,
+          "max": 1.4,
+          "def": 1,
+          "step": 0.01,
+          "unit": "×",
+          "group": "Light",
+          "hint": "Overall level of the printed colours."
+        },
+        "vignette": {
+          "type": "range",
+          "label": "Vignette",
+          "min": 0,
+          "max": 0.5,
+          "def": 0,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Darkens the frame edge. Off by default for graphic work.",
+          "randMax": 0.2
+        },
+        "quality": {
+          "type": "select",
+          "label": "Quality",
+          "options": [
+            {
+              "v": "live",
+              "l": "Live"
+            },
+            {
+              "v": "balanced",
+              "l": "Balanced"
+            },
+            {
+              "v": "export",
+              "l": "Export"
+            }
+          ],
+          "def": "balanced",
+          "mutate": 0,
+          "group": "Quality",
+          "hint": "Sample counts only. Composition, phase and exposure stay the same."
+        }
+      }
+    },
+    {
+      "id": "plane-argument",
+      "name": "Plane Argument",
+      "group": "Deconstruct Field",
+      "tags": [
+        "large planes",
+        "opposition"
+      ],
+      "blurb": "A few huge planes lean against each other and slide apart, arguing across the page.",
+      "palette": "cream-cobalt",
+      "flash": false,
+      "cost": 1,
+      "passes": [
+        {
+          "src": "styles/plane-argument.glsl"
+        }
+      ],
+      "params": {
+        "planes": {
+          "type": "int",
+          "label": "Plane count",
+          "min": 6,
+          "max": 28,
+          "def": 7,
+          "group": "Form",
+          "hint": "Number of planes in the composition. Most are small; a few dominate.",
+          "mutate": 0.3
+        },
+        "arcR": {
+          "type": "range",
+          "label": "Arc radius",
+          "min": 0.1,
+          "max": 0.65,
+          "def": 0.5,
+          "step": 0.0028,
+          "group": "Form",
+          "hint": "Radius of the principal cobalt arc in scene units."
+        },
+        "grid": {
+          "type": "range",
+          "label": "Grid spacing",
+          "min": 0.015,
+          "max": 0.12,
+          "def": 0.06,
+          "step": 0.00052,
+          "group": "Form",
+          "hint": "Spacing of the hairline grids that ride on the planes.",
+          "log": true
+        },
+        "lineW": {
+          "type": "range",
+          "label": "Line width",
+          "min": 0.7,
+          "max": 3,
+          "def": 1.2,
+          "step": 0.05,
+          "group": "Material",
+          "unit": "px",
+          "hint": "Hairline width in screen pixels."
+        },
+        "sep": {
+          "type": "range",
+          "label": "Layer separation",
+          "min": 0,
+          "max": 0.15,
+          "def": 0.05,
+          "step": 0.00075,
+          "group": "Light",
+          "hint": "Soft shadow offset between layers. 0 prints everything flat."
+        },
+        "offset": {
+          "type": "range",
+          "label": "Offset amplitude",
+          "min": 0,
+          "max": 0.35,
+          "def": 0.2,
+          "step": 0.0017,
+          "group": "Motion",
+          "hint": "How far planes travel on their moves."
+        },
+        "rot": {
+          "type": "range",
+          "label": "Rotation amplitude",
+          "min": 0,
+          "max": 0.5,
+          "def": 0.15,
+          "step": 0.0025,
+          "group": "Motion",
+          "hint": "How far planes rotate on their moves, radians."
+        },
+        "hold": {
+          "type": "range",
+          "label": "Hold fraction",
+          "min": 0.1,
+          "max": 0.6,
+          "def": 0.35,
+          "step": 0.0025,
+          "group": "Motion",
+          "hint": "Share of each half cycle spent at rest."
+        },
+        "recomp": {
+          "type": "int",
+          "label": "Recompositions per loop",
+          "min": 1,
+          "max": 3,
+          "def": 1,
+          "group": "Motion",
+          "hint": "Whole in-hold-out-return cycles per loop.",
+          "mutate": 0
+        },
+        "keyAngle": {
+          "type": "range",
+          "label": "Shadow direction",
+          "min": -180,
+          "max": 180,
+          "def": -45,
+          "step": 1,
+          "unit": "°",
+          "group": "Light",
+          "hint": "Direction the soft layer shadow falls, degrees.",
+          "randMax": 180
+        },
+        "exposure": {
+          "type": "range",
+          "label": "Exposure",
+          "min": 0.7,
+          "max": 1.4,
+          "def": 1,
+          "step": 0.01,
+          "unit": "×",
+          "group": "Light",
+          "hint": "Overall level of the printed colours."
+        },
+        "vignette": {
+          "type": "range",
+          "label": "Vignette",
+          "min": 0,
+          "max": 0.5,
+          "def": 0,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Darkens the frame edge. Off by default for graphic work.",
+          "randMax": 0.2
+        },
+        "quality": {
+          "type": "select",
+          "label": "Quality",
+          "options": [
+            {
+              "v": "live",
+              "l": "Live"
+            },
+            {
+              "v": "balanced",
+              "l": "Balanced"
+            },
+            {
+              "v": "export",
+              "l": "Export"
+            }
+          ],
+          "def": "balanced",
+          "mutate": 0,
+          "group": "Quality",
+          "hint": "Sample counts only. Composition, phase and exposure stay the same."
+        }
+      }
+    },
+    {
+      "id": "partial-circle",
+      "name": "Partial Circle",
+      "group": "Deconstruct Field",
+      "tags": [
+        "arcs",
+        "circle"
+      ],
+      "blurb": "Concentric partial circles of different weights rotate through short, eased arcs.",
+      "palette": "sand-teal",
+      "flash": false,
+      "cost": 1,
+      "passes": [
+        {
+          "src": "styles/partial-circle.glsl"
+        }
+      ],
+      "params": {
+        "planes": {
+          "type": "int",
+          "label": "Plane count",
+          "min": 6,
+          "max": 28,
+          "def": 8,
+          "group": "Form",
+          "hint": "Number of planes in the composition. Most are small; a few dominate.",
+          "mutate": 0.3
+        },
+        "arcR": {
+          "type": "range",
+          "label": "Arc radius",
+          "min": 0.1,
+          "max": 0.65,
+          "def": 0.5,
+          "step": 0.0028,
+          "group": "Form",
+          "hint": "Radius of the principal cobalt arc in scene units."
+        },
+        "grid": {
+          "type": "range",
+          "label": "Grid spacing",
+          "min": 0.015,
+          "max": 0.12,
+          "def": 0.045,
+          "step": 0.00052,
+          "group": "Form",
+          "hint": "Spacing of the hairline grids that ride on the planes.",
+          "log": true
+        },
+        "lineW": {
+          "type": "range",
+          "label": "Line width",
+          "min": 0.7,
+          "max": 3,
+          "def": 1.2,
+          "step": 0.05,
+          "group": "Material",
+          "unit": "px",
+          "hint": "Hairline width in screen pixels."
+        },
+        "sep": {
+          "type": "range",
+          "label": "Layer separation",
+          "min": 0,
+          "max": 0.15,
+          "def": 0.05,
+          "step": 0.00075,
+          "group": "Light",
+          "hint": "Soft shadow offset between layers. 0 prints everything flat."
+        },
+        "offset": {
+          "type": "range",
+          "label": "Offset amplitude",
+          "min": 0,
+          "max": 0.35,
+          "def": 0.08,
+          "step": 0.0017,
+          "group": "Motion",
+          "hint": "How far planes travel on their moves."
+        },
+        "rot": {
+          "type": "range",
+          "label": "Rotation amplitude",
+          "min": 0,
+          "max": 0.5,
+          "def": 0.3,
+          "step": 0.0025,
+          "group": "Motion",
+          "hint": "How far planes rotate on their moves, radians."
+        },
+        "hold": {
+          "type": "range",
+          "label": "Hold fraction",
+          "min": 0.1,
+          "max": 0.6,
+          "def": 0.3,
+          "step": 0.0025,
+          "group": "Motion",
+          "hint": "Share of each half cycle spent at rest."
+        },
+        "recomp": {
+          "type": "int",
+          "label": "Recompositions per loop",
+          "min": 1,
+          "max": 3,
+          "def": 1,
+          "group": "Motion",
+          "hint": "Whole in-hold-out-return cycles per loop.",
+          "mutate": 0
+        },
+        "keyAngle": {
+          "type": "range",
+          "label": "Shadow direction",
+          "min": -180,
+          "max": 180,
+          "def": -45,
+          "step": 1,
+          "unit": "°",
+          "group": "Light",
+          "hint": "Direction the soft layer shadow falls, degrees.",
+          "randMax": 180
+        },
+        "exposure": {
+          "type": "range",
+          "label": "Exposure",
+          "min": 0.7,
+          "max": 1.4,
+          "def": 1,
+          "step": 0.01,
+          "unit": "×",
+          "group": "Light",
+          "hint": "Overall level of the printed colours."
+        },
+        "vignette": {
+          "type": "range",
+          "label": "Vignette",
+          "min": 0,
+          "max": 0.5,
+          "def": 0,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Darkens the frame edge. Off by default for graphic work.",
+          "randMax": 0.2
+        },
+        "quality": {
+          "type": "select",
+          "label": "Quality",
+          "options": [
+            {
+              "v": "live",
+              "l": "Live"
+            },
+            {
+              "v": "balanced",
+              "l": "Balanced"
+            },
+            {
+              "v": "export",
+              "l": "Export"
+            }
+          ],
+          "def": "balanced",
+          "mutate": 0,
+          "group": "Quality",
+          "hint": "Sample counts only. Composition, phase and exposure stay the same."
+        }
+      }
+    },
+    {
+      "id": "red-interruption",
+      "name": "Red Interruption",
+      "group": "Deconstruct Field",
+      "tags": [
+        "vermilion",
+        "accent"
+      ],
+      "blurb": "Mostly black and bone, until a vermilion bar slides across and interrupts the composition.",
+      "palette": "bone-ink",
+      "flash": false,
+      "cost": 1,
+      "passes": [
+        {
+          "src": "styles/red-interruption.glsl"
+        }
+      ],
+      "params": {
+        "planes": {
+          "type": "int",
+          "label": "Plane count",
+          "min": 6,
+          "max": 28,
+          "def": 13,
+          "group": "Form",
+          "hint": "Number of planes in the composition. Most are small; a few dominate.",
+          "mutate": 0.3
+        },
+        "arcR": {
+          "type": "range",
+          "label": "Arc radius",
+          "min": 0.1,
+          "max": 0.65,
+          "def": 0.35,
+          "step": 0.0028,
+          "group": "Form",
+          "hint": "Radius of the principal cobalt arc in scene units."
+        },
+        "grid": {
+          "type": "range",
+          "label": "Grid spacing",
+          "min": 0.015,
+          "max": 0.12,
+          "def": 0.04,
+          "step": 0.00052,
+          "group": "Form",
+          "hint": "Spacing of the hairline grids that ride on the planes.",
+          "log": true
+        },
+        "lineW": {
+          "type": "range",
+          "label": "Line width",
+          "min": 0.7,
+          "max": 3,
+          "def": 1.2,
+          "step": 0.05,
+          "group": "Material",
+          "unit": "px",
+          "hint": "Hairline width in screen pixels."
+        },
+        "sep": {
+          "type": "range",
+          "label": "Layer separation",
+          "min": 0,
+          "max": 0.15,
+          "def": 0.05,
+          "step": 0.00075,
+          "group": "Light",
+          "hint": "Soft shadow offset between layers. 0 prints everything flat."
+        },
+        "offset": {
+          "type": "range",
+          "label": "Offset amplitude",
+          "min": 0,
+          "max": 0.35,
+          "def": 0.14,
+          "step": 0.0017,
+          "group": "Motion",
+          "hint": "How far planes travel on their moves."
+        },
+        "rot": {
+          "type": "range",
+          "label": "Rotation amplitude",
+          "min": 0,
+          "max": 0.5,
+          "def": 0.12,
+          "step": 0.0025,
+          "group": "Motion",
+          "hint": "How far planes rotate on their moves, radians."
+        },
+        "hold": {
+          "type": "range",
+          "label": "Hold fraction",
+          "min": 0.1,
+          "max": 0.6,
+          "def": 0.4,
+          "step": 0.0025,
+          "group": "Motion",
+          "hint": "Share of each half cycle spent at rest."
+        },
+        "recomp": {
+          "type": "int",
+          "label": "Recompositions per loop",
+          "min": 1,
+          "max": 3,
+          "def": 1,
+          "group": "Motion",
+          "hint": "Whole in-hold-out-return cycles per loop.",
+          "mutate": 0
+        },
+        "keyAngle": {
+          "type": "range",
+          "label": "Shadow direction",
+          "min": -180,
+          "max": 180,
+          "def": -45,
+          "step": 1,
+          "unit": "°",
+          "group": "Light",
+          "hint": "Direction the soft layer shadow falls, degrees.",
+          "randMax": 180
+        },
+        "exposure": {
+          "type": "range",
+          "label": "Exposure",
+          "min": 0.7,
+          "max": 1.4,
+          "def": 1,
+          "step": 0.01,
+          "unit": "×",
+          "group": "Light",
+          "hint": "Overall level of the printed colours."
+        },
+        "vignette": {
+          "type": "range",
+          "label": "Vignette",
+          "min": 0,
+          "max": 0.5,
+          "def": 0,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Darkens the frame edge. Off by default for graphic work.",
+          "randMax": 0.2
+        },
+        "quality": {
+          "type": "select",
+          "label": "Quality",
+          "options": [
+            {
+              "v": "live",
+              "l": "Live"
+            },
+            {
+              "v": "balanced",
+              "l": "Balanced"
+            },
+            {
+              "v": "export",
+              "l": "Export"
+            }
+          ],
+          "def": "balanced",
+          "mutate": 0,
+          "group": "Quality",
+          "hint": "Sample counts only. Composition, phase and exposure stay the same."
+        }
+      }
+    },
+    {
+      "id": "grid-dislocation",
+      "name": "Grid Dislocation",
+      "group": "Deconstruct Field",
+      "tags": [
+        "grid",
+        "dislocation"
+      ],
+      "blurb": "The grid is the subject: rows of it slip sideways against each other and settle back.",
+      "palette": "night-paper",
+      "flash": false,
+      "cost": 1,
+      "passes": [
+        {
+          "src": "styles/grid-dislocation.glsl"
+        }
+      ],
+      "params": {
+        "planes": {
+          "type": "int",
+          "label": "Plane count",
+          "min": 6,
+          "max": 28,
+          "def": 10,
+          "group": "Form",
+          "hint": "Number of planes in the composition. Most are small; a few dominate.",
+          "mutate": 0.3
+        },
+        "arcR": {
+          "type": "range",
+          "label": "Arc radius",
+          "min": 0.1,
+          "max": 0.65,
+          "def": 0.35,
+          "step": 0.0028,
+          "group": "Form",
+          "hint": "Radius of the principal cobalt arc in scene units."
+        },
+        "grid": {
+          "type": "range",
+          "label": "Grid spacing",
+          "min": 0.015,
+          "max": 0.12,
+          "def": 0.055,
+          "step": 0.00052,
+          "group": "Form",
+          "hint": "Spacing of the hairline grids that ride on the planes.",
+          "log": true
+        },
+        "lineW": {
+          "type": "range",
+          "label": "Line width",
+          "min": 0.7,
+          "max": 3,
+          "def": 1.4,
+          "step": 0.05,
+          "group": "Material",
+          "unit": "px",
+          "hint": "Hairline width in screen pixels."
+        },
+        "sep": {
+          "type": "range",
+          "label": "Layer separation",
+          "min": 0,
+          "max": 0.15,
+          "def": 0.05,
+          "step": 0.00075,
+          "group": "Light",
+          "hint": "Soft shadow offset between layers. 0 prints everything flat."
+        },
+        "offset": {
+          "type": "range",
+          "label": "Offset amplitude",
+          "min": 0,
+          "max": 0.35,
+          "def": 0.1,
+          "step": 0.0017,
+          "group": "Motion",
+          "hint": "How far planes travel on their moves."
+        },
+        "rot": {
+          "type": "range",
+          "label": "Rotation amplitude",
+          "min": 0,
+          "max": 0.5,
+          "def": 0.12,
+          "step": 0.0025,
+          "group": "Motion",
+          "hint": "How far planes rotate on their moves, radians."
+        },
+        "hold": {
+          "type": "range",
+          "label": "Hold fraction",
+          "min": 0.1,
+          "max": 0.6,
+          "def": 0.3,
+          "step": 0.0025,
+          "group": "Motion",
+          "hint": "Share of each half cycle spent at rest."
+        },
+        "recomp": {
+          "type": "int",
+          "label": "Recompositions per loop",
+          "min": 1,
+          "max": 3,
+          "def": 1,
+          "group": "Motion",
+          "hint": "Whole in-hold-out-return cycles per loop.",
+          "mutate": 0
+        },
+        "keyAngle": {
+          "type": "range",
+          "label": "Shadow direction",
+          "min": -180,
+          "max": 180,
+          "def": -45,
+          "step": 1,
+          "unit": "°",
+          "group": "Light",
+          "hint": "Direction the soft layer shadow falls, degrees.",
+          "randMax": 180
+        },
+        "exposure": {
+          "type": "range",
+          "label": "Exposure",
+          "min": 0.7,
+          "max": 1.4,
+          "def": 1,
+          "step": 0.01,
+          "unit": "×",
+          "group": "Light",
+          "hint": "Overall level of the printed colours."
+        },
+        "vignette": {
+          "type": "range",
+          "label": "Vignette",
+          "min": 0,
+          "max": 0.5,
+          "def": 0,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Darkens the frame edge. Off by default for graphic work.",
+          "randMax": 0.2
+        },
+        "quality": {
+          "type": "select",
+          "label": "Quality",
+          "options": [
+            {
+              "v": "live",
+              "l": "Live"
+            },
+            {
+              "v": "balanced",
+              "l": "Balanced"
+            },
+            {
+              "v": "export",
+              "l": "Export"
+            }
+          ],
+          "def": "balanced",
+          "mutate": 0,
+          "group": "Quality",
+          "hint": "Sample counts only. Composition, phase and exposure stay the same."
+        }
+      }
+    },
+    {
+      "id": "quiet-construct",
+      "name": "Quiet Construct",
+      "group": "Deconstruct Field",
+      "tags": [
+        "calm",
+        "ambient"
+      ],
+      "blurb": "Six planes and a single arc in lots of white space; small, slow moves. Made for text-safe backgrounds.",
+      "palette": "bone-ink",
+      "flash": false,
+      "cost": 1,
+      "passes": [
+        {
+          "src": "styles/quiet-construct.glsl"
+        }
+      ],
+      "params": {
+        "planes": {
+          "type": "int",
+          "label": "Plane count",
+          "min": 6,
+          "max": 28,
+          "def": 6,
+          "group": "Form",
+          "hint": "Number of planes in the composition. Most are small; a few dominate.",
+          "mutate": 0.3
+        },
+        "arcR": {
+          "type": "range",
+          "label": "Arc radius",
+          "min": 0.1,
+          "max": 0.65,
+          "def": 0.3,
+          "step": 0.0028,
+          "group": "Form",
+          "hint": "Radius of the principal cobalt arc in scene units."
+        },
+        "grid": {
+          "type": "range",
+          "label": "Grid spacing",
+          "min": 0.015,
+          "max": 0.12,
+          "def": 0.07,
+          "step": 0.00052,
+          "group": "Form",
+          "hint": "Spacing of the hairline grids that ride on the planes.",
+          "log": true
+        },
+        "lineW": {
+          "type": "range",
+          "label": "Line width",
+          "min": 0.7,
+          "max": 3,
+          "def": 1,
+          "step": 0.05,
+          "group": "Material",
+          "unit": "px",
+          "hint": "Hairline width in screen pixels."
+        },
+        "sep": {
+          "type": "range",
+          "label": "Layer separation",
+          "min": 0,
+          "max": 0.15,
+          "def": 0.03,
+          "step": 0.00075,
+          "group": "Light",
+          "hint": "Soft shadow offset between layers. 0 prints everything flat."
+        },
+        "offset": {
+          "type": "range",
+          "label": "Offset amplitude",
+          "min": 0,
+          "max": 0.35,
+          "def": 0.05,
+          "step": 0.0017,
+          "group": "Motion",
+          "hint": "How far planes travel on their moves."
+        },
+        "rot": {
+          "type": "range",
+          "label": "Rotation amplitude",
+          "min": 0,
+          "max": 0.5,
+          "def": 0.04,
+          "step": 0.0025,
+          "group": "Motion",
+          "hint": "How far planes rotate on their moves, radians."
+        },
+        "hold": {
+          "type": "range",
+          "label": "Hold fraction",
+          "min": 0.1,
+          "max": 0.6,
+          "def": 0.5,
+          "step": 0.0025,
+          "group": "Motion",
+          "hint": "Share of each half cycle spent at rest."
+        },
+        "recomp": {
+          "type": "int",
+          "label": "Recompositions per loop",
+          "min": 1,
+          "max": 3,
+          "def": 1,
+          "group": "Motion",
+          "hint": "Whole in-hold-out-return cycles per loop.",
+          "mutate": 0
+        },
+        "keyAngle": {
+          "type": "range",
+          "label": "Shadow direction",
+          "min": -180,
+          "max": 180,
+          "def": -45,
+          "step": 1,
+          "unit": "°",
+          "group": "Light",
+          "hint": "Direction the soft layer shadow falls, degrees.",
+          "randMax": 180
+        },
+        "exposure": {
+          "type": "range",
+          "label": "Exposure",
+          "min": 0.7,
+          "max": 1.4,
+          "def": 1,
+          "step": 0.01,
+          "unit": "×",
+          "group": "Light",
+          "hint": "Overall level of the printed colours."
+        },
+        "vignette": {
+          "type": "range",
+          "label": "Vignette",
+          "min": 0,
+          "max": 0.5,
+          "def": 0,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Darkens the frame edge. Off by default for graphic work.",
+          "randMax": 0.2
+        },
+        "quality": {
+          "type": "select",
+          "label": "Quality",
+          "options": [
+            {
+              "v": "live",
+              "l": "Live"
+            },
+            {
+              "v": "balanced",
+              "l": "Balanced"
+            },
+            {
+              "v": "export",
+              "l": "Export"
+            }
+          ],
+          "def": "balanced",
+          "mutate": 0,
+          "group": "Quality",
+          "hint": "Sample counts only. Composition, phase and exposure stay the same."
+        }
+      }
+    }
+  ]
+}
