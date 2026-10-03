@@ -15,6 +15,7 @@ AgentMotif is Motif's shader director agent. It turns a reference **image**, a w
 
 | Path | What |
 | --- | --- |
+| [`PLAYBOOK.md`](PLAYBOOK.md) | **Start here.** How to use AgentMotif, how to brief it, and everything it considers when building a shader. |
 | [`AGENT.md`](AGENT.md) | The agent's operating manual: the SDK contract, toolchain, the brief → ship loop, taste rules, the curiosity protocol and the SDK-proposal protocol. This is the single source of truth. |
 | [`lib/glsl/`](lib/glsl) | The AgentMotif GLSL library (32 KB, loop-safe, passes the SDK 4 sandbox): `field` (field taxonomy, Astral cosine fold with its Lipschitz bound, renderers `AM_MARCH_L` / `AM_SEGMENT` / `AM_GLOW` / `AM_VOLUME`), `color` (OKLab/OKLCh, AgX, PBR Neutral, grading), `noise` (curl, domain warp, flow maps, gyroid volumes, caustics, stars, IGN), `light` (GGX, split-sum env, procedural studio HDRI, thin film, spectral, sheen, HG phase), `post` (bloom, halation, anamorphic, spectral CA, bokeh, Kuwahara, CAS, grain), `sdf` (2D/3D primitives, operators, raymarch/normal/shadow/AO macros), `motion` (bezier easing, springs, stagger, on-twos). |
 | [`tools/am.mjs`](tools/am.mjs) | The look-dev CLI on the SDK 4 runtime: `analyze`, `compare`, `tune`, `qa` (adds quality-exposure and transition-endpoint checks), `film`, `frame` (styles, effects, transitions, text and media inputs), `lib` (with the app's sandbox analysis), `new` (an @4 graph scaffold). |
