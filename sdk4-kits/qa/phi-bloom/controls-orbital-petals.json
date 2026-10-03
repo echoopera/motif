@@ -1,0 +1,284 @@
+{
+  "kit": "phi-bloom",
+  "style": "orbital-petals",
+  "phase": 0.37,
+  "size": [
+    120,
+    213
+  ],
+  "note": "effect = max mean-abs 8-bit change vs the default frame over min/max (or every option)",
+  "rows": [
+    {
+      "key": "petals",
+      "label": "Petal count",
+      "type": "int",
+      "def": 180,
+      "vals": [
+        48,
+        240
+      ],
+      "diffs": [
+        33.25,
+        25.09
+      ],
+      "effect": 33.25
+    },
+    {
+      "key": "bladeLen",
+      "label": "Blade length",
+      "type": "range",
+      "def": 0.05,
+      "vals": [
+        0.03,
+        0.16
+      ],
+      "diffs": [
+        20.37,
+        44.81
+      ],
+      "effect": 44.81
+    },
+    {
+      "key": "taper",
+      "label": "Blade taper",
+      "type": "range",
+      "def": 0.5,
+      "vals": [
+        0.15,
+        0.9
+      ],
+      "diffs": [
+        5.85,
+        6.8
+      ],
+      "effect": 6.8
+    },
+    {
+      "key": "depth",
+      "label": "Depth spacing",
+      "type": "range",
+      "def": 0.12,
+      "vals": [
+        0.02,
+        0.3
+      ],
+      "diffs": [
+        0,
+        0
+      ],
+      "effect": 0
+    },
+    {
+      "key": "translucency",
+      "label": "Translucency",
+      "type": "range",
+      "def": 0.3,
+      "vals": [
+        0,
+        0.75
+      ],
+      "diffs": [
+        0.23,
+        0.31
+      ],
+      "effect": 0.31
+    },
+    {
+      "key": "rim",
+      "label": "Rim intensity",
+      "type": "range",
+      "def": 1.1,
+      "vals": [
+        0,
+        2
+      ],
+      "diffs": [
+        3.01,
+        2.46
+      ],
+      "effect": 3.01
+    },
+    {
+      "key": "caustic",
+      "label": "Copper caustics",
+      "type": "range",
+      "def": 0.9,
+      "vals": [
+        0,
+        1.5
+      ],
+      "diffs": [
+        2.86,
+        1.82
+      ],
+      "effect": 2.86
+    },
+    {
+      "key": "core",
+      "label": "Core glow",
+      "type": "range",
+      "def": 0.7,
+      "vals": [
+        0,
+        3
+      ],
+      "diffs": [
+        1.29,
+        3.75
+      ],
+      "effect": 3.75
+    },
+    {
+      "key": "turns",
+      "label": "Turns per loop",
+      "type": "int",
+      "def": 1,
+      "vals": [
+        0,
+        2
+      ],
+      "diffs": [
+        0,
+        6.63
+      ],
+      "effect": 6.63
+    },
+    {
+      "key": "breath",
+      "label": "Breath amplitude",
+      "type": "range",
+      "def": 0.035,
+      "vals": [
+        0,
+        0.12
+      ],
+      "diffs": [
+        0.46,
+        1.14
+      ],
+      "effect": 1.14
+    },
+    {
+      "key": "orbit",
+      "label": "Camera orbit",
+      "type": "range",
+      "def": 0.06,
+      "vals": [
+        0,
+        0.25
+      ],
+      "diffs": [
+        0.41,
+        1.29
+      ],
+      "effect": 1.29
+    },
+    {
+      "key": "keyAngle",
+      "label": "Key direction",
+      "type": "range",
+      "def": 125,
+      "vals": [
+        -180,
+        180
+      ],
+      "diffs": [
+        4.66,
+        4.66
+      ],
+      "effect": 4.66
+    },
+    {
+      "key": "exposure",
+      "label": "Exposure",
+      "type": "range",
+      "def": 1,
+      "vals": [
+        0.4,
+        2.4
+      ],
+      "diffs": [
+        29.68,
+        37.53
+      ],
+      "effect": 37.53
+    },
+    {
+      "key": "bloom",
+      "label": "Bloom",
+      "type": "range",
+      "def": 0.55,
+      "vals": [
+        0,
+        1.6
+      ],
+      "diffs": [
+        9.59,
+        11.38
+      ],
+      "effect": 11.38
+    },
+    {
+      "key": "bloomRadius",
+      "label": "Bloom radius",
+      "type": "range",
+      "def": 1,
+      "vals": [
+        0.4,
+        2.2
+      ],
+      "diffs": [
+        3.59,
+        4.31
+      ],
+      "effect": 4.31
+    },
+    {
+      "key": "lensCA",
+      "label": "Edge fringe",
+      "type": "range",
+      "def": 0.12,
+      "vals": [
+        0,
+        0.5
+      ],
+      "diffs": [
+        0.43,
+        1.33
+      ],
+      "effect": 1.33
+    },
+    {
+      "key": "vignette",
+      "label": "Vignette",
+      "type": "range",
+      "def": 0.38,
+      "vals": [
+        0,
+        0.8
+      ],
+      "diffs": [
+        1.14,
+        1.38
+      ],
+      "effect": 1.38
+    },
+    {
+      "key": "quality",
+      "label": "Quality",
+      "type": "select",
+      "def": "balanced",
+      "vals": [
+        "live",
+        "balanced",
+        "export"
+      ],
+      "diffs": [
+        2.6,
+        0,
+        0
+      ],
+      "effect": 2.6
+    }
+  ]
+}

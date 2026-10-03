@@ -8,6 +8,11 @@
 // Loop: every temporal term is an integer harmonic of theta; "flow" translates the lattice by whole indices per loop and
 // every petal attribute is a smooth function of its effective index, so petal m at p=1 equals petal m+k at p=0.
 
+#define P_PETALS p_petals
+#define P_TAPER p_taper
+#define P_FLOW p_flow
+#define P_PITCH p_pitch
+#define P_UNFOLD p_unfold
 const float GA = 2.399963229728653;
 const int KJ = 27;                       // half window: 55 candidate indices per layer (proven reach below)
 
@@ -60,13 +65,13 @@ Blade shadeBlade(vec2 b, float L, float W, float taper, float soft, float id, ve
   float tr = p_translucency * thin * (0.4 + 0.6 * clamp(0.5 - 0.5 * ndl, 0.0, 1.0));
   vec3 col = base * (0.22 + 1.15 * diff);
   col += u_ink * spec * 0.55;
-  col += tintA * fres * p_rim * 0.55 * (0.4 + 0.6 * diff) + tintA * edge * p_rim * 0.35;
+  col += tintA * fres * p_rim * 0.55 * (0.4 + 0.6 * diff) + tintA * edge * p_rim * 0.7;
   col += tintB * tr * 1.1;
   // copper caustic threads: thin curves that follow the blade (midrib-converging), brighter facing the key
   if (p_caustic > 0.001 && k_q() > 0) {
     float w = sin(ny * 11.0 + sin(u * 5.0 + id * 9.0) * 1.7 + id * 6.0);
     float th = pow(0.5 + 0.5 * w, 22.0) * smoothstep(0.0, 0.4, t) * (1.0 - smoothstep(0.7, 1.0, t));
-    col += tintB * th * p_caustic * (0.25 + 0.9 * diff) * (1.0 - far);
+    col += tintB * th * p_caustic * (0.45 + 1.6 * diff) * (1.0 - far);
   }
   // faint veins along the form
   if (k_q() > 0) {
@@ -163,7 +168,7 @@ vec4 fernLayer(vec2 p, float rot0, float curl, float Lk, float soft, float salt,
   vec3 acc = vec3(0.0); float cov = 0.0; vec3 K = k_key(); float th = k_theta();
   if (mirror > 0.5) p.x = -p.x;
   const int M = 34;
-  float bsp = p_pitch;
+  float bsp = P_PITCH;
   float total = (3.1 + 1.4 * curl) * TAU * 0.5;
   vec2 sp = vec2(0.0);
   for (int i = 0; i < M; i++) {
@@ -218,10 +223,10 @@ vec4 scene_main(vec2 uv, vec2 fc, int variant) {
   vec2 asp = M_asp();
   vec2 c0 = vec2(-0.05, 0.12);
   vec2 orb = p_orbit * k_calm() * vec2(cos(th), sin(th) * 0.8);                 // closed camera orbit
-  float N = float(p_petals);
+  float N = float(P_PETALS);
   float px = k_px();
   float turnsRot = TAU * float(p_turns) * k_phase();                  // whole field: integer turns per loop
-  float flowPh = float(p_flow) * k_phase();
+  float flowPh = float(P_FLOW) * k_phase();
   float ds = p_depth;
   vec3 far = vec3(0.0);
   // palette roles: ink ivory, a0 champagne, a1 copper, a2 jade
@@ -229,14 +234,14 @@ vec4 scene_main(vec2 uv, vec2 fc, int variant) {
   vec3 col = phiGround(uv, c0 + orb * 0.5, ds);
   float Rf = 0.50;
   float lenK = p_bladeLen, widK = 0.46;
-  float taper = p_taper;
+  float taper = P_TAPER;
   vec4 L1, L2, L3;
   vec2 pf = uv - (c0 - orb * 0.6 * ds * 2.0);                          // far stratum: moves against the camera
   vec2 pm = uv - c0;
   vec2 pn = uv - (c0 + orb * 1.5 * ds * 4.0);                          // near stratum: moves with it, further
 
   if (variant == 4) {                                                   // Jade Crown: rings of upright blades
-    int rings = clamp(p_petals / 24, 3, 9);
+    int rings = clamp(P_PETALS / 24, 3, 9);
     float L = lenK * 2.4, W = L * 0.30;
     for (int k = 0; k < 9; k++) {
       if (k >= rings) break;
@@ -250,7 +255,7 @@ vec4 scene_main(vec2 uv, vec2 fc, int variant) {
       col = mix(col, R.rgb, R.a);
     }
   } else if (variant == 7) {                                            // Orbital Petals: tilted rings of tangent petals
-    int rings = clamp(p_petals / 30, 3, 8);
+    int rings = clamp(P_PETALS / 30, 3, 8);
     for (int k = 0; k < 8; k++) {
       if (k >= rings) break;
       float kk = float(k) / float(max(rings - 1, 1));
@@ -264,33 +269,33 @@ vec4 scene_main(vec2 uv, vec2 fc, int variant) {
       col = mix(col, R.rgb, R.a);
     }
   } else if (variant == 2) {                                            // Copper Fern: log-spiral spine with leaflets
-    float curl = p_unfold * 3.0 + 0.6;
-    vec4 F2 = fernLayer(pf * 1.15 + vec2(0.05, 0.0), -0.9 + turnsRot * 0.0, curl, lenK * 1.5, px * 2.5, 31.0, 0.7, champ, copper, 1.0);
+    float curl = P_UNFOLD * 3.0 + 0.6;
+    vec4 F2 = fernLayer(pf * 1.15 + vec2(0.05, 0.0), -0.9 - turnsRot, curl, lenK * 1.5, px * 2.5, 31.0, 0.7, champ, copper, 1.0);
     col = mix(col, F2.rgb * 0.55, F2.a);
-    vec4 F1 = fernLayer(pm, 0.6, curl, lenK * 1.8, px * 1.2, 7.0, 0.0, champ, copper, 0.0);
+    vec4 F1 = fernLayer(pm, 0.6 + turnsRot, curl, lenK * 1.8, px * 1.2, 7.0, 0.0, champ, copper, 0.0);
     col = mix(col, F1.rgb, F1.a);
   } else {
     // phyllotaxis variants
     float e1 = 1.0, rotA = turnsRot + 0.6;
     float lk = lenK, wk = widK, tl = 0.55, rd = taper, sN = N;
     float rotFar = -turnsRot + 1.9;
-    if (variant == 1) { lk = lenK * 0.55; wk = 0.82; tl = 0.2; rd = 0.15; sN = min(N * 1.5, 240.0 * 1.25); }       // Golden Seed: rounded florets
+    if (variant == 1) { lk = lenK * 0.55; wk = 0.82; tl = 0.2; rd = taper * 0.4; sN = min(N * 1.5, 240.0 * 1.25); }       // Golden Seed: rounded florets
     if (variant == 3) { lk = lenK * 1.15; wk = 0.40; tl = 0.9; }                                                      // Ivory Helix: swept blades
     if (variant == 5) { lk = lenK * 1.35; wk = 0.5; tl = 0.35; }                                                      // Spiral Canopy
     if (variant == 8) { lk = lenK * 0.95; wk = 0.5; }                                                                 // Quiet Unfold
     float Rfa = Rf * (variant == 3 ? 1.05 : 1.0);
-    L1 = phiLayer(pf * 1.22, sN * 0.8, Rfa, lk * 0.95, wk, px * 3.5, 21.0, rotFar, flowPh * 0.7, p_unfold * 0.5, 1.0, champ, copper, 0.0, tl, rd);
-    col = mix(col, L1.rgb * mix(vec3(1.0), u_a2 * 2.2 + 0.08, 0.55) * 0.5, L1.a);
-    L2 = phiLayer(pm, sN, Rfa, lk, wk, px * 1.2, 3.0, rotA, flowPh, p_unfold, 0.0, champ, copper, 0.0, tl, rd);
+    L1 = phiLayer(pf * 1.22, sN * 0.8, Rfa, lk * 0.95, wk, px * 3.5, 21.0, rotFar, flowPh * 0.7, P_UNFOLD * 0.5, 1.0, champ, copper, 0.0, tl, rd);
+    col = mix(col, L1.rgb * (u_a2 * 1.5 + 0.03) * 0.55, L1.a * 0.55);       // far stratum: jade-tinted, never a grey haze
+    L2 = phiLayer(pm, sN, Rfa, lk, wk, px * 1.2, 3.0, rotA, flowPh, P_UNFOLD, 0.0, champ, copper, 0.0, tl, rd);
     if (variant == 6) {                                                 // Twin Phyllotaxis: counter-rotating second lattice
-      vec4 T2 = phiLayer(pm * 1.0, sN * 0.618, Rfa * 0.96, lk * 1.2, wk, px * 1.2, 17.0, -turnsRot * 2.0 + 2.2, -flowPh, p_unfold, 0.0, copper, champ, 0.0, -tl, rd);
+      vec4 T2 = phiLayer(pm * 1.0, sN * 0.618, Rfa * 0.96, lk * 1.2, wk, px * 1.2, 17.0, -turnsRot * 2.0 + 2.2, -flowPh, P_UNFOLD, 0.0, copper, champ, 0.0, -tl, rd);
       col = mix(col, T2.rgb * 0.8, T2.a);
     }
     col = mix(col, L2.rgb, L2.a);
     // logarithmic spiral scaffold: separate from phyllotaxis, 2 px emissive thread with a travelling pulse
     {
       float r = max(length(pm), 1e-3);
-      float b = max(p_pitch, 0.05);
+      float b = max(P_PITCH, 0.05);
       float a = log(r / 0.03) / b;
       float arms = 2.0;
       float dphi = k_wrapang((atan(pm.y, pm.x) - a - turnsRot * 0.0) * arms) / arms;

@@ -1,0 +1,329 @@
+{
+  "kit": "phi-bloom",
+  "style": "ivory-helix",
+  "phase": 0.37,
+  "size": [
+    120,
+    213
+  ],
+  "note": "effect = max mean-abs 8-bit change vs the default frame over min/max (or every option)",
+  "rows": [
+    {
+      "key": "petals",
+      "label": "Petal count",
+      "type": "int",
+      "def": 168,
+      "vals": [
+        48,
+        240
+      ],
+      "diffs": [
+        22.6,
+        15.1
+      ],
+      "effect": 22.6
+    },
+    {
+      "key": "pitch",
+      "label": "Spiral pitch",
+      "type": "range",
+      "def": 0.18,
+      "vals": [
+        0.08,
+        0.35
+      ],
+      "diffs": [
+        1.14,
+        1.21
+      ],
+      "effect": 1.21
+    },
+    {
+      "key": "bladeLen",
+      "label": "Blade length",
+      "type": "range",
+      "def": 0.082,
+      "vals": [
+        0.03,
+        0.16
+      ],
+      "diffs": [
+        26.25,
+        38.42
+      ],
+      "effect": 38.42
+    },
+    {
+      "key": "taper",
+      "label": "Blade taper",
+      "type": "range",
+      "def": 0.62,
+      "vals": [
+        0.15,
+        0.9
+      ],
+      "diffs": [
+        7.42,
+        4.99
+      ],
+      "effect": 7.42
+    },
+    {
+      "key": "depth",
+      "label": "Depth spacing",
+      "type": "range",
+      "def": 0.12,
+      "vals": [
+        0.02,
+        0.3
+      ],
+      "diffs": [
+        4.06,
+        6.45
+      ],
+      "effect": 6.45
+    },
+    {
+      "key": "translucency",
+      "label": "Translucency",
+      "type": "range",
+      "def": 0.3,
+      "vals": [
+        0,
+        0.75
+      ],
+      "diffs": [
+        0.42,
+        0.6
+      ],
+      "effect": 0.6
+    },
+    {
+      "key": "rim",
+      "label": "Rim intensity",
+      "type": "range",
+      "def": 1,
+      "vals": [
+        0,
+        2
+      ],
+      "diffs": [
+        4.48,
+        3.87
+      ],
+      "effect": 4.48
+    },
+    {
+      "key": "caustic",
+      "label": "Copper caustics",
+      "type": "range",
+      "def": 0.3,
+      "vals": [
+        0,
+        1.5
+      ],
+      "diffs": [
+        0.63,
+        2.52
+      ],
+      "effect": 2.52
+    },
+    {
+      "key": "core",
+      "label": "Core glow",
+      "type": "range",
+      "def": 0.5,
+      "vals": [
+        0,
+        3
+      ],
+      "diffs": [
+        0.96,
+        3.69
+      ],
+      "effect": 3.69
+    },
+    {
+      "key": "turns",
+      "label": "Turns per loop",
+      "type": "int",
+      "def": 0,
+      "vals": [
+        0,
+        2
+      ],
+      "diffs": [
+        0,
+        19.09
+      ],
+      "effect": 19.09
+    },
+    {
+      "key": "breath",
+      "label": "Breath amplitude",
+      "type": "range",
+      "def": 0.035,
+      "vals": [
+        0,
+        0.12
+      ],
+      "diffs": [
+        1.78,
+        4.27
+      ],
+      "effect": 4.27
+    },
+    {
+      "key": "unfold",
+      "label": "Unfold",
+      "type": "range",
+      "def": 0.04,
+      "vals": [
+        0,
+        0.3
+      ],
+      "diffs": [
+        4.23,
+        18.66
+      ],
+      "effect": 18.66
+    },
+    {
+      "key": "flow",
+      "label": "Flow steps per loop",
+      "type": "int",
+      "def": 1,
+      "vals": [
+        0,
+        3
+      ],
+      "diffs": [
+        8.48,
+        14.27
+      ],
+      "effect": 14.27
+    },
+    {
+      "key": "orbit",
+      "label": "Camera orbit",
+      "type": "range",
+      "def": 0.06,
+      "vals": [
+        0,
+        0.25
+      ],
+      "diffs": [
+        4.19,
+        10.79
+      ],
+      "effect": 10.79
+    },
+    {
+      "key": "keyAngle",
+      "label": "Key direction",
+      "type": "range",
+      "def": 125,
+      "vals": [
+        -180,
+        180
+      ],
+      "diffs": [
+        5.71,
+        5.71
+      ],
+      "effect": 5.71
+    },
+    {
+      "key": "exposure",
+      "label": "Exposure",
+      "type": "range",
+      "def": 1,
+      "vals": [
+        0.4,
+        2.4
+      ],
+      "diffs": [
+        26.87,
+        36.84
+      ],
+      "effect": 36.84
+    },
+    {
+      "key": "bloom",
+      "label": "Bloom",
+      "type": "range",
+      "def": 0.55,
+      "vals": [
+        0,
+        1.6
+      ],
+      "diffs": [
+        1.99,
+        3.02
+      ],
+      "effect": 3.02
+    },
+    {
+      "key": "bloomRadius",
+      "label": "Bloom radius",
+      "type": "range",
+      "def": 1,
+      "vals": [
+        0.4,
+        2.2
+      ],
+      "diffs": [
+        0.63,
+        1.15
+      ],
+      "effect": 1.15
+    },
+    {
+      "key": "lensCA",
+      "label": "Edge fringe",
+      "type": "range",
+      "def": 0.12,
+      "vals": [
+        0,
+        0.5
+      ],
+      "diffs": [
+        0.39,
+        1.21
+      ],
+      "effect": 1.21
+    },
+    {
+      "key": "vignette",
+      "label": "Vignette",
+      "type": "range",
+      "def": 0.38,
+      "vals": [
+        0,
+        0.8
+      ],
+      "diffs": [
+        1.9,
+        2.42
+      ],
+      "effect": 2.42
+    },
+    {
+      "key": "quality",
+      "label": "Quality",
+      "type": "select",
+      "def": "balanced",
+      "vals": [
+        "live",
+        "balanced",
+        "export"
+      ],
+      "diffs": [
+        0.86,
+        0,
+        0
+      ],
+      "effect": 0.86
+    }
+  ]
+}
