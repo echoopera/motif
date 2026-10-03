@@ -1,0 +1,2310 @@
+{
+  "format": "motif-kit@4",
+  "id": "cellular-cosmos",
+  "name": "Cellular Cosmos",
+  "version": "1.0.0",
+  "author": "Motif",
+  "description": "Translucent emerald membranes, coral colonies, radial organs and dark channels. A deterministic periodic lifecycle of division, migration and reintegration. Nine seamless infinite loops.",
+  "license": "",
+  "accent": "#2FD39A",
+  "common": "common.glsl",
+  "palettes": [
+    {
+      "id": "emerald-coral",
+      "name": "Emerald Coral",
+      "bg": "#010C09",
+      "ink": "#F7F0DA",
+      "a": [
+        "#2FD39A",
+        "#FF5C3A",
+        "#0A4A3D"
+      ]
+    },
+    {
+      "id": "abyss",
+      "name": "Abyss",
+      "bg": "#01070D",
+      "ink": "#E8F6FF",
+      "a": [
+        "#3DB8E8",
+        "#F2A65A",
+        "#0B3050"
+      ]
+    },
+    {
+      "id": "lagoon-pink",
+      "name": "Lagoon Pink",
+      "bg": "#020D0C",
+      "ink": "#FFF0F2",
+      "a": [
+        "#4FE0C8",
+        "#FF7AA8",
+        "#0E4B4A"
+      ]
+    },
+    {
+      "id": "bloom-amber",
+      "name": "Bloom Amber",
+      "bg": "#0B0705",
+      "ink": "#FFF3DC",
+      "a": [
+        "#C9D94E",
+        "#FF8A3A",
+        "#3A3010"
+      ]
+    }
+  ],
+  "styles": [
+    {
+      "id": "cellular-cosmos-hero",
+      "name": "Cellular Cosmos Hero",
+      "group": "Cellular Cosmos",
+      "tags": [
+        "flagship",
+        "cells",
+        "lifecycle"
+      ],
+      "blurb": "Emerald and coral colonies with radial organs; daughters divide, wander and rejoin on one closed cycle.",
+      "palette": "emerald-coral",
+      "flash": false,
+      "cost": 1.5,
+      "graph": {
+        "buffers": {
+          "scene": {
+            "scale": 0.75
+          },
+          "glowA": {
+            "scale": 0.25
+          },
+          "glowB": {
+            "scale": 0.125
+          }
+        },
+        "passes": [
+          {
+            "src": "styles/cellular-cosmos-hero.glsl",
+            "reads": [],
+            "writes": "scene"
+          },
+          {
+            "src": "styles/_glowA.glsl",
+            "reads": [
+              "scene"
+            ],
+            "writes": "glowA"
+          },
+          {
+            "src": "styles/_glowB.glsl",
+            "reads": [
+              "glowA"
+            ],
+            "writes": "glowB"
+          },
+          {
+            "src": "styles/_out.glsl",
+            "reads": [
+              "scene",
+              "glowA",
+              "glowB"
+            ],
+            "writes": "output"
+          }
+        ]
+      },
+      "params": {
+        "count": {
+          "type": "int",
+          "label": "Colony count",
+          "min": 8,
+          "max": 36,
+          "def": 18,
+          "group": "Form",
+          "hint": "Approximate number of colonies in the frame. Sets the cell size.",
+          "mutate": 0.3
+        },
+        "species": {
+          "type": "range",
+          "label": "Species mix",
+          "min": 0,
+          "max": 1,
+          "def": 0.6,
+          "step": 0.005,
+          "group": "Form",
+          "hint": "Share of coral colonies against emerald cells."
+        },
+        "membrane": {
+          "type": "range",
+          "label": "Membrane width",
+          "min": 0.003,
+          "max": 0.035,
+          "def": 0.012,
+          "step": 0.00016,
+          "group": "Material",
+          "hint": "Width of the bright membrane and its dark channel, scene units.",
+          "log": true
+        },
+        "translucency": {
+          "type": "range",
+          "label": "Translucency",
+          "min": 0,
+          "max": 0.7,
+          "def": 0.25,
+          "step": 0.0035,
+          "group": "Material",
+          "hint": "How glassy the cell bodies are."
+        },
+        "organelles": {
+          "type": "range",
+          "label": "Organelle density",
+          "min": 0.1,
+          "max": 1,
+          "def": 0.6,
+          "step": 0.0045,
+          "group": "Material",
+          "hint": "Number of organelle points circling each nucleus."
+        },
+        "filaments": {
+          "type": "int",
+          "label": "Filament count",
+          "min": 8,
+          "max": 48,
+          "def": 24,
+          "group": "Material",
+          "hint": "Radial filaments around each nucleus. A spatial count.",
+          "mutate": 0.3
+        },
+        "divAmp": {
+          "type": "range",
+          "label": "Division amplitude",
+          "min": 0,
+          "max": 0.4,
+          "def": 0.18,
+          "step": 0.002,
+          "group": "Motion",
+          "hint": "How far a daughter cell separates from its parent."
+        },
+        "migrate": {
+          "type": "range",
+          "label": "Migration radius",
+          "min": 0,
+          "max": 0.25,
+          "def": 0.1,
+          "step": 0.0013,
+          "group": "Motion",
+          "hint": "Radius of each colony's closed migration orbit."
+        },
+        "cycles": {
+          "type": "int",
+          "label": "Lifecycles per loop",
+          "min": 1,
+          "max": 3,
+          "def": 1,
+          "group": "Motion",
+          "hint": "Whole division and reintegration cycles per loop.",
+          "mutate": 0
+        },
+        "wobble": {
+          "type": "range",
+          "label": "Membrane wobble",
+          "min": 0,
+          "max": 0.3,
+          "def": 0.08,
+          "step": 0.0015,
+          "group": "Motion",
+          "hint": "Standing wave along the membranes (used by Membrane Choir)."
+        },
+        "keyAngle": {
+          "type": "range",
+          "label": "Key direction",
+          "min": -180,
+          "max": 180,
+          "def": 60,
+          "step": 1,
+          "unit": "°",
+          "group": "Light",
+          "hint": "Direction of the key light in the picture plane, degrees.",
+          "randMax": 180
+        },
+        "exposure": {
+          "type": "range",
+          "label": "Exposure",
+          "min": 0.4,
+          "max": 2.4,
+          "def": 1,
+          "step": 0.01,
+          "unit": "×",
+          "log": true,
+          "group": "Light",
+          "hint": "Linear exposure before the single tone map.",
+          "randMax": 1.4
+        },
+        "bloom": {
+          "type": "range",
+          "label": "Bloom",
+          "min": 0,
+          "max": 1.6,
+          "def": 0.45,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Glow added around emissive light. 0 shows the bare geometry.",
+          "randMax": 0.9
+        },
+        "bloomRadius": {
+          "type": "range",
+          "label": "Bloom radius",
+          "min": 0.4,
+          "max": 2.2,
+          "def": 1,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Width of the glow relative to the frame.",
+          "randMax": 1.5
+        },
+        "lensCA": {
+          "type": "range",
+          "label": "Edge fringe",
+          "min": 0,
+          "max": 0.5,
+          "def": 0.12,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Spectral fringing toward the frame edge.",
+          "randMax": 0.25
+        },
+        "vignette": {
+          "type": "range",
+          "label": "Vignette",
+          "min": 0,
+          "max": 0.8,
+          "def": 0.38,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Darkens the frame edge; never touches the focal area.",
+          "randMax": 0.55
+        },
+        "quality": {
+          "type": "select",
+          "label": "Quality",
+          "options": [
+            {
+              "v": "live",
+              "l": "Live"
+            },
+            {
+              "v": "balanced",
+              "l": "Balanced"
+            },
+            {
+              "v": "export",
+              "l": "Export"
+            }
+          ],
+          "def": "balanced",
+          "mutate": 0,
+          "group": "Quality",
+          "hint": "Sample counts only. Composition, phase and exposure stay the same."
+        }
+      }
+    },
+    {
+      "id": "emerald-colonies",
+      "name": "Emerald Colonies",
+      "group": "Cellular Cosmos",
+      "tags": [
+        "emerald",
+        "large"
+      ],
+      "blurb": "One species of large, glassy emerald colonies drifting slowly in their dark channels.",
+      "palette": "emerald-coral",
+      "flash": false,
+      "cost": 1.5,
+      "graph": {
+        "buffers": {
+          "scene": {
+            "scale": 0.75
+          },
+          "glowA": {
+            "scale": 0.25
+          },
+          "glowB": {
+            "scale": 0.125
+          }
+        },
+        "passes": [
+          {
+            "src": "styles/emerald-colonies.glsl",
+            "reads": [],
+            "writes": "scene"
+          },
+          {
+            "src": "styles/_glowA.glsl",
+            "reads": [
+              "scene"
+            ],
+            "writes": "glowA"
+          },
+          {
+            "src": "styles/_glowB.glsl",
+            "reads": [
+              "glowA"
+            ],
+            "writes": "glowB"
+          },
+          {
+            "src": "styles/_out.glsl",
+            "reads": [
+              "scene",
+              "glowA",
+              "glowB"
+            ],
+            "writes": "output"
+          }
+        ]
+      },
+      "params": {
+        "count": {
+          "type": "int",
+          "label": "Colony count",
+          "min": 8,
+          "max": 36,
+          "def": 12,
+          "group": "Form",
+          "hint": "Approximate number of colonies in the frame. Sets the cell size.",
+          "mutate": 0.3
+        },
+        "species": {
+          "type": "range",
+          "label": "Species mix",
+          "min": 0,
+          "max": 1,
+          "def": 0,
+          "step": 0.005,
+          "group": "Form",
+          "hint": "Share of coral colonies against emerald cells."
+        },
+        "membrane": {
+          "type": "range",
+          "label": "Membrane width",
+          "min": 0.003,
+          "max": 0.035,
+          "def": 0.012,
+          "step": 0.00016,
+          "group": "Material",
+          "hint": "Width of the bright membrane and its dark channel, scene units.",
+          "log": true
+        },
+        "translucency": {
+          "type": "range",
+          "label": "Translucency",
+          "min": 0,
+          "max": 0.7,
+          "def": 0.45,
+          "step": 0.0035,
+          "group": "Material",
+          "hint": "How glassy the cell bodies are."
+        },
+        "organelles": {
+          "type": "range",
+          "label": "Organelle density",
+          "min": 0.1,
+          "max": 1,
+          "def": 0.6,
+          "step": 0.0045,
+          "group": "Material",
+          "hint": "Number of organelle points circling each nucleus."
+        },
+        "filaments": {
+          "type": "int",
+          "label": "Filament count",
+          "min": 8,
+          "max": 48,
+          "def": 20,
+          "group": "Material",
+          "hint": "Radial filaments around each nucleus. A spatial count.",
+          "mutate": 0.3
+        },
+        "divAmp": {
+          "type": "range",
+          "label": "Division amplitude",
+          "min": 0,
+          "max": 0.4,
+          "def": 0.12,
+          "step": 0.002,
+          "group": "Motion",
+          "hint": "How far a daughter cell separates from its parent."
+        },
+        "migrate": {
+          "type": "range",
+          "label": "Migration radius",
+          "min": 0,
+          "max": 0.25,
+          "def": 0.1,
+          "step": 0.0013,
+          "group": "Motion",
+          "hint": "Radius of each colony's closed migration orbit."
+        },
+        "cycles": {
+          "type": "int",
+          "label": "Lifecycles per loop",
+          "min": 1,
+          "max": 3,
+          "def": 1,
+          "group": "Motion",
+          "hint": "Whole division and reintegration cycles per loop.",
+          "mutate": 0
+        },
+        "wobble": {
+          "type": "range",
+          "label": "Membrane wobble",
+          "min": 0,
+          "max": 0.3,
+          "def": 0.08,
+          "step": 0.0015,
+          "group": "Motion",
+          "hint": "Standing wave along the membranes (used by Membrane Choir)."
+        },
+        "keyAngle": {
+          "type": "range",
+          "label": "Key direction",
+          "min": -180,
+          "max": 180,
+          "def": 60,
+          "step": 1,
+          "unit": "°",
+          "group": "Light",
+          "hint": "Direction of the key light in the picture plane, degrees.",
+          "randMax": 180
+        },
+        "exposure": {
+          "type": "range",
+          "label": "Exposure",
+          "min": 0.4,
+          "max": 2.4,
+          "def": 1,
+          "step": 0.01,
+          "unit": "×",
+          "log": true,
+          "group": "Light",
+          "hint": "Linear exposure before the single tone map.",
+          "randMax": 1.4
+        },
+        "bloom": {
+          "type": "range",
+          "label": "Bloom",
+          "min": 0,
+          "max": 1.6,
+          "def": 0.45,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Glow added around emissive light. 0 shows the bare geometry.",
+          "randMax": 0.9
+        },
+        "bloomRadius": {
+          "type": "range",
+          "label": "Bloom radius",
+          "min": 0.4,
+          "max": 2.2,
+          "def": 1,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Width of the glow relative to the frame.",
+          "randMax": 1.5
+        },
+        "lensCA": {
+          "type": "range",
+          "label": "Edge fringe",
+          "min": 0,
+          "max": 0.5,
+          "def": 0.12,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Spectral fringing toward the frame edge.",
+          "randMax": 0.25
+        },
+        "vignette": {
+          "type": "range",
+          "label": "Vignette",
+          "min": 0,
+          "max": 0.8,
+          "def": 0.38,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Darkens the frame edge; never touches the focal area.",
+          "randMax": 0.55
+        },
+        "quality": {
+          "type": "select",
+          "label": "Quality",
+          "options": [
+            {
+              "v": "live",
+              "l": "Live"
+            },
+            {
+              "v": "balanced",
+              "l": "Balanced"
+            },
+            {
+              "v": "export",
+              "l": "Export"
+            }
+          ],
+          "def": "balanced",
+          "mutate": 0,
+          "group": "Quality",
+          "hint": "Sample counts only. Composition, phase and exposure stay the same."
+        }
+      }
+    },
+    {
+      "id": "coral-division",
+      "name": "Coral Division",
+      "group": "Cellular Cosmos",
+      "tags": [
+        "coral",
+        "division"
+      ],
+      "blurb": "Coral colonies bud and split decisively, daughters sliding well apart before they rejoin.",
+      "palette": "emerald-coral",
+      "flash": false,
+      "cost": 1.5,
+      "graph": {
+        "buffers": {
+          "scene": {
+            "scale": 0.75
+          },
+          "glowA": {
+            "scale": 0.25
+          },
+          "glowB": {
+            "scale": 0.125
+          }
+        },
+        "passes": [
+          {
+            "src": "styles/coral-division.glsl",
+            "reads": [],
+            "writes": "scene"
+          },
+          {
+            "src": "styles/_glowA.glsl",
+            "reads": [
+              "scene"
+            ],
+            "writes": "glowA"
+          },
+          {
+            "src": "styles/_glowB.glsl",
+            "reads": [
+              "glowA"
+            ],
+            "writes": "glowB"
+          },
+          {
+            "src": "styles/_out.glsl",
+            "reads": [
+              "scene",
+              "glowA",
+              "glowB"
+            ],
+            "writes": "output"
+          }
+        ]
+      },
+      "params": {
+        "count": {
+          "type": "int",
+          "label": "Colony count",
+          "min": 8,
+          "max": 36,
+          "def": 16,
+          "group": "Form",
+          "hint": "Approximate number of colonies in the frame. Sets the cell size.",
+          "mutate": 0.3
+        },
+        "species": {
+          "type": "range",
+          "label": "Species mix",
+          "min": 0,
+          "max": 1,
+          "def": 1,
+          "step": 0.005,
+          "group": "Form",
+          "hint": "Share of coral colonies against emerald cells."
+        },
+        "membrane": {
+          "type": "range",
+          "label": "Membrane width",
+          "min": 0.003,
+          "max": 0.035,
+          "def": 0.014,
+          "step": 0.00016,
+          "group": "Material",
+          "hint": "Width of the bright membrane and its dark channel, scene units.",
+          "log": true
+        },
+        "translucency": {
+          "type": "range",
+          "label": "Translucency",
+          "min": 0,
+          "max": 0.7,
+          "def": 0.25,
+          "step": 0.0035,
+          "group": "Material",
+          "hint": "How glassy the cell bodies are."
+        },
+        "organelles": {
+          "type": "range",
+          "label": "Organelle density",
+          "min": 0.1,
+          "max": 1,
+          "def": 0.6,
+          "step": 0.0045,
+          "group": "Material",
+          "hint": "Number of organelle points circling each nucleus."
+        },
+        "filaments": {
+          "type": "int",
+          "label": "Filament count",
+          "min": 8,
+          "max": 48,
+          "def": 24,
+          "group": "Material",
+          "hint": "Radial filaments around each nucleus. A spatial count.",
+          "mutate": 0.3
+        },
+        "divAmp": {
+          "type": "range",
+          "label": "Division amplitude",
+          "min": 0,
+          "max": 0.4,
+          "def": 0.34,
+          "step": 0.002,
+          "group": "Motion",
+          "hint": "How far a daughter cell separates from its parent."
+        },
+        "migrate": {
+          "type": "range",
+          "label": "Migration radius",
+          "min": 0,
+          "max": 0.25,
+          "def": 0.06,
+          "step": 0.0013,
+          "group": "Motion",
+          "hint": "Radius of each colony's closed migration orbit."
+        },
+        "cycles": {
+          "type": "int",
+          "label": "Lifecycles per loop",
+          "min": 1,
+          "max": 3,
+          "def": 1,
+          "group": "Motion",
+          "hint": "Whole division and reintegration cycles per loop.",
+          "mutate": 0
+        },
+        "wobble": {
+          "type": "range",
+          "label": "Membrane wobble",
+          "min": 0,
+          "max": 0.3,
+          "def": 0.08,
+          "step": 0.0015,
+          "group": "Motion",
+          "hint": "Standing wave along the membranes (used by Membrane Choir)."
+        },
+        "keyAngle": {
+          "type": "range",
+          "label": "Key direction",
+          "min": -180,
+          "max": 180,
+          "def": 60,
+          "step": 1,
+          "unit": "°",
+          "group": "Light",
+          "hint": "Direction of the key light in the picture plane, degrees.",
+          "randMax": 180
+        },
+        "exposure": {
+          "type": "range",
+          "label": "Exposure",
+          "min": 0.4,
+          "max": 2.4,
+          "def": 1,
+          "step": 0.01,
+          "unit": "×",
+          "log": true,
+          "group": "Light",
+          "hint": "Linear exposure before the single tone map.",
+          "randMax": 1.4
+        },
+        "bloom": {
+          "type": "range",
+          "label": "Bloom",
+          "min": 0,
+          "max": 1.6,
+          "def": 0.45,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Glow added around emissive light. 0 shows the bare geometry.",
+          "randMax": 0.9
+        },
+        "bloomRadius": {
+          "type": "range",
+          "label": "Bloom radius",
+          "min": 0.4,
+          "max": 2.2,
+          "def": 1,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Width of the glow relative to the frame.",
+          "randMax": 1.5
+        },
+        "lensCA": {
+          "type": "range",
+          "label": "Edge fringe",
+          "min": 0,
+          "max": 0.5,
+          "def": 0.12,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Spectral fringing toward the frame edge.",
+          "randMax": 0.25
+        },
+        "vignette": {
+          "type": "range",
+          "label": "Vignette",
+          "min": 0,
+          "max": 0.8,
+          "def": 0.38,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Darkens the frame edge; never touches the focal area.",
+          "randMax": 0.55
+        },
+        "quality": {
+          "type": "select",
+          "label": "Quality",
+          "options": [
+            {
+              "v": "live",
+              "l": "Live"
+            },
+            {
+              "v": "balanced",
+              "l": "Balanced"
+            },
+            {
+              "v": "export",
+              "l": "Export"
+            }
+          ],
+          "def": "balanced",
+          "mutate": 0,
+          "group": "Quality",
+          "hint": "Sample counts only. Composition, phase and exposure stay the same."
+        }
+      }
+    },
+    {
+      "id": "membrane-choir",
+      "name": "Membrane Choir",
+      "group": "Cellular Cosmos",
+      "tags": [
+        "membranes",
+        "wave"
+      ],
+      "blurb": "The membranes are the subject: bright, thick borders that waver together like a choir.",
+      "palette": "abyss",
+      "flash": false,
+      "cost": 1.5,
+      "graph": {
+        "buffers": {
+          "scene": {
+            "scale": 0.75
+          },
+          "glowA": {
+            "scale": 0.25
+          },
+          "glowB": {
+            "scale": 0.125
+          }
+        },
+        "passes": [
+          {
+            "src": "styles/membrane-choir.glsl",
+            "reads": [],
+            "writes": "scene"
+          },
+          {
+            "src": "styles/_glowA.glsl",
+            "reads": [
+              "scene"
+            ],
+            "writes": "glowA"
+          },
+          {
+            "src": "styles/_glowB.glsl",
+            "reads": [
+              "glowA"
+            ],
+            "writes": "glowB"
+          },
+          {
+            "src": "styles/_out.glsl",
+            "reads": [
+              "scene",
+              "glowA",
+              "glowB"
+            ],
+            "writes": "output"
+          }
+        ]
+      },
+      "params": {
+        "count": {
+          "type": "int",
+          "label": "Colony count",
+          "min": 8,
+          "max": 36,
+          "def": 20,
+          "group": "Form",
+          "hint": "Approximate number of colonies in the frame. Sets the cell size.",
+          "mutate": 0.3
+        },
+        "species": {
+          "type": "range",
+          "label": "Species mix",
+          "min": 0,
+          "max": 1,
+          "def": 0.6,
+          "step": 0.005,
+          "group": "Form",
+          "hint": "Share of coral colonies against emerald cells."
+        },
+        "membrane": {
+          "type": "range",
+          "label": "Membrane width",
+          "min": 0.003,
+          "max": 0.035,
+          "def": 0.016,
+          "step": 0.00016,
+          "group": "Material",
+          "hint": "Width of the bright membrane and its dark channel, scene units.",
+          "log": true
+        },
+        "translucency": {
+          "type": "range",
+          "label": "Translucency",
+          "min": 0,
+          "max": 0.7,
+          "def": 0.5,
+          "step": 0.0035,
+          "group": "Material",
+          "hint": "How glassy the cell bodies are."
+        },
+        "organelles": {
+          "type": "range",
+          "label": "Organelle density",
+          "min": 0.1,
+          "max": 1,
+          "def": 0.6,
+          "step": 0.0045,
+          "group": "Material",
+          "hint": "Number of organelle points circling each nucleus."
+        },
+        "filaments": {
+          "type": "int",
+          "label": "Filament count",
+          "min": 8,
+          "max": 48,
+          "def": 24,
+          "group": "Material",
+          "hint": "Radial filaments around each nucleus. A spatial count.",
+          "mutate": 0.3
+        },
+        "divAmp": {
+          "type": "range",
+          "label": "Division amplitude",
+          "min": 0,
+          "max": 0.4,
+          "def": 0.1,
+          "step": 0.002,
+          "group": "Motion",
+          "hint": "How far a daughter cell separates from its parent."
+        },
+        "migrate": {
+          "type": "range",
+          "label": "Migration radius",
+          "min": 0,
+          "max": 0.25,
+          "def": 0.05,
+          "step": 0.0013,
+          "group": "Motion",
+          "hint": "Radius of each colony's closed migration orbit."
+        },
+        "cycles": {
+          "type": "int",
+          "label": "Lifecycles per loop",
+          "min": 1,
+          "max": 3,
+          "def": 1,
+          "group": "Motion",
+          "hint": "Whole division and reintegration cycles per loop.",
+          "mutate": 0
+        },
+        "wobble": {
+          "type": "range",
+          "label": "Membrane wobble",
+          "min": 0,
+          "max": 0.3,
+          "def": 0.16,
+          "step": 0.0015,
+          "group": "Motion",
+          "hint": "Standing wave along the membranes (used by Membrane Choir)."
+        },
+        "keyAngle": {
+          "type": "range",
+          "label": "Key direction",
+          "min": -180,
+          "max": 180,
+          "def": 60,
+          "step": 1,
+          "unit": "°",
+          "group": "Light",
+          "hint": "Direction of the key light in the picture plane, degrees.",
+          "randMax": 180
+        },
+        "exposure": {
+          "type": "range",
+          "label": "Exposure",
+          "min": 0.4,
+          "max": 2.4,
+          "def": 1,
+          "step": 0.01,
+          "unit": "×",
+          "log": true,
+          "group": "Light",
+          "hint": "Linear exposure before the single tone map.",
+          "randMax": 1.4
+        },
+        "bloom": {
+          "type": "range",
+          "label": "Bloom",
+          "min": 0,
+          "max": 1.6,
+          "def": 0.4,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Glow added around emissive light. 0 shows the bare geometry.",
+          "randMax": 0.9
+        },
+        "bloomRadius": {
+          "type": "range",
+          "label": "Bloom radius",
+          "min": 0.4,
+          "max": 2.2,
+          "def": 1,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Width of the glow relative to the frame.",
+          "randMax": 1.5
+        },
+        "lensCA": {
+          "type": "range",
+          "label": "Edge fringe",
+          "min": 0,
+          "max": 0.5,
+          "def": 0.12,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Spectral fringing toward the frame edge.",
+          "randMax": 0.25
+        },
+        "vignette": {
+          "type": "range",
+          "label": "Vignette",
+          "min": 0,
+          "max": 0.8,
+          "def": 0.38,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Darkens the frame edge; never touches the focal area.",
+          "randMax": 0.55
+        },
+        "quality": {
+          "type": "select",
+          "label": "Quality",
+          "options": [
+            {
+              "v": "live",
+              "l": "Live"
+            },
+            {
+              "v": "balanced",
+              "l": "Balanced"
+            },
+            {
+              "v": "export",
+              "l": "Export"
+            }
+          ],
+          "def": "balanced",
+          "mutate": 0,
+          "group": "Quality",
+          "hint": "Sample counts only. Composition, phase and exposure stay the same."
+        }
+      }
+    },
+    {
+      "id": "spore-drift",
+      "name": "Spore Drift",
+      "group": "Cellular Cosmos",
+      "tags": [
+        "spores",
+        "small"
+      ],
+      "blurb": "A fine scatter of small cells and spores drifting on tight closed loops.",
+      "palette": "bloom-amber",
+      "flash": false,
+      "cost": 1.5,
+      "graph": {
+        "buffers": {
+          "scene": {
+            "scale": 0.75
+          },
+          "glowA": {
+            "scale": 0.25
+          },
+          "glowB": {
+            "scale": 0.125
+          }
+        },
+        "passes": [
+          {
+            "src": "styles/spore-drift.glsl",
+            "reads": [],
+            "writes": "scene"
+          },
+          {
+            "src": "styles/_glowA.glsl",
+            "reads": [
+              "scene"
+            ],
+            "writes": "glowA"
+          },
+          {
+            "src": "styles/_glowB.glsl",
+            "reads": [
+              "glowA"
+            ],
+            "writes": "glowB"
+          },
+          {
+            "src": "styles/_out.glsl",
+            "reads": [
+              "scene",
+              "glowA",
+              "glowB"
+            ],
+            "writes": "output"
+          }
+        ]
+      },
+      "params": {
+        "count": {
+          "type": "int",
+          "label": "Colony count",
+          "min": 8,
+          "max": 36,
+          "def": 36,
+          "group": "Form",
+          "hint": "Approximate number of colonies in the frame. Sets the cell size.",
+          "mutate": 0.3
+        },
+        "species": {
+          "type": "range",
+          "label": "Species mix",
+          "min": 0,
+          "max": 1,
+          "def": 0.35,
+          "step": 0.005,
+          "group": "Form",
+          "hint": "Share of coral colonies against emerald cells."
+        },
+        "membrane": {
+          "type": "range",
+          "label": "Membrane width",
+          "min": 0.003,
+          "max": 0.035,
+          "def": 0.006,
+          "step": 0.00016,
+          "group": "Material",
+          "hint": "Width of the bright membrane and its dark channel, scene units.",
+          "log": true
+        },
+        "translucency": {
+          "type": "range",
+          "label": "Translucency",
+          "min": 0,
+          "max": 0.7,
+          "def": 0.5,
+          "step": 0.0035,
+          "group": "Material",
+          "hint": "How glassy the cell bodies are."
+        },
+        "organelles": {
+          "type": "range",
+          "label": "Organelle density",
+          "min": 0.1,
+          "max": 1,
+          "def": 0.25,
+          "step": 0.0045,
+          "group": "Material",
+          "hint": "Number of organelle points circling each nucleus."
+        },
+        "filaments": {
+          "type": "int",
+          "label": "Filament count",
+          "min": 8,
+          "max": 48,
+          "def": 12,
+          "group": "Material",
+          "hint": "Radial filaments around each nucleus. A spatial count.",
+          "mutate": 0.3
+        },
+        "divAmp": {
+          "type": "range",
+          "label": "Division amplitude",
+          "min": 0,
+          "max": 0.4,
+          "def": 0.15,
+          "step": 0.002,
+          "group": "Motion",
+          "hint": "How far a daughter cell separates from its parent."
+        },
+        "migrate": {
+          "type": "range",
+          "label": "Migration radius",
+          "min": 0,
+          "max": 0.25,
+          "def": 0.07,
+          "step": 0.0013,
+          "group": "Motion",
+          "hint": "Radius of each colony's closed migration orbit."
+        },
+        "cycles": {
+          "type": "int",
+          "label": "Lifecycles per loop",
+          "min": 1,
+          "max": 3,
+          "def": 1,
+          "group": "Motion",
+          "hint": "Whole division and reintegration cycles per loop.",
+          "mutate": 0
+        },
+        "wobble": {
+          "type": "range",
+          "label": "Membrane wobble",
+          "min": 0,
+          "max": 0.3,
+          "def": 0.08,
+          "step": 0.0015,
+          "group": "Motion",
+          "hint": "Standing wave along the membranes (used by Membrane Choir)."
+        },
+        "keyAngle": {
+          "type": "range",
+          "label": "Key direction",
+          "min": -180,
+          "max": 180,
+          "def": 60,
+          "step": 1,
+          "unit": "°",
+          "group": "Light",
+          "hint": "Direction of the key light in the picture plane, degrees.",
+          "randMax": 180
+        },
+        "exposure": {
+          "type": "range",
+          "label": "Exposure",
+          "min": 0.4,
+          "max": 2.4,
+          "def": 1,
+          "step": 0.01,
+          "unit": "×",
+          "log": true,
+          "group": "Light",
+          "hint": "Linear exposure before the single tone map.",
+          "randMax": 1.4
+        },
+        "bloom": {
+          "type": "range",
+          "label": "Bloom",
+          "min": 0,
+          "max": 1.6,
+          "def": 0.45,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Glow added around emissive light. 0 shows the bare geometry.",
+          "randMax": 0.9
+        },
+        "bloomRadius": {
+          "type": "range",
+          "label": "Bloom radius",
+          "min": 0.4,
+          "max": 2.2,
+          "def": 1,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Width of the glow relative to the frame.",
+          "randMax": 1.5
+        },
+        "lensCA": {
+          "type": "range",
+          "label": "Edge fringe",
+          "min": 0,
+          "max": 0.5,
+          "def": 0.12,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Spectral fringing toward the frame edge.",
+          "randMax": 0.25
+        },
+        "vignette": {
+          "type": "range",
+          "label": "Vignette",
+          "min": 0,
+          "max": 0.8,
+          "def": 0.38,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Darkens the frame edge; never touches the focal area.",
+          "randMax": 0.55
+        },
+        "quality": {
+          "type": "select",
+          "label": "Quality",
+          "options": [
+            {
+              "v": "live",
+              "l": "Live"
+            },
+            {
+              "v": "balanced",
+              "l": "Balanced"
+            },
+            {
+              "v": "export",
+              "l": "Export"
+            }
+          ],
+          "def": "balanced",
+          "mutate": 0,
+          "group": "Quality",
+          "hint": "Sample counts only. Composition, phase and exposure stay the same."
+        }
+      }
+    },
+    {
+      "id": "symbiotic-web",
+      "name": "Symbiotic Web",
+      "group": "Cellular Cosmos",
+      "tags": [
+        "web",
+        "network"
+      ],
+      "blurb": "Neighbouring colonies are tied by luminous filaments that tighten and slacken as they move.",
+      "palette": "lagoon-pink",
+      "flash": false,
+      "cost": 1.5,
+      "graph": {
+        "buffers": {
+          "scene": {
+            "scale": 0.75
+          },
+          "glowA": {
+            "scale": 0.25
+          },
+          "glowB": {
+            "scale": 0.125
+          }
+        },
+        "passes": [
+          {
+            "src": "styles/symbiotic-web.glsl",
+            "reads": [],
+            "writes": "scene"
+          },
+          {
+            "src": "styles/_glowA.glsl",
+            "reads": [
+              "scene"
+            ],
+            "writes": "glowA"
+          },
+          {
+            "src": "styles/_glowB.glsl",
+            "reads": [
+              "glowA"
+            ],
+            "writes": "glowB"
+          },
+          {
+            "src": "styles/_out.glsl",
+            "reads": [
+              "scene",
+              "glowA",
+              "glowB"
+            ],
+            "writes": "output"
+          }
+        ]
+      },
+      "params": {
+        "count": {
+          "type": "int",
+          "label": "Colony count",
+          "min": 8,
+          "max": 36,
+          "def": 22,
+          "group": "Form",
+          "hint": "Approximate number of colonies in the frame. Sets the cell size.",
+          "mutate": 0.3
+        },
+        "species": {
+          "type": "range",
+          "label": "Species mix",
+          "min": 0,
+          "max": 1,
+          "def": 0.5,
+          "step": 0.005,
+          "group": "Form",
+          "hint": "Share of coral colonies against emerald cells."
+        },
+        "membrane": {
+          "type": "range",
+          "label": "Membrane width",
+          "min": 0.003,
+          "max": 0.035,
+          "def": 0.01,
+          "step": 0.00016,
+          "group": "Material",
+          "hint": "Width of the bright membrane and its dark channel, scene units.",
+          "log": true
+        },
+        "translucency": {
+          "type": "range",
+          "label": "Translucency",
+          "min": 0,
+          "max": 0.7,
+          "def": 0.25,
+          "step": 0.0035,
+          "group": "Material",
+          "hint": "How glassy the cell bodies are."
+        },
+        "organelles": {
+          "type": "range",
+          "label": "Organelle density",
+          "min": 0.1,
+          "max": 1,
+          "def": 0.6,
+          "step": 0.0045,
+          "group": "Material",
+          "hint": "Number of organelle points circling each nucleus."
+        },
+        "filaments": {
+          "type": "int",
+          "label": "Filament count",
+          "min": 8,
+          "max": 48,
+          "def": 24,
+          "group": "Material",
+          "hint": "Radial filaments around each nucleus. A spatial count.",
+          "mutate": 0.3
+        },
+        "divAmp": {
+          "type": "range",
+          "label": "Division amplitude",
+          "min": 0,
+          "max": 0.4,
+          "def": 0.1,
+          "step": 0.002,
+          "group": "Motion",
+          "hint": "How far a daughter cell separates from its parent."
+        },
+        "migrate": {
+          "type": "range",
+          "label": "Migration radius",
+          "min": 0,
+          "max": 0.25,
+          "def": 0.12,
+          "step": 0.0013,
+          "group": "Motion",
+          "hint": "Radius of each colony's closed migration orbit."
+        },
+        "cycles": {
+          "type": "int",
+          "label": "Lifecycles per loop",
+          "min": 1,
+          "max": 3,
+          "def": 1,
+          "group": "Motion",
+          "hint": "Whole division and reintegration cycles per loop.",
+          "mutate": 0
+        },
+        "wobble": {
+          "type": "range",
+          "label": "Membrane wobble",
+          "min": 0,
+          "max": 0.3,
+          "def": 0.08,
+          "step": 0.0015,
+          "group": "Motion",
+          "hint": "Standing wave along the membranes (used by Membrane Choir)."
+        },
+        "keyAngle": {
+          "type": "range",
+          "label": "Key direction",
+          "min": -180,
+          "max": 180,
+          "def": 60,
+          "step": 1,
+          "unit": "°",
+          "group": "Light",
+          "hint": "Direction of the key light in the picture plane, degrees.",
+          "randMax": 180
+        },
+        "exposure": {
+          "type": "range",
+          "label": "Exposure",
+          "min": 0.4,
+          "max": 2.4,
+          "def": 1,
+          "step": 0.01,
+          "unit": "×",
+          "log": true,
+          "group": "Light",
+          "hint": "Linear exposure before the single tone map.",
+          "randMax": 1.4
+        },
+        "bloom": {
+          "type": "range",
+          "label": "Bloom",
+          "min": 0,
+          "max": 1.6,
+          "def": 0.45,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Glow added around emissive light. 0 shows the bare geometry.",
+          "randMax": 0.9
+        },
+        "bloomRadius": {
+          "type": "range",
+          "label": "Bloom radius",
+          "min": 0.4,
+          "max": 2.2,
+          "def": 1,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Width of the glow relative to the frame.",
+          "randMax": 1.5
+        },
+        "lensCA": {
+          "type": "range",
+          "label": "Edge fringe",
+          "min": 0,
+          "max": 0.5,
+          "def": 0.12,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Spectral fringing toward the frame edge.",
+          "randMax": 0.25
+        },
+        "vignette": {
+          "type": "range",
+          "label": "Vignette",
+          "min": 0,
+          "max": 0.8,
+          "def": 0.38,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Darkens the frame edge; never touches the focal area.",
+          "randMax": 0.55
+        },
+        "quality": {
+          "type": "select",
+          "label": "Quality",
+          "options": [
+            {
+              "v": "live",
+              "l": "Live"
+            },
+            {
+              "v": "balanced",
+              "l": "Balanced"
+            },
+            {
+              "v": "export",
+              "l": "Export"
+            }
+          ],
+          "def": "balanced",
+          "mutate": 0,
+          "group": "Quality",
+          "hint": "Sample counts only. Composition, phase and exposure stay the same."
+        }
+      }
+    },
+    {
+      "id": "radial-organs",
+      "name": "Radial Organs",
+      "group": "Cellular Cosmos",
+      "tags": [
+        "radial",
+        "sun"
+      ],
+      "blurb": "A few big cells each with a sunburst of radial organs and orbiting organelle rings.",
+      "palette": "bloom-amber",
+      "flash": false,
+      "cost": 1.5,
+      "graph": {
+        "buffers": {
+          "scene": {
+            "scale": 0.75
+          },
+          "glowA": {
+            "scale": 0.25
+          },
+          "glowB": {
+            "scale": 0.125
+          }
+        },
+        "passes": [
+          {
+            "src": "styles/radial-organs.glsl",
+            "reads": [],
+            "writes": "scene"
+          },
+          {
+            "src": "styles/_glowA.glsl",
+            "reads": [
+              "scene"
+            ],
+            "writes": "glowA"
+          },
+          {
+            "src": "styles/_glowB.glsl",
+            "reads": [
+              "glowA"
+            ],
+            "writes": "glowB"
+          },
+          {
+            "src": "styles/_out.glsl",
+            "reads": [
+              "scene",
+              "glowA",
+              "glowB"
+            ],
+            "writes": "output"
+          }
+        ]
+      },
+      "params": {
+        "count": {
+          "type": "int",
+          "label": "Colony count",
+          "min": 8,
+          "max": 36,
+          "def": 10,
+          "group": "Form",
+          "hint": "Approximate number of colonies in the frame. Sets the cell size.",
+          "mutate": 0.3
+        },
+        "species": {
+          "type": "range",
+          "label": "Species mix",
+          "min": 0,
+          "max": 1,
+          "def": 0.3,
+          "step": 0.005,
+          "group": "Form",
+          "hint": "Share of coral colonies against emerald cells."
+        },
+        "membrane": {
+          "type": "range",
+          "label": "Membrane width",
+          "min": 0.003,
+          "max": 0.035,
+          "def": 0.012,
+          "step": 0.00016,
+          "group": "Material",
+          "hint": "Width of the bright membrane and its dark channel, scene units.",
+          "log": true
+        },
+        "translucency": {
+          "type": "range",
+          "label": "Translucency",
+          "min": 0,
+          "max": 0.7,
+          "def": 0.25,
+          "step": 0.0035,
+          "group": "Material",
+          "hint": "How glassy the cell bodies are."
+        },
+        "organelles": {
+          "type": "range",
+          "label": "Organelle density",
+          "min": 0.1,
+          "max": 1,
+          "def": 0.95,
+          "step": 0.0045,
+          "group": "Material",
+          "hint": "Number of organelle points circling each nucleus."
+        },
+        "filaments": {
+          "type": "int",
+          "label": "Filament count",
+          "min": 8,
+          "max": 48,
+          "def": 40,
+          "group": "Material",
+          "hint": "Radial filaments around each nucleus. A spatial count.",
+          "mutate": 0.3
+        },
+        "divAmp": {
+          "type": "range",
+          "label": "Division amplitude",
+          "min": 0,
+          "max": 0.4,
+          "def": 0.08,
+          "step": 0.002,
+          "group": "Motion",
+          "hint": "How far a daughter cell separates from its parent."
+        },
+        "migrate": {
+          "type": "range",
+          "label": "Migration radius",
+          "min": 0,
+          "max": 0.25,
+          "def": 0.05,
+          "step": 0.0013,
+          "group": "Motion",
+          "hint": "Radius of each colony's closed migration orbit."
+        },
+        "cycles": {
+          "type": "int",
+          "label": "Lifecycles per loop",
+          "min": 1,
+          "max": 3,
+          "def": 1,
+          "group": "Motion",
+          "hint": "Whole division and reintegration cycles per loop.",
+          "mutate": 0
+        },
+        "wobble": {
+          "type": "range",
+          "label": "Membrane wobble",
+          "min": 0,
+          "max": 0.3,
+          "def": 0.08,
+          "step": 0.0015,
+          "group": "Motion",
+          "hint": "Standing wave along the membranes (used by Membrane Choir)."
+        },
+        "keyAngle": {
+          "type": "range",
+          "label": "Key direction",
+          "min": -180,
+          "max": 180,
+          "def": 60,
+          "step": 1,
+          "unit": "°",
+          "group": "Light",
+          "hint": "Direction of the key light in the picture plane, degrees.",
+          "randMax": 180
+        },
+        "exposure": {
+          "type": "range",
+          "label": "Exposure",
+          "min": 0.4,
+          "max": 2.4,
+          "def": 1,
+          "step": 0.01,
+          "unit": "×",
+          "log": true,
+          "group": "Light",
+          "hint": "Linear exposure before the single tone map.",
+          "randMax": 1.4
+        },
+        "bloom": {
+          "type": "range",
+          "label": "Bloom",
+          "min": 0,
+          "max": 1.6,
+          "def": 0.45,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Glow added around emissive light. 0 shows the bare geometry.",
+          "randMax": 0.9
+        },
+        "bloomRadius": {
+          "type": "range",
+          "label": "Bloom radius",
+          "min": 0.4,
+          "max": 2.2,
+          "def": 1,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Width of the glow relative to the frame.",
+          "randMax": 1.5
+        },
+        "lensCA": {
+          "type": "range",
+          "label": "Edge fringe",
+          "min": 0,
+          "max": 0.5,
+          "def": 0.12,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Spectral fringing toward the frame edge.",
+          "randMax": 0.25
+        },
+        "vignette": {
+          "type": "range",
+          "label": "Vignette",
+          "min": 0,
+          "max": 0.8,
+          "def": 0.38,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Darkens the frame edge; never touches the focal area.",
+          "randMax": 0.55
+        },
+        "quality": {
+          "type": "select",
+          "label": "Quality",
+          "options": [
+            {
+              "v": "live",
+              "l": "Live"
+            },
+            {
+              "v": "balanced",
+              "l": "Balanced"
+            },
+            {
+              "v": "export",
+              "l": "Export"
+            }
+          ],
+          "def": "balanced",
+          "mutate": 0,
+          "group": "Quality",
+          "hint": "Sample counts only. Composition, phase and exposure stay the same."
+        }
+      }
+    },
+    {
+      "id": "quiet-mitosis",
+      "name": "Quiet Mitosis",
+      "group": "Cellular Cosmos",
+      "tags": [
+        "calm",
+        "ambient"
+      ],
+      "blurb": "The softest cycle: few cells, dim light, one slow division at a time. Made for quiet backgrounds.",
+      "palette": "abyss",
+      "flash": false,
+      "cost": 1.5,
+      "graph": {
+        "buffers": {
+          "scene": {
+            "scale": 0.75
+          },
+          "glowA": {
+            "scale": 0.25
+          },
+          "glowB": {
+            "scale": 0.125
+          }
+        },
+        "passes": [
+          {
+            "src": "styles/quiet-mitosis.glsl",
+            "reads": [],
+            "writes": "scene"
+          },
+          {
+            "src": "styles/_glowA.glsl",
+            "reads": [
+              "scene"
+            ],
+            "writes": "glowA"
+          },
+          {
+            "src": "styles/_glowB.glsl",
+            "reads": [
+              "glowA"
+            ],
+            "writes": "glowB"
+          },
+          {
+            "src": "styles/_out.glsl",
+            "reads": [
+              "scene",
+              "glowA",
+              "glowB"
+            ],
+            "writes": "output"
+          }
+        ]
+      },
+      "params": {
+        "count": {
+          "type": "int",
+          "label": "Colony count",
+          "min": 8,
+          "max": 36,
+          "def": 11,
+          "group": "Form",
+          "hint": "Approximate number of colonies in the frame. Sets the cell size.",
+          "mutate": 0.3
+        },
+        "species": {
+          "type": "range",
+          "label": "Species mix",
+          "min": 0,
+          "max": 1,
+          "def": 0.2,
+          "step": 0.005,
+          "group": "Form",
+          "hint": "Share of coral colonies against emerald cells."
+        },
+        "membrane": {
+          "type": "range",
+          "label": "Membrane width",
+          "min": 0.003,
+          "max": 0.035,
+          "def": 0.012,
+          "step": 0.00016,
+          "group": "Material",
+          "hint": "Width of the bright membrane and its dark channel, scene units.",
+          "log": true
+        },
+        "translucency": {
+          "type": "range",
+          "label": "Translucency",
+          "min": 0,
+          "max": 0.7,
+          "def": 0.25,
+          "step": 0.0035,
+          "group": "Material",
+          "hint": "How glassy the cell bodies are."
+        },
+        "organelles": {
+          "type": "range",
+          "label": "Organelle density",
+          "min": 0.1,
+          "max": 1,
+          "def": 0.35,
+          "step": 0.0045,
+          "group": "Material",
+          "hint": "Number of organelle points circling each nucleus."
+        },
+        "filaments": {
+          "type": "int",
+          "label": "Filament count",
+          "min": 8,
+          "max": 48,
+          "def": 16,
+          "group": "Material",
+          "hint": "Radial filaments around each nucleus. A spatial count.",
+          "mutate": 0.3
+        },
+        "divAmp": {
+          "type": "range",
+          "label": "Division amplitude",
+          "min": 0,
+          "max": 0.4,
+          "def": 0.16,
+          "step": 0.002,
+          "group": "Motion",
+          "hint": "How far a daughter cell separates from its parent."
+        },
+        "migrate": {
+          "type": "range",
+          "label": "Migration radius",
+          "min": 0,
+          "max": 0.25,
+          "def": 0.04,
+          "step": 0.0013,
+          "group": "Motion",
+          "hint": "Radius of each colony's closed migration orbit."
+        },
+        "cycles": {
+          "type": "int",
+          "label": "Lifecycles per loop",
+          "min": 1,
+          "max": 3,
+          "def": 1,
+          "group": "Motion",
+          "hint": "Whole division and reintegration cycles per loop.",
+          "mutate": 0
+        },
+        "wobble": {
+          "type": "range",
+          "label": "Membrane wobble",
+          "min": 0,
+          "max": 0.3,
+          "def": 0.08,
+          "step": 0.0015,
+          "group": "Motion",
+          "hint": "Standing wave along the membranes (used by Membrane Choir)."
+        },
+        "keyAngle": {
+          "type": "range",
+          "label": "Key direction",
+          "min": -180,
+          "max": 180,
+          "def": 60,
+          "step": 1,
+          "unit": "°",
+          "group": "Light",
+          "hint": "Direction of the key light in the picture plane, degrees.",
+          "randMax": 180
+        },
+        "exposure": {
+          "type": "range",
+          "label": "Exposure",
+          "min": 0.4,
+          "max": 2.4,
+          "def": 0.9,
+          "step": 0.01,
+          "unit": "×",
+          "log": true,
+          "group": "Light",
+          "hint": "Linear exposure before the single tone map.",
+          "randMax": 1.4
+        },
+        "bloom": {
+          "type": "range",
+          "label": "Bloom",
+          "min": 0,
+          "max": 1.6,
+          "def": 0.3,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Glow added around emissive light. 0 shows the bare geometry.",
+          "randMax": 0.9
+        },
+        "bloomRadius": {
+          "type": "range",
+          "label": "Bloom radius",
+          "min": 0.4,
+          "max": 2.2,
+          "def": 1,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Width of the glow relative to the frame.",
+          "randMax": 1.5
+        },
+        "lensCA": {
+          "type": "range",
+          "label": "Edge fringe",
+          "min": 0,
+          "max": 0.5,
+          "def": 0.12,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Spectral fringing toward the frame edge.",
+          "randMax": 0.25
+        },
+        "vignette": {
+          "type": "range",
+          "label": "Vignette",
+          "min": 0,
+          "max": 0.8,
+          "def": 0.5,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Darkens the frame edge; never touches the focal area.",
+          "randMax": 0.55
+        },
+        "quality": {
+          "type": "select",
+          "label": "Quality",
+          "options": [
+            {
+              "v": "live",
+              "l": "Live"
+            },
+            {
+              "v": "balanced",
+              "l": "Balanced"
+            },
+            {
+              "v": "export",
+              "l": "Export"
+            }
+          ],
+          "def": "balanced",
+          "mutate": 0,
+          "group": "Quality",
+          "hint": "Sample counts only. Composition, phase and exposure stay the same."
+        }
+      }
+    },
+    {
+      "id": "tidal-habitat",
+      "name": "Tidal Habitat",
+      "group": "Cellular Cosmos",
+      "tags": [
+        "tide",
+        "sway"
+      ],
+      "blurb": "The whole habitat sways in a tidal wave: neighbouring colonies lag one another.",
+      "palette": "lagoon-pink",
+      "flash": false,
+      "cost": 1.5,
+      "graph": {
+        "buffers": {
+          "scene": {
+            "scale": 0.75
+          },
+          "glowA": {
+            "scale": 0.25
+          },
+          "glowB": {
+            "scale": 0.125
+          }
+        },
+        "passes": [
+          {
+            "src": "styles/tidal-habitat.glsl",
+            "reads": [],
+            "writes": "scene"
+          },
+          {
+            "src": "styles/_glowA.glsl",
+            "reads": [
+              "scene"
+            ],
+            "writes": "glowA"
+          },
+          {
+            "src": "styles/_glowB.glsl",
+            "reads": [
+              "glowA"
+            ],
+            "writes": "glowB"
+          },
+          {
+            "src": "styles/_out.glsl",
+            "reads": [
+              "scene",
+              "glowA",
+              "glowB"
+            ],
+            "writes": "output"
+          }
+        ]
+      },
+      "params": {
+        "count": {
+          "type": "int",
+          "label": "Colony count",
+          "min": 8,
+          "max": 36,
+          "def": 18,
+          "group": "Form",
+          "hint": "Approximate number of colonies in the frame. Sets the cell size.",
+          "mutate": 0.3
+        },
+        "species": {
+          "type": "range",
+          "label": "Species mix",
+          "min": 0,
+          "max": 1,
+          "def": 0.45,
+          "step": 0.005,
+          "group": "Form",
+          "hint": "Share of coral colonies against emerald cells."
+        },
+        "membrane": {
+          "type": "range",
+          "label": "Membrane width",
+          "min": 0.003,
+          "max": 0.035,
+          "def": 0.012,
+          "step": 0.00016,
+          "group": "Material",
+          "hint": "Width of the bright membrane and its dark channel, scene units.",
+          "log": true
+        },
+        "translucency": {
+          "type": "range",
+          "label": "Translucency",
+          "min": 0,
+          "max": 0.7,
+          "def": 0.25,
+          "step": 0.0035,
+          "group": "Material",
+          "hint": "How glassy the cell bodies are."
+        },
+        "organelles": {
+          "type": "range",
+          "label": "Organelle density",
+          "min": 0.1,
+          "max": 1,
+          "def": 0.6,
+          "step": 0.0045,
+          "group": "Material",
+          "hint": "Number of organelle points circling each nucleus."
+        },
+        "filaments": {
+          "type": "int",
+          "label": "Filament count",
+          "min": 8,
+          "max": 48,
+          "def": 24,
+          "group": "Material",
+          "hint": "Radial filaments around each nucleus. A spatial count.",
+          "mutate": 0.3
+        },
+        "divAmp": {
+          "type": "range",
+          "label": "Division amplitude",
+          "min": 0,
+          "max": 0.4,
+          "def": 0.12,
+          "step": 0.002,
+          "group": "Motion",
+          "hint": "How far a daughter cell separates from its parent."
+        },
+        "migrate": {
+          "type": "range",
+          "label": "Migration radius",
+          "min": 0,
+          "max": 0.25,
+          "def": 0.2,
+          "step": 0.0013,
+          "group": "Motion",
+          "hint": "Radius of each colony's closed migration orbit."
+        },
+        "cycles": {
+          "type": "int",
+          "label": "Lifecycles per loop",
+          "min": 1,
+          "max": 3,
+          "def": 1,
+          "group": "Motion",
+          "hint": "Whole division and reintegration cycles per loop.",
+          "mutate": 0
+        },
+        "wobble": {
+          "type": "range",
+          "label": "Membrane wobble",
+          "min": 0,
+          "max": 0.3,
+          "def": 0.08,
+          "step": 0.0015,
+          "group": "Motion",
+          "hint": "Standing wave along the membranes (used by Membrane Choir)."
+        },
+        "keyAngle": {
+          "type": "range",
+          "label": "Key direction",
+          "min": -180,
+          "max": 180,
+          "def": 60,
+          "step": 1,
+          "unit": "°",
+          "group": "Light",
+          "hint": "Direction of the key light in the picture plane, degrees.",
+          "randMax": 180
+        },
+        "exposure": {
+          "type": "range",
+          "label": "Exposure",
+          "min": 0.4,
+          "max": 2.4,
+          "def": 1,
+          "step": 0.01,
+          "unit": "×",
+          "log": true,
+          "group": "Light",
+          "hint": "Linear exposure before the single tone map.",
+          "randMax": 1.4
+        },
+        "bloom": {
+          "type": "range",
+          "label": "Bloom",
+          "min": 0,
+          "max": 1.6,
+          "def": 0.45,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Glow added around emissive light. 0 shows the bare geometry.",
+          "randMax": 0.9
+        },
+        "bloomRadius": {
+          "type": "range",
+          "label": "Bloom radius",
+          "min": 0.4,
+          "max": 2.2,
+          "def": 1,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Width of the glow relative to the frame.",
+          "randMax": 1.5
+        },
+        "lensCA": {
+          "type": "range",
+          "label": "Edge fringe",
+          "min": 0,
+          "max": 0.5,
+          "def": 0.12,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Spectral fringing toward the frame edge.",
+          "randMax": 0.25
+        },
+        "vignette": {
+          "type": "range",
+          "label": "Vignette",
+          "min": 0,
+          "max": 0.8,
+          "def": 0.38,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Darkens the frame edge; never touches the focal area.",
+          "randMax": 0.55
+        },
+        "quality": {
+          "type": "select",
+          "label": "Quality",
+          "options": [
+            {
+              "v": "live",
+              "l": "Live"
+            },
+            {
+              "v": "balanced",
+              "l": "Balanced"
+            },
+            {
+              "v": "export",
+              "l": "Export"
+            }
+          ],
+          "def": "balanced",
+          "mutate": 0,
+          "group": "Quality",
+          "hint": "Sample counts only. Composition, phase and exposure stay the same."
+        }
+      }
+    }
+  ]
+}
