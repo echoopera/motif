@@ -1,6 +1,6 @@
 {
   "kit": "harmonic-matter",
-  "style": "harmonic-matter-hero",
+  "style": "nodal-sea",
   "phase": 0.37,
   "size": [
     120,
@@ -12,76 +12,76 @@
       "key": "modes",
       "label": "Wave modes",
       "type": "int",
-      "def": 3,
+      "def": 5,
       "vals": [
         2,
         6
       ],
       "diffs": [
-        11.7,
-        11.31
+        17.25,
+        3.03
       ],
-      "effect": 11.7
+      "effect": 17.25
     },
     {
       "key": "amp",
       "label": "Amplitude",
       "type": "range",
-      "def": 0.2,
+      "def": 0.12,
       "vals": [
         0.03,
         0.35
       ],
       "diffs": [
-        14.25,
-        14.22
+        7.95,
+        13.1
       ],
-      "effect": 14.25
+      "effect": 13.1
     },
     {
       "key": "wavelength",
       "label": "Wavelength",
       "type": "range",
-      "def": 0.6,
+      "def": 0.45,
       "vals": [
         0.15,
         1.5
       ],
       "diffs": [
-        25.82,
-        22.3
+        19.23,
+        21.37
       ],
-      "effect": 25.82
+      "effect": 21.37
     },
     {
       "key": "tilt",
       "label": "Camera pitch",
       "type": "range",
-      "def": 0.85,
+      "def": 0.42,
       "vals": [
         0.15,
         1.2
       ],
       "diffs": [
-        37.58,
-        30.62
+        26.01,
+        42.92
       ],
-      "effect": 37.58
+      "effect": 42.92
     },
     {
       "key": "nodeWidth",
       "label": "Node width",
       "type": "range",
-      "def": 0.006,
+      "def": 0.014,
       "vals": [
         0.002,
         0.03
       ],
       "diffs": [
-        0.87,
-        15.28
+        20.71,
+        11.15
       ],
-      "effect": 15.28
+      "effect": 20.71
     },
     {
       "key": "opacity",
@@ -93,10 +93,10 @@
         0.7
       ],
       "diffs": [
-        3.95,
-        3.29
+        5.7,
+        3.9
       ],
-      "effect": 3.95
+      "effect": 5.7
     },
     {
       "key": "warmth",
@@ -108,10 +108,10 @@
         1
       ],
       "diffs": [
-        10.66,
-        3.74
+        3.19,
+        1.28
       ],
-      "effect": 10.66
+      "effect": 3.19
     },
     {
       "key": "density",
@@ -123,10 +123,10 @@
         1
       ],
       "diffs": [
-        23.66,
-        38.92
+        6.66,
+        17.51
       ],
-      "effect": 38.92
+      "effect": 17.51
     },
     {
       "key": "particleR",
@@ -139,9 +139,9 @@
       ],
       "diffs": [
         0,
-        1.17
+        3.51
       ],
-      "effect": 1.17
+      "effect": 3.51
     },
     {
       "key": "drift",
@@ -153,10 +153,10 @@
         0.5
       ],
       "diffs": [
-        8.79,
-        9.71
+        3.67,
+        3.24
       ],
-      "effect": 9.71
+      "effect": 3.67
     },
     {
       "key": "osc",
@@ -169,9 +169,9 @@
       ],
       "diffs": [
         0,
-        19.3
+        19.46
       ],
-      "effect": 19.3
+      "effect": 19.46
     },
     {
       "key": "orbit",
@@ -183,10 +183,10 @@
         0.3
       ],
       "diffs": [
-        13.96,
-        20.6
+        18.02,
+        20.12
       ],
-      "effect": 20.6
+      "effect": 20.12
     },
     {
       "key": "keyAngle",
@@ -198,10 +198,10 @@
         180
       ],
       "diffs": [
-        4.33,
-        4.33
+        3.81,
+        3.81
       ],
-      "effect": 4.33
+      "effect": 3.81
     },
     {
       "key": "exposure",
@@ -213,10 +213,10 @@
         2.4
       ],
       "diffs": [
-        33.94,
-        37.77
+        25.76,
+        36.53
       ],
-      "effect": 37.77
+      "effect": 36.53
     },
     {
       "key": "bloom",
@@ -228,10 +228,10 @@
         1.6
       ],
       "diffs": [
-        6.28,
-        10.37
+        1.68,
+        3.17
       ],
-      "effect": 10.37
+      "effect": 3.17
     },
     {
       "key": "bloomRadius",
@@ -243,10 +243,10 @@
         2.2
       ],
       "diffs": [
-        2.19,
-        2.68
+        0.78,
+        1.04
       ],
-      "effect": 2.68
+      "effect": 1.04
     },
     {
       "key": "lensCA",
@@ -258,10 +258,10 @@
         0.5
       ],
       "diffs": [
-        0.51,
-        1.59
+        0.42,
+        1.3
       ],
-      "effect": 1.59
+      "effect": 1.3
     },
     {
       "key": "vignette",
@@ -273,10 +273,10 @@
         0.8
       ],
       "diffs": [
-        2.04,
-        2.72
+        1.94,
+        2.56
       ],
-      "effect": 2.72
+      "effect": 2.56
     },
     {
       "key": "quality",
@@ -289,11 +289,11 @@
         "export"
       ],
       "diffs": [
-        0.15,
+        0.14,
         0,
-        0.08
+        0.1
       ],
-      "effect": 0.15
+      "effect": 0.14
     }
   ]
 }

@@ -150,7 +150,7 @@ vec4 scene_main(vec2 uv, vec2 fc, int variant) {
     // nodal contour: |h| / |grad h| is the distance to the node on the surface
     float gl = max(length(hg.yz), 0.06);
     float nd = abs(hg.x) / gl;
-    float nodeW = p_nodeWidth * (variant == 1 ? 1.6 : variant == 2 ? 0.0 : 1.0);
+    float nodeW = p_nodeWidth * (variant == 1 ? 1.6 : 1.0);
     float node = nodeW > 0.0 ? exp(-pow(nd / max(nodeW, 1e-4), 2.0)) : 0.0;
     node *= 1.0 - smoothstep(0.0, 0.5, t * k_px() * 5.0 / max(nodeW, 1e-3) * 0.02);
     vec3 em = mix(u_a0, u_ink, 0.6) * node * (s == 0 ? 0.7 : 0.18);       // contours read on the top sheet; lower sheets stay quiet

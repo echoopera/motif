@@ -697,17 +697,6 @@
           "group": "Form",
           "hint": "Elevation of the camera above the surface, radians."
         },
-        "nodeWidth": {
-          "type": "range",
-          "label": "Node width",
-          "min": 0.002,
-          "max": 0.03,
-          "def": 0.004,
-          "step": 0.00014,
-          "group": "Material",
-          "hint": "Width of the glowing nodal contours, measured on the surface.",
-          "log": true
-        },
         "opacity": {
           "type": "range",
           "label": "Membrane opacity",

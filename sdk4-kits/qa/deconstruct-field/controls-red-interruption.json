@@ -1,0 +1,209 @@
+{
+  "kit": "deconstruct-field",
+  "style": "red-interruption",
+  "phase": 0.37,
+  "size": [
+    120,
+    213
+  ],
+  "note": "effect = max mean-abs 8-bit change vs the default frame over min/max (or every option)",
+  "rows": [
+    {
+      "key": "planes",
+      "label": "Plane count",
+      "type": "int",
+      "def": 13,
+      "vals": [
+        6,
+        28
+      ],
+      "diffs": [
+        46.36,
+        39.98
+      ],
+      "effect": 46.36
+    },
+    {
+      "key": "arcR",
+      "label": "Arc radius",
+      "type": "range",
+      "def": 0.35,
+      "vals": [
+        0.1,
+        0.65
+      ],
+      "diffs": [
+        4.59,
+        6.75
+      ],
+      "effect": 6.75
+    },
+    {
+      "key": "grid",
+      "label": "Grid spacing",
+      "type": "range",
+      "def": 0.04,
+      "vals": [
+        0.015,
+        0.12
+      ],
+      "diffs": [
+        5.18,
+        2.15
+      ],
+      "effect": 5.18
+    },
+    {
+      "key": "lineW",
+      "label": "Line width",
+      "type": "range",
+      "def": 1.2,
+      "vals": [
+        0.7,
+        3
+      ],
+      "diffs": [
+        1.41,
+        5.14
+      ],
+      "effect": 5.14
+    },
+    {
+      "key": "sep",
+      "label": "Layer separation",
+      "type": "range",
+      "def": 0.05,
+      "vals": [
+        0,
+        0.15
+      ],
+      "diffs": [
+        6.52,
+        11.95
+      ],
+      "effect": 11.95
+    },
+    {
+      "key": "offset",
+      "label": "Offset amplitude",
+      "type": "range",
+      "def": 0.14,
+      "vals": [
+        0,
+        0.35
+      ],
+      "diffs": [
+        39.2,
+        61.46
+      ],
+      "effect": 61.46
+    },
+    {
+      "key": "rot",
+      "label": "Rotation amplitude",
+      "type": "range",
+      "def": 0.12,
+      "vals": [
+        0,
+        0.5
+      ],
+      "diffs": [
+        25.41,
+        55.12
+      ],
+      "effect": 55.12
+    },
+    {
+      "key": "hold",
+      "label": "Hold fraction",
+      "type": "range",
+      "def": 0.4,
+      "vals": [
+        0.1,
+        0.6
+      ],
+      "diffs": [
+        13.39,
+        15.68
+      ],
+      "effect": 15.68
+    },
+    {
+      "key": "recomp",
+      "label": "Recompositions per loop",
+      "type": "int",
+      "def": 1,
+      "vals": [
+        1,
+        3
+      ],
+      "diffs": [
+        0,
+        21.18
+      ],
+      "effect": 21.18
+    },
+    {
+      "key": "keyAngle",
+      "label": "Shadow direction",
+      "type": "range",
+      "def": -45,
+      "vals": [
+        -180,
+        180
+      ],
+      "diffs": [
+        7.28,
+        7.28
+      ],
+      "effect": 7.28
+    },
+    {
+      "key": "exposure",
+      "label": "Exposure",
+      "type": "range",
+      "def": 1,
+      "vals": [
+        0.7,
+        1.4
+      ],
+      "diffs": [
+        21.75,
+        20.01
+      ],
+      "effect": 21.75
+    },
+    {
+      "key": "vignette",
+      "label": "Vignette",
+      "type": "range",
+      "def": 0,
+      "vals": [
+        0,
+        0.5
+      ],
+      "diffs": [
+        0,
+        7.12
+      ],
+      "effect": 7.12
+    },
+    {
+      "key": "quality",
+      "label": "Quality",
+      "type": "select",
+      "def": "balanced",
+      "vals": [
+        "live",
+        "balanced",
+        "export"
+      ],
+      "diffs": [
+        6.52,
+        0,
+        0
+      ],
+      "effect": 6.52
+    }
+  ]
+}
