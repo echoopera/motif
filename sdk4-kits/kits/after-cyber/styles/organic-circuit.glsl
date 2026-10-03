@@ -60,7 +60,8 @@ vec3 afterLattice(vec2 q, mat3 M, int variant, float th) {
   if (variant == 4) pu = vec2(0.0);
   vec2 cell = floor(pu / cs + 0.5);
   vec3 col = vec3(0.0);
-  float edgeR = p_edgeR, partR = p_particleR;
+  float partR = p_particleR;
+  float edgeR = p_edgeR;
   int W = 4;
   vec3 hair = u_a0;
   float halfN = float(p_res) * 0.5;
@@ -111,7 +112,7 @@ vec3 afterLattice(vec2 q, mat3 M, int variant, float th) {
     if (variant == 4) bright *= 1.4;
     col += nc * (exp(-d * d / (r * r)) * 2.2 + exp(-d / (r * 5.0)) * 0.11) * bright;
     // lime particles leave a short closed trail while in transport
-    if (lime > 0.5 && s > 0.05 && k_q() > 0) {
+    if (lime > 0.5 && s > 0.05) {
       float s3, w3, i3, l3, z3;
       float th2 = th - 0.18;
       vec3 Pp = ndPos(cid, cs, variant, th2, s3, w3, i3, l3, z3);
@@ -142,59 +143,8 @@ vec4 scene_main(vec2 uv, vec2 fc, int variant) {
   float sm2 = 0.5 + 0.5 * ln3(vec3(uv * 3.1 + 5.0, 1.0), 1.0, 0.4);
   vec3 smoke = u_a2 * (0.10 + 0.55 * sm * sm2) * exp(-dot(uv * vec2(1.0, 0.7), uv * vec2(1.0, 0.7)) * 1.6);
   vec3 col = u_bg + smoke * (variant == 7 ? 0.7 : variant == 7 ? 1.0 : 1.0) * (variant == 6 ? 1.6 : 1.0) * 0.8;
-  bool hasPoly = (variant == 0 || variant == 2 || variant == 5 || variant == 8);
-  // polyhedron tests
-  float hitT = -1.0; vec3 hn = vec3(0.0); float edgeD = 1.0;
-  vec3 pos = vec3(0.0);
-  if (hasPoly) {
-    float ang = 0.3 + 0.35 * sin(th) * calm + 0.0;
-    mat3 Rp = mat3(cos(ang), 0.0, -sin(ang), 0.0, 1.0, 0.0, sin(ang), 0.0, cos(ang));
-    { float a = 0.45 + 0.1 * cos(th); mat3 X = mat3(1.0, 0.0, 0.0, 0.0, cos(a), sin(a), 0.0, -sin(a), cos(a)); Rp = X * Rp; }
-    vec3 ro = vec3(0.0, 0.0, 3.0), rd = normalize(vec3(uv * 0.85, -1.0));
-    vec3 roL = transpose(Rp) * ro, rdL = transpose(Rp) * rd;
-    int kind = (variant == 5) ? 1 : 0;
-    int cnt = kind == 1 ? 8 : 12;
-    float h0 = (variant == 2 ? 0.62 : variant == 5 ? 0.46 : variant == 8 ? 0.40 : 0.42);
-    float tin = -1e3, tout = 1e3; int fi = 0;
-    for (int i = 0; i < 12; i++) {
-      if (i >= cnt) break;
-      vec3 n = polyN(i, kind);
-      float h = h0;
-      if (variant == 5) h = h0 * (1.0 + 0.30 * sin(th + float(i) * 1.9) * calm) * (1.0 + 0.0);
-      float dn = dot(n, rdL), no = dot(n, roL);
-      float t = (h - no) / (abs(dn) < 1e-5 ? 1e-5 : dn);
-      if (dn < 0.0) { if (t > tin) { tin = t; fi = i; } } else { if (t < tout) tout = t; }
-    }
-    if (tin < tout && tin > 0.0) {
-      hitT = tin; hn = Rp * polyN(fi, kind); pos = roL + rdL * tin;
-      float e = 1e3;
-      for (int i = 0; i < 12; i++) {
-        if (i >= cnt) break;
-        if (i == fi) continue;
-        float h = h0;
-        if (variant == 5) h = h0 * (1.0 + 0.30 * sin(th + float(i) * 1.9) * calm);
-        e = min(e, abs(h - dot(polyN(i, kind), pos)));
-      }
-      edgeD = e;
-    }
-  }
-  if (variant == 4) M = Mi;
   vec3 lat = afterLattice(q, M, variant, th);
-  if (hitT > 0.0) {
-    // glass: lattice seen through a facet, offset along the facet normal (approximate refraction)
-    vec2 refr = hn.xy * p_refr * (1.0 + 0.5 * (1.0 - abs(hn.z)));
-    vec3 inner = afterLattice(q + refr, M, variant, th);
-    float fres = pow(1.0 - clamp(abs(dot(hn, normalize(vec3(uv * 0.85, -1.0)))), 0.0, 1.0), 3.0);
-    vec3 K = k_key();
-    float spec = pow(max(dot(reflect(normalize(vec3(uv * 0.85, -1.0)), hn), K), 0.0), 36.0);
-    vec3 tint = mix(u_a2 * 0.7, u_a0 * 0.15, 0.4);
-    vec3 glass = inner * (1.0 - p_glass * 0.6) + tint * p_glass * 1.5 + u_a0 * fres * (0.25 + p_glass) * 0.6 + u_ink * spec * 0.5;
-    float hair = exp(-pow(edgeD / (p_edgeR * 1.1 + px), 2.0));
-    glass += u_a0 * hair * 1.5 + u_ink * hair * 0.25;
-    col = col * (1.0 - p_glass * 0.3) + glass;
-    col += lat * 0.0;
-  } else col += lat;
-  col *= 1.0;
+  col += lat;
   return vec4(col, 1.0);
 }
 

@@ -38,7 +38,6 @@ Particles follow closed circles at integer harmonics with fixed seeded phases; e
 - **Motion**: Reconstructions per loop (`cycles`)
 - **Light**: Key direction (`keyAngle`), Exposure (`exposure`)
 - **Lens**: Bloom (`bloom`), Bloom radius (`bloomRadius`), Edge fringe (`lensCA`), Vignette (`vignette`)
-- **Quality**: Quality (`quality`)
 
 ## Palettes
 

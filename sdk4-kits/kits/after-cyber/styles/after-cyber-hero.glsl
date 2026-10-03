@@ -60,7 +60,8 @@ vec3 afterLattice(vec2 q, mat3 M, int variant, float th) {
   if (variant == 4) pu = vec2(0.0);
   vec2 cell = floor(pu / cs + 0.5);
   vec3 col = vec3(0.0);
-  float edgeR = p_edgeR, partR = p_particleR;
+  float partR = p_particleR;
+  float edgeR = p_edgeR;
   int W = 4;
   vec3 hair = u_a0;
   float halfN = float(p_res) * 0.5;
@@ -111,7 +112,7 @@ vec3 afterLattice(vec2 q, mat3 M, int variant, float th) {
     if (variant == 4) bright *= 1.4;
     col += nc * (exp(-d * d / (r * r)) * 2.2 + exp(-d / (r * 5.0)) * 0.11) * bright;
     // lime particles leave a short closed trail while in transport
-    if (lime > 0.5 && s > 0.05 && k_q() > 0) {
+    if (lime > 0.5 && s > 0.05) {
       float s3, w3, i3, l3, z3;
       float th2 = th - 0.18;
       vec3 Pp = ndPos(cid, cs, variant, th2, s3, w3, i3, l3, z3);
@@ -194,7 +195,6 @@ vec4 scene_main(vec2 uv, vec2 fc, int variant) {
     col = col * (1.0 - p_glass * 0.3) + glass;
     col += lat * 0.0;
   } else col += lat;
-  col *= 1.0;
   return vec4(col, 1.0);
 }
 

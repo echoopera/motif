@@ -46,7 +46,12 @@ vec2 ndProj(vec3 p, mat3 M, out float z) { vec3 w = M * p; z = w.z; return w.xy 
 
 vec3 afterLattice(vec2 q, mat3 M, int variant, float th) {
   float px = k_px();
+//@if 4
+  float cs = 0.105;
+//@endif
+//@if 0 1 2 3 5 6 7 8
   float cs = 1.05 / float(p_res);
+//@endif
   // invert the projection to the sheet plane to find the central lattice cell
   vec3 ro = vec3(0.0, 0.0, -1.0 / 0.45);                                       // matches ndProj: w.xy/(1+0.45 z)*1.12 -> camera at z = -1/0.45
   // plane z' = 0 in sheet space: n = M*(0,0,1), through the origin
@@ -59,10 +64,18 @@ vec3 afterLattice(vec2 q, mat3 M, int variant, float th) {
   if (variant == 4) pu = vec2(0.0);
   vec2 cell = floor(pu / cs + 0.5);
   vec3 col = vec3(0.0);
-  float edgeR = p_edgeR, partR = p_particleR;
+  float partR = p_particleR;
+//@if 0 1 2 5 6 7 8
+  float edgeR = p_edgeR;
+//@endif
   int W = 4;
   vec3 hair = u_a0;
+//@if 4
+  float halfN = 0.0;
+//@endif
+//@if 0 1 2 3 5 6 7 8
   float halfN = float(p_res) * 0.5;
+//@endif
   for (int j = -5; j <= 5; j++) for (int i = -5; i <= 5; i++) {
     vec2 cid = cell + vec2(float(i), float(j));
     if (variant == 4) {
@@ -77,6 +90,7 @@ vec3 afterLattice(vec2 q, mat3 M, int variant, float th) {
     float z0; vec2 A = ndProj(P0, M, z0);
     float depthK = clamp(1.0 - 0.8 * z0, 0.25, 1.4);
     // connections to forward neighbours (right, down; scaffold adds diagonals; organic circuit routes Manhattan)
+//@if 0 1 2 5 6 7 8
     if (variant != 4 && variant != 3) {
       for (int k = 0; k < 4; k++) {
         if (k >= 2 && variant != 1 && variant != 6) break;
@@ -102,6 +116,7 @@ vec3 afterLattice(vec2 q, mat3 M, int variant, float th) {
         col += hair * (core * 1.2 + exp(-d / (wd * 7.0 + px)) * 0.05) * we * zk;
       }
     }
+//@endif
     // node / particle: cyan when attached, lime when selected, grows slightly while dispersed
     float d = length(q - A);
     float r = partR * (1.0 + 0.7 * s) * (0.8 + 0.4 * depthK);
@@ -110,7 +125,7 @@ vec3 afterLattice(vec2 q, mat3 M, int variant, float th) {
     if (variant == 4) bright *= 1.4;
     col += nc * (exp(-d * d / (r * r)) * 2.2 + exp(-d / (r * 5.0)) * 0.11) * bright;
     // lime particles leave a short closed trail while in transport
-    if (lime > 0.5 && s > 0.05 && k_q() > 0) {
+    if (lime > 0.5 && s > 0.05) {
       float s3, w3, i3, l3, z3;
       float th2 = th - 0.18;
       vec3 Pp = ndPos(cid, cs, variant, th2, s3, w3, i3, l3, z3);
@@ -141,6 +156,7 @@ vec4 scene_main(vec2 uv, vec2 fc, int variant) {
   float sm2 = 0.5 + 0.5 * ln3(vec3(uv * 3.1 + 5.0, 1.0), 1.0, 0.4);
   vec3 smoke = u_a2 * (0.10 + 0.55 * sm * sm2) * exp(-dot(uv * vec2(1.0, 0.7), uv * vec2(1.0, 0.7)) * 1.6);
   vec3 col = u_bg + smoke * (variant == 7 ? 0.7 : variant == 7 ? 1.0 : 1.0) * (variant == 6 ? 1.6 : 1.0) * 0.8;
+//@if 0 2 5 8
   bool hasPoly = (variant == 0 || variant == 2 || variant == 5 || variant == 8);
   // polyhedron tests
   float hitT = -1.0; vec3 hn = vec3(0.0); float edgeD = 1.0;
@@ -178,7 +194,9 @@ vec4 scene_main(vec2 uv, vec2 fc, int variant) {
     }
   }
   if (variant == 4) M = Mi;
+//@endif
   vec3 lat = afterLattice(q, M, variant, th);
+//@if 0 2 5 8
   if (hitT > 0.0) {
     // glass: lattice seen through a facet, offset along the facet normal (approximate refraction)
     vec2 refr = hn.xy * p_refr * (1.0 + 0.5 * (1.0 - abs(hn.z)));
@@ -193,6 +211,9 @@ vec4 scene_main(vec2 uv, vec2 fc, int variant) {
     col = col * (1.0 - p_glass * 0.3) + glass;
     col += lat * 0.0;
   } else col += lat;
-  col *= 1.0;
+//@endif
+//@if 1 3 4 6 7
+  col += lat;
+//@endif
   return vec4(col, 1.0);
 }

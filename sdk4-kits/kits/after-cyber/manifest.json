@@ -272,28 +272,6 @@
           "group": "Lens",
           "hint": "Darkens the frame edge; never touches the focal area.",
           "randMax": 0.55
-        },
-        "quality": {
-          "type": "select",
-          "label": "Quality",
-          "options": [
-            {
-              "v": "live",
-              "l": "Live"
-            },
-            {
-              "v": "balanced",
-              "l": "Balanced"
-            },
-            {
-              "v": "export",
-              "l": "Export"
-            }
-          ],
-          "def": "balanced",
-          "mutate": 0,
-          "group": "Quality",
-          "hint": "Sample counts only. Composition, phase and exposure stay the same."
         }
       }
     },
@@ -394,26 +372,6 @@
           "hint": "Radius of the cyan hairlines, scene units.",
           "log": true
         },
-        "glass": {
-          "type": "range",
-          "label": "Glass opacity",
-          "min": 0,
-          "max": 0.55,
-          "def": 0.16,
-          "step": 0.0028,
-          "group": "Material",
-          "hint": "Smoky tint inside the polyhedron."
-        },
-        "refr": {
-          "type": "range",
-          "label": "Refraction strength",
-          "min": 0,
-          "max": 0.12,
-          "def": 0.035,
-          "step": 0.0006,
-          "group": "Material",
-          "hint": "Screen-space offset of the lattice seen through facets. An approximation, not transport."
-        },
         "particleR": {
           "type": "range",
           "label": "Particle radius",
@@ -444,18 +402,6 @@
           "group": "Motion",
           "hint": "Whole dissolve - transport - reassemble cycles per loop.",
           "mutate": 0
-        },
-        "keyAngle": {
-          "type": "range",
-          "label": "Key direction",
-          "min": -180,
-          "max": 180,
-          "def": 60,
-          "step": 1,
-          "unit": "°",
-          "group": "Light",
-          "hint": "Direction of the key light in the picture plane, degrees.",
-          "randMax": 180
         },
         "exposure": {
           "type": "range",
@@ -513,28 +459,6 @@
           "group": "Lens",
           "hint": "Darkens the frame edge; never touches the focal area.",
           "randMax": 0.55
-        },
-        "quality": {
-          "type": "select",
-          "label": "Quality",
-          "options": [
-            {
-              "v": "live",
-              "l": "Live"
-            },
-            {
-              "v": "balanced",
-              "l": "Balanced"
-            },
-            {
-              "v": "export",
-              "l": "Export"
-            }
-          ],
-          "def": "balanced",
-          "mutate": 0,
-          "group": "Quality",
-          "hint": "Sample counts only. Composition, phase and exposure stay the same."
         }
       }
     },
@@ -754,28 +678,6 @@
           "group": "Lens",
           "hint": "Darkens the frame edge; never touches the focal area.",
           "randMax": 0.55
-        },
-        "quality": {
-          "type": "select",
-          "label": "Quality",
-          "options": [
-            {
-              "v": "live",
-              "l": "Live"
-            },
-            {
-              "v": "balanced",
-              "l": "Balanced"
-            },
-            {
-              "v": "export",
-              "l": "Export"
-            }
-          ],
-          "def": "balanced",
-          "mutate": 0,
-          "group": "Quality",
-          "hint": "Sample counts only. Composition, phase and exposure stay the same."
         }
       }
     },
@@ -845,16 +747,6 @@
           "hint": "Nodes along each side of the lattice. A spatial count.",
           "mutate": 0.3
         },
-        "connect": {
-          "type": "range",
-          "label": "Connection radius",
-          "min": 0.03,
-          "max": 0.2,
-          "def": 0.1,
-          "step": 0.00085,
-          "group": "Form",
-          "hint": "Longest connection that stays fully drawn; longer links fade smoothly."
-        },
         "disperse": {
           "type": "range",
           "label": "Dispersal radius",
@@ -864,37 +756,6 @@
           "step": 0.0025,
           "group": "Form",
           "hint": "How far nodes travel when they dissolve. Clamped to the lattice search window."
-        },
-        "edgeR": {
-          "type": "range",
-          "label": "Edge radius",
-          "min": 0.001,
-          "max": 0.01,
-          "def": 0.002,
-          "step": 0.000045,
-          "group": "Material",
-          "hint": "Radius of the cyan hairlines, scene units.",
-          "log": true
-        },
-        "glass": {
-          "type": "range",
-          "label": "Glass opacity",
-          "min": 0,
-          "max": 0.55,
-          "def": 0.16,
-          "step": 0.0028,
-          "group": "Material",
-          "hint": "Smoky tint inside the polyhedron."
-        },
-        "refr": {
-          "type": "range",
-          "label": "Refraction strength",
-          "min": 0,
-          "max": 0.12,
-          "def": 0.035,
-          "step": 0.0006,
-          "group": "Material",
-          "hint": "Screen-space offset of the lattice seen through facets. An approximation, not transport."
         },
         "particleR": {
           "type": "range",
@@ -926,18 +787,6 @@
           "group": "Motion",
           "hint": "Whole dissolve - transport - reassemble cycles per loop.",
           "mutate": 0
-        },
-        "keyAngle": {
-          "type": "range",
-          "label": "Key direction",
-          "min": -180,
-          "max": 180,
-          "def": 60,
-          "step": 1,
-          "unit": "°",
-          "group": "Light",
-          "hint": "Direction of the key light in the picture plane, degrees.",
-          "randMax": 180
         },
         "exposure": {
           "type": "range",
@@ -995,28 +844,6 @@
           "group": "Lens",
           "hint": "Darkens the frame edge; never touches the focal area.",
           "randMax": 0.55
-        },
-        "quality": {
-          "type": "select",
-          "label": "Quality",
-          "options": [
-            {
-              "v": "live",
-              "l": "Live"
-            },
-            {
-              "v": "balanced",
-              "l": "Balanced"
-            },
-            {
-              "v": "export",
-              "l": "Export"
-            }
-          ],
-          "def": "balanced",
-          "mutate": 0,
-          "group": "Quality",
-          "hint": "Sample counts only. Composition, phase and exposure stay the same."
         }
       }
     },
@@ -1076,26 +903,6 @@
         ]
       },
       "params": {
-        "res": {
-          "type": "int",
-          "label": "Lattice resolution",
-          "min": 6,
-          "max": 18,
-          "def": 14,
-          "group": "Form",
-          "hint": "Nodes along each side of the lattice. A spatial count.",
-          "mutate": 0.3
-        },
-        "connect": {
-          "type": "range",
-          "label": "Connection radius",
-          "min": 0.03,
-          "max": 0.2,
-          "def": 0.09,
-          "step": 0.00085,
-          "group": "Form",
-          "hint": "Longest connection that stays fully drawn; longer links fade smoothly."
-        },
         "disperse": {
           "type": "range",
           "label": "Dispersal radius",
@@ -1105,37 +912,6 @@
           "step": 0.0025,
           "group": "Form",
           "hint": "How far nodes travel when they dissolve. Clamped to the lattice search window."
-        },
-        "edgeR": {
-          "type": "range",
-          "label": "Edge radius",
-          "min": 0.001,
-          "max": 0.01,
-          "def": 0.002,
-          "step": 0.000045,
-          "group": "Material",
-          "hint": "Radius of the cyan hairlines, scene units.",
-          "log": true
-        },
-        "glass": {
-          "type": "range",
-          "label": "Glass opacity",
-          "min": 0,
-          "max": 0.55,
-          "def": 0.16,
-          "step": 0.0028,
-          "group": "Material",
-          "hint": "Smoky tint inside the polyhedron."
-        },
-        "refr": {
-          "type": "range",
-          "label": "Refraction strength",
-          "min": 0,
-          "max": 0.12,
-          "def": 0.035,
-          "step": 0.0006,
-          "group": "Material",
-          "hint": "Screen-space offset of the lattice seen through facets. An approximation, not transport."
         },
         "particleR": {
           "type": "range",
@@ -1167,18 +943,6 @@
           "group": "Motion",
           "hint": "Whole dissolve - transport - reassemble cycles per loop.",
           "mutate": 0
-        },
-        "keyAngle": {
-          "type": "range",
-          "label": "Key direction",
-          "min": -180,
-          "max": 180,
-          "def": 60,
-          "step": 1,
-          "unit": "°",
-          "group": "Light",
-          "hint": "Direction of the key light in the picture plane, degrees.",
-          "randMax": 180
         },
         "exposure": {
           "type": "range",
@@ -1236,28 +1000,6 @@
           "group": "Lens",
           "hint": "Darkens the frame edge; never touches the focal area.",
           "randMax": 0.55
-        },
-        "quality": {
-          "type": "select",
-          "label": "Quality",
-          "options": [
-            {
-              "v": "live",
-              "l": "Live"
-            },
-            {
-              "v": "balanced",
-              "l": "Balanced"
-            },
-            {
-              "v": "export",
-              "l": "Export"
-            }
-          ],
-          "def": "balanced",
-          "mutate": 0,
-          "group": "Quality",
-          "hint": "Sample counts only. Composition, phase and exposure stay the same."
         }
       }
     },
@@ -1477,28 +1219,6 @@
           "group": "Lens",
           "hint": "Darkens the frame edge; never touches the focal area.",
           "randMax": 0.55
-        },
-        "quality": {
-          "type": "select",
-          "label": "Quality",
-          "options": [
-            {
-              "v": "live",
-              "l": "Live"
-            },
-            {
-              "v": "balanced",
-              "l": "Balanced"
-            },
-            {
-              "v": "export",
-              "l": "Export"
-            }
-          ],
-          "def": "balanced",
-          "mutate": 0,
-          "group": "Quality",
-          "hint": "Sample counts only. Composition, phase and exposure stay the same."
         }
       }
     },
@@ -1599,26 +1319,6 @@
           "hint": "Radius of the cyan hairlines, scene units.",
           "log": true
         },
-        "glass": {
-          "type": "range",
-          "label": "Glass opacity",
-          "min": 0,
-          "max": 0.55,
-          "def": 0.16,
-          "step": 0.0028,
-          "group": "Material",
-          "hint": "Smoky tint inside the polyhedron."
-        },
-        "refr": {
-          "type": "range",
-          "label": "Refraction strength",
-          "min": 0,
-          "max": 0.12,
-          "def": 0.035,
-          "step": 0.0006,
-          "group": "Material",
-          "hint": "Screen-space offset of the lattice seen through facets. An approximation, not transport."
-        },
         "particleR": {
           "type": "range",
           "label": "Particle radius",
@@ -1649,18 +1349,6 @@
           "group": "Motion",
           "hint": "Whole dissolve - transport - reassemble cycles per loop.",
           "mutate": 0
-        },
-        "keyAngle": {
-          "type": "range",
-          "label": "Key direction",
-          "min": -180,
-          "max": 180,
-          "def": 60,
-          "step": 1,
-          "unit": "°",
-          "group": "Light",
-          "hint": "Direction of the key light in the picture plane, degrees.",
-          "randMax": 180
         },
         "exposure": {
           "type": "range",
@@ -1718,28 +1406,6 @@
           "group": "Lens",
           "hint": "Darkens the frame edge; never touches the focal area.",
           "randMax": 0.55
-        },
-        "quality": {
-          "type": "select",
-          "label": "Quality",
-          "options": [
-            {
-              "v": "live",
-              "l": "Live"
-            },
-            {
-              "v": "balanced",
-              "l": "Balanced"
-            },
-            {
-              "v": "export",
-              "l": "Export"
-            }
-          ],
-          "def": "balanced",
-          "mutate": 0,
-          "group": "Quality",
-          "hint": "Sample counts only. Composition, phase and exposure stay the same."
         }
       }
     },
@@ -1840,26 +1506,6 @@
           "hint": "Radius of the cyan hairlines, scene units.",
           "log": true
         },
-        "glass": {
-          "type": "range",
-          "label": "Glass opacity",
-          "min": 0,
-          "max": 0.55,
-          "def": 0.16,
-          "step": 0.0028,
-          "group": "Material",
-          "hint": "Smoky tint inside the polyhedron."
-        },
-        "refr": {
-          "type": "range",
-          "label": "Refraction strength",
-          "min": 0,
-          "max": 0.12,
-          "def": 0.035,
-          "step": 0.0006,
-          "group": "Material",
-          "hint": "Screen-space offset of the lattice seen through facets. An approximation, not transport."
-        },
         "particleR": {
           "type": "range",
           "label": "Particle radius",
@@ -1890,18 +1536,6 @@
           "group": "Motion",
           "hint": "Whole dissolve - transport - reassemble cycles per loop.",
           "mutate": 0
-        },
-        "keyAngle": {
-          "type": "range",
-          "label": "Key direction",
-          "min": -180,
-          "max": 180,
-          "def": 60,
-          "step": 1,
-          "unit": "°",
-          "group": "Light",
-          "hint": "Direction of the key light in the picture plane, degrees.",
-          "randMax": 180
         },
         "exposure": {
           "type": "range",
@@ -1959,28 +1593,6 @@
           "group": "Lens",
           "hint": "Darkens the frame edge; never touches the focal area.",
           "randMax": 0.55
-        },
-        "quality": {
-          "type": "select",
-          "label": "Quality",
-          "options": [
-            {
-              "v": "live",
-              "l": "Live"
-            },
-            {
-              "v": "balanced",
-              "l": "Balanced"
-            },
-            {
-              "v": "export",
-              "l": "Export"
-            }
-          ],
-          "def": "balanced",
-          "mutate": 0,
-          "group": "Quality",
-          "hint": "Sample counts only. Composition, phase and exposure stay the same."
         }
       }
     },
@@ -2200,28 +1812,6 @@
           "group": "Lens",
           "hint": "Darkens the frame edge; never touches the focal area.",
           "randMax": 0.55
-        },
-        "quality": {
-          "type": "select",
-          "label": "Quality",
-          "options": [
-            {
-              "v": "live",
-              "l": "Live"
-            },
-            {
-              "v": "balanced",
-              "l": "Balanced"
-            },
-            {
-              "v": "export",
-              "l": "Export"
-            }
-          ],
-          "def": "balanced",
-          "mutate": 0,
-          "group": "Quality",
-          "hint": "Sample counts only. Composition, phase and exposure stay the same."
         }
       }
     }
