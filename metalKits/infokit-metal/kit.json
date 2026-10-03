@@ -1,0 +1,3024 @@
+{
+  "format": "motif-metal@1",
+  "source": "motif-kit@1",
+  "sdk": "1.2.0",
+  "id": "infokit",
+  "name": "InfoKit",
+  "version": "1.0.0",
+  "author": "Echo Opera",
+  "description": "Ten loop-safe infographic motion treatments with live media, bitmap wordmarks and parametric geometry.",
+  "accent": "#6AFFD8",
+  "license": "Custom",
+  "palettes": [
+    {
+      "id": "signal-atlas",
+      "name": "Signal Atlas",
+      "bg": "#090D15",
+      "ink": "#E9F4EE",
+      "a": [
+        "#6AFFD8",
+        "#EF954C",
+        "#8A9DBB"
+      ]
+    },
+    {
+      "id": "orbital-index",
+      "name": "Orbital Index",
+      "bg": "#080C13",
+      "ink": "#F2F4EA",
+      "a": [
+        "#9ADFFF",
+        "#ED6A72",
+        "#C3AAFE"
+      ]
+    },
+    {
+      "id": "golden-ledger",
+      "name": "Golden Ledger",
+      "bg": "#11100E",
+      "ink": "#F8F0DA",
+      "a": [
+        "#F4CC78",
+        "#A8C3C0",
+        "#F17D68"
+      ]
+    },
+    {
+      "id": "vector-relay",
+      "name": "Vector Relay",
+      "bg": "#0A1010",
+      "ink": "#F0F7E9",
+      "a": [
+        "#B2EF63",
+        "#57AFD8",
+        "#D2A2FC"
+      ]
+    },
+    {
+      "id": "phase-portrait",
+      "name": "Phase Portrait",
+      "bg": "#0A0A18",
+      "ink": "#F0EAFB",
+      "a": [
+        "#BEA5FF",
+        "#53D6EA",
+        "#F599AC"
+      ]
+    },
+    {
+      "id": "telemetry-bloom",
+      "name": "Telemetry Bloom",
+      "bg": "#110917",
+      "ink": "#F8E8F5",
+      "a": [
+        "#F99ADD",
+        "#64D8E0",
+        "#DDA667"
+      ]
+    },
+    {
+      "id": "typographic-field",
+      "name": "Typographic Field",
+      "bg": "#10110F",
+      "ink": "#F0EEE8",
+      "a": [
+        "#D8EE91",
+        "#77C2AF",
+        "#E4A586"
+      ]
+    },
+    {
+      "id": "datum-cascade",
+      "name": "Datum Cascade",
+      "bg": "#071018",
+      "ink": "#E5F3F3",
+      "a": [
+        "#5FE2ED",
+        "#F9B96A",
+        "#A985D8"
+      ]
+    }
+  ],
+  "styles": [
+    {
+      "id": "infokit/signal-atlas",
+      "localId": "signal-atlas",
+      "name": "Signal Atlas",
+      "blurb": "Orbiting signal arcs and editorial readouts.",
+      "group": "InfoKit / Motion Graphic",
+      "tags": [
+        "typography",
+        "infographic",
+        "media",
+        "loop",
+        "broadcast"
+      ],
+      "palette": "signal-atlas",
+      "flash": false,
+      "cost": 1,
+      "passes": [
+        {
+          "function": "mfs_infokit_signal_atlas_p0",
+          "source": "infokit_signal_atlas_p0",
+          "scale": 1
+        }
+      ],
+      "inputs": [
+        {
+          "id": "source",
+          "type": "media",
+          "label": "Visual source",
+          "fit": "fill",
+          "hint": "Photo or video behind the type and data geometry."
+        }
+      ],
+      "params": [
+        {
+          "key": "headline",
+          "index": 0,
+          "type": "select",
+          "label": "Headline",
+          "def": "signal",
+          "group": "Typography",
+          "hint": "Choose a built-in wordmark; the SDK does not expose arbitrary text strings.",
+          "options": [
+            {
+              "v": "signal",
+              "l": "SIGNAL"
+            },
+            {
+              "v": "orbit",
+              "l": "ORBIT"
+            },
+            {
+              "v": "golden",
+              "l": "GOLDEN"
+            },
+            {
+              "v": "vector",
+              "l": "VECTOR"
+            },
+            {
+              "v": "phase",
+              "l": "PHASE"
+            },
+            {
+              "v": "bloom",
+              "l": "BLOOM"
+            },
+            {
+              "v": "field",
+              "l": "FIELD"
+            },
+            {
+              "v": "datum",
+              "l": "DATUM"
+            },
+            {
+              "v": "spectra",
+              "l": "SPECTRA"
+            },
+            {
+              "v": "future",
+              "l": "FUTURE"
+            }
+          ]
+        },
+        {
+          "key": "titleSize",
+          "index": 1,
+          "type": "range",
+          "label": "Title scale",
+          "def": 1,
+          "min": 0.6,
+          "max": 1.5,
+          "step": 0.01,
+          "group": "Typography"
+        },
+        {
+          "key": "letterSpace",
+          "index": 2,
+          "type": "range",
+          "label": "Tracking",
+          "def": 1,
+          "min": 0.78,
+          "max": 1.5,
+          "step": 0.01,
+          "group": "Typography"
+        },
+        {
+          "key": "detail",
+          "index": 3,
+          "type": "toggle",
+          "label": "Detail labels",
+          "def": true,
+          "group": "Typography"
+        },
+        {
+          "key": "density",
+          "index": 4,
+          "type": "int",
+          "label": "Data density",
+          "def": 9,
+          "min": 3,
+          "max": 18,
+          "step": 1,
+          "group": "Geometry"
+        },
+        {
+          "key": "originX",
+          "index": 5,
+          "type": "range",
+          "label": "Focal origin X",
+          "def": 0,
+          "min": -0.25,
+          "max": 0.25,
+          "step": 0.0013,
+          "group": "Geometry",
+          "hint": "Shift the geometric focal point.",
+          "part": {
+            "of": "origin",
+            "kind": "point",
+            "i": 0,
+            "label": "Focal origin"
+          }
+        },
+        {
+          "key": "originY",
+          "index": 6,
+          "type": "range",
+          "label": "Focal origin Y",
+          "def": 0,
+          "min": -0.25,
+          "max": 0.25,
+          "step": 0.0013,
+          "group": "Geometry",
+          "hint": "Shift the geometric focal point.",
+          "part": {
+            "of": "origin",
+            "kind": "point",
+            "i": 1,
+            "label": "Focal origin"
+          }
+        },
+        {
+          "key": "structure",
+          "index": 7,
+          "type": "range",
+          "label": "Structure",
+          "def": 0.75,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Geometry"
+        },
+        {
+          "key": "cycles",
+          "index": 8,
+          "type": "int",
+          "label": "Cycles / loop",
+          "def": 1,
+          "min": 1,
+          "max": 4,
+          "step": 1,
+          "group": "Motion"
+        },
+        {
+          "key": "motion",
+          "index": 9,
+          "type": "range",
+          "label": "Motion",
+          "def": 0.6,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Motion"
+        },
+        {
+          "key": "sourceMix",
+          "index": 10,
+          "type": "range",
+          "label": "Source amount",
+          "def": 0.58,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Image",
+          "hint": "Blend a dropped image or video behind the treatment."
+        },
+        {
+          "key": "contrast",
+          "index": 11,
+          "type": "range",
+          "label": "Media contrast",
+          "def": 0.8,
+          "min": 0.2,
+          "max": 2,
+          "step": 0.01,
+          "group": "Image"
+        },
+        {
+          "key": "tintR",
+          "index": 12,
+          "type": "range",
+          "label": "Accent colour R",
+          "def": 0.4157,
+          "min": 0,
+          "max": 1,
+          "step": 0.001,
+          "group": "Look",
+          "mutate": 0.5,
+          "part": {
+            "of": "tint",
+            "kind": "color",
+            "i": 0,
+            "label": "Accent colour"
+          }
+        },
+        {
+          "key": "tintG",
+          "index": 13,
+          "type": "range",
+          "label": "Accent colour G",
+          "def": 1,
+          "min": 0,
+          "max": 1,
+          "step": 0.001,
+          "group": "Look",
+          "mutate": 0.5,
+          "part": {
+            "of": "tint",
+            "kind": "color",
+            "i": 1,
+            "label": "Accent colour"
+          }
+        },
+        {
+          "key": "tintB",
+          "index": 14,
+          "type": "range",
+          "label": "Accent colour B",
+          "def": 0.8471,
+          "min": 0,
+          "max": 1,
+          "step": 0.001,
+          "group": "Look",
+          "mutate": 0.5,
+          "part": {
+            "of": "tint",
+            "kind": "color",
+            "i": 2,
+            "label": "Accent colour"
+          }
+        },
+        {
+          "key": "tintMix",
+          "index": 15,
+          "type": "range",
+          "label": "Custom accent",
+          "def": 0,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Look"
+        },
+        {
+          "key": "frame",
+          "index": 16,
+          "type": "toggle",
+          "label": "Frame guides",
+          "def": true,
+          "group": "Look"
+        }
+      ]
+    },
+    {
+      "id": "infokit/orbital-index",
+      "localId": "orbital-index",
+      "name": "Orbital Index",
+      "blurb": "Concentric telemetry and tracked orbit labels.",
+      "group": "InfoKit / Motion Graphic",
+      "tags": [
+        "typography",
+        "infographic",
+        "media",
+        "loop",
+        "broadcast"
+      ],
+      "palette": "orbital-index",
+      "flash": false,
+      "cost": 1,
+      "passes": [
+        {
+          "function": "mfs_infokit_orbital_index_p0",
+          "source": "infokit_orbital_index_p0",
+          "scale": 1
+        }
+      ],
+      "inputs": [
+        {
+          "id": "source",
+          "type": "media",
+          "label": "Visual source",
+          "fit": "fill",
+          "hint": "Photo or video behind the type and data geometry."
+        }
+      ],
+      "params": [
+        {
+          "key": "headline",
+          "index": 0,
+          "type": "select",
+          "label": "Headline",
+          "def": "orbit",
+          "group": "Typography",
+          "hint": "Choose a built-in wordmark; the SDK does not expose arbitrary text strings.",
+          "options": [
+            {
+              "v": "signal",
+              "l": "SIGNAL"
+            },
+            {
+              "v": "orbit",
+              "l": "ORBIT"
+            },
+            {
+              "v": "golden",
+              "l": "GOLDEN"
+            },
+            {
+              "v": "vector",
+              "l": "VECTOR"
+            },
+            {
+              "v": "phase",
+              "l": "PHASE"
+            },
+            {
+              "v": "bloom",
+              "l": "BLOOM"
+            },
+            {
+              "v": "field",
+              "l": "FIELD"
+            },
+            {
+              "v": "datum",
+              "l": "DATUM"
+            },
+            {
+              "v": "spectra",
+              "l": "SPECTRA"
+            },
+            {
+              "v": "future",
+              "l": "FUTURE"
+            }
+          ]
+        },
+        {
+          "key": "titleSize",
+          "index": 1,
+          "type": "range",
+          "label": "Title scale",
+          "def": 1,
+          "min": 0.6,
+          "max": 1.5,
+          "step": 0.01,
+          "group": "Typography"
+        },
+        {
+          "key": "letterSpace",
+          "index": 2,
+          "type": "range",
+          "label": "Tracking",
+          "def": 1,
+          "min": 0.78,
+          "max": 1.5,
+          "step": 0.01,
+          "group": "Typography"
+        },
+        {
+          "key": "detail",
+          "index": 3,
+          "type": "toggle",
+          "label": "Detail labels",
+          "def": true,
+          "group": "Typography"
+        },
+        {
+          "key": "density",
+          "index": 4,
+          "type": "int",
+          "label": "Data density",
+          "def": 7,
+          "min": 3,
+          "max": 18,
+          "step": 1,
+          "group": "Geometry"
+        },
+        {
+          "key": "originX",
+          "index": 5,
+          "type": "range",
+          "label": "Focal origin X",
+          "def": 0,
+          "min": -0.25,
+          "max": 0.25,
+          "step": 0.0013,
+          "group": "Geometry",
+          "hint": "Shift the geometric focal point.",
+          "part": {
+            "of": "origin",
+            "kind": "point",
+            "i": 0,
+            "label": "Focal origin"
+          }
+        },
+        {
+          "key": "originY",
+          "index": 6,
+          "type": "range",
+          "label": "Focal origin Y",
+          "def": 0,
+          "min": -0.25,
+          "max": 0.25,
+          "step": 0.0013,
+          "group": "Geometry",
+          "hint": "Shift the geometric focal point.",
+          "part": {
+            "of": "origin",
+            "kind": "point",
+            "i": 1,
+            "label": "Focal origin"
+          }
+        },
+        {
+          "key": "structure",
+          "index": 7,
+          "type": "range",
+          "label": "Structure",
+          "def": 0.75,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Geometry"
+        },
+        {
+          "key": "cycles",
+          "index": 8,
+          "type": "int",
+          "label": "Cycles / loop",
+          "def": 1,
+          "min": 1,
+          "max": 4,
+          "step": 1,
+          "group": "Motion"
+        },
+        {
+          "key": "motion",
+          "index": 9,
+          "type": "range",
+          "label": "Motion",
+          "def": 0.6,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Motion"
+        },
+        {
+          "key": "sourceMix",
+          "index": 10,
+          "type": "range",
+          "label": "Source amount",
+          "def": 0.55,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Image",
+          "hint": "Blend a dropped image or video behind the treatment."
+        },
+        {
+          "key": "contrast",
+          "index": 11,
+          "type": "range",
+          "label": "Media contrast",
+          "def": 0.8,
+          "min": 0.2,
+          "max": 2,
+          "step": 0.01,
+          "group": "Image"
+        },
+        {
+          "key": "tintR",
+          "index": 12,
+          "type": "range",
+          "label": "Accent colour R",
+          "def": 0.6039,
+          "min": 0,
+          "max": 1,
+          "step": 0.001,
+          "group": "Look",
+          "mutate": 0.5,
+          "part": {
+            "of": "tint",
+            "kind": "color",
+            "i": 0,
+            "label": "Accent colour"
+          }
+        },
+        {
+          "key": "tintG",
+          "index": 13,
+          "type": "range",
+          "label": "Accent colour G",
+          "def": 0.8745,
+          "min": 0,
+          "max": 1,
+          "step": 0.001,
+          "group": "Look",
+          "mutate": 0.5,
+          "part": {
+            "of": "tint",
+            "kind": "color",
+            "i": 1,
+            "label": "Accent colour"
+          }
+        },
+        {
+          "key": "tintB",
+          "index": 14,
+          "type": "range",
+          "label": "Accent colour B",
+          "def": 1,
+          "min": 0,
+          "max": 1,
+          "step": 0.001,
+          "group": "Look",
+          "mutate": 0.5,
+          "part": {
+            "of": "tint",
+            "kind": "color",
+            "i": 2,
+            "label": "Accent colour"
+          }
+        },
+        {
+          "key": "tintMix",
+          "index": 15,
+          "type": "range",
+          "label": "Custom accent",
+          "def": 0,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Look"
+        },
+        {
+          "key": "frame",
+          "index": 16,
+          "type": "toggle",
+          "label": "Frame guides",
+          "def": true,
+          "group": "Look"
+        }
+      ]
+    },
+    {
+      "id": "infokit/golden-ledger",
+      "localId": "golden-ledger",
+      "name": "Golden Ledger",
+      "blurb": "Golden-section grid with animated quantitative bars.",
+      "group": "InfoKit / Motion Graphic",
+      "tags": [
+        "typography",
+        "infographic",
+        "media",
+        "loop",
+        "broadcast"
+      ],
+      "palette": "golden-ledger",
+      "flash": false,
+      "cost": 1,
+      "passes": [
+        {
+          "function": "mfs_infokit_golden_ledger_p0",
+          "source": "infokit_golden_ledger_p0",
+          "scale": 1
+        }
+      ],
+      "inputs": [
+        {
+          "id": "source",
+          "type": "media",
+          "label": "Visual source",
+          "fit": "fill",
+          "hint": "Photo or video behind the type and data geometry."
+        }
+      ],
+      "params": [
+        {
+          "key": "headline",
+          "index": 0,
+          "type": "select",
+          "label": "Headline",
+          "def": "golden",
+          "group": "Typography",
+          "hint": "Choose a built-in wordmark; the SDK does not expose arbitrary text strings.",
+          "options": [
+            {
+              "v": "signal",
+              "l": "SIGNAL"
+            },
+            {
+              "v": "orbit",
+              "l": "ORBIT"
+            },
+            {
+              "v": "golden",
+              "l": "GOLDEN"
+            },
+            {
+              "v": "vector",
+              "l": "VECTOR"
+            },
+            {
+              "v": "phase",
+              "l": "PHASE"
+            },
+            {
+              "v": "bloom",
+              "l": "BLOOM"
+            },
+            {
+              "v": "field",
+              "l": "FIELD"
+            },
+            {
+              "v": "datum",
+              "l": "DATUM"
+            },
+            {
+              "v": "spectra",
+              "l": "SPECTRA"
+            },
+            {
+              "v": "future",
+              "l": "FUTURE"
+            }
+          ]
+        },
+        {
+          "key": "titleSize",
+          "index": 1,
+          "type": "range",
+          "label": "Title scale",
+          "def": 1,
+          "min": 0.6,
+          "max": 1.5,
+          "step": 0.01,
+          "group": "Typography"
+        },
+        {
+          "key": "letterSpace",
+          "index": 2,
+          "type": "range",
+          "label": "Tracking",
+          "def": 1,
+          "min": 0.78,
+          "max": 1.5,
+          "step": 0.01,
+          "group": "Typography"
+        },
+        {
+          "key": "detail",
+          "index": 3,
+          "type": "toggle",
+          "label": "Detail labels",
+          "def": true,
+          "group": "Typography"
+        },
+        {
+          "key": "density",
+          "index": 4,
+          "type": "int",
+          "label": "Data density",
+          "def": 13,
+          "min": 3,
+          "max": 18,
+          "step": 1,
+          "group": "Geometry"
+        },
+        {
+          "key": "originX",
+          "index": 5,
+          "type": "range",
+          "label": "Focal origin X",
+          "def": 0,
+          "min": -0.25,
+          "max": 0.25,
+          "step": 0.0013,
+          "group": "Geometry",
+          "hint": "Shift the geometric focal point.",
+          "part": {
+            "of": "origin",
+            "kind": "point",
+            "i": 0,
+            "label": "Focal origin"
+          }
+        },
+        {
+          "key": "originY",
+          "index": 6,
+          "type": "range",
+          "label": "Focal origin Y",
+          "def": 0,
+          "min": -0.25,
+          "max": 0.25,
+          "step": 0.0013,
+          "group": "Geometry",
+          "hint": "Shift the geometric focal point.",
+          "part": {
+            "of": "origin",
+            "kind": "point",
+            "i": 1,
+            "label": "Focal origin"
+          }
+        },
+        {
+          "key": "structure",
+          "index": 7,
+          "type": "range",
+          "label": "Structure",
+          "def": 0.75,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Geometry"
+        },
+        {
+          "key": "cycles",
+          "index": 8,
+          "type": "int",
+          "label": "Cycles / loop",
+          "def": 1,
+          "min": 1,
+          "max": 4,
+          "step": 1,
+          "group": "Motion"
+        },
+        {
+          "key": "motion",
+          "index": 9,
+          "type": "range",
+          "label": "Motion",
+          "def": 0.6,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Motion"
+        },
+        {
+          "key": "sourceMix",
+          "index": 10,
+          "type": "range",
+          "label": "Source amount",
+          "def": 0.35,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Image",
+          "hint": "Blend a dropped image or video behind the treatment."
+        },
+        {
+          "key": "contrast",
+          "index": 11,
+          "type": "range",
+          "label": "Media contrast",
+          "def": 0.8,
+          "min": 0.2,
+          "max": 2,
+          "step": 0.01,
+          "group": "Image"
+        },
+        {
+          "key": "tintR",
+          "index": 12,
+          "type": "range",
+          "label": "Accent colour R",
+          "def": 0.9569,
+          "min": 0,
+          "max": 1,
+          "step": 0.001,
+          "group": "Look",
+          "mutate": 0.5,
+          "part": {
+            "of": "tint",
+            "kind": "color",
+            "i": 0,
+            "label": "Accent colour"
+          }
+        },
+        {
+          "key": "tintG",
+          "index": 13,
+          "type": "range",
+          "label": "Accent colour G",
+          "def": 0.8,
+          "min": 0,
+          "max": 1,
+          "step": 0.001,
+          "group": "Look",
+          "mutate": 0.5,
+          "part": {
+            "of": "tint",
+            "kind": "color",
+            "i": 1,
+            "label": "Accent colour"
+          }
+        },
+        {
+          "key": "tintB",
+          "index": 14,
+          "type": "range",
+          "label": "Accent colour B",
+          "def": 0.4706,
+          "min": 0,
+          "max": 1,
+          "step": 0.001,
+          "group": "Look",
+          "mutate": 0.5,
+          "part": {
+            "of": "tint",
+            "kind": "color",
+            "i": 2,
+            "label": "Accent colour"
+          }
+        },
+        {
+          "key": "tintMix",
+          "index": 15,
+          "type": "range",
+          "label": "Custom accent",
+          "def": 0,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Look"
+        },
+        {
+          "key": "frame",
+          "index": 16,
+          "type": "toggle",
+          "label": "Frame guides",
+          "def": true,
+          "group": "Look"
+        }
+      ]
+    },
+    {
+      "id": "infokit/vector-relay",
+      "localId": "vector-relay",
+      "name": "Vector Relay",
+      "blurb": "Vector rays, coordinate targets, and wayfinding.",
+      "group": "InfoKit / Motion Graphic",
+      "tags": [
+        "typography",
+        "infographic",
+        "media",
+        "loop",
+        "broadcast"
+      ],
+      "palette": "vector-relay",
+      "flash": false,
+      "cost": 1,
+      "passes": [
+        {
+          "function": "mfs_infokit_vector_relay_p0",
+          "source": "infokit_vector_relay_p0",
+          "scale": 1
+        }
+      ],
+      "inputs": [
+        {
+          "id": "source",
+          "type": "media",
+          "label": "Visual source",
+          "fit": "fill",
+          "hint": "Photo or video behind the type and data geometry."
+        }
+      ],
+      "params": [
+        {
+          "key": "headline",
+          "index": 0,
+          "type": "select",
+          "label": "Headline",
+          "def": "vector",
+          "group": "Typography",
+          "hint": "Choose a built-in wordmark; the SDK does not expose arbitrary text strings.",
+          "options": [
+            {
+              "v": "signal",
+              "l": "SIGNAL"
+            },
+            {
+              "v": "orbit",
+              "l": "ORBIT"
+            },
+            {
+              "v": "golden",
+              "l": "GOLDEN"
+            },
+            {
+              "v": "vector",
+              "l": "VECTOR"
+            },
+            {
+              "v": "phase",
+              "l": "PHASE"
+            },
+            {
+              "v": "bloom",
+              "l": "BLOOM"
+            },
+            {
+              "v": "field",
+              "l": "FIELD"
+            },
+            {
+              "v": "datum",
+              "l": "DATUM"
+            },
+            {
+              "v": "spectra",
+              "l": "SPECTRA"
+            },
+            {
+              "v": "future",
+              "l": "FUTURE"
+            }
+          ]
+        },
+        {
+          "key": "titleSize",
+          "index": 1,
+          "type": "range",
+          "label": "Title scale",
+          "def": 1,
+          "min": 0.6,
+          "max": 1.5,
+          "step": 0.01,
+          "group": "Typography"
+        },
+        {
+          "key": "letterSpace",
+          "index": 2,
+          "type": "range",
+          "label": "Tracking",
+          "def": 1,
+          "min": 0.78,
+          "max": 1.5,
+          "step": 0.01,
+          "group": "Typography"
+        },
+        {
+          "key": "detail",
+          "index": 3,
+          "type": "toggle",
+          "label": "Detail labels",
+          "def": true,
+          "group": "Typography"
+        },
+        {
+          "key": "density",
+          "index": 4,
+          "type": "int",
+          "label": "Data density",
+          "def": 12,
+          "min": 3,
+          "max": 18,
+          "step": 1,
+          "group": "Geometry"
+        },
+        {
+          "key": "originX",
+          "index": 5,
+          "type": "range",
+          "label": "Focal origin X",
+          "def": 0,
+          "min": -0.25,
+          "max": 0.25,
+          "step": 0.0013,
+          "group": "Geometry",
+          "hint": "Shift the geometric focal point.",
+          "part": {
+            "of": "origin",
+            "kind": "point",
+            "i": 0,
+            "label": "Focal origin"
+          }
+        },
+        {
+          "key": "originY",
+          "index": 6,
+          "type": "range",
+          "label": "Focal origin Y",
+          "def": 0,
+          "min": -0.25,
+          "max": 0.25,
+          "step": 0.0013,
+          "group": "Geometry",
+          "hint": "Shift the geometric focal point.",
+          "part": {
+            "of": "origin",
+            "kind": "point",
+            "i": 1,
+            "label": "Focal origin"
+          }
+        },
+        {
+          "key": "structure",
+          "index": 7,
+          "type": "range",
+          "label": "Structure",
+          "def": 0.75,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Geometry"
+        },
+        {
+          "key": "cycles",
+          "index": 8,
+          "type": "int",
+          "label": "Cycles / loop",
+          "def": 1,
+          "min": 1,
+          "max": 4,
+          "step": 1,
+          "group": "Motion"
+        },
+        {
+          "key": "motion",
+          "index": 9,
+          "type": "range",
+          "label": "Motion",
+          "def": 0.6,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Motion"
+        },
+        {
+          "key": "sourceMix",
+          "index": 10,
+          "type": "range",
+          "label": "Source amount",
+          "def": 0.62,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Image",
+          "hint": "Blend a dropped image or video behind the treatment."
+        },
+        {
+          "key": "contrast",
+          "index": 11,
+          "type": "range",
+          "label": "Media contrast",
+          "def": 0.8,
+          "min": 0.2,
+          "max": 2,
+          "step": 0.01,
+          "group": "Image"
+        },
+        {
+          "key": "tintR",
+          "index": 12,
+          "type": "range",
+          "label": "Accent colour R",
+          "def": 0.698,
+          "min": 0,
+          "max": 1,
+          "step": 0.001,
+          "group": "Look",
+          "mutate": 0.5,
+          "part": {
+            "of": "tint",
+            "kind": "color",
+            "i": 0,
+            "label": "Accent colour"
+          }
+        },
+        {
+          "key": "tintG",
+          "index": 13,
+          "type": "range",
+          "label": "Accent colour G",
+          "def": 0.9373,
+          "min": 0,
+          "max": 1,
+          "step": 0.001,
+          "group": "Look",
+          "mutate": 0.5,
+          "part": {
+            "of": "tint",
+            "kind": "color",
+            "i": 1,
+            "label": "Accent colour"
+          }
+        },
+        {
+          "key": "tintB",
+          "index": 14,
+          "type": "range",
+          "label": "Accent colour B",
+          "def": 0.3882,
+          "min": 0,
+          "max": 1,
+          "step": 0.001,
+          "group": "Look",
+          "mutate": 0.5,
+          "part": {
+            "of": "tint",
+            "kind": "color",
+            "i": 2,
+            "label": "Accent colour"
+          }
+        },
+        {
+          "key": "tintMix",
+          "index": 15,
+          "type": "range",
+          "label": "Custom accent",
+          "def": 0,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Look"
+        },
+        {
+          "key": "frame",
+          "index": 16,
+          "type": "toggle",
+          "label": "Frame guides",
+          "def": true,
+          "group": "Look"
+        }
+      ]
+    },
+    {
+      "id": "infokit/phase-portrait",
+      "localId": "phase-portrait",
+      "name": "Phase Portrait",
+      "blurb": "Oscillating phase plot with spare broadcast typography.",
+      "group": "InfoKit / Motion Graphic",
+      "tags": [
+        "typography",
+        "infographic",
+        "media",
+        "loop",
+        "broadcast"
+      ],
+      "palette": "phase-portrait",
+      "flash": false,
+      "cost": 1,
+      "passes": [
+        {
+          "function": "mfs_infokit_phase_portrait_p0",
+          "source": "infokit_phase_portrait_p0",
+          "scale": 1
+        }
+      ],
+      "inputs": [
+        {
+          "id": "source",
+          "type": "media",
+          "label": "Visual source",
+          "fit": "fill",
+          "hint": "Photo or video behind the type and data geometry."
+        }
+      ],
+      "params": [
+        {
+          "key": "headline",
+          "index": 0,
+          "type": "select",
+          "label": "Headline",
+          "def": "phase",
+          "group": "Typography",
+          "hint": "Choose a built-in wordmark; the SDK does not expose arbitrary text strings.",
+          "options": [
+            {
+              "v": "signal",
+              "l": "SIGNAL"
+            },
+            {
+              "v": "orbit",
+              "l": "ORBIT"
+            },
+            {
+              "v": "golden",
+              "l": "GOLDEN"
+            },
+            {
+              "v": "vector",
+              "l": "VECTOR"
+            },
+            {
+              "v": "phase",
+              "l": "PHASE"
+            },
+            {
+              "v": "bloom",
+              "l": "BLOOM"
+            },
+            {
+              "v": "field",
+              "l": "FIELD"
+            },
+            {
+              "v": "datum",
+              "l": "DATUM"
+            },
+            {
+              "v": "spectra",
+              "l": "SPECTRA"
+            },
+            {
+              "v": "future",
+              "l": "FUTURE"
+            }
+          ]
+        },
+        {
+          "key": "titleSize",
+          "index": 1,
+          "type": "range",
+          "label": "Title scale",
+          "def": 1,
+          "min": 0.6,
+          "max": 1.5,
+          "step": 0.01,
+          "group": "Typography"
+        },
+        {
+          "key": "letterSpace",
+          "index": 2,
+          "type": "range",
+          "label": "Tracking",
+          "def": 1,
+          "min": 0.78,
+          "max": 1.5,
+          "step": 0.01,
+          "group": "Typography"
+        },
+        {
+          "key": "detail",
+          "index": 3,
+          "type": "toggle",
+          "label": "Detail labels",
+          "def": true,
+          "group": "Typography"
+        },
+        {
+          "key": "density",
+          "index": 4,
+          "type": "int",
+          "label": "Data density",
+          "def": 6,
+          "min": 3,
+          "max": 18,
+          "step": 1,
+          "group": "Geometry"
+        },
+        {
+          "key": "originX",
+          "index": 5,
+          "type": "range",
+          "label": "Focal origin X",
+          "def": 0,
+          "min": -0.25,
+          "max": 0.25,
+          "step": 0.0013,
+          "group": "Geometry",
+          "hint": "Shift the geometric focal point.",
+          "part": {
+            "of": "origin",
+            "kind": "point",
+            "i": 0,
+            "label": "Focal origin"
+          }
+        },
+        {
+          "key": "originY",
+          "index": 6,
+          "type": "range",
+          "label": "Focal origin Y",
+          "def": 0,
+          "min": -0.25,
+          "max": 0.25,
+          "step": 0.0013,
+          "group": "Geometry",
+          "hint": "Shift the geometric focal point.",
+          "part": {
+            "of": "origin",
+            "kind": "point",
+            "i": 1,
+            "label": "Focal origin"
+          }
+        },
+        {
+          "key": "structure",
+          "index": 7,
+          "type": "range",
+          "label": "Structure",
+          "def": 0.75,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Geometry"
+        },
+        {
+          "key": "cycles",
+          "index": 8,
+          "type": "int",
+          "label": "Cycles / loop",
+          "def": 1,
+          "min": 1,
+          "max": 4,
+          "step": 1,
+          "group": "Motion"
+        },
+        {
+          "key": "motion",
+          "index": 9,
+          "type": "range",
+          "label": "Motion",
+          "def": 0.6,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Motion"
+        },
+        {
+          "key": "sourceMix",
+          "index": 10,
+          "type": "range",
+          "label": "Source amount",
+          "def": 0.5,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Image",
+          "hint": "Blend a dropped image or video behind the treatment."
+        },
+        {
+          "key": "contrast",
+          "index": 11,
+          "type": "range",
+          "label": "Media contrast",
+          "def": 0.8,
+          "min": 0.2,
+          "max": 2,
+          "step": 0.01,
+          "group": "Image"
+        },
+        {
+          "key": "tintR",
+          "index": 12,
+          "type": "range",
+          "label": "Accent colour R",
+          "def": 0.7451,
+          "min": 0,
+          "max": 1,
+          "step": 0.001,
+          "group": "Look",
+          "mutate": 0.5,
+          "part": {
+            "of": "tint",
+            "kind": "color",
+            "i": 0,
+            "label": "Accent colour"
+          }
+        },
+        {
+          "key": "tintG",
+          "index": 13,
+          "type": "range",
+          "label": "Accent colour G",
+          "def": 0.6471,
+          "min": 0,
+          "max": 1,
+          "step": 0.001,
+          "group": "Look",
+          "mutate": 0.5,
+          "part": {
+            "of": "tint",
+            "kind": "color",
+            "i": 1,
+            "label": "Accent colour"
+          }
+        },
+        {
+          "key": "tintB",
+          "index": 14,
+          "type": "range",
+          "label": "Accent colour B",
+          "def": 1,
+          "min": 0,
+          "max": 1,
+          "step": 0.001,
+          "group": "Look",
+          "mutate": 0.5,
+          "part": {
+            "of": "tint",
+            "kind": "color",
+            "i": 2,
+            "label": "Accent colour"
+          }
+        },
+        {
+          "key": "tintMix",
+          "index": 15,
+          "type": "range",
+          "label": "Custom accent",
+          "def": 0,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Look"
+        },
+        {
+          "key": "frame",
+          "index": 16,
+          "type": "toggle",
+          "label": "Frame guides",
+          "def": true,
+          "group": "Look"
+        }
+      ]
+    },
+    {
+      "id": "infokit/telemetry-bloom",
+      "localId": "telemetry-bloom",
+      "name": "Telemetry Bloom",
+      "blurb": "Blooming radial data glyph over visual media.",
+      "group": "InfoKit / Motion Graphic",
+      "tags": [
+        "typography",
+        "infographic",
+        "media",
+        "loop",
+        "broadcast"
+      ],
+      "palette": "telemetry-bloom",
+      "flash": false,
+      "cost": 1,
+      "passes": [
+        {
+          "function": "mfs_infokit_telemetry_bloom_p0",
+          "source": "infokit_telemetry_bloom_p0",
+          "scale": 1
+        }
+      ],
+      "inputs": [
+        {
+          "id": "source",
+          "type": "media",
+          "label": "Visual source",
+          "fit": "fill",
+          "hint": "Photo or video behind the type and data geometry."
+        }
+      ],
+      "params": [
+        {
+          "key": "headline",
+          "index": 0,
+          "type": "select",
+          "label": "Headline",
+          "def": "bloom",
+          "group": "Typography",
+          "hint": "Choose a built-in wordmark; the SDK does not expose arbitrary text strings.",
+          "options": [
+            {
+              "v": "signal",
+              "l": "SIGNAL"
+            },
+            {
+              "v": "orbit",
+              "l": "ORBIT"
+            },
+            {
+              "v": "golden",
+              "l": "GOLDEN"
+            },
+            {
+              "v": "vector",
+              "l": "VECTOR"
+            },
+            {
+              "v": "phase",
+              "l": "PHASE"
+            },
+            {
+              "v": "bloom",
+              "l": "BLOOM"
+            },
+            {
+              "v": "field",
+              "l": "FIELD"
+            },
+            {
+              "v": "datum",
+              "l": "DATUM"
+            },
+            {
+              "v": "spectra",
+              "l": "SPECTRA"
+            },
+            {
+              "v": "future",
+              "l": "FUTURE"
+            }
+          ]
+        },
+        {
+          "key": "titleSize",
+          "index": 1,
+          "type": "range",
+          "label": "Title scale",
+          "def": 1,
+          "min": 0.6,
+          "max": 1.5,
+          "step": 0.01,
+          "group": "Typography"
+        },
+        {
+          "key": "letterSpace",
+          "index": 2,
+          "type": "range",
+          "label": "Tracking",
+          "def": 1,
+          "min": 0.78,
+          "max": 1.5,
+          "step": 0.01,
+          "group": "Typography"
+        },
+        {
+          "key": "detail",
+          "index": 3,
+          "type": "toggle",
+          "label": "Detail labels",
+          "def": true,
+          "group": "Typography"
+        },
+        {
+          "key": "density",
+          "index": 4,
+          "type": "int",
+          "label": "Data density",
+          "def": 10,
+          "min": 3,
+          "max": 18,
+          "step": 1,
+          "group": "Geometry"
+        },
+        {
+          "key": "originX",
+          "index": 5,
+          "type": "range",
+          "label": "Focal origin X",
+          "def": 0,
+          "min": -0.25,
+          "max": 0.25,
+          "step": 0.0013,
+          "group": "Geometry",
+          "hint": "Shift the geometric focal point.",
+          "part": {
+            "of": "origin",
+            "kind": "point",
+            "i": 0,
+            "label": "Focal origin"
+          }
+        },
+        {
+          "key": "originY",
+          "index": 6,
+          "type": "range",
+          "label": "Focal origin Y",
+          "def": 0,
+          "min": -0.25,
+          "max": 0.25,
+          "step": 0.0013,
+          "group": "Geometry",
+          "hint": "Shift the geometric focal point.",
+          "part": {
+            "of": "origin",
+            "kind": "point",
+            "i": 1,
+            "label": "Focal origin"
+          }
+        },
+        {
+          "key": "structure",
+          "index": 7,
+          "type": "range",
+          "label": "Structure",
+          "def": 0.75,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Geometry"
+        },
+        {
+          "key": "cycles",
+          "index": 8,
+          "type": "int",
+          "label": "Cycles / loop",
+          "def": 1,
+          "min": 1,
+          "max": 4,
+          "step": 1,
+          "group": "Motion"
+        },
+        {
+          "key": "motion",
+          "index": 9,
+          "type": "range",
+          "label": "Motion",
+          "def": 0.6,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Motion"
+        },
+        {
+          "key": "sourceMix",
+          "index": 10,
+          "type": "range",
+          "label": "Source amount",
+          "def": 0.54,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Image",
+          "hint": "Blend a dropped image or video behind the treatment."
+        },
+        {
+          "key": "contrast",
+          "index": 11,
+          "type": "range",
+          "label": "Media contrast",
+          "def": 0.8,
+          "min": 0.2,
+          "max": 2,
+          "step": 0.01,
+          "group": "Image"
+        },
+        {
+          "key": "tintR",
+          "index": 12,
+          "type": "range",
+          "label": "Accent colour R",
+          "def": 0.9765,
+          "min": 0,
+          "max": 1,
+          "step": 0.001,
+          "group": "Look",
+          "mutate": 0.5,
+          "part": {
+            "of": "tint",
+            "kind": "color",
+            "i": 0,
+            "label": "Accent colour"
+          }
+        },
+        {
+          "key": "tintG",
+          "index": 13,
+          "type": "range",
+          "label": "Accent colour G",
+          "def": 0.6039,
+          "min": 0,
+          "max": 1,
+          "step": 0.001,
+          "group": "Look",
+          "mutate": 0.5,
+          "part": {
+            "of": "tint",
+            "kind": "color",
+            "i": 1,
+            "label": "Accent colour"
+          }
+        },
+        {
+          "key": "tintB",
+          "index": 14,
+          "type": "range",
+          "label": "Accent colour B",
+          "def": 0.8667,
+          "min": 0,
+          "max": 1,
+          "step": 0.001,
+          "group": "Look",
+          "mutate": 0.5,
+          "part": {
+            "of": "tint",
+            "kind": "color",
+            "i": 2,
+            "label": "Accent colour"
+          }
+        },
+        {
+          "key": "tintMix",
+          "index": 15,
+          "type": "range",
+          "label": "Custom accent",
+          "def": 0,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Look"
+        },
+        {
+          "key": "frame",
+          "index": 16,
+          "type": "toggle",
+          "label": "Frame guides",
+          "def": true,
+          "group": "Look"
+        }
+      ]
+    },
+    {
+      "id": "infokit/typographic-field",
+      "localId": "typographic-field",
+      "name": "Typographic Field",
+      "blurb": "Modular typographic columns and moving field lines.",
+      "group": "InfoKit / Motion Graphic",
+      "tags": [
+        "typography",
+        "infographic",
+        "media",
+        "loop",
+        "broadcast"
+      ],
+      "palette": "typographic-field",
+      "flash": false,
+      "cost": 1,
+      "passes": [
+        {
+          "function": "mfs_infokit_typographic_field_p0",
+          "source": "infokit_typographic_field_p0",
+          "scale": 1
+        }
+      ],
+      "inputs": [
+        {
+          "id": "source",
+          "type": "media",
+          "label": "Visual source",
+          "fit": "fill",
+          "hint": "Photo or video behind the type and data geometry."
+        }
+      ],
+      "params": [
+        {
+          "key": "headline",
+          "index": 0,
+          "type": "select",
+          "label": "Headline",
+          "def": "field",
+          "group": "Typography",
+          "hint": "Choose a built-in wordmark; the SDK does not expose arbitrary text strings.",
+          "options": [
+            {
+              "v": "signal",
+              "l": "SIGNAL"
+            },
+            {
+              "v": "orbit",
+              "l": "ORBIT"
+            },
+            {
+              "v": "golden",
+              "l": "GOLDEN"
+            },
+            {
+              "v": "vector",
+              "l": "VECTOR"
+            },
+            {
+              "v": "phase",
+              "l": "PHASE"
+            },
+            {
+              "v": "bloom",
+              "l": "BLOOM"
+            },
+            {
+              "v": "field",
+              "l": "FIELD"
+            },
+            {
+              "v": "datum",
+              "l": "DATUM"
+            },
+            {
+              "v": "spectra",
+              "l": "SPECTRA"
+            },
+            {
+              "v": "future",
+              "l": "FUTURE"
+            }
+          ]
+        },
+        {
+          "key": "titleSize",
+          "index": 1,
+          "type": "range",
+          "label": "Title scale",
+          "def": 1,
+          "min": 0.6,
+          "max": 1.5,
+          "step": 0.01,
+          "group": "Typography"
+        },
+        {
+          "key": "letterSpace",
+          "index": 2,
+          "type": "range",
+          "label": "Tracking",
+          "def": 1,
+          "min": 0.78,
+          "max": 1.5,
+          "step": 0.01,
+          "group": "Typography"
+        },
+        {
+          "key": "detail",
+          "index": 3,
+          "type": "toggle",
+          "label": "Detail labels",
+          "def": true,
+          "group": "Typography"
+        },
+        {
+          "key": "density",
+          "index": 4,
+          "type": "int",
+          "label": "Data density",
+          "def": 15,
+          "min": 3,
+          "max": 18,
+          "step": 1,
+          "group": "Geometry"
+        },
+        {
+          "key": "originX",
+          "index": 5,
+          "type": "range",
+          "label": "Focal origin X",
+          "def": 0,
+          "min": -0.25,
+          "max": 0.25,
+          "step": 0.0013,
+          "group": "Geometry",
+          "hint": "Shift the geometric focal point.",
+          "part": {
+            "of": "origin",
+            "kind": "point",
+            "i": 0,
+            "label": "Focal origin"
+          }
+        },
+        {
+          "key": "originY",
+          "index": 6,
+          "type": "range",
+          "label": "Focal origin Y",
+          "def": 0,
+          "min": -0.25,
+          "max": 0.25,
+          "step": 0.0013,
+          "group": "Geometry",
+          "hint": "Shift the geometric focal point.",
+          "part": {
+            "of": "origin",
+            "kind": "point",
+            "i": 1,
+            "label": "Focal origin"
+          }
+        },
+        {
+          "key": "structure",
+          "index": 7,
+          "type": "range",
+          "label": "Structure",
+          "def": 0.75,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Geometry"
+        },
+        {
+          "key": "cycles",
+          "index": 8,
+          "type": "int",
+          "label": "Cycles / loop",
+          "def": 1,
+          "min": 1,
+          "max": 4,
+          "step": 1,
+          "group": "Motion"
+        },
+        {
+          "key": "motion",
+          "index": 9,
+          "type": "range",
+          "label": "Motion",
+          "def": 0.6,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Motion"
+        },
+        {
+          "key": "sourceMix",
+          "index": 10,
+          "type": "range",
+          "label": "Source amount",
+          "def": 0.38,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Image",
+          "hint": "Blend a dropped image or video behind the treatment."
+        },
+        {
+          "key": "contrast",
+          "index": 11,
+          "type": "range",
+          "label": "Media contrast",
+          "def": 0.8,
+          "min": 0.2,
+          "max": 2,
+          "step": 0.01,
+          "group": "Image"
+        },
+        {
+          "key": "tintR",
+          "index": 12,
+          "type": "range",
+          "label": "Accent colour R",
+          "def": 0.8471,
+          "min": 0,
+          "max": 1,
+          "step": 0.001,
+          "group": "Look",
+          "mutate": 0.5,
+          "part": {
+            "of": "tint",
+            "kind": "color",
+            "i": 0,
+            "label": "Accent colour"
+          }
+        },
+        {
+          "key": "tintG",
+          "index": 13,
+          "type": "range",
+          "label": "Accent colour G",
+          "def": 0.9333,
+          "min": 0,
+          "max": 1,
+          "step": 0.001,
+          "group": "Look",
+          "mutate": 0.5,
+          "part": {
+            "of": "tint",
+            "kind": "color",
+            "i": 1,
+            "label": "Accent colour"
+          }
+        },
+        {
+          "key": "tintB",
+          "index": 14,
+          "type": "range",
+          "label": "Accent colour B",
+          "def": 0.5686,
+          "min": 0,
+          "max": 1,
+          "step": 0.001,
+          "group": "Look",
+          "mutate": 0.5,
+          "part": {
+            "of": "tint",
+            "kind": "color",
+            "i": 2,
+            "label": "Accent colour"
+          }
+        },
+        {
+          "key": "tintMix",
+          "index": 15,
+          "type": "range",
+          "label": "Custom accent",
+          "def": 0,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Look"
+        },
+        {
+          "key": "frame",
+          "index": 16,
+          "type": "toggle",
+          "label": "Frame guides",
+          "def": true,
+          "group": "Look"
+        }
+      ]
+    },
+    {
+      "id": "infokit/datum-cascade",
+      "localId": "datum-cascade",
+      "name": "Datum Cascade",
+      "blurb": "Cascading datum ticks and vertical editorial hierarchy.",
+      "group": "InfoKit / Motion Graphic",
+      "tags": [
+        "typography",
+        "infographic",
+        "media",
+        "loop",
+        "broadcast"
+      ],
+      "palette": "datum-cascade",
+      "flash": false,
+      "cost": 1,
+      "passes": [
+        {
+          "function": "mfs_infokit_datum_cascade_p0",
+          "source": "infokit_datum_cascade_p0",
+          "scale": 1
+        }
+      ],
+      "inputs": [
+        {
+          "id": "source",
+          "type": "media",
+          "label": "Visual source",
+          "fit": "fill",
+          "hint": "Photo or video behind the type and data geometry."
+        }
+      ],
+      "params": [
+        {
+          "key": "headline",
+          "index": 0,
+          "type": "select",
+          "label": "Headline",
+          "def": "datum",
+          "group": "Typography",
+          "hint": "Choose a built-in wordmark; the SDK does not expose arbitrary text strings.",
+          "options": [
+            {
+              "v": "signal",
+              "l": "SIGNAL"
+            },
+            {
+              "v": "orbit",
+              "l": "ORBIT"
+            },
+            {
+              "v": "golden",
+              "l": "GOLDEN"
+            },
+            {
+              "v": "vector",
+              "l": "VECTOR"
+            },
+            {
+              "v": "phase",
+              "l": "PHASE"
+            },
+            {
+              "v": "bloom",
+              "l": "BLOOM"
+            },
+            {
+              "v": "field",
+              "l": "FIELD"
+            },
+            {
+              "v": "datum",
+              "l": "DATUM"
+            },
+            {
+              "v": "spectra",
+              "l": "SPECTRA"
+            },
+            {
+              "v": "future",
+              "l": "FUTURE"
+            }
+          ]
+        },
+        {
+          "key": "titleSize",
+          "index": 1,
+          "type": "range",
+          "label": "Title scale",
+          "def": 1,
+          "min": 0.6,
+          "max": 1.5,
+          "step": 0.01,
+          "group": "Typography"
+        },
+        {
+          "key": "letterSpace",
+          "index": 2,
+          "type": "range",
+          "label": "Tracking",
+          "def": 1,
+          "min": 0.78,
+          "max": 1.5,
+          "step": 0.01,
+          "group": "Typography"
+        },
+        {
+          "key": "detail",
+          "index": 3,
+          "type": "toggle",
+          "label": "Detail labels",
+          "def": true,
+          "group": "Typography"
+        },
+        {
+          "key": "density",
+          "index": 4,
+          "type": "int",
+          "label": "Data density",
+          "def": 14,
+          "min": 3,
+          "max": 18,
+          "step": 1,
+          "group": "Geometry"
+        },
+        {
+          "key": "originX",
+          "index": 5,
+          "type": "range",
+          "label": "Focal origin X",
+          "def": 0,
+          "min": -0.25,
+          "max": 0.25,
+          "step": 0.0013,
+          "group": "Geometry",
+          "hint": "Shift the geometric focal point.",
+          "part": {
+            "of": "origin",
+            "kind": "point",
+            "i": 0,
+            "label": "Focal origin"
+          }
+        },
+        {
+          "key": "originY",
+          "index": 6,
+          "type": "range",
+          "label": "Focal origin Y",
+          "def": 0,
+          "min": -0.25,
+          "max": 0.25,
+          "step": 0.0013,
+          "group": "Geometry",
+          "hint": "Shift the geometric focal point.",
+          "part": {
+            "of": "origin",
+            "kind": "point",
+            "i": 1,
+            "label": "Focal origin"
+          }
+        },
+        {
+          "key": "structure",
+          "index": 7,
+          "type": "range",
+          "label": "Structure",
+          "def": 0.75,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Geometry"
+        },
+        {
+          "key": "cycles",
+          "index": 8,
+          "type": "int",
+          "label": "Cycles / loop",
+          "def": 1,
+          "min": 1,
+          "max": 4,
+          "step": 1,
+          "group": "Motion"
+        },
+        {
+          "key": "motion",
+          "index": 9,
+          "type": "range",
+          "label": "Motion",
+          "def": 0.6,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Motion"
+        },
+        {
+          "key": "sourceMix",
+          "index": 10,
+          "type": "range",
+          "label": "Source amount",
+          "def": 0.48,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Image",
+          "hint": "Blend a dropped image or video behind the treatment."
+        },
+        {
+          "key": "contrast",
+          "index": 11,
+          "type": "range",
+          "label": "Media contrast",
+          "def": 0.8,
+          "min": 0.2,
+          "max": 2,
+          "step": 0.01,
+          "group": "Image"
+        },
+        {
+          "key": "tintR",
+          "index": 12,
+          "type": "range",
+          "label": "Accent colour R",
+          "def": 0.3725,
+          "min": 0,
+          "max": 1,
+          "step": 0.001,
+          "group": "Look",
+          "mutate": 0.5,
+          "part": {
+            "of": "tint",
+            "kind": "color",
+            "i": 0,
+            "label": "Accent colour"
+          }
+        },
+        {
+          "key": "tintG",
+          "index": 13,
+          "type": "range",
+          "label": "Accent colour G",
+          "def": 0.8863,
+          "min": 0,
+          "max": 1,
+          "step": 0.001,
+          "group": "Look",
+          "mutate": 0.5,
+          "part": {
+            "of": "tint",
+            "kind": "color",
+            "i": 1,
+            "label": "Accent colour"
+          }
+        },
+        {
+          "key": "tintB",
+          "index": 14,
+          "type": "range",
+          "label": "Accent colour B",
+          "def": 0.9294,
+          "min": 0,
+          "max": 1,
+          "step": 0.001,
+          "group": "Look",
+          "mutate": 0.5,
+          "part": {
+            "of": "tint",
+            "kind": "color",
+            "i": 2,
+            "label": "Accent colour"
+          }
+        },
+        {
+          "key": "tintMix",
+          "index": 15,
+          "type": "range",
+          "label": "Custom accent",
+          "def": 0,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Look"
+        },
+        {
+          "key": "frame",
+          "index": 16,
+          "type": "toggle",
+          "label": "Frame guides",
+          "def": true,
+          "group": "Look"
+        }
+      ]
+    },
+    {
+      "id": "infokit/spectrum-archive",
+      "localId": "spectrum-archive",
+      "name": "Spectrum Archive",
+      "blurb": "Frequency bands and a dense archival index.",
+      "group": "InfoKit / Motion Graphic",
+      "tags": [
+        "typography",
+        "infographic",
+        "media",
+        "loop",
+        "broadcast"
+      ],
+      "palette": "signal-atlas",
+      "flash": false,
+      "cost": 1,
+      "passes": [
+        {
+          "function": "mfs_infokit_spectrum_archive_p0",
+          "source": "infokit_spectrum_archive_p0",
+          "scale": 1
+        }
+      ],
+      "inputs": [
+        {
+          "id": "source",
+          "type": "media",
+          "label": "Visual source",
+          "fit": "fill",
+          "hint": "Photo or video behind the type and data geometry."
+        }
+      ],
+      "params": [
+        {
+          "key": "headline",
+          "index": 0,
+          "type": "select",
+          "label": "Headline",
+          "def": "spectra",
+          "group": "Typography",
+          "hint": "Choose a built-in wordmark; the SDK does not expose arbitrary text strings.",
+          "options": [
+            {
+              "v": "signal",
+              "l": "SIGNAL"
+            },
+            {
+              "v": "orbit",
+              "l": "ORBIT"
+            },
+            {
+              "v": "golden",
+              "l": "GOLDEN"
+            },
+            {
+              "v": "vector",
+              "l": "VECTOR"
+            },
+            {
+              "v": "phase",
+              "l": "PHASE"
+            },
+            {
+              "v": "bloom",
+              "l": "BLOOM"
+            },
+            {
+              "v": "field",
+              "l": "FIELD"
+            },
+            {
+              "v": "datum",
+              "l": "DATUM"
+            },
+            {
+              "v": "spectra",
+              "l": "SPECTRA"
+            },
+            {
+              "v": "future",
+              "l": "FUTURE"
+            }
+          ]
+        },
+        {
+          "key": "titleSize",
+          "index": 1,
+          "type": "range",
+          "label": "Title scale",
+          "def": 1,
+          "min": 0.6,
+          "max": 1.5,
+          "step": 0.01,
+          "group": "Typography"
+        },
+        {
+          "key": "letterSpace",
+          "index": 2,
+          "type": "range",
+          "label": "Tracking",
+          "def": 1,
+          "min": 0.78,
+          "max": 1.5,
+          "step": 0.01,
+          "group": "Typography"
+        },
+        {
+          "key": "detail",
+          "index": 3,
+          "type": "toggle",
+          "label": "Detail labels",
+          "def": true,
+          "group": "Typography"
+        },
+        {
+          "key": "density",
+          "index": 4,
+          "type": "int",
+          "label": "Data density",
+          "def": 16,
+          "min": 3,
+          "max": 18,
+          "step": 1,
+          "group": "Geometry"
+        },
+        {
+          "key": "originX",
+          "index": 5,
+          "type": "range",
+          "label": "Focal origin X",
+          "def": 0,
+          "min": -0.25,
+          "max": 0.25,
+          "step": 0.0013,
+          "group": "Geometry",
+          "hint": "Shift the geometric focal point.",
+          "part": {
+            "of": "origin",
+            "kind": "point",
+            "i": 0,
+            "label": "Focal origin"
+          }
+        },
+        {
+          "key": "originY",
+          "index": 6,
+          "type": "range",
+          "label": "Focal origin Y",
+          "def": 0,
+          "min": -0.25,
+          "max": 0.25,
+          "step": 0.0013,
+          "group": "Geometry",
+          "hint": "Shift the geometric focal point.",
+          "part": {
+            "of": "origin",
+            "kind": "point",
+            "i": 1,
+            "label": "Focal origin"
+          }
+        },
+        {
+          "key": "structure",
+          "index": 7,
+          "type": "range",
+          "label": "Structure",
+          "def": 0.75,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Geometry"
+        },
+        {
+          "key": "cycles",
+          "index": 8,
+          "type": "int",
+          "label": "Cycles / loop",
+          "def": 1,
+          "min": 1,
+          "max": 4,
+          "step": 1,
+          "group": "Motion"
+        },
+        {
+          "key": "motion",
+          "index": 9,
+          "type": "range",
+          "label": "Motion",
+          "def": 0.6,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Motion"
+        },
+        {
+          "key": "sourceMix",
+          "index": 10,
+          "type": "range",
+          "label": "Source amount",
+          "def": 0.52,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Image",
+          "hint": "Blend a dropped image or video behind the treatment."
+        },
+        {
+          "key": "contrast",
+          "index": 11,
+          "type": "range",
+          "label": "Media contrast",
+          "def": 0.8,
+          "min": 0.2,
+          "max": 2,
+          "step": 0.01,
+          "group": "Image"
+        },
+        {
+          "key": "tintR",
+          "index": 12,
+          "type": "range",
+          "label": "Accent colour R",
+          "def": 0.4627,
+          "min": 0,
+          "max": 1,
+          "step": 0.001,
+          "group": "Look",
+          "mutate": 0.5,
+          "part": {
+            "of": "tint",
+            "kind": "color",
+            "i": 0,
+            "label": "Accent colour"
+          }
+        },
+        {
+          "key": "tintG",
+          "index": 13,
+          "type": "range",
+          "label": "Accent colour G",
+          "def": 0.6863,
+          "min": 0,
+          "max": 1,
+          "step": 0.001,
+          "group": "Look",
+          "mutate": 0.5,
+          "part": {
+            "of": "tint",
+            "kind": "color",
+            "i": 1,
+            "label": "Accent colour"
+          }
+        },
+        {
+          "key": "tintB",
+          "index": 14,
+          "type": "range",
+          "label": "Accent colour B",
+          "def": 1,
+          "min": 0,
+          "max": 1,
+          "step": 0.001,
+          "group": "Look",
+          "mutate": 0.5,
+          "part": {
+            "of": "tint",
+            "kind": "color",
+            "i": 2,
+            "label": "Accent colour"
+          }
+        },
+        {
+          "key": "tintMix",
+          "index": 15,
+          "type": "range",
+          "label": "Custom accent",
+          "def": 1,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Look"
+        },
+        {
+          "key": "frame",
+          "index": 16,
+          "type": "toggle",
+          "label": "Frame guides",
+          "def": true,
+          "group": "Look"
+        }
+      ]
+    },
+    {
+      "id": "infokit/future-protocol",
+      "localId": "future-protocol",
+      "name": "Future Protocol",
+      "blurb": "A cinematic protocol ring with a sparse title lockup.",
+      "group": "InfoKit / Motion Graphic",
+      "tags": [
+        "typography",
+        "infographic",
+        "media",
+        "loop",
+        "broadcast"
+      ],
+      "palette": "orbital-index",
+      "flash": false,
+      "cost": 1,
+      "passes": [
+        {
+          "function": "mfs_infokit_future_protocol_p0",
+          "source": "infokit_future_protocol_p0",
+          "scale": 1
+        }
+      ],
+      "inputs": [
+        {
+          "id": "source",
+          "type": "media",
+          "label": "Visual source",
+          "fit": "fill",
+          "hint": "Photo or video behind the type and data geometry."
+        }
+      ],
+      "params": [
+        {
+          "key": "headline",
+          "index": 0,
+          "type": "select",
+          "label": "Headline",
+          "def": "future",
+          "group": "Typography",
+          "hint": "Choose a built-in wordmark; the SDK does not expose arbitrary text strings.",
+          "options": [
+            {
+              "v": "signal",
+              "l": "SIGNAL"
+            },
+            {
+              "v": "orbit",
+              "l": "ORBIT"
+            },
+            {
+              "v": "golden",
+              "l": "GOLDEN"
+            },
+            {
+              "v": "vector",
+              "l": "VECTOR"
+            },
+            {
+              "v": "phase",
+              "l": "PHASE"
+            },
+            {
+              "v": "bloom",
+              "l": "BLOOM"
+            },
+            {
+              "v": "field",
+              "l": "FIELD"
+            },
+            {
+              "v": "datum",
+              "l": "DATUM"
+            },
+            {
+              "v": "spectra",
+              "l": "SPECTRA"
+            },
+            {
+              "v": "future",
+              "l": "FUTURE"
+            }
+          ]
+        },
+        {
+          "key": "titleSize",
+          "index": 1,
+          "type": "range",
+          "label": "Title scale",
+          "def": 1,
+          "min": 0.6,
+          "max": 1.5,
+          "step": 0.01,
+          "group": "Typography"
+        },
+        {
+          "key": "letterSpace",
+          "index": 2,
+          "type": "range",
+          "label": "Tracking",
+          "def": 1,
+          "min": 0.78,
+          "max": 1.5,
+          "step": 0.01,
+          "group": "Typography"
+        },
+        {
+          "key": "detail",
+          "index": 3,
+          "type": "toggle",
+          "label": "Detail labels",
+          "def": true,
+          "group": "Typography"
+        },
+        {
+          "key": "density",
+          "index": 4,
+          "type": "int",
+          "label": "Data density",
+          "def": 8,
+          "min": 3,
+          "max": 18,
+          "step": 1,
+          "group": "Geometry"
+        },
+        {
+          "key": "originX",
+          "index": 5,
+          "type": "range",
+          "label": "Focal origin X",
+          "def": 0,
+          "min": -0.25,
+          "max": 0.25,
+          "step": 0.0013,
+          "group": "Geometry",
+          "hint": "Shift the geometric focal point.",
+          "part": {
+            "of": "origin",
+            "kind": "point",
+            "i": 0,
+            "label": "Focal origin"
+          }
+        },
+        {
+          "key": "originY",
+          "index": 6,
+          "type": "range",
+          "label": "Focal origin Y",
+          "def": 0,
+          "min": -0.25,
+          "max": 0.25,
+          "step": 0.0013,
+          "group": "Geometry",
+          "hint": "Shift the geometric focal point.",
+          "part": {
+            "of": "origin",
+            "kind": "point",
+            "i": 1,
+            "label": "Focal origin"
+          }
+        },
+        {
+          "key": "structure",
+          "index": 7,
+          "type": "range",
+          "label": "Structure",
+          "def": 0.75,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Geometry"
+        },
+        {
+          "key": "cycles",
+          "index": 8,
+          "type": "int",
+          "label": "Cycles / loop",
+          "def": 1,
+          "min": 1,
+          "max": 4,
+          "step": 1,
+          "group": "Motion"
+        },
+        {
+          "key": "motion",
+          "index": 9,
+          "type": "range",
+          "label": "Motion",
+          "def": 0.6,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Motion"
+        },
+        {
+          "key": "sourceMix",
+          "index": 10,
+          "type": "range",
+          "label": "Source amount",
+          "def": 0.6,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Image",
+          "hint": "Blend a dropped image or video behind the treatment."
+        },
+        {
+          "key": "contrast",
+          "index": 11,
+          "type": "range",
+          "label": "Media contrast",
+          "def": 0.8,
+          "min": 0.2,
+          "max": 2,
+          "step": 0.01,
+          "group": "Image"
+        },
+        {
+          "key": "tintR",
+          "index": 12,
+          "type": "range",
+          "label": "Accent colour R",
+          "def": 0.3176,
+          "min": 0,
+          "max": 1,
+          "step": 0.001,
+          "group": "Look",
+          "mutate": 0.5,
+          "part": {
+            "of": "tint",
+            "kind": "color",
+            "i": 0,
+            "label": "Accent colour"
+          }
+        },
+        {
+          "key": "tintG",
+          "index": 13,
+          "type": "range",
+          "label": "Accent colour G",
+          "def": 0.898,
+          "min": 0,
+          "max": 1,
+          "step": 0.001,
+          "group": "Look",
+          "mutate": 0.5,
+          "part": {
+            "of": "tint",
+            "kind": "color",
+            "i": 1,
+            "label": "Accent colour"
+          }
+        },
+        {
+          "key": "tintB",
+          "index": 14,
+          "type": "range",
+          "label": "Accent colour B",
+          "def": 0.8196,
+          "min": 0,
+          "max": 1,
+          "step": 0.001,
+          "group": "Look",
+          "mutate": 0.5,
+          "part": {
+            "of": "tint",
+            "kind": "color",
+            "i": 2,
+            "label": "Accent colour"
+          }
+        },
+        {
+          "key": "tintMix",
+          "index": 15,
+          "type": "range",
+          "label": "Custom accent",
+          "def": 1,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Look"
+        },
+        {
+          "key": "frame",
+          "index": 16,
+          "type": "toggle",
+          "label": "Frame guides",
+          "def": true,
+          "group": "Look"
+        }
+      ]
+    }
+  ]
+}

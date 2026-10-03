@@ -1,0 +1,4738 @@
+{
+  "format": "motif-metal@1",
+  "source": "motif-kit@1",
+  "sdk": "1.2.0",
+  "id": "kinetic-subdivision",
+  "name": "Kinetic Subdivision",
+  "version": "0.3.0",
+  "author": "Echo Opera",
+  "description": "Ten image and video subdivision treatments with custom motion, layout, sampling, edge and focal controls.",
+  "accent": "#E97445",
+  "license": "All rights reserved",
+  "palettes": [
+    {
+      "id": "field",
+      "name": "Field Orange",
+      "bg": "#111310",
+      "ink": "#F4F2E8",
+      "a": [
+        "#E97445",
+        "#65B4C3",
+        "#F2BD76"
+      ]
+    },
+    {
+      "id": "mono",
+      "name": "Technical Mono",
+      "bg": "#080A09",
+      "ink": "#FAFAF3",
+      "a": [
+        "#C5C9C2",
+        "#657069",
+        "#E8EBE2"
+      ]
+    }
+  ],
+  "styles": [
+    {
+      "id": "kinetic-subdivision/kinetic-treemap",
+      "localId": "kinetic-treemap",
+      "name": "Kinetic Treemap",
+      "blurb": "Nested cells drift smoothly over a shifting image.",
+      "group": "Image systems",
+      "tags": [
+        "treemap",
+        "subdivision",
+        "editorial"
+      ],
+      "palette": "field",
+      "flash": true,
+      "cost": 1,
+      "passes": [
+        {
+          "function": "mfs_kinetic_subdivision_kinetic_treemap_p0",
+          "source": "kinetic_subdivision_kinetic_treemap_p0",
+          "scale": 0.5
+        },
+        {
+          "function": "mfs_kinetic_subdivision_kinetic_treemap_p1",
+          "source": "kinetic_subdivision_kinetic_treemap_p1",
+          "scale": 1
+        },
+        {
+          "function": "mfs_kinetic_subdivision_kinetic_treemap_p2",
+          "source": "kinetic_subdivision_kinetic_treemap_p2",
+          "scale": 1
+        }
+      ],
+      "inputs": [
+        {
+          "id": "source",
+          "type": "media",
+          "label": "Source image or video",
+          "fit": "fill",
+          "hint": "Attach a photo or clip; without one, the procedural source remains."
+        }
+      ],
+      "params": [
+        {
+          "key": "variant",
+          "index": 0,
+          "type": "int",
+          "label": "Treatment ID",
+          "def": 0,
+          "min": 0,
+          "max": 9,
+          "step": 1,
+          "group": "Style",
+          "hint": "The treatment selected by this style; keep it fixed to preserve the preset.",
+          "mutate": 0
+        },
+        {
+          "key": "depth",
+          "index": 1,
+          "type": "int",
+          "label": "Subdivision depth",
+          "def": 5,
+          "min": 2,
+          "max": 7,
+          "step": 1,
+          "group": "Structure"
+        },
+        {
+          "key": "rate",
+          "index": 2,
+          "type": "int",
+          "label": "Changes / loop",
+          "def": 3,
+          "min": 1,
+          "max": 12,
+          "step": 1,
+          "group": "Motion",
+          "mutate": 0.6
+        },
+        {
+          "key": "smoothness",
+          "index": 3,
+          "type": "range",
+          "label": "Smoothness",
+          "def": 0.9,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Motion",
+          "hint": "Fraction of each cycle spent easing into the next layout.",
+          "mutate": 0.4
+        },
+        {
+          "key": "amount",
+          "index": 4,
+          "type": "range",
+          "label": "Displacement",
+          "def": 0.07,
+          "min": 0,
+          "max": 0.2,
+          "step": 0.005,
+          "group": "Motion"
+        },
+        {
+          "key": "edge",
+          "index": 5,
+          "type": "range",
+          "label": "Edge width",
+          "def": 1.1,
+          "min": 0.5,
+          "max": 4,
+          "step": 0.1,
+          "group": "Edges"
+        },
+        {
+          "key": "smear",
+          "index": 6,
+          "type": "range",
+          "label": "Smear",
+          "def": 0.55,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Sampling"
+        },
+        {
+          "key": "ink",
+          "index": 7,
+          "type": "range",
+          "label": "Ink",
+          "def": 0.8,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Edges"
+        },
+        {
+          "key": "imageMix",
+          "index": 8,
+          "type": "range",
+          "label": "Source image",
+          "def": 1,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Source",
+          "hint": "Blend the attached media with the procedural source.",
+          "mutate": 0
+        },
+        {
+          "key": "topologyHold",
+          "index": 9,
+          "type": "int",
+          "label": "Topology hold",
+          "def": 4,
+          "min": 0,
+          "max": 8,
+          "step": 1,
+          "group": "Structure",
+          "hint": "Number of motion cycles before the partition layout evolves.",
+          "mutate": 0.3
+        },
+        {
+          "key": "splitDirection",
+          "index": 10,
+          "type": "select",
+          "label": "Split direction",
+          "def": "auto",
+          "group": "Structure",
+          "options": [
+            {
+              "v": "auto",
+              "l": "Auto"
+            },
+            {
+              "v": "horizontal",
+              "l": "Horizontal"
+            },
+            {
+              "v": "vertical",
+              "l": "Vertical"
+            },
+            {
+              "v": "alternating",
+              "l": "Alternating"
+            }
+          ]
+        },
+        {
+          "key": "cellScale",
+          "index": 11,
+          "type": "select",
+          "label": "Cell scale",
+          "def": "balanced",
+          "group": "Structure",
+          "options": [
+            {
+              "v": "anchors",
+              "l": "Anchors"
+            },
+            {
+              "v": "balanced",
+              "l": "Balanced"
+            },
+            {
+              "v": "fragments",
+              "l": "Fragments"
+            }
+          ]
+        },
+        {
+          "key": "motionCharacter",
+          "index": 12,
+          "type": "select",
+          "label": "Motion character",
+          "def": "glide",
+          "group": "Motion",
+          "options": [
+            {
+              "v": "glide",
+              "l": "Glide"
+            },
+            {
+              "v": "spring",
+              "l": "Spring"
+            },
+            {
+              "v": "steps",
+              "l": "Steps"
+            },
+            {
+              "v": "shutter",
+              "l": "Shutter"
+            }
+          ]
+        },
+        {
+          "key": "sourceSampling",
+          "index": 13,
+          "type": "select",
+          "label": "Source sampling",
+          "def": "intact",
+          "group": "Sampling",
+          "options": [
+            {
+              "v": "intact",
+              "l": "Intact"
+            },
+            {
+              "v": "stretch",
+              "l": "Stretch"
+            },
+            {
+              "v": "scanline",
+              "l": "Scanline"
+            },
+            {
+              "v": "mirror",
+              "l": "Mirror"
+            }
+          ]
+        },
+        {
+          "key": "edgeLanguage",
+          "index": 14,
+          "type": "select",
+          "label": "Edge language",
+          "def": "hairline",
+          "group": "Edges",
+          "options": [
+            {
+              "v": "hairline",
+              "l": "Hairline"
+            },
+            {
+              "v": "gutter",
+              "l": "Gutter"
+            },
+            {
+              "v": "double",
+              "l": "Double"
+            },
+            {
+              "v": "ticks",
+              "l": "Ticks"
+            },
+            {
+              "v": "none",
+              "l": "None"
+            }
+          ]
+        },
+        {
+          "key": "focalProtection",
+          "index": 15,
+          "type": "range",
+          "label": "Focal protection",
+          "def": 0,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Focus",
+          "hint": "Preserve the image around the focal point."
+        },
+        {
+          "key": "splitBias",
+          "index": 16,
+          "type": "range",
+          "label": "Split bias",
+          "def": 0,
+          "min": -0.5,
+          "max": 0.5,
+          "step": 0.01,
+          "group": "Structure",
+          "hint": "Push cut lines toward one side of each cell."
+        },
+        {
+          "key": "displacementAxis",
+          "index": 17,
+          "type": "select",
+          "label": "Displacement axis",
+          "def": "both",
+          "group": "Motion",
+          "hint": "Constrain tile movement to a direction or radial projection.",
+          "options": [
+            {
+              "v": "both",
+              "l": "Both"
+            },
+            {
+              "v": "horizontal",
+              "l": "Horizontal"
+            },
+            {
+              "v": "vertical",
+              "l": "Vertical"
+            },
+            {
+              "v": "radial",
+              "l": "Radial"
+            }
+          ]
+        },
+        {
+          "key": "focalPointX",
+          "index": 18,
+          "type": "range",
+          "label": "Focal point X",
+          "def": 0,
+          "min": -0.5,
+          "max": 0.5,
+          "step": 0.0025,
+          "group": "Focus",
+          "hint": "Drag the XY point onto the area to keep recognizable.",
+          "mutate": 0,
+          "part": {
+            "of": "focalPoint",
+            "kind": "point",
+            "i": 0,
+            "label": "Focal point"
+          }
+        },
+        {
+          "key": "focalPointY",
+          "index": 19,
+          "type": "range",
+          "label": "Focal point Y",
+          "def": 0,
+          "min": -0.5,
+          "max": 0.5,
+          "step": 0.0025,
+          "group": "Focus",
+          "hint": "Drag the XY point onto the area to keep recognizable.",
+          "mutate": 0,
+          "part": {
+            "of": "focalPoint",
+            "kind": "point",
+            "i": 1,
+            "label": "Focal point"
+          }
+        },
+        {
+          "key": "edgeTintR",
+          "index": 20,
+          "type": "range",
+          "label": "Edge color R",
+          "def": 0.9569,
+          "min": 0,
+          "max": 1,
+          "step": 0.001,
+          "group": "Edges",
+          "hint": "Color of subdivision strokes; gutters still use background ink.",
+          "mutate": 0.25,
+          "part": {
+            "of": "edgeTint",
+            "kind": "color",
+            "i": 0,
+            "label": "Edge color"
+          }
+        },
+        {
+          "key": "edgeTintG",
+          "index": 21,
+          "type": "range",
+          "label": "Edge color G",
+          "def": 0.949,
+          "min": 0,
+          "max": 1,
+          "step": 0.001,
+          "group": "Edges",
+          "hint": "Color of subdivision strokes; gutters still use background ink.",
+          "mutate": 0.25,
+          "part": {
+            "of": "edgeTint",
+            "kind": "color",
+            "i": 1,
+            "label": "Edge color"
+          }
+        },
+        {
+          "key": "edgeTintB",
+          "index": 22,
+          "type": "range",
+          "label": "Edge color B",
+          "def": 0.9098,
+          "min": 0,
+          "max": 1,
+          "step": 0.001,
+          "group": "Edges",
+          "hint": "Color of subdivision strokes; gutters still use background ink.",
+          "mutate": 0.25,
+          "part": {
+            "of": "edgeTint",
+            "kind": "color",
+            "i": 2,
+            "label": "Edge color"
+          }
+        },
+        {
+          "key": "echoLength",
+          "index": 23,
+          "type": "range",
+          "label": "Echo length",
+          "def": 1,
+          "min": 0,
+          "max": 3,
+          "step": 0.01,
+          "group": "Sampling",
+          "hint": "Spread the layered copies in Afterimage Atlas.",
+          "show": {
+            "param": "variant",
+            "is": 9
+          }
+        },
+        {
+          "key": "colorSeparation",
+          "index": 24,
+          "type": "range",
+          "label": "Color separation",
+          "def": 1,
+          "min": 0,
+          "max": 3,
+          "step": 0.01,
+          "group": "Sampling",
+          "hint": "Offset red and blue channels in Chromatic Register.",
+          "show": {
+            "param": "variant",
+            "is": 4
+          }
+        }
+      ]
+    },
+    {
+      "id": "kinetic-subdivision/mondrian-drift",
+      "localId": "mondrian-drift",
+      "name": "Mondrian Drift",
+      "blurb": "Hard-gutter composition with sparse orange panels.",
+      "group": "Image systems",
+      "tags": [
+        "mondrian",
+        "blocks",
+        "composition"
+      ],
+      "palette": "field",
+      "flash": true,
+      "cost": 1,
+      "passes": [
+        {
+          "function": "mfs_kinetic_subdivision_mondrian_drift_p0",
+          "source": "kinetic_subdivision_mondrian_drift_p0",
+          "scale": 0.5
+        },
+        {
+          "function": "mfs_kinetic_subdivision_mondrian_drift_p1",
+          "source": "kinetic_subdivision_mondrian_drift_p1",
+          "scale": 1
+        },
+        {
+          "function": "mfs_kinetic_subdivision_mondrian_drift_p2",
+          "source": "kinetic_subdivision_mondrian_drift_p2",
+          "scale": 1
+        }
+      ],
+      "inputs": [
+        {
+          "id": "source",
+          "type": "media",
+          "label": "Source image or video",
+          "fit": "fill",
+          "hint": "Attach a photo or clip; without one, the procedural source remains."
+        }
+      ],
+      "params": [
+        {
+          "key": "variant",
+          "index": 0,
+          "type": "int",
+          "label": "Treatment ID",
+          "def": 1,
+          "min": 0,
+          "max": 9,
+          "step": 1,
+          "group": "Style",
+          "hint": "The treatment selected by this style; keep it fixed to preserve the preset.",
+          "mutate": 0
+        },
+        {
+          "key": "depth",
+          "index": 1,
+          "type": "int",
+          "label": "Subdivision depth",
+          "def": 5,
+          "min": 2,
+          "max": 7,
+          "step": 1,
+          "group": "Structure"
+        },
+        {
+          "key": "rate",
+          "index": 2,
+          "type": "int",
+          "label": "Changes / loop",
+          "def": 3,
+          "min": 1,
+          "max": 12,
+          "step": 1,
+          "group": "Motion",
+          "mutate": 0.6
+        },
+        {
+          "key": "smoothness",
+          "index": 3,
+          "type": "range",
+          "label": "Smoothness",
+          "def": 0.9,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Motion",
+          "hint": "Fraction of each cycle spent easing into the next layout.",
+          "mutate": 0.4
+        },
+        {
+          "key": "amount",
+          "index": 4,
+          "type": "range",
+          "label": "Displacement",
+          "def": 0.07,
+          "min": 0,
+          "max": 0.2,
+          "step": 0.005,
+          "group": "Motion"
+        },
+        {
+          "key": "edge",
+          "index": 5,
+          "type": "range",
+          "label": "Edge width",
+          "def": 1.1,
+          "min": 0.5,
+          "max": 4,
+          "step": 0.1,
+          "group": "Edges"
+        },
+        {
+          "key": "smear",
+          "index": 6,
+          "type": "range",
+          "label": "Smear",
+          "def": 0.55,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Sampling"
+        },
+        {
+          "key": "ink",
+          "index": 7,
+          "type": "range",
+          "label": "Ink",
+          "def": 0.8,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Edges"
+        },
+        {
+          "key": "imageMix",
+          "index": 8,
+          "type": "range",
+          "label": "Source image",
+          "def": 1,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Source",
+          "hint": "Blend the attached media with the procedural source.",
+          "mutate": 0
+        },
+        {
+          "key": "topologyHold",
+          "index": 9,
+          "type": "int",
+          "label": "Topology hold",
+          "def": 4,
+          "min": 0,
+          "max": 8,
+          "step": 1,
+          "group": "Structure",
+          "hint": "Number of motion cycles before the partition layout evolves.",
+          "mutate": 0.3
+        },
+        {
+          "key": "splitDirection",
+          "index": 10,
+          "type": "select",
+          "label": "Split direction",
+          "def": "auto",
+          "group": "Structure",
+          "options": [
+            {
+              "v": "auto",
+              "l": "Auto"
+            },
+            {
+              "v": "horizontal",
+              "l": "Horizontal"
+            },
+            {
+              "v": "vertical",
+              "l": "Vertical"
+            },
+            {
+              "v": "alternating",
+              "l": "Alternating"
+            }
+          ]
+        },
+        {
+          "key": "cellScale",
+          "index": 11,
+          "type": "select",
+          "label": "Cell scale",
+          "def": "balanced",
+          "group": "Structure",
+          "options": [
+            {
+              "v": "anchors",
+              "l": "Anchors"
+            },
+            {
+              "v": "balanced",
+              "l": "Balanced"
+            },
+            {
+              "v": "fragments",
+              "l": "Fragments"
+            }
+          ]
+        },
+        {
+          "key": "motionCharacter",
+          "index": 12,
+          "type": "select",
+          "label": "Motion character",
+          "def": "glide",
+          "group": "Motion",
+          "options": [
+            {
+              "v": "glide",
+              "l": "Glide"
+            },
+            {
+              "v": "spring",
+              "l": "Spring"
+            },
+            {
+              "v": "steps",
+              "l": "Steps"
+            },
+            {
+              "v": "shutter",
+              "l": "Shutter"
+            }
+          ]
+        },
+        {
+          "key": "sourceSampling",
+          "index": 13,
+          "type": "select",
+          "label": "Source sampling",
+          "def": "intact",
+          "group": "Sampling",
+          "options": [
+            {
+              "v": "intact",
+              "l": "Intact"
+            },
+            {
+              "v": "stretch",
+              "l": "Stretch"
+            },
+            {
+              "v": "scanline",
+              "l": "Scanline"
+            },
+            {
+              "v": "mirror",
+              "l": "Mirror"
+            }
+          ]
+        },
+        {
+          "key": "edgeLanguage",
+          "index": 14,
+          "type": "select",
+          "label": "Edge language",
+          "def": "hairline",
+          "group": "Edges",
+          "options": [
+            {
+              "v": "hairline",
+              "l": "Hairline"
+            },
+            {
+              "v": "gutter",
+              "l": "Gutter"
+            },
+            {
+              "v": "double",
+              "l": "Double"
+            },
+            {
+              "v": "ticks",
+              "l": "Ticks"
+            },
+            {
+              "v": "none",
+              "l": "None"
+            }
+          ]
+        },
+        {
+          "key": "focalProtection",
+          "index": 15,
+          "type": "range",
+          "label": "Focal protection",
+          "def": 0,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Focus",
+          "hint": "Preserve the image around the focal point."
+        },
+        {
+          "key": "splitBias",
+          "index": 16,
+          "type": "range",
+          "label": "Split bias",
+          "def": 0,
+          "min": -0.5,
+          "max": 0.5,
+          "step": 0.01,
+          "group": "Structure",
+          "hint": "Push cut lines toward one side of each cell."
+        },
+        {
+          "key": "displacementAxis",
+          "index": 17,
+          "type": "select",
+          "label": "Displacement axis",
+          "def": "both",
+          "group": "Motion",
+          "hint": "Constrain tile movement to a direction or radial projection.",
+          "options": [
+            {
+              "v": "both",
+              "l": "Both"
+            },
+            {
+              "v": "horizontal",
+              "l": "Horizontal"
+            },
+            {
+              "v": "vertical",
+              "l": "Vertical"
+            },
+            {
+              "v": "radial",
+              "l": "Radial"
+            }
+          ]
+        },
+        {
+          "key": "focalPointX",
+          "index": 18,
+          "type": "range",
+          "label": "Focal point X",
+          "def": 0,
+          "min": -0.5,
+          "max": 0.5,
+          "step": 0.0025,
+          "group": "Focus",
+          "hint": "Drag the XY point onto the area to keep recognizable.",
+          "mutate": 0,
+          "part": {
+            "of": "focalPoint",
+            "kind": "point",
+            "i": 0,
+            "label": "Focal point"
+          }
+        },
+        {
+          "key": "focalPointY",
+          "index": 19,
+          "type": "range",
+          "label": "Focal point Y",
+          "def": 0,
+          "min": -0.5,
+          "max": 0.5,
+          "step": 0.0025,
+          "group": "Focus",
+          "hint": "Drag the XY point onto the area to keep recognizable.",
+          "mutate": 0,
+          "part": {
+            "of": "focalPoint",
+            "kind": "point",
+            "i": 1,
+            "label": "Focal point"
+          }
+        },
+        {
+          "key": "edgeTintR",
+          "index": 20,
+          "type": "range",
+          "label": "Edge color R",
+          "def": 0.9569,
+          "min": 0,
+          "max": 1,
+          "step": 0.001,
+          "group": "Edges",
+          "hint": "Color of subdivision strokes; gutters still use background ink.",
+          "mutate": 0.25,
+          "part": {
+            "of": "edgeTint",
+            "kind": "color",
+            "i": 0,
+            "label": "Edge color"
+          }
+        },
+        {
+          "key": "edgeTintG",
+          "index": 21,
+          "type": "range",
+          "label": "Edge color G",
+          "def": 0.949,
+          "min": 0,
+          "max": 1,
+          "step": 0.001,
+          "group": "Edges",
+          "hint": "Color of subdivision strokes; gutters still use background ink.",
+          "mutate": 0.25,
+          "part": {
+            "of": "edgeTint",
+            "kind": "color",
+            "i": 1,
+            "label": "Edge color"
+          }
+        },
+        {
+          "key": "edgeTintB",
+          "index": 22,
+          "type": "range",
+          "label": "Edge color B",
+          "def": 0.9098,
+          "min": 0,
+          "max": 1,
+          "step": 0.001,
+          "group": "Edges",
+          "hint": "Color of subdivision strokes; gutters still use background ink.",
+          "mutate": 0.25,
+          "part": {
+            "of": "edgeTint",
+            "kind": "color",
+            "i": 2,
+            "label": "Edge color"
+          }
+        },
+        {
+          "key": "echoLength",
+          "index": 23,
+          "type": "range",
+          "label": "Echo length",
+          "def": 1,
+          "min": 0,
+          "max": 3,
+          "step": 0.01,
+          "group": "Sampling",
+          "hint": "Spread the layered copies in Afterimage Atlas.",
+          "show": {
+            "param": "variant",
+            "is": 9
+          }
+        },
+        {
+          "key": "colorSeparation",
+          "index": 24,
+          "type": "range",
+          "label": "Color separation",
+          "def": 1,
+          "min": 0,
+          "max": 3,
+          "step": 0.01,
+          "group": "Sampling",
+          "hint": "Offset red and blue channels in Chromatic Register.",
+          "show": {
+            "param": "variant",
+            "is": 4
+          }
+        }
+      ]
+    },
+    {
+      "id": "kinetic-subdivision/barcode-cathedral",
+      "localId": "barcode-cathedral",
+      "name": "Barcode Cathedral",
+      "blurb": "Vertical slices stretch into barcode-like streaks.",
+      "group": "Image systems",
+      "tags": [
+        "barcode",
+        "smear",
+        "vertical"
+      ],
+      "palette": "field",
+      "flash": true,
+      "cost": 1,
+      "passes": [
+        {
+          "function": "mfs_kinetic_subdivision_barcode_cathedral_p0",
+          "source": "kinetic_subdivision_barcode_cathedral_p0",
+          "scale": 0.5
+        },
+        {
+          "function": "mfs_kinetic_subdivision_barcode_cathedral_p1",
+          "source": "kinetic_subdivision_barcode_cathedral_p1",
+          "scale": 1
+        },
+        {
+          "function": "mfs_kinetic_subdivision_barcode_cathedral_p2",
+          "source": "kinetic_subdivision_barcode_cathedral_p2",
+          "scale": 1
+        }
+      ],
+      "inputs": [
+        {
+          "id": "source",
+          "type": "media",
+          "label": "Source image or video",
+          "fit": "fill",
+          "hint": "Attach a photo or clip; without one, the procedural source remains."
+        }
+      ],
+      "params": [
+        {
+          "key": "variant",
+          "index": 0,
+          "type": "int",
+          "label": "Treatment ID",
+          "def": 2,
+          "min": 0,
+          "max": 9,
+          "step": 1,
+          "group": "Style",
+          "hint": "The treatment selected by this style; keep it fixed to preserve the preset.",
+          "mutate": 0
+        },
+        {
+          "key": "depth",
+          "index": 1,
+          "type": "int",
+          "label": "Subdivision depth",
+          "def": 6,
+          "min": 2,
+          "max": 7,
+          "step": 1,
+          "group": "Structure"
+        },
+        {
+          "key": "rate",
+          "index": 2,
+          "type": "int",
+          "label": "Changes / loop",
+          "def": 3,
+          "min": 1,
+          "max": 12,
+          "step": 1,
+          "group": "Motion",
+          "mutate": 0.6
+        },
+        {
+          "key": "smoothness",
+          "index": 3,
+          "type": "range",
+          "label": "Smoothness",
+          "def": 0.9,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Motion",
+          "hint": "Fraction of each cycle spent easing into the next layout.",
+          "mutate": 0.4
+        },
+        {
+          "key": "amount",
+          "index": 4,
+          "type": "range",
+          "label": "Displacement",
+          "def": 0.1,
+          "min": 0,
+          "max": 0.2,
+          "step": 0.005,
+          "group": "Motion"
+        },
+        {
+          "key": "edge",
+          "index": 5,
+          "type": "range",
+          "label": "Edge width",
+          "def": 1.1,
+          "min": 0.5,
+          "max": 4,
+          "step": 0.1,
+          "group": "Edges"
+        },
+        {
+          "key": "smear",
+          "index": 6,
+          "type": "range",
+          "label": "Smear",
+          "def": 0.55,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Sampling"
+        },
+        {
+          "key": "ink",
+          "index": 7,
+          "type": "range",
+          "label": "Ink",
+          "def": 0.8,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Edges"
+        },
+        {
+          "key": "imageMix",
+          "index": 8,
+          "type": "range",
+          "label": "Source image",
+          "def": 1,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Source",
+          "hint": "Blend the attached media with the procedural source.",
+          "mutate": 0
+        },
+        {
+          "key": "topologyHold",
+          "index": 9,
+          "type": "int",
+          "label": "Topology hold",
+          "def": 4,
+          "min": 0,
+          "max": 8,
+          "step": 1,
+          "group": "Structure",
+          "hint": "Number of motion cycles before the partition layout evolves.",
+          "mutate": 0.3
+        },
+        {
+          "key": "splitDirection",
+          "index": 10,
+          "type": "select",
+          "label": "Split direction",
+          "def": "auto",
+          "group": "Structure",
+          "options": [
+            {
+              "v": "auto",
+              "l": "Auto"
+            },
+            {
+              "v": "horizontal",
+              "l": "Horizontal"
+            },
+            {
+              "v": "vertical",
+              "l": "Vertical"
+            },
+            {
+              "v": "alternating",
+              "l": "Alternating"
+            }
+          ]
+        },
+        {
+          "key": "cellScale",
+          "index": 11,
+          "type": "select",
+          "label": "Cell scale",
+          "def": "balanced",
+          "group": "Structure",
+          "options": [
+            {
+              "v": "anchors",
+              "l": "Anchors"
+            },
+            {
+              "v": "balanced",
+              "l": "Balanced"
+            },
+            {
+              "v": "fragments",
+              "l": "Fragments"
+            }
+          ]
+        },
+        {
+          "key": "motionCharacter",
+          "index": 12,
+          "type": "select",
+          "label": "Motion character",
+          "def": "glide",
+          "group": "Motion",
+          "options": [
+            {
+              "v": "glide",
+              "l": "Glide"
+            },
+            {
+              "v": "spring",
+              "l": "Spring"
+            },
+            {
+              "v": "steps",
+              "l": "Steps"
+            },
+            {
+              "v": "shutter",
+              "l": "Shutter"
+            }
+          ]
+        },
+        {
+          "key": "sourceSampling",
+          "index": 13,
+          "type": "select",
+          "label": "Source sampling",
+          "def": "intact",
+          "group": "Sampling",
+          "options": [
+            {
+              "v": "intact",
+              "l": "Intact"
+            },
+            {
+              "v": "stretch",
+              "l": "Stretch"
+            },
+            {
+              "v": "scanline",
+              "l": "Scanline"
+            },
+            {
+              "v": "mirror",
+              "l": "Mirror"
+            }
+          ]
+        },
+        {
+          "key": "edgeLanguage",
+          "index": 14,
+          "type": "select",
+          "label": "Edge language",
+          "def": "hairline",
+          "group": "Edges",
+          "options": [
+            {
+              "v": "hairline",
+              "l": "Hairline"
+            },
+            {
+              "v": "gutter",
+              "l": "Gutter"
+            },
+            {
+              "v": "double",
+              "l": "Double"
+            },
+            {
+              "v": "ticks",
+              "l": "Ticks"
+            },
+            {
+              "v": "none",
+              "l": "None"
+            }
+          ]
+        },
+        {
+          "key": "focalProtection",
+          "index": 15,
+          "type": "range",
+          "label": "Focal protection",
+          "def": 0,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Focus",
+          "hint": "Preserve the image around the focal point."
+        },
+        {
+          "key": "splitBias",
+          "index": 16,
+          "type": "range",
+          "label": "Split bias",
+          "def": 0,
+          "min": -0.5,
+          "max": 0.5,
+          "step": 0.01,
+          "group": "Structure",
+          "hint": "Push cut lines toward one side of each cell."
+        },
+        {
+          "key": "displacementAxis",
+          "index": 17,
+          "type": "select",
+          "label": "Displacement axis",
+          "def": "both",
+          "group": "Motion",
+          "hint": "Constrain tile movement to a direction or radial projection.",
+          "options": [
+            {
+              "v": "both",
+              "l": "Both"
+            },
+            {
+              "v": "horizontal",
+              "l": "Horizontal"
+            },
+            {
+              "v": "vertical",
+              "l": "Vertical"
+            },
+            {
+              "v": "radial",
+              "l": "Radial"
+            }
+          ]
+        },
+        {
+          "key": "focalPointX",
+          "index": 18,
+          "type": "range",
+          "label": "Focal point X",
+          "def": 0,
+          "min": -0.5,
+          "max": 0.5,
+          "step": 0.0025,
+          "group": "Focus",
+          "hint": "Drag the XY point onto the area to keep recognizable.",
+          "mutate": 0,
+          "part": {
+            "of": "focalPoint",
+            "kind": "point",
+            "i": 0,
+            "label": "Focal point"
+          }
+        },
+        {
+          "key": "focalPointY",
+          "index": 19,
+          "type": "range",
+          "label": "Focal point Y",
+          "def": 0,
+          "min": -0.5,
+          "max": 0.5,
+          "step": 0.0025,
+          "group": "Focus",
+          "hint": "Drag the XY point onto the area to keep recognizable.",
+          "mutate": 0,
+          "part": {
+            "of": "focalPoint",
+            "kind": "point",
+            "i": 1,
+            "label": "Focal point"
+          }
+        },
+        {
+          "key": "edgeTintR",
+          "index": 20,
+          "type": "range",
+          "label": "Edge color R",
+          "def": 0.9569,
+          "min": 0,
+          "max": 1,
+          "step": 0.001,
+          "group": "Edges",
+          "hint": "Color of subdivision strokes; gutters still use background ink.",
+          "mutate": 0.25,
+          "part": {
+            "of": "edgeTint",
+            "kind": "color",
+            "i": 0,
+            "label": "Edge color"
+          }
+        },
+        {
+          "key": "edgeTintG",
+          "index": 21,
+          "type": "range",
+          "label": "Edge color G",
+          "def": 0.949,
+          "min": 0,
+          "max": 1,
+          "step": 0.001,
+          "group": "Edges",
+          "hint": "Color of subdivision strokes; gutters still use background ink.",
+          "mutate": 0.25,
+          "part": {
+            "of": "edgeTint",
+            "kind": "color",
+            "i": 1,
+            "label": "Edge color"
+          }
+        },
+        {
+          "key": "edgeTintB",
+          "index": 22,
+          "type": "range",
+          "label": "Edge color B",
+          "def": 0.9098,
+          "min": 0,
+          "max": 1,
+          "step": 0.001,
+          "group": "Edges",
+          "hint": "Color of subdivision strokes; gutters still use background ink.",
+          "mutate": 0.25,
+          "part": {
+            "of": "edgeTint",
+            "kind": "color",
+            "i": 2,
+            "label": "Edge color"
+          }
+        },
+        {
+          "key": "echoLength",
+          "index": 23,
+          "type": "range",
+          "label": "Echo length",
+          "def": 1,
+          "min": 0,
+          "max": 3,
+          "step": 0.01,
+          "group": "Sampling",
+          "hint": "Spread the layered copies in Afterimage Atlas.",
+          "show": {
+            "param": "variant",
+            "is": 9
+          }
+        },
+        {
+          "key": "colorSeparation",
+          "index": 24,
+          "type": "range",
+          "label": "Color separation",
+          "def": 1,
+          "min": 0,
+          "max": 3,
+          "step": 0.01,
+          "group": "Sampling",
+          "hint": "Offset red and blue channels in Chromatic Register.",
+          "show": {
+            "param": "variant",
+            "is": 4
+          }
+        }
+      ]
+    },
+    {
+      "id": "kinetic-subdivision/scanline-fault",
+      "localId": "scanline-fault",
+      "name": "Scanline Fault",
+      "blurb": "Horizontal rows slide and form subtle scanlines.",
+      "group": "Image systems",
+      "tags": [
+        "scanline",
+        "glitch",
+        "horizontal"
+      ],
+      "palette": "field",
+      "flash": true,
+      "cost": 1,
+      "passes": [
+        {
+          "function": "mfs_kinetic_subdivision_scanline_fault_p0",
+          "source": "kinetic_subdivision_scanline_fault_p0",
+          "scale": 0.5
+        },
+        {
+          "function": "mfs_kinetic_subdivision_scanline_fault_p1",
+          "source": "kinetic_subdivision_scanline_fault_p1",
+          "scale": 1
+        },
+        {
+          "function": "mfs_kinetic_subdivision_scanline_fault_p2",
+          "source": "kinetic_subdivision_scanline_fault_p2",
+          "scale": 1
+        }
+      ],
+      "inputs": [
+        {
+          "id": "source",
+          "type": "media",
+          "label": "Source image or video",
+          "fit": "fill",
+          "hint": "Attach a photo or clip; without one, the procedural source remains."
+        }
+      ],
+      "params": [
+        {
+          "key": "variant",
+          "index": 0,
+          "type": "int",
+          "label": "Treatment ID",
+          "def": 3,
+          "min": 0,
+          "max": 9,
+          "step": 1,
+          "group": "Style",
+          "hint": "The treatment selected by this style; keep it fixed to preserve the preset.",
+          "mutate": 0
+        },
+        {
+          "key": "depth",
+          "index": 1,
+          "type": "int",
+          "label": "Subdivision depth",
+          "def": 6,
+          "min": 2,
+          "max": 7,
+          "step": 1,
+          "group": "Structure"
+        },
+        {
+          "key": "rate",
+          "index": 2,
+          "type": "int",
+          "label": "Changes / loop",
+          "def": 3,
+          "min": 1,
+          "max": 12,
+          "step": 1,
+          "group": "Motion",
+          "mutate": 0.6
+        },
+        {
+          "key": "smoothness",
+          "index": 3,
+          "type": "range",
+          "label": "Smoothness",
+          "def": 0.9,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Motion",
+          "hint": "Fraction of each cycle spent easing into the next layout.",
+          "mutate": 0.4
+        },
+        {
+          "key": "amount",
+          "index": 4,
+          "type": "range",
+          "label": "Displacement",
+          "def": 0.1,
+          "min": 0,
+          "max": 0.2,
+          "step": 0.005,
+          "group": "Motion"
+        },
+        {
+          "key": "edge",
+          "index": 5,
+          "type": "range",
+          "label": "Edge width",
+          "def": 1.1,
+          "min": 0.5,
+          "max": 4,
+          "step": 0.1,
+          "group": "Edges"
+        },
+        {
+          "key": "smear",
+          "index": 6,
+          "type": "range",
+          "label": "Smear",
+          "def": 0.55,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Sampling"
+        },
+        {
+          "key": "ink",
+          "index": 7,
+          "type": "range",
+          "label": "Ink",
+          "def": 0.8,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Edges"
+        },
+        {
+          "key": "imageMix",
+          "index": 8,
+          "type": "range",
+          "label": "Source image",
+          "def": 1,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Source",
+          "hint": "Blend the attached media with the procedural source.",
+          "mutate": 0
+        },
+        {
+          "key": "topologyHold",
+          "index": 9,
+          "type": "int",
+          "label": "Topology hold",
+          "def": 4,
+          "min": 0,
+          "max": 8,
+          "step": 1,
+          "group": "Structure",
+          "hint": "Number of motion cycles before the partition layout evolves.",
+          "mutate": 0.3
+        },
+        {
+          "key": "splitDirection",
+          "index": 10,
+          "type": "select",
+          "label": "Split direction",
+          "def": "auto",
+          "group": "Structure",
+          "options": [
+            {
+              "v": "auto",
+              "l": "Auto"
+            },
+            {
+              "v": "horizontal",
+              "l": "Horizontal"
+            },
+            {
+              "v": "vertical",
+              "l": "Vertical"
+            },
+            {
+              "v": "alternating",
+              "l": "Alternating"
+            }
+          ]
+        },
+        {
+          "key": "cellScale",
+          "index": 11,
+          "type": "select",
+          "label": "Cell scale",
+          "def": "balanced",
+          "group": "Structure",
+          "options": [
+            {
+              "v": "anchors",
+              "l": "Anchors"
+            },
+            {
+              "v": "balanced",
+              "l": "Balanced"
+            },
+            {
+              "v": "fragments",
+              "l": "Fragments"
+            }
+          ]
+        },
+        {
+          "key": "motionCharacter",
+          "index": 12,
+          "type": "select",
+          "label": "Motion character",
+          "def": "glide",
+          "group": "Motion",
+          "options": [
+            {
+              "v": "glide",
+              "l": "Glide"
+            },
+            {
+              "v": "spring",
+              "l": "Spring"
+            },
+            {
+              "v": "steps",
+              "l": "Steps"
+            },
+            {
+              "v": "shutter",
+              "l": "Shutter"
+            }
+          ]
+        },
+        {
+          "key": "sourceSampling",
+          "index": 13,
+          "type": "select",
+          "label": "Source sampling",
+          "def": "intact",
+          "group": "Sampling",
+          "options": [
+            {
+              "v": "intact",
+              "l": "Intact"
+            },
+            {
+              "v": "stretch",
+              "l": "Stretch"
+            },
+            {
+              "v": "scanline",
+              "l": "Scanline"
+            },
+            {
+              "v": "mirror",
+              "l": "Mirror"
+            }
+          ]
+        },
+        {
+          "key": "edgeLanguage",
+          "index": 14,
+          "type": "select",
+          "label": "Edge language",
+          "def": "hairline",
+          "group": "Edges",
+          "options": [
+            {
+              "v": "hairline",
+              "l": "Hairline"
+            },
+            {
+              "v": "gutter",
+              "l": "Gutter"
+            },
+            {
+              "v": "double",
+              "l": "Double"
+            },
+            {
+              "v": "ticks",
+              "l": "Ticks"
+            },
+            {
+              "v": "none",
+              "l": "None"
+            }
+          ]
+        },
+        {
+          "key": "focalProtection",
+          "index": 15,
+          "type": "range",
+          "label": "Focal protection",
+          "def": 0,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Focus",
+          "hint": "Preserve the image around the focal point."
+        },
+        {
+          "key": "splitBias",
+          "index": 16,
+          "type": "range",
+          "label": "Split bias",
+          "def": 0,
+          "min": -0.5,
+          "max": 0.5,
+          "step": 0.01,
+          "group": "Structure",
+          "hint": "Push cut lines toward one side of each cell."
+        },
+        {
+          "key": "displacementAxis",
+          "index": 17,
+          "type": "select",
+          "label": "Displacement axis",
+          "def": "both",
+          "group": "Motion",
+          "hint": "Constrain tile movement to a direction or radial projection.",
+          "options": [
+            {
+              "v": "both",
+              "l": "Both"
+            },
+            {
+              "v": "horizontal",
+              "l": "Horizontal"
+            },
+            {
+              "v": "vertical",
+              "l": "Vertical"
+            },
+            {
+              "v": "radial",
+              "l": "Radial"
+            }
+          ]
+        },
+        {
+          "key": "focalPointX",
+          "index": 18,
+          "type": "range",
+          "label": "Focal point X",
+          "def": 0,
+          "min": -0.5,
+          "max": 0.5,
+          "step": 0.0025,
+          "group": "Focus",
+          "hint": "Drag the XY point onto the area to keep recognizable.",
+          "mutate": 0,
+          "part": {
+            "of": "focalPoint",
+            "kind": "point",
+            "i": 0,
+            "label": "Focal point"
+          }
+        },
+        {
+          "key": "focalPointY",
+          "index": 19,
+          "type": "range",
+          "label": "Focal point Y",
+          "def": 0,
+          "min": -0.5,
+          "max": 0.5,
+          "step": 0.0025,
+          "group": "Focus",
+          "hint": "Drag the XY point onto the area to keep recognizable.",
+          "mutate": 0,
+          "part": {
+            "of": "focalPoint",
+            "kind": "point",
+            "i": 1,
+            "label": "Focal point"
+          }
+        },
+        {
+          "key": "edgeTintR",
+          "index": 20,
+          "type": "range",
+          "label": "Edge color R",
+          "def": 0.9569,
+          "min": 0,
+          "max": 1,
+          "step": 0.001,
+          "group": "Edges",
+          "hint": "Color of subdivision strokes; gutters still use background ink.",
+          "mutate": 0.25,
+          "part": {
+            "of": "edgeTint",
+            "kind": "color",
+            "i": 0,
+            "label": "Edge color"
+          }
+        },
+        {
+          "key": "edgeTintG",
+          "index": 21,
+          "type": "range",
+          "label": "Edge color G",
+          "def": 0.949,
+          "min": 0,
+          "max": 1,
+          "step": 0.001,
+          "group": "Edges",
+          "hint": "Color of subdivision strokes; gutters still use background ink.",
+          "mutate": 0.25,
+          "part": {
+            "of": "edgeTint",
+            "kind": "color",
+            "i": 1,
+            "label": "Edge color"
+          }
+        },
+        {
+          "key": "edgeTintB",
+          "index": 22,
+          "type": "range",
+          "label": "Edge color B",
+          "def": 0.9098,
+          "min": 0,
+          "max": 1,
+          "step": 0.001,
+          "group": "Edges",
+          "hint": "Color of subdivision strokes; gutters still use background ink.",
+          "mutate": 0.25,
+          "part": {
+            "of": "edgeTint",
+            "kind": "color",
+            "i": 2,
+            "label": "Edge color"
+          }
+        },
+        {
+          "key": "echoLength",
+          "index": 23,
+          "type": "range",
+          "label": "Echo length",
+          "def": 1,
+          "min": 0,
+          "max": 3,
+          "step": 0.01,
+          "group": "Sampling",
+          "hint": "Spread the layered copies in Afterimage Atlas.",
+          "show": {
+            "param": "variant",
+            "is": 9
+          }
+        },
+        {
+          "key": "colorSeparation",
+          "index": 24,
+          "type": "range",
+          "label": "Color separation",
+          "def": 1,
+          "min": 0,
+          "max": 3,
+          "step": 0.01,
+          "group": "Sampling",
+          "hint": "Offset red and blue channels in Chromatic Register.",
+          "show": {
+            "param": "variant",
+            "is": 4
+          }
+        }
+      ]
+    },
+    {
+      "id": "kinetic-subdivision/chromatic-register",
+      "localId": "chromatic-register",
+      "name": "Chromatic Register",
+      "blurb": "Offset color channels split around moving partitions.",
+      "group": "Image systems",
+      "tags": [
+        "chromatic",
+        "rgb",
+        "offset"
+      ],
+      "palette": "field",
+      "flash": true,
+      "cost": 1,
+      "passes": [
+        {
+          "function": "mfs_kinetic_subdivision_chromatic_register_p0",
+          "source": "kinetic_subdivision_chromatic_register_p0",
+          "scale": 0.5
+        },
+        {
+          "function": "mfs_kinetic_subdivision_chromatic_register_p1",
+          "source": "kinetic_subdivision_chromatic_register_p1",
+          "scale": 1
+        },
+        {
+          "function": "mfs_kinetic_subdivision_chromatic_register_p2",
+          "source": "kinetic_subdivision_chromatic_register_p2",
+          "scale": 1
+        }
+      ],
+      "inputs": [
+        {
+          "id": "source",
+          "type": "media",
+          "label": "Source image or video",
+          "fit": "fill",
+          "hint": "Attach a photo or clip; without one, the procedural source remains."
+        }
+      ],
+      "params": [
+        {
+          "key": "variant",
+          "index": 0,
+          "type": "int",
+          "label": "Treatment ID",
+          "def": 4,
+          "min": 0,
+          "max": 9,
+          "step": 1,
+          "group": "Style",
+          "hint": "The treatment selected by this style; keep it fixed to preserve the preset.",
+          "mutate": 0
+        },
+        {
+          "key": "depth",
+          "index": 1,
+          "type": "int",
+          "label": "Subdivision depth",
+          "def": 5,
+          "min": 2,
+          "max": 7,
+          "step": 1,
+          "group": "Structure"
+        },
+        {
+          "key": "rate",
+          "index": 2,
+          "type": "int",
+          "label": "Changes / loop",
+          "def": 3,
+          "min": 1,
+          "max": 12,
+          "step": 1,
+          "group": "Motion",
+          "mutate": 0.6
+        },
+        {
+          "key": "smoothness",
+          "index": 3,
+          "type": "range",
+          "label": "Smoothness",
+          "def": 0.9,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Motion",
+          "hint": "Fraction of each cycle spent easing into the next layout.",
+          "mutate": 0.4
+        },
+        {
+          "key": "amount",
+          "index": 4,
+          "type": "range",
+          "label": "Displacement",
+          "def": 0.07,
+          "min": 0,
+          "max": 0.2,
+          "step": 0.005,
+          "group": "Motion"
+        },
+        {
+          "key": "edge",
+          "index": 5,
+          "type": "range",
+          "label": "Edge width",
+          "def": 1.1,
+          "min": 0.5,
+          "max": 4,
+          "step": 0.1,
+          "group": "Edges"
+        },
+        {
+          "key": "smear",
+          "index": 6,
+          "type": "range",
+          "label": "Smear",
+          "def": 0.55,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Sampling"
+        },
+        {
+          "key": "ink",
+          "index": 7,
+          "type": "range",
+          "label": "Ink",
+          "def": 0.8,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Edges"
+        },
+        {
+          "key": "imageMix",
+          "index": 8,
+          "type": "range",
+          "label": "Source image",
+          "def": 1,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Source",
+          "hint": "Blend the attached media with the procedural source.",
+          "mutate": 0
+        },
+        {
+          "key": "topologyHold",
+          "index": 9,
+          "type": "int",
+          "label": "Topology hold",
+          "def": 4,
+          "min": 0,
+          "max": 8,
+          "step": 1,
+          "group": "Structure",
+          "hint": "Number of motion cycles before the partition layout evolves.",
+          "mutate": 0.3
+        },
+        {
+          "key": "splitDirection",
+          "index": 10,
+          "type": "select",
+          "label": "Split direction",
+          "def": "auto",
+          "group": "Structure",
+          "options": [
+            {
+              "v": "auto",
+              "l": "Auto"
+            },
+            {
+              "v": "horizontal",
+              "l": "Horizontal"
+            },
+            {
+              "v": "vertical",
+              "l": "Vertical"
+            },
+            {
+              "v": "alternating",
+              "l": "Alternating"
+            }
+          ]
+        },
+        {
+          "key": "cellScale",
+          "index": 11,
+          "type": "select",
+          "label": "Cell scale",
+          "def": "balanced",
+          "group": "Structure",
+          "options": [
+            {
+              "v": "anchors",
+              "l": "Anchors"
+            },
+            {
+              "v": "balanced",
+              "l": "Balanced"
+            },
+            {
+              "v": "fragments",
+              "l": "Fragments"
+            }
+          ]
+        },
+        {
+          "key": "motionCharacter",
+          "index": 12,
+          "type": "select",
+          "label": "Motion character",
+          "def": "glide",
+          "group": "Motion",
+          "options": [
+            {
+              "v": "glide",
+              "l": "Glide"
+            },
+            {
+              "v": "spring",
+              "l": "Spring"
+            },
+            {
+              "v": "steps",
+              "l": "Steps"
+            },
+            {
+              "v": "shutter",
+              "l": "Shutter"
+            }
+          ]
+        },
+        {
+          "key": "sourceSampling",
+          "index": 13,
+          "type": "select",
+          "label": "Source sampling",
+          "def": "intact",
+          "group": "Sampling",
+          "options": [
+            {
+              "v": "intact",
+              "l": "Intact"
+            },
+            {
+              "v": "stretch",
+              "l": "Stretch"
+            },
+            {
+              "v": "scanline",
+              "l": "Scanline"
+            },
+            {
+              "v": "mirror",
+              "l": "Mirror"
+            }
+          ]
+        },
+        {
+          "key": "edgeLanguage",
+          "index": 14,
+          "type": "select",
+          "label": "Edge language",
+          "def": "hairline",
+          "group": "Edges",
+          "options": [
+            {
+              "v": "hairline",
+              "l": "Hairline"
+            },
+            {
+              "v": "gutter",
+              "l": "Gutter"
+            },
+            {
+              "v": "double",
+              "l": "Double"
+            },
+            {
+              "v": "ticks",
+              "l": "Ticks"
+            },
+            {
+              "v": "none",
+              "l": "None"
+            }
+          ]
+        },
+        {
+          "key": "focalProtection",
+          "index": 15,
+          "type": "range",
+          "label": "Focal protection",
+          "def": 0,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Focus",
+          "hint": "Preserve the image around the focal point."
+        },
+        {
+          "key": "splitBias",
+          "index": 16,
+          "type": "range",
+          "label": "Split bias",
+          "def": 0,
+          "min": -0.5,
+          "max": 0.5,
+          "step": 0.01,
+          "group": "Structure",
+          "hint": "Push cut lines toward one side of each cell."
+        },
+        {
+          "key": "displacementAxis",
+          "index": 17,
+          "type": "select",
+          "label": "Displacement axis",
+          "def": "both",
+          "group": "Motion",
+          "hint": "Constrain tile movement to a direction or radial projection.",
+          "options": [
+            {
+              "v": "both",
+              "l": "Both"
+            },
+            {
+              "v": "horizontal",
+              "l": "Horizontal"
+            },
+            {
+              "v": "vertical",
+              "l": "Vertical"
+            },
+            {
+              "v": "radial",
+              "l": "Radial"
+            }
+          ]
+        },
+        {
+          "key": "focalPointX",
+          "index": 18,
+          "type": "range",
+          "label": "Focal point X",
+          "def": 0,
+          "min": -0.5,
+          "max": 0.5,
+          "step": 0.0025,
+          "group": "Focus",
+          "hint": "Drag the XY point onto the area to keep recognizable.",
+          "mutate": 0,
+          "part": {
+            "of": "focalPoint",
+            "kind": "point",
+            "i": 0,
+            "label": "Focal point"
+          }
+        },
+        {
+          "key": "focalPointY",
+          "index": 19,
+          "type": "range",
+          "label": "Focal point Y",
+          "def": 0,
+          "min": -0.5,
+          "max": 0.5,
+          "step": 0.0025,
+          "group": "Focus",
+          "hint": "Drag the XY point onto the area to keep recognizable.",
+          "mutate": 0,
+          "part": {
+            "of": "focalPoint",
+            "kind": "point",
+            "i": 1,
+            "label": "Focal point"
+          }
+        },
+        {
+          "key": "edgeTintR",
+          "index": 20,
+          "type": "range",
+          "label": "Edge color R",
+          "def": 0.9569,
+          "min": 0,
+          "max": 1,
+          "step": 0.001,
+          "group": "Edges",
+          "hint": "Color of subdivision strokes; gutters still use background ink.",
+          "mutate": 0.25,
+          "part": {
+            "of": "edgeTint",
+            "kind": "color",
+            "i": 0,
+            "label": "Edge color"
+          }
+        },
+        {
+          "key": "edgeTintG",
+          "index": 21,
+          "type": "range",
+          "label": "Edge color G",
+          "def": 0.949,
+          "min": 0,
+          "max": 1,
+          "step": 0.001,
+          "group": "Edges",
+          "hint": "Color of subdivision strokes; gutters still use background ink.",
+          "mutate": 0.25,
+          "part": {
+            "of": "edgeTint",
+            "kind": "color",
+            "i": 1,
+            "label": "Edge color"
+          }
+        },
+        {
+          "key": "edgeTintB",
+          "index": 22,
+          "type": "range",
+          "label": "Edge color B",
+          "def": 0.9098,
+          "min": 0,
+          "max": 1,
+          "step": 0.001,
+          "group": "Edges",
+          "hint": "Color of subdivision strokes; gutters still use background ink.",
+          "mutate": 0.25,
+          "part": {
+            "of": "edgeTint",
+            "kind": "color",
+            "i": 2,
+            "label": "Edge color"
+          }
+        },
+        {
+          "key": "echoLength",
+          "index": 23,
+          "type": "range",
+          "label": "Echo length",
+          "def": 1,
+          "min": 0,
+          "max": 3,
+          "step": 0.01,
+          "group": "Sampling",
+          "hint": "Spread the layered copies in Afterimage Atlas.",
+          "show": {
+            "param": "variant",
+            "is": 9
+          }
+        },
+        {
+          "key": "colorSeparation",
+          "index": 24,
+          "type": "range",
+          "label": "Color separation",
+          "def": 1,
+          "min": 0,
+          "max": 3,
+          "step": 0.01,
+          "group": "Sampling",
+          "hint": "Offset red and blue channels in Chromatic Register.",
+          "show": {
+            "param": "variant",
+            "is": 4
+          }
+        }
+      ]
+    },
+    {
+      "id": "kinetic-subdivision/monolith-cut",
+      "localId": "monolith-cut",
+      "name": "Monolith Cut",
+      "blurb": "Dark slabs interrupt large image fragments.",
+      "group": "Image systems",
+      "tags": [
+        "monolith",
+        "negative-space",
+        "blocks"
+      ],
+      "palette": "field",
+      "flash": true,
+      "cost": 1,
+      "passes": [
+        {
+          "function": "mfs_kinetic_subdivision_monolith_cut_p0",
+          "source": "kinetic_subdivision_monolith_cut_p0",
+          "scale": 0.5
+        },
+        {
+          "function": "mfs_kinetic_subdivision_monolith_cut_p1",
+          "source": "kinetic_subdivision_monolith_cut_p1",
+          "scale": 1
+        },
+        {
+          "function": "mfs_kinetic_subdivision_monolith_cut_p2",
+          "source": "kinetic_subdivision_monolith_cut_p2",
+          "scale": 1
+        }
+      ],
+      "inputs": [
+        {
+          "id": "source",
+          "type": "media",
+          "label": "Source image or video",
+          "fit": "fill",
+          "hint": "Attach a photo or clip; without one, the procedural source remains."
+        }
+      ],
+      "params": [
+        {
+          "key": "variant",
+          "index": 0,
+          "type": "int",
+          "label": "Treatment ID",
+          "def": 5,
+          "min": 0,
+          "max": 9,
+          "step": 1,
+          "group": "Style",
+          "hint": "The treatment selected by this style; keep it fixed to preserve the preset.",
+          "mutate": 0
+        },
+        {
+          "key": "depth",
+          "index": 1,
+          "type": "int",
+          "label": "Subdivision depth",
+          "def": 4,
+          "min": 2,
+          "max": 7,
+          "step": 1,
+          "group": "Structure"
+        },
+        {
+          "key": "rate",
+          "index": 2,
+          "type": "int",
+          "label": "Changes / loop",
+          "def": 3,
+          "min": 1,
+          "max": 12,
+          "step": 1,
+          "group": "Motion",
+          "mutate": 0.6
+        },
+        {
+          "key": "smoothness",
+          "index": 3,
+          "type": "range",
+          "label": "Smoothness",
+          "def": 0.9,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Motion",
+          "hint": "Fraction of each cycle spent easing into the next layout.",
+          "mutate": 0.4
+        },
+        {
+          "key": "amount",
+          "index": 4,
+          "type": "range",
+          "label": "Displacement",
+          "def": 0.07,
+          "min": 0,
+          "max": 0.2,
+          "step": 0.005,
+          "group": "Motion"
+        },
+        {
+          "key": "edge",
+          "index": 5,
+          "type": "range",
+          "label": "Edge width",
+          "def": 1.1,
+          "min": 0.5,
+          "max": 4,
+          "step": 0.1,
+          "group": "Edges"
+        },
+        {
+          "key": "smear",
+          "index": 6,
+          "type": "range",
+          "label": "Smear",
+          "def": 0.55,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Sampling"
+        },
+        {
+          "key": "ink",
+          "index": 7,
+          "type": "range",
+          "label": "Ink",
+          "def": 0.8,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Edges"
+        },
+        {
+          "key": "imageMix",
+          "index": 8,
+          "type": "range",
+          "label": "Source image",
+          "def": 1,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Source",
+          "hint": "Blend the attached media with the procedural source.",
+          "mutate": 0
+        },
+        {
+          "key": "topologyHold",
+          "index": 9,
+          "type": "int",
+          "label": "Topology hold",
+          "def": 4,
+          "min": 0,
+          "max": 8,
+          "step": 1,
+          "group": "Structure",
+          "hint": "Number of motion cycles before the partition layout evolves.",
+          "mutate": 0.3
+        },
+        {
+          "key": "splitDirection",
+          "index": 10,
+          "type": "select",
+          "label": "Split direction",
+          "def": "auto",
+          "group": "Structure",
+          "options": [
+            {
+              "v": "auto",
+              "l": "Auto"
+            },
+            {
+              "v": "horizontal",
+              "l": "Horizontal"
+            },
+            {
+              "v": "vertical",
+              "l": "Vertical"
+            },
+            {
+              "v": "alternating",
+              "l": "Alternating"
+            }
+          ]
+        },
+        {
+          "key": "cellScale",
+          "index": 11,
+          "type": "select",
+          "label": "Cell scale",
+          "def": "balanced",
+          "group": "Structure",
+          "options": [
+            {
+              "v": "anchors",
+              "l": "Anchors"
+            },
+            {
+              "v": "balanced",
+              "l": "Balanced"
+            },
+            {
+              "v": "fragments",
+              "l": "Fragments"
+            }
+          ]
+        },
+        {
+          "key": "motionCharacter",
+          "index": 12,
+          "type": "select",
+          "label": "Motion character",
+          "def": "glide",
+          "group": "Motion",
+          "options": [
+            {
+              "v": "glide",
+              "l": "Glide"
+            },
+            {
+              "v": "spring",
+              "l": "Spring"
+            },
+            {
+              "v": "steps",
+              "l": "Steps"
+            },
+            {
+              "v": "shutter",
+              "l": "Shutter"
+            }
+          ]
+        },
+        {
+          "key": "sourceSampling",
+          "index": 13,
+          "type": "select",
+          "label": "Source sampling",
+          "def": "intact",
+          "group": "Sampling",
+          "options": [
+            {
+              "v": "intact",
+              "l": "Intact"
+            },
+            {
+              "v": "stretch",
+              "l": "Stretch"
+            },
+            {
+              "v": "scanline",
+              "l": "Scanline"
+            },
+            {
+              "v": "mirror",
+              "l": "Mirror"
+            }
+          ]
+        },
+        {
+          "key": "edgeLanguage",
+          "index": 14,
+          "type": "select",
+          "label": "Edge language",
+          "def": "hairline",
+          "group": "Edges",
+          "options": [
+            {
+              "v": "hairline",
+              "l": "Hairline"
+            },
+            {
+              "v": "gutter",
+              "l": "Gutter"
+            },
+            {
+              "v": "double",
+              "l": "Double"
+            },
+            {
+              "v": "ticks",
+              "l": "Ticks"
+            },
+            {
+              "v": "none",
+              "l": "None"
+            }
+          ]
+        },
+        {
+          "key": "focalProtection",
+          "index": 15,
+          "type": "range",
+          "label": "Focal protection",
+          "def": 0,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Focus",
+          "hint": "Preserve the image around the focal point."
+        },
+        {
+          "key": "splitBias",
+          "index": 16,
+          "type": "range",
+          "label": "Split bias",
+          "def": 0,
+          "min": -0.5,
+          "max": 0.5,
+          "step": 0.01,
+          "group": "Structure",
+          "hint": "Push cut lines toward one side of each cell."
+        },
+        {
+          "key": "displacementAxis",
+          "index": 17,
+          "type": "select",
+          "label": "Displacement axis",
+          "def": "both",
+          "group": "Motion",
+          "hint": "Constrain tile movement to a direction or radial projection.",
+          "options": [
+            {
+              "v": "both",
+              "l": "Both"
+            },
+            {
+              "v": "horizontal",
+              "l": "Horizontal"
+            },
+            {
+              "v": "vertical",
+              "l": "Vertical"
+            },
+            {
+              "v": "radial",
+              "l": "Radial"
+            }
+          ]
+        },
+        {
+          "key": "focalPointX",
+          "index": 18,
+          "type": "range",
+          "label": "Focal point X",
+          "def": 0,
+          "min": -0.5,
+          "max": 0.5,
+          "step": 0.0025,
+          "group": "Focus",
+          "hint": "Drag the XY point onto the area to keep recognizable.",
+          "mutate": 0,
+          "part": {
+            "of": "focalPoint",
+            "kind": "point",
+            "i": 0,
+            "label": "Focal point"
+          }
+        },
+        {
+          "key": "focalPointY",
+          "index": 19,
+          "type": "range",
+          "label": "Focal point Y",
+          "def": 0,
+          "min": -0.5,
+          "max": 0.5,
+          "step": 0.0025,
+          "group": "Focus",
+          "hint": "Drag the XY point onto the area to keep recognizable.",
+          "mutate": 0,
+          "part": {
+            "of": "focalPoint",
+            "kind": "point",
+            "i": 1,
+            "label": "Focal point"
+          }
+        },
+        {
+          "key": "edgeTintR",
+          "index": 20,
+          "type": "range",
+          "label": "Edge color R",
+          "def": 0.9569,
+          "min": 0,
+          "max": 1,
+          "step": 0.001,
+          "group": "Edges",
+          "hint": "Color of subdivision strokes; gutters still use background ink.",
+          "mutate": 0.25,
+          "part": {
+            "of": "edgeTint",
+            "kind": "color",
+            "i": 0,
+            "label": "Edge color"
+          }
+        },
+        {
+          "key": "edgeTintG",
+          "index": 21,
+          "type": "range",
+          "label": "Edge color G",
+          "def": 0.949,
+          "min": 0,
+          "max": 1,
+          "step": 0.001,
+          "group": "Edges",
+          "hint": "Color of subdivision strokes; gutters still use background ink.",
+          "mutate": 0.25,
+          "part": {
+            "of": "edgeTint",
+            "kind": "color",
+            "i": 1,
+            "label": "Edge color"
+          }
+        },
+        {
+          "key": "edgeTintB",
+          "index": 22,
+          "type": "range",
+          "label": "Edge color B",
+          "def": 0.9098,
+          "min": 0,
+          "max": 1,
+          "step": 0.001,
+          "group": "Edges",
+          "hint": "Color of subdivision strokes; gutters still use background ink.",
+          "mutate": 0.25,
+          "part": {
+            "of": "edgeTint",
+            "kind": "color",
+            "i": 2,
+            "label": "Edge color"
+          }
+        },
+        {
+          "key": "echoLength",
+          "index": 23,
+          "type": "range",
+          "label": "Echo length",
+          "def": 1,
+          "min": 0,
+          "max": 3,
+          "step": 0.01,
+          "group": "Sampling",
+          "hint": "Spread the layered copies in Afterimage Atlas.",
+          "show": {
+            "param": "variant",
+            "is": 9
+          }
+        },
+        {
+          "key": "colorSeparation",
+          "index": 24,
+          "type": "range",
+          "label": "Color separation",
+          "def": 1,
+          "min": 0,
+          "max": 3,
+          "step": 0.01,
+          "group": "Sampling",
+          "hint": "Offset red and blue channels in Chromatic Register.",
+          "show": {
+            "param": "variant",
+            "is": 4
+          }
+        }
+      ]
+    },
+    {
+      "id": "kinetic-subdivision/offset-press",
+      "localId": "offset-press",
+      "name": "Offset Press",
+      "blurb": "Ink-like duotone with dense editorial gutters.",
+      "group": "Image systems",
+      "tags": [
+        "print",
+        "duotone",
+        "editorial"
+      ],
+      "palette": "field",
+      "flash": true,
+      "cost": 1,
+      "passes": [
+        {
+          "function": "mfs_kinetic_subdivision_offset_press_p0",
+          "source": "kinetic_subdivision_offset_press_p0",
+          "scale": 0.5
+        },
+        {
+          "function": "mfs_kinetic_subdivision_offset_press_p1",
+          "source": "kinetic_subdivision_offset_press_p1",
+          "scale": 1
+        },
+        {
+          "function": "mfs_kinetic_subdivision_offset_press_p2",
+          "source": "kinetic_subdivision_offset_press_p2",
+          "scale": 1
+        }
+      ],
+      "inputs": [
+        {
+          "id": "source",
+          "type": "media",
+          "label": "Source image or video",
+          "fit": "fill",
+          "hint": "Attach a photo or clip; without one, the procedural source remains."
+        }
+      ],
+      "params": [
+        {
+          "key": "variant",
+          "index": 0,
+          "type": "int",
+          "label": "Treatment ID",
+          "def": 6,
+          "min": 0,
+          "max": 9,
+          "step": 1,
+          "group": "Style",
+          "hint": "The treatment selected by this style; keep it fixed to preserve the preset.",
+          "mutate": 0
+        },
+        {
+          "key": "depth",
+          "index": 1,
+          "type": "int",
+          "label": "Subdivision depth",
+          "def": 5,
+          "min": 2,
+          "max": 7,
+          "step": 1,
+          "group": "Structure"
+        },
+        {
+          "key": "rate",
+          "index": 2,
+          "type": "int",
+          "label": "Changes / loop",
+          "def": 3,
+          "min": 1,
+          "max": 12,
+          "step": 1,
+          "group": "Motion",
+          "mutate": 0.6
+        },
+        {
+          "key": "smoothness",
+          "index": 3,
+          "type": "range",
+          "label": "Smoothness",
+          "def": 0.9,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Motion",
+          "hint": "Fraction of each cycle spent easing into the next layout.",
+          "mutate": 0.4
+        },
+        {
+          "key": "amount",
+          "index": 4,
+          "type": "range",
+          "label": "Displacement",
+          "def": 0.07,
+          "min": 0,
+          "max": 0.2,
+          "step": 0.005,
+          "group": "Motion"
+        },
+        {
+          "key": "edge",
+          "index": 5,
+          "type": "range",
+          "label": "Edge width",
+          "def": 1.1,
+          "min": 0.5,
+          "max": 4,
+          "step": 0.1,
+          "group": "Edges"
+        },
+        {
+          "key": "smear",
+          "index": 6,
+          "type": "range",
+          "label": "Smear",
+          "def": 0.55,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Sampling"
+        },
+        {
+          "key": "ink",
+          "index": 7,
+          "type": "range",
+          "label": "Ink",
+          "def": 0.8,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Edges"
+        },
+        {
+          "key": "imageMix",
+          "index": 8,
+          "type": "range",
+          "label": "Source image",
+          "def": 1,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Source",
+          "hint": "Blend the attached media with the procedural source.",
+          "mutate": 0
+        },
+        {
+          "key": "topologyHold",
+          "index": 9,
+          "type": "int",
+          "label": "Topology hold",
+          "def": 4,
+          "min": 0,
+          "max": 8,
+          "step": 1,
+          "group": "Structure",
+          "hint": "Number of motion cycles before the partition layout evolves.",
+          "mutate": 0.3
+        },
+        {
+          "key": "splitDirection",
+          "index": 10,
+          "type": "select",
+          "label": "Split direction",
+          "def": "auto",
+          "group": "Structure",
+          "options": [
+            {
+              "v": "auto",
+              "l": "Auto"
+            },
+            {
+              "v": "horizontal",
+              "l": "Horizontal"
+            },
+            {
+              "v": "vertical",
+              "l": "Vertical"
+            },
+            {
+              "v": "alternating",
+              "l": "Alternating"
+            }
+          ]
+        },
+        {
+          "key": "cellScale",
+          "index": 11,
+          "type": "select",
+          "label": "Cell scale",
+          "def": "balanced",
+          "group": "Structure",
+          "options": [
+            {
+              "v": "anchors",
+              "l": "Anchors"
+            },
+            {
+              "v": "balanced",
+              "l": "Balanced"
+            },
+            {
+              "v": "fragments",
+              "l": "Fragments"
+            }
+          ]
+        },
+        {
+          "key": "motionCharacter",
+          "index": 12,
+          "type": "select",
+          "label": "Motion character",
+          "def": "glide",
+          "group": "Motion",
+          "options": [
+            {
+              "v": "glide",
+              "l": "Glide"
+            },
+            {
+              "v": "spring",
+              "l": "Spring"
+            },
+            {
+              "v": "steps",
+              "l": "Steps"
+            },
+            {
+              "v": "shutter",
+              "l": "Shutter"
+            }
+          ]
+        },
+        {
+          "key": "sourceSampling",
+          "index": 13,
+          "type": "select",
+          "label": "Source sampling",
+          "def": "intact",
+          "group": "Sampling",
+          "options": [
+            {
+              "v": "intact",
+              "l": "Intact"
+            },
+            {
+              "v": "stretch",
+              "l": "Stretch"
+            },
+            {
+              "v": "scanline",
+              "l": "Scanline"
+            },
+            {
+              "v": "mirror",
+              "l": "Mirror"
+            }
+          ]
+        },
+        {
+          "key": "edgeLanguage",
+          "index": 14,
+          "type": "select",
+          "label": "Edge language",
+          "def": "hairline",
+          "group": "Edges",
+          "options": [
+            {
+              "v": "hairline",
+              "l": "Hairline"
+            },
+            {
+              "v": "gutter",
+              "l": "Gutter"
+            },
+            {
+              "v": "double",
+              "l": "Double"
+            },
+            {
+              "v": "ticks",
+              "l": "Ticks"
+            },
+            {
+              "v": "none",
+              "l": "None"
+            }
+          ]
+        },
+        {
+          "key": "focalProtection",
+          "index": 15,
+          "type": "range",
+          "label": "Focal protection",
+          "def": 0,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Focus",
+          "hint": "Preserve the image around the focal point."
+        },
+        {
+          "key": "splitBias",
+          "index": 16,
+          "type": "range",
+          "label": "Split bias",
+          "def": 0,
+          "min": -0.5,
+          "max": 0.5,
+          "step": 0.01,
+          "group": "Structure",
+          "hint": "Push cut lines toward one side of each cell."
+        },
+        {
+          "key": "displacementAxis",
+          "index": 17,
+          "type": "select",
+          "label": "Displacement axis",
+          "def": "both",
+          "group": "Motion",
+          "hint": "Constrain tile movement to a direction or radial projection.",
+          "options": [
+            {
+              "v": "both",
+              "l": "Both"
+            },
+            {
+              "v": "horizontal",
+              "l": "Horizontal"
+            },
+            {
+              "v": "vertical",
+              "l": "Vertical"
+            },
+            {
+              "v": "radial",
+              "l": "Radial"
+            }
+          ]
+        },
+        {
+          "key": "focalPointX",
+          "index": 18,
+          "type": "range",
+          "label": "Focal point X",
+          "def": 0,
+          "min": -0.5,
+          "max": 0.5,
+          "step": 0.0025,
+          "group": "Focus",
+          "hint": "Drag the XY point onto the area to keep recognizable.",
+          "mutate": 0,
+          "part": {
+            "of": "focalPoint",
+            "kind": "point",
+            "i": 0,
+            "label": "Focal point"
+          }
+        },
+        {
+          "key": "focalPointY",
+          "index": 19,
+          "type": "range",
+          "label": "Focal point Y",
+          "def": 0,
+          "min": -0.5,
+          "max": 0.5,
+          "step": 0.0025,
+          "group": "Focus",
+          "hint": "Drag the XY point onto the area to keep recognizable.",
+          "mutate": 0,
+          "part": {
+            "of": "focalPoint",
+            "kind": "point",
+            "i": 1,
+            "label": "Focal point"
+          }
+        },
+        {
+          "key": "edgeTintR",
+          "index": 20,
+          "type": "range",
+          "label": "Edge color R",
+          "def": 0.9569,
+          "min": 0,
+          "max": 1,
+          "step": 0.001,
+          "group": "Edges",
+          "hint": "Color of subdivision strokes; gutters still use background ink.",
+          "mutate": 0.25,
+          "part": {
+            "of": "edgeTint",
+            "kind": "color",
+            "i": 0,
+            "label": "Edge color"
+          }
+        },
+        {
+          "key": "edgeTintG",
+          "index": 21,
+          "type": "range",
+          "label": "Edge color G",
+          "def": 0.949,
+          "min": 0,
+          "max": 1,
+          "step": 0.001,
+          "group": "Edges",
+          "hint": "Color of subdivision strokes; gutters still use background ink.",
+          "mutate": 0.25,
+          "part": {
+            "of": "edgeTint",
+            "kind": "color",
+            "i": 1,
+            "label": "Edge color"
+          }
+        },
+        {
+          "key": "edgeTintB",
+          "index": 22,
+          "type": "range",
+          "label": "Edge color B",
+          "def": 0.9098,
+          "min": 0,
+          "max": 1,
+          "step": 0.001,
+          "group": "Edges",
+          "hint": "Color of subdivision strokes; gutters still use background ink.",
+          "mutate": 0.25,
+          "part": {
+            "of": "edgeTint",
+            "kind": "color",
+            "i": 2,
+            "label": "Edge color"
+          }
+        },
+        {
+          "key": "echoLength",
+          "index": 23,
+          "type": "range",
+          "label": "Echo length",
+          "def": 1,
+          "min": 0,
+          "max": 3,
+          "step": 0.01,
+          "group": "Sampling",
+          "hint": "Spread the layered copies in Afterimage Atlas.",
+          "show": {
+            "param": "variant",
+            "is": 9
+          }
+        },
+        {
+          "key": "colorSeparation",
+          "index": 24,
+          "type": "range",
+          "label": "Color separation",
+          "def": 1,
+          "min": 0,
+          "max": 3,
+          "step": 0.01,
+          "group": "Sampling",
+          "hint": "Offset red and blue channels in Chromatic Register.",
+          "show": {
+            "param": "variant",
+            "is": 4
+          }
+        }
+      ]
+    },
+    {
+      "id": "kinetic-subdivision/signal-cascade",
+      "localId": "signal-cascade",
+      "name": "Signal Cascade",
+      "blurb": "Rhythmic row displacement and pixel-locked smears.",
+      "group": "Image systems",
+      "tags": [
+        "signal",
+        "smear",
+        "glitch"
+      ],
+      "palette": "field",
+      "flash": true,
+      "cost": 1,
+      "passes": [
+        {
+          "function": "mfs_kinetic_subdivision_signal_cascade_p0",
+          "source": "kinetic_subdivision_signal_cascade_p0",
+          "scale": 0.5
+        },
+        {
+          "function": "mfs_kinetic_subdivision_signal_cascade_p1",
+          "source": "kinetic_subdivision_signal_cascade_p1",
+          "scale": 1
+        },
+        {
+          "function": "mfs_kinetic_subdivision_signal_cascade_p2",
+          "source": "kinetic_subdivision_signal_cascade_p2",
+          "scale": 1
+        }
+      ],
+      "inputs": [
+        {
+          "id": "source",
+          "type": "media",
+          "label": "Source image or video",
+          "fit": "fill",
+          "hint": "Attach a photo or clip; without one, the procedural source remains."
+        }
+      ],
+      "params": [
+        {
+          "key": "variant",
+          "index": 0,
+          "type": "int",
+          "label": "Treatment ID",
+          "def": 7,
+          "min": 0,
+          "max": 9,
+          "step": 1,
+          "group": "Style",
+          "hint": "The treatment selected by this style; keep it fixed to preserve the preset.",
+          "mutate": 0
+        },
+        {
+          "key": "depth",
+          "index": 1,
+          "type": "int",
+          "label": "Subdivision depth",
+          "def": 6,
+          "min": 2,
+          "max": 7,
+          "step": 1,
+          "group": "Structure"
+        },
+        {
+          "key": "rate",
+          "index": 2,
+          "type": "int",
+          "label": "Changes / loop",
+          "def": 3,
+          "min": 1,
+          "max": 12,
+          "step": 1,
+          "group": "Motion",
+          "mutate": 0.6
+        },
+        {
+          "key": "smoothness",
+          "index": 3,
+          "type": "range",
+          "label": "Smoothness",
+          "def": 0.9,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Motion",
+          "hint": "Fraction of each cycle spent easing into the next layout.",
+          "mutate": 0.4
+        },
+        {
+          "key": "amount",
+          "index": 4,
+          "type": "range",
+          "label": "Displacement",
+          "def": 0.1,
+          "min": 0,
+          "max": 0.2,
+          "step": 0.005,
+          "group": "Motion"
+        },
+        {
+          "key": "edge",
+          "index": 5,
+          "type": "range",
+          "label": "Edge width",
+          "def": 1.1,
+          "min": 0.5,
+          "max": 4,
+          "step": 0.1,
+          "group": "Edges"
+        },
+        {
+          "key": "smear",
+          "index": 6,
+          "type": "range",
+          "label": "Smear",
+          "def": 0.55,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Sampling"
+        },
+        {
+          "key": "ink",
+          "index": 7,
+          "type": "range",
+          "label": "Ink",
+          "def": 0.8,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Edges"
+        },
+        {
+          "key": "imageMix",
+          "index": 8,
+          "type": "range",
+          "label": "Source image",
+          "def": 1,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Source",
+          "hint": "Blend the attached media with the procedural source.",
+          "mutate": 0
+        },
+        {
+          "key": "topologyHold",
+          "index": 9,
+          "type": "int",
+          "label": "Topology hold",
+          "def": 4,
+          "min": 0,
+          "max": 8,
+          "step": 1,
+          "group": "Structure",
+          "hint": "Number of motion cycles before the partition layout evolves.",
+          "mutate": 0.3
+        },
+        {
+          "key": "splitDirection",
+          "index": 10,
+          "type": "select",
+          "label": "Split direction",
+          "def": "auto",
+          "group": "Structure",
+          "options": [
+            {
+              "v": "auto",
+              "l": "Auto"
+            },
+            {
+              "v": "horizontal",
+              "l": "Horizontal"
+            },
+            {
+              "v": "vertical",
+              "l": "Vertical"
+            },
+            {
+              "v": "alternating",
+              "l": "Alternating"
+            }
+          ]
+        },
+        {
+          "key": "cellScale",
+          "index": 11,
+          "type": "select",
+          "label": "Cell scale",
+          "def": "balanced",
+          "group": "Structure",
+          "options": [
+            {
+              "v": "anchors",
+              "l": "Anchors"
+            },
+            {
+              "v": "balanced",
+              "l": "Balanced"
+            },
+            {
+              "v": "fragments",
+              "l": "Fragments"
+            }
+          ]
+        },
+        {
+          "key": "motionCharacter",
+          "index": 12,
+          "type": "select",
+          "label": "Motion character",
+          "def": "glide",
+          "group": "Motion",
+          "options": [
+            {
+              "v": "glide",
+              "l": "Glide"
+            },
+            {
+              "v": "spring",
+              "l": "Spring"
+            },
+            {
+              "v": "steps",
+              "l": "Steps"
+            },
+            {
+              "v": "shutter",
+              "l": "Shutter"
+            }
+          ]
+        },
+        {
+          "key": "sourceSampling",
+          "index": 13,
+          "type": "select",
+          "label": "Source sampling",
+          "def": "intact",
+          "group": "Sampling",
+          "options": [
+            {
+              "v": "intact",
+              "l": "Intact"
+            },
+            {
+              "v": "stretch",
+              "l": "Stretch"
+            },
+            {
+              "v": "scanline",
+              "l": "Scanline"
+            },
+            {
+              "v": "mirror",
+              "l": "Mirror"
+            }
+          ]
+        },
+        {
+          "key": "edgeLanguage",
+          "index": 14,
+          "type": "select",
+          "label": "Edge language",
+          "def": "hairline",
+          "group": "Edges",
+          "options": [
+            {
+              "v": "hairline",
+              "l": "Hairline"
+            },
+            {
+              "v": "gutter",
+              "l": "Gutter"
+            },
+            {
+              "v": "double",
+              "l": "Double"
+            },
+            {
+              "v": "ticks",
+              "l": "Ticks"
+            },
+            {
+              "v": "none",
+              "l": "None"
+            }
+          ]
+        },
+        {
+          "key": "focalProtection",
+          "index": 15,
+          "type": "range",
+          "label": "Focal protection",
+          "def": 0,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Focus",
+          "hint": "Preserve the image around the focal point."
+        },
+        {
+          "key": "splitBias",
+          "index": 16,
+          "type": "range",
+          "label": "Split bias",
+          "def": 0,
+          "min": -0.5,
+          "max": 0.5,
+          "step": 0.01,
+          "group": "Structure",
+          "hint": "Push cut lines toward one side of each cell."
+        },
+        {
+          "key": "displacementAxis",
+          "index": 17,
+          "type": "select",
+          "label": "Displacement axis",
+          "def": "both",
+          "group": "Motion",
+          "hint": "Constrain tile movement to a direction or radial projection.",
+          "options": [
+            {
+              "v": "both",
+              "l": "Both"
+            },
+            {
+              "v": "horizontal",
+              "l": "Horizontal"
+            },
+            {
+              "v": "vertical",
+              "l": "Vertical"
+            },
+            {
+              "v": "radial",
+              "l": "Radial"
+            }
+          ]
+        },
+        {
+          "key": "focalPointX",
+          "index": 18,
+          "type": "range",
+          "label": "Focal point X",
+          "def": 0,
+          "min": -0.5,
+          "max": 0.5,
+          "step": 0.0025,
+          "group": "Focus",
+          "hint": "Drag the XY point onto the area to keep recognizable.",
+          "mutate": 0,
+          "part": {
+            "of": "focalPoint",
+            "kind": "point",
+            "i": 0,
+            "label": "Focal point"
+          }
+        },
+        {
+          "key": "focalPointY",
+          "index": 19,
+          "type": "range",
+          "label": "Focal point Y",
+          "def": 0,
+          "min": -0.5,
+          "max": 0.5,
+          "step": 0.0025,
+          "group": "Focus",
+          "hint": "Drag the XY point onto the area to keep recognizable.",
+          "mutate": 0,
+          "part": {
+            "of": "focalPoint",
+            "kind": "point",
+            "i": 1,
+            "label": "Focal point"
+          }
+        },
+        {
+          "key": "edgeTintR",
+          "index": 20,
+          "type": "range",
+          "label": "Edge color R",
+          "def": 0.9569,
+          "min": 0,
+          "max": 1,
+          "step": 0.001,
+          "group": "Edges",
+          "hint": "Color of subdivision strokes; gutters still use background ink.",
+          "mutate": 0.25,
+          "part": {
+            "of": "edgeTint",
+            "kind": "color",
+            "i": 0,
+            "label": "Edge color"
+          }
+        },
+        {
+          "key": "edgeTintG",
+          "index": 21,
+          "type": "range",
+          "label": "Edge color G",
+          "def": 0.949,
+          "min": 0,
+          "max": 1,
+          "step": 0.001,
+          "group": "Edges",
+          "hint": "Color of subdivision strokes; gutters still use background ink.",
+          "mutate": 0.25,
+          "part": {
+            "of": "edgeTint",
+            "kind": "color",
+            "i": 1,
+            "label": "Edge color"
+          }
+        },
+        {
+          "key": "edgeTintB",
+          "index": 22,
+          "type": "range",
+          "label": "Edge color B",
+          "def": 0.9098,
+          "min": 0,
+          "max": 1,
+          "step": 0.001,
+          "group": "Edges",
+          "hint": "Color of subdivision strokes; gutters still use background ink.",
+          "mutate": 0.25,
+          "part": {
+            "of": "edgeTint",
+            "kind": "color",
+            "i": 2,
+            "label": "Edge color"
+          }
+        },
+        {
+          "key": "echoLength",
+          "index": 23,
+          "type": "range",
+          "label": "Echo length",
+          "def": 1,
+          "min": 0,
+          "max": 3,
+          "step": 0.01,
+          "group": "Sampling",
+          "hint": "Spread the layered copies in Afterimage Atlas.",
+          "show": {
+            "param": "variant",
+            "is": 9
+          }
+        },
+        {
+          "key": "colorSeparation",
+          "index": 24,
+          "type": "range",
+          "label": "Color separation",
+          "def": 1,
+          "min": 0,
+          "max": 3,
+          "step": 0.01,
+          "group": "Sampling",
+          "hint": "Offset red and blue channels in Chromatic Register.",
+          "show": {
+            "param": "variant",
+            "is": 4
+          }
+        }
+      ]
+    },
+    {
+      "id": "kinetic-subdivision/survey-grid",
+      "localId": "survey-grid",
+      "name": "Survey Grid",
+      "blurb": "Fine subdivision with ticks and survey marks.",
+      "group": "Image systems",
+      "tags": [
+        "technical",
+        "grid",
+        "hud"
+      ],
+      "palette": "field",
+      "flash": true,
+      "cost": 1,
+      "passes": [
+        {
+          "function": "mfs_kinetic_subdivision_survey_grid_p0",
+          "source": "kinetic_subdivision_survey_grid_p0",
+          "scale": 0.5
+        },
+        {
+          "function": "mfs_kinetic_subdivision_survey_grid_p1",
+          "source": "kinetic_subdivision_survey_grid_p1",
+          "scale": 1
+        },
+        {
+          "function": "mfs_kinetic_subdivision_survey_grid_p2",
+          "source": "kinetic_subdivision_survey_grid_p2",
+          "scale": 1
+        }
+      ],
+      "inputs": [
+        {
+          "id": "source",
+          "type": "media",
+          "label": "Source image or video",
+          "fit": "fill",
+          "hint": "Attach a photo or clip; without one, the procedural source remains."
+        }
+      ],
+      "params": [
+        {
+          "key": "variant",
+          "index": 0,
+          "type": "int",
+          "label": "Treatment ID",
+          "def": 8,
+          "min": 0,
+          "max": 9,
+          "step": 1,
+          "group": "Style",
+          "hint": "The treatment selected by this style; keep it fixed to preserve the preset.",
+          "mutate": 0
+        },
+        {
+          "key": "depth",
+          "index": 1,
+          "type": "int",
+          "label": "Subdivision depth",
+          "def": 6,
+          "min": 2,
+          "max": 7,
+          "step": 1,
+          "group": "Structure"
+        },
+        {
+          "key": "rate",
+          "index": 2,
+          "type": "int",
+          "label": "Changes / loop",
+          "def": 3,
+          "min": 1,
+          "max": 12,
+          "step": 1,
+          "group": "Motion",
+          "mutate": 0.6
+        },
+        {
+          "key": "smoothness",
+          "index": 3,
+          "type": "range",
+          "label": "Smoothness",
+          "def": 0.9,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Motion",
+          "hint": "Fraction of each cycle spent easing into the next layout.",
+          "mutate": 0.4
+        },
+        {
+          "key": "amount",
+          "index": 4,
+          "type": "range",
+          "label": "Displacement",
+          "def": 0.07,
+          "min": 0,
+          "max": 0.2,
+          "step": 0.005,
+          "group": "Motion"
+        },
+        {
+          "key": "edge",
+          "index": 5,
+          "type": "range",
+          "label": "Edge width",
+          "def": 1.1,
+          "min": 0.5,
+          "max": 4,
+          "step": 0.1,
+          "group": "Edges"
+        },
+        {
+          "key": "smear",
+          "index": 6,
+          "type": "range",
+          "label": "Smear",
+          "def": 0.55,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Sampling"
+        },
+        {
+          "key": "ink",
+          "index": 7,
+          "type": "range",
+          "label": "Ink",
+          "def": 0.8,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Edges"
+        },
+        {
+          "key": "imageMix",
+          "index": 8,
+          "type": "range",
+          "label": "Source image",
+          "def": 1,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Source",
+          "hint": "Blend the attached media with the procedural source.",
+          "mutate": 0
+        },
+        {
+          "key": "topologyHold",
+          "index": 9,
+          "type": "int",
+          "label": "Topology hold",
+          "def": 4,
+          "min": 0,
+          "max": 8,
+          "step": 1,
+          "group": "Structure",
+          "hint": "Number of motion cycles before the partition layout evolves.",
+          "mutate": 0.3
+        },
+        {
+          "key": "splitDirection",
+          "index": 10,
+          "type": "select",
+          "label": "Split direction",
+          "def": "auto",
+          "group": "Structure",
+          "options": [
+            {
+              "v": "auto",
+              "l": "Auto"
+            },
+            {
+              "v": "horizontal",
+              "l": "Horizontal"
+            },
+            {
+              "v": "vertical",
+              "l": "Vertical"
+            },
+            {
+              "v": "alternating",
+              "l": "Alternating"
+            }
+          ]
+        },
+        {
+          "key": "cellScale",
+          "index": 11,
+          "type": "select",
+          "label": "Cell scale",
+          "def": "balanced",
+          "group": "Structure",
+          "options": [
+            {
+              "v": "anchors",
+              "l": "Anchors"
+            },
+            {
+              "v": "balanced",
+              "l": "Balanced"
+            },
+            {
+              "v": "fragments",
+              "l": "Fragments"
+            }
+          ]
+        },
+        {
+          "key": "motionCharacter",
+          "index": 12,
+          "type": "select",
+          "label": "Motion character",
+          "def": "glide",
+          "group": "Motion",
+          "options": [
+            {
+              "v": "glide",
+              "l": "Glide"
+            },
+            {
+              "v": "spring",
+              "l": "Spring"
+            },
+            {
+              "v": "steps",
+              "l": "Steps"
+            },
+            {
+              "v": "shutter",
+              "l": "Shutter"
+            }
+          ]
+        },
+        {
+          "key": "sourceSampling",
+          "index": 13,
+          "type": "select",
+          "label": "Source sampling",
+          "def": "intact",
+          "group": "Sampling",
+          "options": [
+            {
+              "v": "intact",
+              "l": "Intact"
+            },
+            {
+              "v": "stretch",
+              "l": "Stretch"
+            },
+            {
+              "v": "scanline",
+              "l": "Scanline"
+            },
+            {
+              "v": "mirror",
+              "l": "Mirror"
+            }
+          ]
+        },
+        {
+          "key": "edgeLanguage",
+          "index": 14,
+          "type": "select",
+          "label": "Edge language",
+          "def": "hairline",
+          "group": "Edges",
+          "options": [
+            {
+              "v": "hairline",
+              "l": "Hairline"
+            },
+            {
+              "v": "gutter",
+              "l": "Gutter"
+            },
+            {
+              "v": "double",
+              "l": "Double"
+            },
+            {
+              "v": "ticks",
+              "l": "Ticks"
+            },
+            {
+              "v": "none",
+              "l": "None"
+            }
+          ]
+        },
+        {
+          "key": "focalProtection",
+          "index": 15,
+          "type": "range",
+          "label": "Focal protection",
+          "def": 0,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Focus",
+          "hint": "Preserve the image around the focal point."
+        },
+        {
+          "key": "splitBias",
+          "index": 16,
+          "type": "range",
+          "label": "Split bias",
+          "def": 0,
+          "min": -0.5,
+          "max": 0.5,
+          "step": 0.01,
+          "group": "Structure",
+          "hint": "Push cut lines toward one side of each cell."
+        },
+        {
+          "key": "displacementAxis",
+          "index": 17,
+          "type": "select",
+          "label": "Displacement axis",
+          "def": "both",
+          "group": "Motion",
+          "hint": "Constrain tile movement to a direction or radial projection.",
+          "options": [
+            {
+              "v": "both",
+              "l": "Both"
+            },
+            {
+              "v": "horizontal",
+              "l": "Horizontal"
+            },
+            {
+              "v": "vertical",
+              "l": "Vertical"
+            },
+            {
+              "v": "radial",
+              "l": "Radial"
+            }
+          ]
+        },
+        {
+          "key": "focalPointX",
+          "index": 18,
+          "type": "range",
+          "label": "Focal point X",
+          "def": 0,
+          "min": -0.5,
+          "max": 0.5,
+          "step": 0.0025,
+          "group": "Focus",
+          "hint": "Drag the XY point onto the area to keep recognizable.",
+          "mutate": 0,
+          "part": {
+            "of": "focalPoint",
+            "kind": "point",
+            "i": 0,
+            "label": "Focal point"
+          }
+        },
+        {
+          "key": "focalPointY",
+          "index": 19,
+          "type": "range",
+          "label": "Focal point Y",
+          "def": 0,
+          "min": -0.5,
+          "max": 0.5,
+          "step": 0.0025,
+          "group": "Focus",
+          "hint": "Drag the XY point onto the area to keep recognizable.",
+          "mutate": 0,
+          "part": {
+            "of": "focalPoint",
+            "kind": "point",
+            "i": 1,
+            "label": "Focal point"
+          }
+        },
+        {
+          "key": "edgeTintR",
+          "index": 20,
+          "type": "range",
+          "label": "Edge color R",
+          "def": 0.9569,
+          "min": 0,
+          "max": 1,
+          "step": 0.001,
+          "group": "Edges",
+          "hint": "Color of subdivision strokes; gutters still use background ink.",
+          "mutate": 0.25,
+          "part": {
+            "of": "edgeTint",
+            "kind": "color",
+            "i": 0,
+            "label": "Edge color"
+          }
+        },
+        {
+          "key": "edgeTintG",
+          "index": 21,
+          "type": "range",
+          "label": "Edge color G",
+          "def": 0.949,
+          "min": 0,
+          "max": 1,
+          "step": 0.001,
+          "group": "Edges",
+          "hint": "Color of subdivision strokes; gutters still use background ink.",
+          "mutate": 0.25,
+          "part": {
+            "of": "edgeTint",
+            "kind": "color",
+            "i": 1,
+            "label": "Edge color"
+          }
+        },
+        {
+          "key": "edgeTintB",
+          "index": 22,
+          "type": "range",
+          "label": "Edge color B",
+          "def": 0.9098,
+          "min": 0,
+          "max": 1,
+          "step": 0.001,
+          "group": "Edges",
+          "hint": "Color of subdivision strokes; gutters still use background ink.",
+          "mutate": 0.25,
+          "part": {
+            "of": "edgeTint",
+            "kind": "color",
+            "i": 2,
+            "label": "Edge color"
+          }
+        },
+        {
+          "key": "echoLength",
+          "index": 23,
+          "type": "range",
+          "label": "Echo length",
+          "def": 1,
+          "min": 0,
+          "max": 3,
+          "step": 0.01,
+          "group": "Sampling",
+          "hint": "Spread the layered copies in Afterimage Atlas.",
+          "show": {
+            "param": "variant",
+            "is": 9
+          }
+        },
+        {
+          "key": "colorSeparation",
+          "index": 24,
+          "type": "range",
+          "label": "Color separation",
+          "def": 1,
+          "min": 0,
+          "max": 3,
+          "step": 0.01,
+          "group": "Sampling",
+          "hint": "Offset red and blue channels in Chromatic Register.",
+          "show": {
+            "param": "variant",
+            "is": 4
+          }
+        }
+      ]
+    },
+    {
+      "id": "kinetic-subdivision/afterimage-atlas",
+      "localId": "afterimage-atlas",
+      "name": "Afterimage Atlas",
+      "blurb": "Layered echoes leave a translucent spatial memory.",
+      "group": "Image systems",
+      "tags": [
+        "echo",
+        "ghost",
+        "translucent"
+      ],
+      "palette": "field",
+      "flash": true,
+      "cost": 1,
+      "passes": [
+        {
+          "function": "mfs_kinetic_subdivision_afterimage_atlas_p0",
+          "source": "kinetic_subdivision_afterimage_atlas_p0",
+          "scale": 0.5
+        },
+        {
+          "function": "mfs_kinetic_subdivision_afterimage_atlas_p1",
+          "source": "kinetic_subdivision_afterimage_atlas_p1",
+          "scale": 1
+        },
+        {
+          "function": "mfs_kinetic_subdivision_afterimage_atlas_p2",
+          "source": "kinetic_subdivision_afterimage_atlas_p2",
+          "scale": 1
+        }
+      ],
+      "inputs": [
+        {
+          "id": "source",
+          "type": "media",
+          "label": "Source image or video",
+          "fit": "fill",
+          "hint": "Attach a photo or clip; without one, the procedural source remains."
+        }
+      ],
+      "params": [
+        {
+          "key": "variant",
+          "index": 0,
+          "type": "int",
+          "label": "Treatment ID",
+          "def": 9,
+          "min": 0,
+          "max": 9,
+          "step": 1,
+          "group": "Style",
+          "hint": "The treatment selected by this style; keep it fixed to preserve the preset.",
+          "mutate": 0
+        },
+        {
+          "key": "depth",
+          "index": 1,
+          "type": "int",
+          "label": "Subdivision depth",
+          "def": 5,
+          "min": 2,
+          "max": 7,
+          "step": 1,
+          "group": "Structure"
+        },
+        {
+          "key": "rate",
+          "index": 2,
+          "type": "int",
+          "label": "Changes / loop",
+          "def": 3,
+          "min": 1,
+          "max": 12,
+          "step": 1,
+          "group": "Motion",
+          "mutate": 0.6
+        },
+        {
+          "key": "smoothness",
+          "index": 3,
+          "type": "range",
+          "label": "Smoothness",
+          "def": 0.9,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Motion",
+          "hint": "Fraction of each cycle spent easing into the next layout.",
+          "mutate": 0.4
+        },
+        {
+          "key": "amount",
+          "index": 4,
+          "type": "range",
+          "label": "Displacement",
+          "def": 0.07,
+          "min": 0,
+          "max": 0.2,
+          "step": 0.005,
+          "group": "Motion"
+        },
+        {
+          "key": "edge",
+          "index": 5,
+          "type": "range",
+          "label": "Edge width",
+          "def": 1.1,
+          "min": 0.5,
+          "max": 4,
+          "step": 0.1,
+          "group": "Edges"
+        },
+        {
+          "key": "smear",
+          "index": 6,
+          "type": "range",
+          "label": "Smear",
+          "def": 0.55,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Sampling"
+        },
+        {
+          "key": "ink",
+          "index": 7,
+          "type": "range",
+          "label": "Ink",
+          "def": 0.8,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Edges"
+        },
+        {
+          "key": "imageMix",
+          "index": 8,
+          "type": "range",
+          "label": "Source image",
+          "def": 1,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Source",
+          "hint": "Blend the attached media with the procedural source.",
+          "mutate": 0
+        },
+        {
+          "key": "topologyHold",
+          "index": 9,
+          "type": "int",
+          "label": "Topology hold",
+          "def": 4,
+          "min": 0,
+          "max": 8,
+          "step": 1,
+          "group": "Structure",
+          "hint": "Number of motion cycles before the partition layout evolves.",
+          "mutate": 0.3
+        },
+        {
+          "key": "splitDirection",
+          "index": 10,
+          "type": "select",
+          "label": "Split direction",
+          "def": "auto",
+          "group": "Structure",
+          "options": [
+            {
+              "v": "auto",
+              "l": "Auto"
+            },
+            {
+              "v": "horizontal",
+              "l": "Horizontal"
+            },
+            {
+              "v": "vertical",
+              "l": "Vertical"
+            },
+            {
+              "v": "alternating",
+              "l": "Alternating"
+            }
+          ]
+        },
+        {
+          "key": "cellScale",
+          "index": 11,
+          "type": "select",
+          "label": "Cell scale",
+          "def": "balanced",
+          "group": "Structure",
+          "options": [
+            {
+              "v": "anchors",
+              "l": "Anchors"
+            },
+            {
+              "v": "balanced",
+              "l": "Balanced"
+            },
+            {
+              "v": "fragments",
+              "l": "Fragments"
+            }
+          ]
+        },
+        {
+          "key": "motionCharacter",
+          "index": 12,
+          "type": "select",
+          "label": "Motion character",
+          "def": "glide",
+          "group": "Motion",
+          "options": [
+            {
+              "v": "glide",
+              "l": "Glide"
+            },
+            {
+              "v": "spring",
+              "l": "Spring"
+            },
+            {
+              "v": "steps",
+              "l": "Steps"
+            },
+            {
+              "v": "shutter",
+              "l": "Shutter"
+            }
+          ]
+        },
+        {
+          "key": "sourceSampling",
+          "index": 13,
+          "type": "select",
+          "label": "Source sampling",
+          "def": "intact",
+          "group": "Sampling",
+          "options": [
+            {
+              "v": "intact",
+              "l": "Intact"
+            },
+            {
+              "v": "stretch",
+              "l": "Stretch"
+            },
+            {
+              "v": "scanline",
+              "l": "Scanline"
+            },
+            {
+              "v": "mirror",
+              "l": "Mirror"
+            }
+          ]
+        },
+        {
+          "key": "edgeLanguage",
+          "index": 14,
+          "type": "select",
+          "label": "Edge language",
+          "def": "hairline",
+          "group": "Edges",
+          "options": [
+            {
+              "v": "hairline",
+              "l": "Hairline"
+            },
+            {
+              "v": "gutter",
+              "l": "Gutter"
+            },
+            {
+              "v": "double",
+              "l": "Double"
+            },
+            {
+              "v": "ticks",
+              "l": "Ticks"
+            },
+            {
+              "v": "none",
+              "l": "None"
+            }
+          ]
+        },
+        {
+          "key": "focalProtection",
+          "index": 15,
+          "type": "range",
+          "label": "Focal protection",
+          "def": 0,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Focus",
+          "hint": "Preserve the image around the focal point."
+        },
+        {
+          "key": "splitBias",
+          "index": 16,
+          "type": "range",
+          "label": "Split bias",
+          "def": 0,
+          "min": -0.5,
+          "max": 0.5,
+          "step": 0.01,
+          "group": "Structure",
+          "hint": "Push cut lines toward one side of each cell."
+        },
+        {
+          "key": "displacementAxis",
+          "index": 17,
+          "type": "select",
+          "label": "Displacement axis",
+          "def": "both",
+          "group": "Motion",
+          "hint": "Constrain tile movement to a direction or radial projection.",
+          "options": [
+            {
+              "v": "both",
+              "l": "Both"
+            },
+            {
+              "v": "horizontal",
+              "l": "Horizontal"
+            },
+            {
+              "v": "vertical",
+              "l": "Vertical"
+            },
+            {
+              "v": "radial",
+              "l": "Radial"
+            }
+          ]
+        },
+        {
+          "key": "focalPointX",
+          "index": 18,
+          "type": "range",
+          "label": "Focal point X",
+          "def": 0,
+          "min": -0.5,
+          "max": 0.5,
+          "step": 0.0025,
+          "group": "Focus",
+          "hint": "Drag the XY point onto the area to keep recognizable.",
+          "mutate": 0,
+          "part": {
+            "of": "focalPoint",
+            "kind": "point",
+            "i": 0,
+            "label": "Focal point"
+          }
+        },
+        {
+          "key": "focalPointY",
+          "index": 19,
+          "type": "range",
+          "label": "Focal point Y",
+          "def": 0,
+          "min": -0.5,
+          "max": 0.5,
+          "step": 0.0025,
+          "group": "Focus",
+          "hint": "Drag the XY point onto the area to keep recognizable.",
+          "mutate": 0,
+          "part": {
+            "of": "focalPoint",
+            "kind": "point",
+            "i": 1,
+            "label": "Focal point"
+          }
+        },
+        {
+          "key": "edgeTintR",
+          "index": 20,
+          "type": "range",
+          "label": "Edge color R",
+          "def": 0.9569,
+          "min": 0,
+          "max": 1,
+          "step": 0.001,
+          "group": "Edges",
+          "hint": "Color of subdivision strokes; gutters still use background ink.",
+          "mutate": 0.25,
+          "part": {
+            "of": "edgeTint",
+            "kind": "color",
+            "i": 0,
+            "label": "Edge color"
+          }
+        },
+        {
+          "key": "edgeTintG",
+          "index": 21,
+          "type": "range",
+          "label": "Edge color G",
+          "def": 0.949,
+          "min": 0,
+          "max": 1,
+          "step": 0.001,
+          "group": "Edges",
+          "hint": "Color of subdivision strokes; gutters still use background ink.",
+          "mutate": 0.25,
+          "part": {
+            "of": "edgeTint",
+            "kind": "color",
+            "i": 1,
+            "label": "Edge color"
+          }
+        },
+        {
+          "key": "edgeTintB",
+          "index": 22,
+          "type": "range",
+          "label": "Edge color B",
+          "def": 0.9098,
+          "min": 0,
+          "max": 1,
+          "step": 0.001,
+          "group": "Edges",
+          "hint": "Color of subdivision strokes; gutters still use background ink.",
+          "mutate": 0.25,
+          "part": {
+            "of": "edgeTint",
+            "kind": "color",
+            "i": 2,
+            "label": "Edge color"
+          }
+        },
+        {
+          "key": "echoLength",
+          "index": 23,
+          "type": "range",
+          "label": "Echo length",
+          "def": 1,
+          "min": 0,
+          "max": 3,
+          "step": 0.01,
+          "group": "Sampling",
+          "hint": "Spread the layered copies in Afterimage Atlas.",
+          "show": {
+            "param": "variant",
+            "is": 9
+          }
+        },
+        {
+          "key": "colorSeparation",
+          "index": 24,
+          "type": "range",
+          "label": "Color separation",
+          "def": 1,
+          "min": 0,
+          "max": 3,
+          "step": 0.01,
+          "group": "Sampling",
+          "hint": "Offset red and blue channels in Chromatic Register.",
+          "show": {
+            "param": "variant",
+            "is": 4
+          }
+        }
+      ]
+    }
+  ]
+}

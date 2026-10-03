@@ -1,0 +1,2339 @@
+{
+  "format": "motif-metal@1",
+  "source": "motif-kit@1",
+  "sdk": "1.2.0",
+  "id": "wallcast",
+  "name": "Wallcast",
+  "version": "1.0.0",
+  "author": "Echo Opera",
+  "description": "Ten image shaders for on-air graphics, cyber-city screens and EDM video walls. Attach a still or clip to a layer and treat it; a night-skyline test image plays when nothing is attached.",
+  "accent": "#FF9A2E",
+  "license": "All rights reserved",
+  "palettes": [
+    {
+      "id": "amber",
+      "name": "Amber Signal",
+      "bg": "#0A0B0D",
+      "ink": "#EBE8E1",
+      "a": [
+        "#FF9A2E",
+        "#5FE3D0",
+        "#FF4133"
+      ]
+    },
+    {
+      "id": "ice",
+      "name": "Ice Broadcast",
+      "bg": "#060A12",
+      "ink": "#EAF4FF",
+      "a": [
+        "#4CC9F0",
+        "#F72585",
+        "#FFD166"
+      ]
+    },
+    {
+      "id": "magenta",
+      "name": "Festival Magenta",
+      "bg": "#0B0710",
+      "ink": "#F6ECFF",
+      "a": [
+        "#FF2E93",
+        "#39F0C8",
+        "#FFB800"
+      ]
+    },
+    {
+      "id": "steel",
+      "name": "Steel Mono",
+      "bg": "#08090A",
+      "ink": "#F2F2EE",
+      "a": [
+        "#C9CCCF",
+        "#7C8790",
+        "#E8E4D8"
+      ]
+    }
+  ],
+  "styles": [
+    {
+      "id": "wallcast/prism-split",
+      "localId": "prism-split",
+      "name": "Prism Split",
+      "blurb": "Radial colour split and anamorphic light streaks that flare on every kick.",
+      "group": "Optics",
+      "tags": [
+        "chromatic",
+        "streak",
+        "lens",
+        "on-air"
+      ],
+      "palette": "amber",
+      "flash": true,
+      "cost": 1,
+      "passes": [
+        {
+          "function": "mfs_wallcast_prism_split_p0",
+          "source": "wallcast_prism_split_p0",
+          "scale": 0.5
+        },
+        {
+          "function": "mfs_wallcast_prism_split_p1",
+          "source": "wallcast_prism_split_p1",
+          "scale": 1
+        }
+      ],
+      "inputs": [
+        {
+          "id": "source",
+          "type": "media",
+          "label": "Source",
+          "fit": "fill",
+          "hint": "Still or clip to treat. Without one, the kit's test image plays."
+        }
+      ],
+      "params": [
+        {
+          "key": "split",
+          "index": 0,
+          "type": "range",
+          "label": "Split",
+          "def": 0.022,
+          "min": 0,
+          "max": 0.08,
+          "step": 0.001,
+          "mutate": 0.7
+        },
+        {
+          "key": "spectral",
+          "index": 1,
+          "type": "toggle",
+          "label": "Spectral fringe",
+          "def": true,
+          "hint": "Adds a seven-tap rainbow fringe on top of the RGB split.",
+          "mutate": 0.2
+        },
+        {
+          "key": "streak",
+          "index": 2,
+          "type": "range",
+          "label": "Streak gain",
+          "def": 0.9,
+          "min": 0,
+          "max": 2,
+          "step": 0.01,
+          "unit": "×",
+          "group": "Streaks",
+          "mutate": 0.6
+        },
+        {
+          "key": "streakLen",
+          "index": 3,
+          "type": "range",
+          "label": "Streak length",
+          "def": 0.22,
+          "min": 0.05,
+          "max": 0.5,
+          "step": 0.01,
+          "group": "Streaks",
+          "mutate": 0.5
+        },
+        {
+          "key": "streakCool",
+          "index": 4,
+          "type": "range",
+          "label": "Cool streak",
+          "def": 0.4,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Streaks",
+          "hint": "Cyan streak mixed in opposite the amber one.",
+          "mutate": 0.4
+        },
+        {
+          "key": "sweeps",
+          "index": 5,
+          "type": "int",
+          "label": "Light sweeps / loop",
+          "def": 1,
+          "min": 0,
+          "max": 4,
+          "step": 1,
+          "group": "Streaks",
+          "mutate": 0.3
+        },
+        {
+          "key": "beats",
+          "index": 6,
+          "type": "int",
+          "label": "Beats / loop",
+          "def": 4,
+          "min": 1,
+          "max": 16,
+          "step": 1,
+          "group": "Beat",
+          "hint": "Kick pulses per loop. The limiter caps this at 3 per second.",
+          "mutate": 0.3
+        },
+        {
+          "key": "hitAmt",
+          "index": 7,
+          "type": "range",
+          "label": "Beat drive",
+          "def": 1,
+          "min": 0,
+          "max": 1.5,
+          "step": 0.01,
+          "unit": "×",
+          "group": "Beat",
+          "hint": "How hard the internal beat drives the effect.",
+          "mutate": 0.5
+        },
+        {
+          "key": "hit",
+          "index": 8,
+          "type": "range",
+          "label": "Hit",
+          "def": 0,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Beat",
+          "hint": "Map a live kick band here to drive the effect from audio.",
+          "mutate": 0
+        },
+        {
+          "key": "exposure",
+          "index": 9,
+          "type": "range",
+          "label": "Exposure",
+          "def": 1,
+          "min": 0.4,
+          "max": 1.6,
+          "step": 0.01,
+          "unit": "×",
+          "group": "Finish",
+          "mutate": 0.2
+        },
+        {
+          "key": "vignette",
+          "index": 10,
+          "type": "range",
+          "label": "Vignette",
+          "def": 0.4,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Finish",
+          "mutate": 0.3
+        },
+        {
+          "key": "hud",
+          "index": 11,
+          "type": "toggle",
+          "label": "HUD frame",
+          "def": false,
+          "group": "HUD",
+          "hint": "Corner brackets, numeric readout and a beat trace.",
+          "mutate": 0
+        },
+        {
+          "key": "readout",
+          "index": 12,
+          "type": "range",
+          "label": "Readout",
+          "def": 128,
+          "min": 0,
+          "max": 9999,
+          "step": 1,
+          "group": "HUD",
+          "hint": "Shown as four digits. Key it or map a data channel to it.",
+          "mutate": 0,
+          "show": {
+            "param": "hud",
+            "is": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "wallcast/halftone-pulse",
+      "localId": "halftone-pulse",
+      "name": "Halftone Pulse",
+      "blurb": "Three halftone screens at three angles. Dots breathe with the kick.",
+      "group": "Print and pixel",
+      "tags": [
+        "halftone",
+        "print",
+        "dots",
+        "on-air"
+      ],
+      "palette": "amber",
+      "flash": false,
+      "cost": 1,
+      "passes": [
+        {
+          "function": "mfs_wallcast_halftone_pulse_p0",
+          "source": "wallcast_halftone_pulse_p0",
+          "scale": 0.5
+        },
+        {
+          "function": "mfs_wallcast_halftone_pulse_p1",
+          "source": "wallcast_halftone_pulse_p1",
+          "scale": 1
+        }
+      ],
+      "inputs": [
+        {
+          "id": "source",
+          "type": "media",
+          "label": "Source",
+          "fit": "fill",
+          "hint": "Still or clip to treat. Without one, the kit's test image plays."
+        }
+      ],
+      "params": [
+        {
+          "key": "cells",
+          "index": 0,
+          "type": "int",
+          "label": "Screen cells",
+          "def": 96,
+          "min": 30,
+          "max": 200,
+          "step": 1,
+          "hint": "Cells across the short side of the frame.",
+          "mutate": 0.4
+        },
+        {
+          "key": "inkMode",
+          "index": 1,
+          "type": "select",
+          "label": "Ink mode",
+          "def": "light",
+          "hint": "Light adds RGB dots to the ground. Ink subtracts CMY from paper.",
+          "mutate": 0.3,
+          "options": [
+            {
+              "v": "light",
+              "l": "Light on dark"
+            },
+            {
+              "v": "print",
+              "l": "Ink on paper"
+            }
+          ]
+        },
+        {
+          "key": "gain",
+          "index": 2,
+          "type": "range",
+          "label": "Dot gain",
+          "def": 0.72,
+          "min": 0.4,
+          "max": 1,
+          "step": 0.01,
+          "mutate": 0.5
+        },
+        {
+          "key": "drift",
+          "index": 3,
+          "type": "range",
+          "label": "Angle drift",
+          "def": 0.03,
+          "min": 0,
+          "max": 0.15,
+          "step": 0.005,
+          "mutate": 0.4
+        },
+        {
+          "key": "registration",
+          "index": 4,
+          "type": "range",
+          "label": "Registration",
+          "def": 0.25,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "hint": "Offsets the red and blue screens like a loose print run.",
+          "mutate": 0.4
+        },
+        {
+          "key": "under",
+          "index": 5,
+          "type": "range",
+          "label": "Source under-print",
+          "def": 0.05,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "hint": "Light mode only. Lets the original image show under the dots.",
+          "mutate": 0.3
+        },
+        {
+          "key": "beats",
+          "index": 6,
+          "type": "int",
+          "label": "Beats / loop",
+          "def": 4,
+          "min": 1,
+          "max": 16,
+          "step": 1,
+          "group": "Beat",
+          "hint": "Kick pulses per loop. The limiter caps this at 3 per second.",
+          "mutate": 0.3
+        },
+        {
+          "key": "hitAmt",
+          "index": 7,
+          "type": "range",
+          "label": "Beat drive",
+          "def": 1,
+          "min": 0,
+          "max": 1.5,
+          "step": 0.01,
+          "unit": "×",
+          "group": "Beat",
+          "hint": "How hard the internal beat drives the effect.",
+          "mutate": 0.5
+        },
+        {
+          "key": "hit",
+          "index": 8,
+          "type": "range",
+          "label": "Hit",
+          "def": 0,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Beat",
+          "hint": "Map a live kick band here to drive the effect from audio.",
+          "mutate": 0
+        },
+        {
+          "key": "exposure",
+          "index": 9,
+          "type": "range",
+          "label": "Exposure",
+          "def": 1,
+          "min": 0.4,
+          "max": 1.6,
+          "step": 0.01,
+          "unit": "×",
+          "group": "Finish",
+          "mutate": 0.2
+        },
+        {
+          "key": "vignette",
+          "index": 10,
+          "type": "range",
+          "label": "Vignette",
+          "def": 0.4,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Finish",
+          "mutate": 0.3
+        },
+        {
+          "key": "hud",
+          "index": 11,
+          "type": "toggle",
+          "label": "HUD frame",
+          "def": false,
+          "group": "HUD",
+          "hint": "Corner brackets, numeric readout and a beat trace.",
+          "mutate": 0
+        },
+        {
+          "key": "readout",
+          "index": 12,
+          "type": "range",
+          "label": "Readout",
+          "def": 128,
+          "min": 0,
+          "max": 9999,
+          "step": 1,
+          "group": "HUD",
+          "hint": "Shown as four digits. Key it or map a data channel to it.",
+          "mutate": 0,
+          "show": {
+            "param": "hud",
+            "is": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "wallcast/slice-shift",
+      "localId": "slice-shift",
+      "name": "Slice Shift",
+      "blurb": "Row and column tears with an RGB split. Cuts on the beat, snaps back between.",
+      "group": "Glitch and light",
+      "tags": [
+        "glitch",
+        "tear",
+        "scanline",
+        "edm"
+      ],
+      "palette": "magenta",
+      "flash": true,
+      "cost": 1,
+      "passes": [
+        {
+          "function": "mfs_wallcast_slice_shift_p0",
+          "source": "wallcast_slice_shift_p0",
+          "scale": 0.5
+        },
+        {
+          "function": "mfs_wallcast_slice_shift_p1",
+          "source": "wallcast_slice_shift_p1",
+          "scale": 1
+        }
+      ],
+      "inputs": [
+        {
+          "id": "source",
+          "type": "media",
+          "label": "Source",
+          "fit": "fill",
+          "hint": "Still or clip to treat. Without one, the kit's test image plays."
+        }
+      ],
+      "params": [
+        {
+          "key": "bands",
+          "index": 0,
+          "type": "int",
+          "label": "Bands",
+          "def": 24,
+          "min": 6,
+          "max": 64,
+          "step": 1,
+          "mutate": 0.5
+        },
+        {
+          "key": "rate",
+          "index": 1,
+          "type": "int",
+          "label": "Changes / loop",
+          "def": 6,
+          "min": 1,
+          "max": 12,
+          "step": 1,
+          "hint": "Tear pattern changes per loop. The limiter caps it at 3 per second.",
+          "mutate": 0.5
+        },
+        {
+          "key": "tear",
+          "index": 2,
+          "type": "range",
+          "label": "Tear",
+          "def": 0.55,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "mutate": 0.7
+        },
+        {
+          "key": "blocks",
+          "index": 3,
+          "type": "range",
+          "label": "Column blocks",
+          "def": 0.4,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "mutate": 0.5
+        },
+        {
+          "key": "rgb",
+          "index": 4,
+          "type": "range",
+          "label": "RGB split",
+          "def": 0.5,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "mutate": 0.5
+        },
+        {
+          "key": "scan",
+          "index": 5,
+          "type": "range",
+          "label": "Scanlines",
+          "def": 0.5,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "mutate": 0.3
+        },
+        {
+          "key": "beats",
+          "index": 6,
+          "type": "int",
+          "label": "Beats / loop",
+          "def": 4,
+          "min": 1,
+          "max": 16,
+          "step": 1,
+          "group": "Beat",
+          "hint": "Kick pulses per loop. The limiter caps this at 3 per second.",
+          "mutate": 0.3
+        },
+        {
+          "key": "hitAmt",
+          "index": 7,
+          "type": "range",
+          "label": "Beat drive",
+          "def": 1,
+          "min": 0,
+          "max": 1.5,
+          "step": 0.01,
+          "unit": "×",
+          "group": "Beat",
+          "hint": "How hard the internal beat drives the effect.",
+          "mutate": 0.5
+        },
+        {
+          "key": "hit",
+          "index": 8,
+          "type": "range",
+          "label": "Hit",
+          "def": 0,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Beat",
+          "hint": "Map a live kick band here to drive the effect from audio.",
+          "mutate": 0
+        },
+        {
+          "key": "exposure",
+          "index": 9,
+          "type": "range",
+          "label": "Exposure",
+          "def": 1,
+          "min": 0.4,
+          "max": 1.6,
+          "step": 0.01,
+          "unit": "×",
+          "group": "Finish",
+          "mutate": 0.2
+        },
+        {
+          "key": "vignette",
+          "index": 10,
+          "type": "range",
+          "label": "Vignette",
+          "def": 0.4,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Finish",
+          "mutate": 0.3
+        },
+        {
+          "key": "hud",
+          "index": 11,
+          "type": "toggle",
+          "label": "HUD frame",
+          "def": false,
+          "group": "HUD",
+          "hint": "Corner brackets, numeric readout and a beat trace.",
+          "mutate": 0
+        },
+        {
+          "key": "readout",
+          "index": 12,
+          "type": "range",
+          "label": "Readout",
+          "def": 128,
+          "min": 0,
+          "max": 9999,
+          "step": 1,
+          "group": "HUD",
+          "hint": "Shown as four digits. Key it or map a data channel to it.",
+          "mutate": 0,
+          "show": {
+            "param": "hud",
+            "is": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "wallcast/depth-stack",
+      "localId": "depth-stack",
+      "name": "Depth Stack",
+      "blurb": "Background, mid and foreground at three depths. The foreground keeps its alpha and casts a shadow.",
+      "group": "Depth and data",
+      "tags": [
+        "parallax",
+        "layers",
+        "depth",
+        "on-air"
+      ],
+      "palette": "amber",
+      "flash": false,
+      "cost": 1,
+      "passes": [
+        {
+          "function": "mfs_wallcast_depth_stack_p0",
+          "source": "wallcast_depth_stack_p0",
+          "scale": 0.5
+        },
+        {
+          "function": "mfs_wallcast_depth_stack_p1",
+          "source": "wallcast_depth_stack_p1",
+          "scale": 1
+        }
+      ],
+      "inputs": [
+        {
+          "id": "source",
+          "type": "media",
+          "label": "Background",
+          "fit": "fill",
+          "hint": "Backdrop photo or clip. It also feeds the mid layer."
+        },
+        {
+          "id": "fore",
+          "type": "media",
+          "label": "Foreground",
+          "fit": "fit",
+          "hint": "Cut-out or product shot. Transparent PNGs keep their alpha."
+        }
+      ],
+      "params": [
+        {
+          "key": "cameraX",
+          "index": 0,
+          "type": "range",
+          "label": "Camera X",
+          "def": 0,
+          "min": -0.5,
+          "max": 0.5,
+          "step": 0.0025,
+          "group": "Camera",
+          "hint": "Parallax offset. Key or map it for a camera move.",
+          "part": {
+            "of": "camera",
+            "kind": "point",
+            "i": 0,
+            "label": "Camera"
+          }
+        },
+        {
+          "key": "cameraY",
+          "index": 1,
+          "type": "range",
+          "label": "Camera Y",
+          "def": 0,
+          "min": -0.5,
+          "max": 0.5,
+          "step": 0.0025,
+          "group": "Camera",
+          "hint": "Parallax offset. Key or map it for a camera move.",
+          "part": {
+            "of": "camera",
+            "kind": "point",
+            "i": 1,
+            "label": "Camera"
+          }
+        },
+        {
+          "key": "orbit",
+          "index": 2,
+          "type": "range",
+          "label": "Orbit",
+          "def": 0.5,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Camera",
+          "hint": "Loops one slow circle per loop.",
+          "mutate": 0.5
+        },
+        {
+          "key": "depthBg",
+          "index": 3,
+          "type": "range",
+          "label": "Background depth",
+          "def": 0.35,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Depth",
+          "mutate": 0.5
+        },
+        {
+          "key": "depthMid",
+          "index": 4,
+          "type": "range",
+          "label": "Mid depth",
+          "def": 0.6,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Depth",
+          "mutate": 0.5
+        },
+        {
+          "key": "depthFore",
+          "index": 5,
+          "type": "range",
+          "label": "Foreground depth",
+          "def": 1,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Depth",
+          "mutate": 0.5
+        },
+        {
+          "key": "midBlend",
+          "index": 6,
+          "type": "range",
+          "label": "Mid layer",
+          "def": 0.7,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Depth",
+          "hint": "Screen-blends a deeper copy of the background.",
+          "mutate": 0.5
+        },
+        {
+          "key": "shadow",
+          "index": 7,
+          "type": "range",
+          "label": "Shadow",
+          "def": 0.55,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Foreground",
+          "mutate": 0.4
+        },
+        {
+          "key": "lumaKey",
+          "index": 8,
+          "type": "toggle",
+          "label": "Key out dark",
+          "def": true,
+          "group": "Foreground",
+          "hint": "Drops near-black pixels of an opaque foreground photo.",
+          "mutate": 0
+        },
+        {
+          "key": "keyLevel",
+          "index": 9,
+          "type": "range",
+          "label": "Key level",
+          "def": 0.03,
+          "min": 0.005,
+          "max": 0.2,
+          "step": 0.005,
+          "group": "Foreground",
+          "mutate": 0,
+          "log": true,
+          "show": {
+            "param": "lumaKey",
+            "is": true
+          }
+        },
+        {
+          "key": "sweeps",
+          "index": 10,
+          "type": "int",
+          "label": "Light sweeps / loop",
+          "def": 1,
+          "min": 0,
+          "max": 3,
+          "step": 1,
+          "mutate": 0.3
+        },
+        {
+          "key": "beats",
+          "index": 11,
+          "type": "int",
+          "label": "Beats / loop",
+          "def": 4,
+          "min": 1,
+          "max": 16,
+          "step": 1,
+          "group": "Beat",
+          "hint": "Kick pulses per loop. The limiter caps this at 3 per second.",
+          "mutate": 0.3
+        },
+        {
+          "key": "hitAmt",
+          "index": 12,
+          "type": "range",
+          "label": "Beat drive",
+          "def": 1,
+          "min": 0,
+          "max": 1.5,
+          "step": 0.01,
+          "unit": "×",
+          "group": "Beat",
+          "hint": "How hard the internal beat drives the effect.",
+          "mutate": 0.5
+        },
+        {
+          "key": "hit",
+          "index": 13,
+          "type": "range",
+          "label": "Hit",
+          "def": 0,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Beat",
+          "hint": "Map a live kick band here to drive the effect from audio.",
+          "mutate": 0
+        },
+        {
+          "key": "exposure",
+          "index": 14,
+          "type": "range",
+          "label": "Exposure",
+          "def": 1,
+          "min": 0.4,
+          "max": 1.6,
+          "step": 0.01,
+          "unit": "×",
+          "group": "Finish",
+          "mutate": 0.2
+        },
+        {
+          "key": "vignette",
+          "index": 15,
+          "type": "range",
+          "label": "Vignette",
+          "def": 0.4,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Finish",
+          "mutate": 0.3
+        },
+        {
+          "key": "hud",
+          "index": 16,
+          "type": "toggle",
+          "label": "HUD frame",
+          "def": false,
+          "group": "HUD",
+          "hint": "Corner brackets, numeric readout and a beat trace.",
+          "mutate": 0
+        },
+        {
+          "key": "readout",
+          "index": 17,
+          "type": "range",
+          "label": "Readout",
+          "def": 128,
+          "min": 0,
+          "max": 9999,
+          "step": 1,
+          "group": "HUD",
+          "hint": "Shown as four digits. Key it or map a data channel to it.",
+          "mutate": 0,
+          "show": {
+            "param": "hud",
+            "is": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "wallcast/contour-radar",
+      "localId": "contour-radar",
+      "name": "Contour Radar",
+      "blurb": "Iso-luminance contours with a radar sweep, range rings and a reticle that reads out the local level.",
+      "group": "Depth and data",
+      "tags": [
+        "contour",
+        "radar",
+        "hud",
+        "data",
+        "cyber-city"
+      ],
+      "palette": "amber",
+      "flash": false,
+      "cost": 1,
+      "passes": [
+        {
+          "function": "mfs_wallcast_contour_radar_p0",
+          "source": "wallcast_contour_radar_p0",
+          "scale": 0.5
+        },
+        {
+          "function": "mfs_wallcast_contour_radar_p1",
+          "source": "wallcast_contour_radar_p1",
+          "scale": 1
+        }
+      ],
+      "inputs": [
+        {
+          "id": "source",
+          "type": "media",
+          "label": "Source",
+          "fit": "fill",
+          "hint": "Still or clip to treat. Without one, the kit's test image plays."
+        }
+      ],
+      "params": [
+        {
+          "key": "levels",
+          "index": 0,
+          "type": "int",
+          "label": "Contour levels",
+          "def": 18,
+          "min": 4,
+          "max": 40,
+          "step": 1,
+          "mutate": 0.5
+        },
+        {
+          "key": "major",
+          "index": 1,
+          "type": "int",
+          "label": "Major interval",
+          "def": 4,
+          "min": 2,
+          "max": 8,
+          "step": 1,
+          "mutate": 0.3
+        },
+        {
+          "key": "drift",
+          "index": 2,
+          "type": "int",
+          "label": "Contour drift",
+          "def": 1,
+          "min": -3,
+          "max": 3,
+          "step": 1,
+          "hint": "Whole major intervals per loop, so the loop closes.",
+          "mutate": 0.3
+        },
+        {
+          "key": "sweeps",
+          "index": 3,
+          "type": "int",
+          "label": "Radar sweeps / loop",
+          "def": 1,
+          "min": 1,
+          "max": 3,
+          "step": 1,
+          "group": "Radar",
+          "mutate": 0.3
+        },
+        {
+          "key": "trail",
+          "index": 4,
+          "type": "range",
+          "label": "Sweep trail",
+          "def": 5,
+          "min": 1,
+          "max": 12,
+          "step": 0.1,
+          "group": "Radar",
+          "mutate": 0.5
+        },
+        {
+          "key": "rings",
+          "index": 5,
+          "type": "toggle",
+          "label": "Range rings",
+          "def": true,
+          "group": "Radar",
+          "mutate": 0
+        },
+        {
+          "key": "showReticle",
+          "index": 6,
+          "type": "toggle",
+          "label": "Reticle",
+          "def": true,
+          "group": "Reticle",
+          "mutate": 0
+        },
+        {
+          "key": "reticleX",
+          "index": 7,
+          "type": "range",
+          "label": "Reticle position X",
+          "def": 0.15,
+          "min": -0.9,
+          "max": 0.9,
+          "step": 0.0045,
+          "group": "Reticle",
+          "hint": "Key or map it to follow a subject.",
+          "part": {
+            "of": "reticle",
+            "kind": "point",
+            "i": 0,
+            "label": "Reticle position"
+          }
+        },
+        {
+          "key": "reticleY",
+          "index": 8,
+          "type": "range",
+          "label": "Reticle position Y",
+          "def": 0.1,
+          "min": -0.9,
+          "max": 0.9,
+          "step": 0.0045,
+          "group": "Reticle",
+          "hint": "Key or map it to follow a subject.",
+          "part": {
+            "of": "reticle",
+            "kind": "point",
+            "i": 1,
+            "label": "Reticle position"
+          }
+        },
+        {
+          "key": "beats",
+          "index": 9,
+          "type": "int",
+          "label": "Beats / loop",
+          "def": 4,
+          "min": 1,
+          "max": 16,
+          "step": 1,
+          "group": "Beat",
+          "hint": "Kick pulses per loop. The limiter caps this at 3 per second.",
+          "mutate": 0.3
+        },
+        {
+          "key": "hitAmt",
+          "index": 10,
+          "type": "range",
+          "label": "Beat drive",
+          "def": 1,
+          "min": 0,
+          "max": 1.5,
+          "step": 0.01,
+          "unit": "×",
+          "group": "Beat",
+          "hint": "How hard the internal beat drives the effect.",
+          "mutate": 0.5
+        },
+        {
+          "key": "hit",
+          "index": 11,
+          "type": "range",
+          "label": "Hit",
+          "def": 0,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Beat",
+          "hint": "Map a live kick band here to drive the effect from audio.",
+          "mutate": 0
+        },
+        {
+          "key": "exposure",
+          "index": 12,
+          "type": "range",
+          "label": "Exposure",
+          "def": 1,
+          "min": 0.4,
+          "max": 1.6,
+          "step": 0.01,
+          "unit": "×",
+          "group": "Finish",
+          "mutate": 0.2
+        },
+        {
+          "key": "vignette",
+          "index": 13,
+          "type": "range",
+          "label": "Vignette",
+          "def": 0.4,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Finish",
+          "mutate": 0.3
+        },
+        {
+          "key": "hud",
+          "index": 14,
+          "type": "toggle",
+          "label": "HUD frame",
+          "def": true,
+          "group": "HUD",
+          "hint": "Corner brackets, numeric readout and a beat trace.",
+          "mutate": 0
+        },
+        {
+          "key": "readout",
+          "index": 15,
+          "type": "range",
+          "label": "Readout",
+          "def": 128,
+          "min": 0,
+          "max": 9999,
+          "step": 1,
+          "group": "HUD",
+          "hint": "Shown as four digits. Key it or map a data channel to it.",
+          "mutate": 0,
+          "show": {
+            "param": "hud",
+            "is": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "wallcast/led-wall",
+      "localId": "led-wall",
+      "name": "LED Wall",
+      "blurb": "A pixel-mapped LED panel with sub-pixels, cell gaps, bloom, a scan wipe and sparkle.",
+      "group": "Print and pixel",
+      "tags": [
+        "led",
+        "pixel",
+        "wall",
+        "edm",
+        "cyber-city"
+      ],
+      "palette": "amber",
+      "flash": true,
+      "cost": 1,
+      "passes": [
+        {
+          "function": "mfs_wallcast_led_wall_p0",
+          "source": "wallcast_led_wall_p0",
+          "scale": 0.5
+        },
+        {
+          "function": "mfs_wallcast_led_wall_p1",
+          "source": "wallcast_led_wall_p1",
+          "scale": 1
+        }
+      ],
+      "inputs": [
+        {
+          "id": "source",
+          "type": "media",
+          "label": "Source",
+          "fit": "fill",
+          "hint": "Still or clip to treat. Without one, the kit's test image plays."
+        }
+      ],
+      "params": [
+        {
+          "key": "cells",
+          "index": 0,
+          "type": "int",
+          "label": "Cells high",
+          "def": 72,
+          "min": 24,
+          "max": 160,
+          "step": 1,
+          "hint": "Panel pitch. Set it to match the real wall.",
+          "mutate": 0.4
+        },
+        {
+          "key": "shape",
+          "index": 1,
+          "type": "select",
+          "label": "Cell shape",
+          "def": "square",
+          "mutate": 0.2,
+          "options": [
+            {
+              "v": "square",
+              "l": "Square"
+            },
+            {
+              "v": "round",
+              "l": "Round"
+            }
+          ]
+        },
+        {
+          "key": "gap",
+          "index": 2,
+          "type": "range",
+          "label": "Cell gap",
+          "def": 0.4,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "mutate": 0.4
+        },
+        {
+          "key": "subpixel",
+          "index": 3,
+          "type": "range",
+          "label": "Sub-pixels",
+          "def": 0.5,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "mutate": 0.4
+        },
+        {
+          "key": "bloom",
+          "index": 4,
+          "type": "range",
+          "label": "Bloom",
+          "def": 0.5,
+          "min": 0,
+          "max": 1.5,
+          "step": 0.01,
+          "mutate": 0.5
+        },
+        {
+          "key": "sparkle",
+          "index": 5,
+          "type": "range",
+          "label": "Sparkle",
+          "def": 0.3,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "hint": "Time-slotted, so the limiter caps its rate.",
+          "mutate": 0.5
+        },
+        {
+          "key": "wipes",
+          "index": 6,
+          "type": "int",
+          "label": "Scan wipes / loop",
+          "def": 1,
+          "min": 0,
+          "max": 3,
+          "step": 1,
+          "mutate": 0.3
+        },
+        {
+          "key": "beats",
+          "index": 7,
+          "type": "int",
+          "label": "Beats / loop",
+          "def": 4,
+          "min": 1,
+          "max": 16,
+          "step": 1,
+          "group": "Beat",
+          "hint": "Kick pulses per loop. The limiter caps this at 3 per second.",
+          "mutate": 0.3
+        },
+        {
+          "key": "hitAmt",
+          "index": 8,
+          "type": "range",
+          "label": "Beat drive",
+          "def": 1,
+          "min": 0,
+          "max": 1.5,
+          "step": 0.01,
+          "unit": "×",
+          "group": "Beat",
+          "hint": "How hard the internal beat drives the effect.",
+          "mutate": 0.5
+        },
+        {
+          "key": "hit",
+          "index": 9,
+          "type": "range",
+          "label": "Hit",
+          "def": 0,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Beat",
+          "hint": "Map a live kick band here to drive the effect from audio.",
+          "mutate": 0
+        },
+        {
+          "key": "exposure",
+          "index": 10,
+          "type": "range",
+          "label": "Exposure",
+          "def": 1,
+          "min": 0.4,
+          "max": 1.6,
+          "step": 0.01,
+          "unit": "×",
+          "group": "Finish",
+          "mutate": 0.2
+        },
+        {
+          "key": "vignette",
+          "index": 11,
+          "type": "range",
+          "label": "Vignette",
+          "def": 0.4,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Finish",
+          "mutate": 0.3
+        },
+        {
+          "key": "hud",
+          "index": 12,
+          "type": "toggle",
+          "label": "HUD frame",
+          "def": true,
+          "group": "HUD",
+          "hint": "Corner brackets, numeric readout and a beat trace.",
+          "mutate": 0
+        },
+        {
+          "key": "readout",
+          "index": 13,
+          "type": "range",
+          "label": "Readout",
+          "def": 128,
+          "min": 0,
+          "max": 9999,
+          "step": 1,
+          "group": "HUD",
+          "hint": "Shown as four digits. Key it or map a data channel to it.",
+          "mutate": 0,
+          "show": {
+            "param": "hud",
+            "is": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "wallcast/neon-trace",
+      "localId": "neon-trace",
+      "name": "Neon Trace",
+      "blurb": "Three edge-detection scales drawn as light, with a cycling palette and a travelling gate.",
+      "group": "Glitch and light",
+      "tags": [
+        "edge",
+        "neon",
+        "glow",
+        "cyber-city"
+      ],
+      "palette": "ice",
+      "flash": true,
+      "cost": 1,
+      "passes": [
+        {
+          "function": "mfs_wallcast_neon_trace_p0",
+          "source": "wallcast_neon_trace_p0",
+          "scale": 0.5
+        },
+        {
+          "function": "mfs_wallcast_neon_trace_p1",
+          "source": "wallcast_neon_trace_p1",
+          "scale": 1
+        }
+      ],
+      "inputs": [
+        {
+          "id": "source",
+          "type": "media",
+          "label": "Source",
+          "fit": "fill",
+          "hint": "Still or clip to treat. Without one, the kit's test image plays."
+        }
+      ],
+      "params": [
+        {
+          "key": "width",
+          "index": 0,
+          "type": "range",
+          "label": "Line width",
+          "def": 1.5,
+          "min": 0.5,
+          "max": 4,
+          "step": 0.1,
+          "unit": "px",
+          "mutate": 0.5
+        },
+        {
+          "key": "glow",
+          "index": 1,
+          "type": "range",
+          "label": "Glow",
+          "def": 0.9,
+          "min": 0,
+          "max": 2,
+          "step": 0.01,
+          "mutate": 0.6
+        },
+        {
+          "key": "spread",
+          "index": 2,
+          "type": "range",
+          "label": "Glow spread",
+          "def": 1,
+          "min": 0.5,
+          "max": 2,
+          "step": 0.01,
+          "mutate": 0.4
+        },
+        {
+          "key": "gate",
+          "index": 3,
+          "type": "int",
+          "label": "Gate sweeps / loop",
+          "def": 1,
+          "min": 0,
+          "max": 3,
+          "step": 1,
+          "mutate": 0.3
+        },
+        {
+          "key": "colorMode",
+          "index": 4,
+          "type": "select",
+          "label": "Colour",
+          "def": "spectrum",
+          "group": "Colour",
+          "mutate": 0.2,
+          "options": [
+            {
+              "v": "spectrum",
+              "l": "Spectrum"
+            },
+            {
+              "v": "accents",
+              "l": "Palette accents"
+            },
+            {
+              "v": "mono",
+              "l": "Mono ink"
+            }
+          ]
+        },
+        {
+          "key": "hueCycles",
+          "index": 5,
+          "type": "int",
+          "label": "Hue cycles / loop",
+          "def": 1,
+          "min": 0,
+          "max": 3,
+          "step": 1,
+          "group": "Colour",
+          "mutate": 0.3
+        },
+        {
+          "key": "hueSpan",
+          "index": 6,
+          "type": "range",
+          "label": "Hue span",
+          "def": 0.35,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Colour",
+          "mutate": 0.4
+        },
+        {
+          "key": "base",
+          "index": 7,
+          "type": "range",
+          "label": "Source under-glow",
+          "def": 0.12,
+          "min": 0,
+          "max": 0.5,
+          "step": 0.01,
+          "group": "Colour",
+          "mutate": 0.4
+        },
+        {
+          "key": "beats",
+          "index": 8,
+          "type": "int",
+          "label": "Beats / loop",
+          "def": 4,
+          "min": 1,
+          "max": 16,
+          "step": 1,
+          "group": "Beat",
+          "hint": "Kick pulses per loop. The limiter caps this at 3 per second.",
+          "mutate": 0.3
+        },
+        {
+          "key": "hitAmt",
+          "index": 9,
+          "type": "range",
+          "label": "Beat drive",
+          "def": 1,
+          "min": 0,
+          "max": 1.5,
+          "step": 0.01,
+          "unit": "×",
+          "group": "Beat",
+          "hint": "How hard the internal beat drives the effect.",
+          "mutate": 0.5
+        },
+        {
+          "key": "hit",
+          "index": 10,
+          "type": "range",
+          "label": "Hit",
+          "def": 0,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Beat",
+          "hint": "Map a live kick band here to drive the effect from audio.",
+          "mutate": 0
+        },
+        {
+          "key": "exposure",
+          "index": 11,
+          "type": "range",
+          "label": "Exposure",
+          "def": 1,
+          "min": 0.4,
+          "max": 1.6,
+          "step": 0.01,
+          "unit": "×",
+          "group": "Finish",
+          "mutate": 0.2
+        },
+        {
+          "key": "vignette",
+          "index": 12,
+          "type": "range",
+          "label": "Vignette",
+          "def": 0.4,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Finish",
+          "mutate": 0.3
+        },
+        {
+          "key": "hud",
+          "index": 13,
+          "type": "toggle",
+          "label": "HUD frame",
+          "def": false,
+          "group": "HUD",
+          "hint": "Corner brackets, numeric readout and a beat trace.",
+          "mutate": 0
+        },
+        {
+          "key": "readout",
+          "index": 14,
+          "type": "range",
+          "label": "Readout",
+          "def": 128,
+          "min": 0,
+          "max": 9999,
+          "step": 1,
+          "group": "HUD",
+          "hint": "Shown as four digits. Key it or map a data channel to it.",
+          "mutate": 0,
+          "show": {
+            "param": "hud",
+            "is": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "wallcast/glyph-mosaic",
+      "localId": "glyph-mosaic",
+      "name": "Glyph Mosaic",
+      "blurb": "The image rebuilt from numerals and marks by brightness, with falling data trails.",
+      "group": "Print and pixel",
+      "tags": [
+        "glyph",
+        "ascii",
+        "data",
+        "typography",
+        "on-air"
+      ],
+      "palette": "amber",
+      "flash": false,
+      "cost": 1,
+      "passes": [
+        {
+          "function": "mfs_wallcast_glyph_mosaic_p0",
+          "source": "wallcast_glyph_mosaic_p0",
+          "scale": 0.5
+        },
+        {
+          "function": "mfs_wallcast_glyph_mosaic_p1",
+          "source": "wallcast_glyph_mosaic_p1",
+          "scale": 1
+        }
+      ],
+      "inputs": [
+        {
+          "id": "source",
+          "type": "media",
+          "label": "Source",
+          "fit": "fill",
+          "hint": "Still or clip to treat. Without one, the kit's test image plays."
+        }
+      ],
+      "params": [
+        {
+          "key": "cols",
+          "index": 0,
+          "type": "int",
+          "label": "Columns",
+          "def": 96,
+          "min": 40,
+          "max": 160,
+          "step": 1,
+          "mutate": 0.4
+        },
+        {
+          "key": "rain",
+          "index": 1,
+          "type": "int",
+          "label": "Rain speed",
+          "def": 1,
+          "min": 0,
+          "max": 4,
+          "step": 1,
+          "hint": "Whole cycles per loop. 0 stops the rain.",
+          "mutate": 0.3
+        },
+        {
+          "key": "flicker",
+          "index": 2,
+          "type": "range",
+          "label": "Flicker",
+          "def": 0.35,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "hint": "Live cells swap glyphs. Rate is capped by the limiter.",
+          "mutate": 0.5
+        },
+        {
+          "key": "feed",
+          "index": 3,
+          "type": "range",
+          "label": "Data feed",
+          "def": 0.5,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Data",
+          "hint": "Map a data channel here. Density fills as it rises.",
+          "mutate": 0
+        },
+        {
+          "key": "contrast",
+          "index": 4,
+          "type": "range",
+          "label": "Contrast",
+          "def": 1.1,
+          "min": 0.5,
+          "max": 2,
+          "step": 0.01,
+          "group": "Data",
+          "mutate": 0.4
+        },
+        {
+          "key": "tone",
+          "index": 5,
+          "type": "select",
+          "label": "Tone",
+          "def": "source",
+          "group": "Data",
+          "mutate": 0.2,
+          "options": [
+            {
+              "v": "source",
+              "l": "Source colour"
+            },
+            {
+              "v": "amber",
+              "l": "Palette amber"
+            },
+            {
+              "v": "ink",
+              "l": "Mono ink"
+            }
+          ]
+        },
+        {
+          "key": "beats",
+          "index": 6,
+          "type": "int",
+          "label": "Beats / loop",
+          "def": 4,
+          "min": 1,
+          "max": 16,
+          "step": 1,
+          "group": "Beat",
+          "hint": "Kick pulses per loop. The limiter caps this at 3 per second.",
+          "mutate": 0.3
+        },
+        {
+          "key": "hitAmt",
+          "index": 7,
+          "type": "range",
+          "label": "Beat drive",
+          "def": 1,
+          "min": 0,
+          "max": 1.5,
+          "step": 0.01,
+          "unit": "×",
+          "group": "Beat",
+          "hint": "How hard the internal beat drives the effect.",
+          "mutate": 0.5
+        },
+        {
+          "key": "hit",
+          "index": 8,
+          "type": "range",
+          "label": "Hit",
+          "def": 0,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Beat",
+          "hint": "Map a live kick band here to drive the effect from audio.",
+          "mutate": 0
+        },
+        {
+          "key": "exposure",
+          "index": 9,
+          "type": "range",
+          "label": "Exposure",
+          "def": 1,
+          "min": 0.4,
+          "max": 1.6,
+          "step": 0.01,
+          "unit": "×",
+          "group": "Finish",
+          "mutate": 0.2
+        },
+        {
+          "key": "vignette",
+          "index": 10,
+          "type": "range",
+          "label": "Vignette",
+          "def": 0.4,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Finish",
+          "mutate": 0.3
+        },
+        {
+          "key": "hud",
+          "index": 11,
+          "type": "toggle",
+          "label": "HUD frame",
+          "def": true,
+          "group": "HUD",
+          "hint": "Corner brackets, numeric readout and a beat trace.",
+          "mutate": 0
+        },
+        {
+          "key": "readout",
+          "index": 12,
+          "type": "range",
+          "label": "Readout",
+          "def": 128,
+          "min": 0,
+          "max": 9999,
+          "step": 1,
+          "group": "HUD",
+          "hint": "Shown as four digits. Key it or map a data channel to it.",
+          "mutate": 0,
+          "show": {
+            "param": "hud",
+            "is": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "wallcast/shockwave",
+      "localId": "shockwave",
+      "name": "Shockwave",
+      "blurb": "Each kick launches a refractive ring with a colour split. Earlier rings trail and fade.",
+      "group": "Optics",
+      "tags": [
+        "ripple",
+        "refraction",
+        "kick",
+        "edm"
+      ],
+      "palette": "magenta",
+      "flash": true,
+      "cost": 1,
+      "passes": [
+        {
+          "function": "mfs_wallcast_shockwave_p0",
+          "source": "wallcast_shockwave_p0",
+          "scale": 0.5
+        },
+        {
+          "function": "mfs_wallcast_shockwave_p1",
+          "source": "wallcast_shockwave_p1",
+          "scale": 1
+        }
+      ],
+      "inputs": [
+        {
+          "id": "source",
+          "type": "media",
+          "label": "Source",
+          "fit": "fill",
+          "hint": "Still or clip to treat. Without one, the kit's test image plays."
+        }
+      ],
+      "params": [
+        {
+          "key": "originX",
+          "index": 0,
+          "type": "range",
+          "label": "Origin X",
+          "def": 0,
+          "min": -0.9,
+          "max": 0.9,
+          "step": 0.0045,
+          "hint": "Where the rings start. Key or map it.",
+          "part": {
+            "of": "origin",
+            "kind": "point",
+            "i": 0,
+            "label": "Origin"
+          }
+        },
+        {
+          "key": "originY",
+          "index": 1,
+          "type": "range",
+          "label": "Origin Y",
+          "def": 0,
+          "min": -0.9,
+          "max": 0.9,
+          "step": 0.0045,
+          "hint": "Where the rings start. Key or map it.",
+          "part": {
+            "of": "origin",
+            "kind": "point",
+            "i": 1,
+            "label": "Origin"
+          }
+        },
+        {
+          "key": "speed",
+          "index": 2,
+          "type": "range",
+          "label": "Ring speed",
+          "def": 0.42,
+          "min": 0.1,
+          "max": 1.2,
+          "step": 0.01,
+          "mutate": 0.5
+        },
+        {
+          "key": "refract",
+          "index": 3,
+          "type": "range",
+          "label": "Refraction",
+          "def": 0.8,
+          "min": 0,
+          "max": 1.5,
+          "step": 0.01,
+          "mutate": 0.6
+        },
+        {
+          "key": "sharp",
+          "index": 4,
+          "type": "range",
+          "label": "Ring sharpness",
+          "def": 11,
+          "min": 4,
+          "max": 24,
+          "step": 0.5,
+          "mutate": 0.4
+        },
+        {
+          "key": "rings",
+          "index": 5,
+          "type": "int",
+          "label": "Rings",
+          "def": 3,
+          "min": 1,
+          "max": 3,
+          "step": 1,
+          "mutate": 0.3
+        },
+        {
+          "key": "chroma",
+          "index": 6,
+          "type": "range",
+          "label": "Colour split",
+          "def": 0.5,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "mutate": 0.5
+        },
+        {
+          "key": "glow",
+          "index": 7,
+          "type": "range",
+          "label": "Ring glow",
+          "def": 0.25,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "mutate": 0.4
+        },
+        {
+          "key": "beats",
+          "index": 8,
+          "type": "int",
+          "label": "Beats / loop",
+          "def": 4,
+          "min": 1,
+          "max": 16,
+          "step": 1,
+          "group": "Beat",
+          "hint": "Kick pulses per loop. The limiter caps this at 3 per second.",
+          "mutate": 0.3
+        },
+        {
+          "key": "hitAmt",
+          "index": 9,
+          "type": "range",
+          "label": "Beat drive",
+          "def": 1,
+          "min": 0,
+          "max": 1.5,
+          "step": 0.01,
+          "unit": "×",
+          "group": "Beat",
+          "hint": "How hard the internal beat drives the effect.",
+          "mutate": 0.5
+        },
+        {
+          "key": "hit",
+          "index": 10,
+          "type": "range",
+          "label": "Hit",
+          "def": 0,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Beat",
+          "hint": "Map a live kick band here to drive the effect from audio.",
+          "mutate": 0
+        },
+        {
+          "key": "exposure",
+          "index": 11,
+          "type": "range",
+          "label": "Exposure",
+          "def": 1,
+          "min": 0.4,
+          "max": 1.6,
+          "step": 0.01,
+          "unit": "×",
+          "group": "Finish",
+          "mutate": 0.2
+        },
+        {
+          "key": "vignette",
+          "index": 12,
+          "type": "range",
+          "label": "Vignette",
+          "def": 0.4,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Finish",
+          "mutate": 0.3
+        },
+        {
+          "key": "hud",
+          "index": 13,
+          "type": "toggle",
+          "label": "HUD frame",
+          "def": false,
+          "group": "HUD",
+          "hint": "Corner brackets, numeric readout and a beat trace.",
+          "mutate": 0
+        },
+        {
+          "key": "readout",
+          "index": 14,
+          "type": "range",
+          "label": "Readout",
+          "def": 128,
+          "min": 0,
+          "max": 9999,
+          "step": 1,
+          "group": "HUD",
+          "hint": "Shown as four digits. Key it or map a data channel to it.",
+          "mutate": 0,
+          "show": {
+            "param": "hud",
+            "is": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "wallcast/kaleido-wall",
+      "localId": "kaleido-wall",
+      "name": "Kaleido Wall",
+      "blurb": "A mirror-fold kaleidoscope that turns one still into a festival pattern field.",
+      "group": "Optics",
+      "tags": [
+        "kaleidoscope",
+        "mirror",
+        "pattern",
+        "edm"
+      ],
+      "palette": "magenta",
+      "flash": true,
+      "cost": 1,
+      "passes": [
+        {
+          "function": "mfs_wallcast_kaleido_wall_p0",
+          "source": "wallcast_kaleido_wall_p0",
+          "scale": 0.5
+        },
+        {
+          "function": "mfs_wallcast_kaleido_wall_p1",
+          "source": "wallcast_kaleido_wall_p1",
+          "scale": 1
+        }
+      ],
+      "inputs": [
+        {
+          "id": "source",
+          "type": "media",
+          "label": "Source",
+          "fit": "fill",
+          "hint": "Still or clip to treat. Without one, the kit's test image plays."
+        }
+      ],
+      "params": [
+        {
+          "key": "segments",
+          "index": 0,
+          "type": "int",
+          "label": "Segments",
+          "def": 6,
+          "min": 3,
+          "max": 12,
+          "step": 1,
+          "mutate": 0.4
+        },
+        {
+          "key": "spin",
+          "index": 1,
+          "type": "int",
+          "label": "Spin / loop",
+          "def": 1,
+          "min": -2,
+          "max": 2,
+          "step": 1,
+          "mutate": 0.3
+        },
+        {
+          "key": "scale",
+          "index": 2,
+          "type": "range",
+          "label": "Pattern scale",
+          "def": 0.9,
+          "min": 0.3,
+          "max": 1.5,
+          "step": 0.01,
+          "mutate": 0.5
+        },
+        {
+          "key": "breathe",
+          "index": 3,
+          "type": "range",
+          "label": "Breathe",
+          "def": 0.08,
+          "min": 0,
+          "max": 0.3,
+          "step": 0.01,
+          "mutate": 0.4
+        },
+        {
+          "key": "drift",
+          "index": 4,
+          "type": "int",
+          "label": "Drift / loop",
+          "def": 0,
+          "min": 0,
+          "max": 2,
+          "step": 1,
+          "hint": "Whole mirror periods per loop.",
+          "mutate": 0.2
+        },
+        {
+          "key": "chroma",
+          "index": 5,
+          "type": "range",
+          "label": "Colour split",
+          "def": 0.5,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "mutate": 0.5
+        },
+        {
+          "key": "centerX",
+          "index": 6,
+          "type": "range",
+          "label": "Centre X",
+          "def": 0,
+          "min": -0.5,
+          "max": 0.5,
+          "step": 0.0025,
+          "hint": "Moves the point the pattern folds around.",
+          "part": {
+            "of": "center",
+            "kind": "point",
+            "i": 0,
+            "label": "Centre"
+          }
+        },
+        {
+          "key": "centerY",
+          "index": 7,
+          "type": "range",
+          "label": "Centre Y",
+          "def": 0,
+          "min": -0.5,
+          "max": 0.5,
+          "step": 0.0025,
+          "hint": "Moves the point the pattern folds around.",
+          "part": {
+            "of": "center",
+            "kind": "point",
+            "i": 1,
+            "label": "Centre"
+          }
+        },
+        {
+          "key": "seams",
+          "index": 8,
+          "type": "range",
+          "label": "Seams",
+          "def": 0.35,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "mutate": 0.4
+        },
+        {
+          "key": "beats",
+          "index": 9,
+          "type": "int",
+          "label": "Beats / loop",
+          "def": 4,
+          "min": 1,
+          "max": 16,
+          "step": 1,
+          "group": "Beat",
+          "hint": "Kick pulses per loop. The limiter caps this at 3 per second.",
+          "mutate": 0.3
+        },
+        {
+          "key": "hitAmt",
+          "index": 10,
+          "type": "range",
+          "label": "Beat drive",
+          "def": 1,
+          "min": 0,
+          "max": 1.5,
+          "step": 0.01,
+          "unit": "×",
+          "group": "Beat",
+          "hint": "How hard the internal beat drives the effect.",
+          "mutate": 0.5
+        },
+        {
+          "key": "hit",
+          "index": 11,
+          "type": "range",
+          "label": "Hit",
+          "def": 0,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Beat",
+          "hint": "Map a live kick band here to drive the effect from audio.",
+          "mutate": 0
+        },
+        {
+          "key": "exposure",
+          "index": 12,
+          "type": "range",
+          "label": "Exposure",
+          "def": 1,
+          "min": 0.4,
+          "max": 1.6,
+          "step": 0.01,
+          "unit": "×",
+          "group": "Finish",
+          "mutate": 0.2
+        },
+        {
+          "key": "vignette",
+          "index": 13,
+          "type": "range",
+          "label": "Vignette",
+          "def": 0.4,
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "group": "Finish",
+          "mutate": 0.3
+        },
+        {
+          "key": "hud",
+          "index": 14,
+          "type": "toggle",
+          "label": "HUD frame",
+          "def": false,
+          "group": "HUD",
+          "hint": "Corner brackets, numeric readout and a beat trace.",
+          "mutate": 0
+        },
+        {
+          "key": "readout",
+          "index": 15,
+          "type": "range",
+          "label": "Readout",
+          "def": 128,
+          "min": 0,
+          "max": 9999,
+          "step": 1,
+          "group": "HUD",
+          "hint": "Shown as four digits. Key it or map a data channel to it.",
+          "mutate": 0,
+          "show": {
+            "param": "hud",
+            "is": true
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "name": "motif-metal",
+  "version": "1.0.0",
+  "description": "Translate Motif kits (motif-kit@1, WebGL2/GLSL) into Metal Shading Language Swift packages for macOS and iPadOS.",
+  "type": "module",
+  "bin": { "motif-metal": "bin/motif-metal.mjs" },
+  "scripts": { "test": "node test/run.mjs" },
+  "license": "UNLICENSED",
+  "private": true
+}

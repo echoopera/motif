@@ -9,6 +9,8 @@ Browser-based, prompt-directed procedural animation studio for type, shapes, par
 | `docs/` | PRD & Engineering Spec (md, docx, pdf), Competitive landscape (md, pdf), Style Lab pro enhancements |
 | `site/` | Marketing one-pager (`motif-one-pager.html`) |
 | `style-lab/` | Motif Style Lab — 25-style parametric playground: full source, design specs, build script, tests, and `dist/standalone.html` |
+| `tools/motif-metal/` | Converts web Motif kits (`.motifkit`, GLSL) to Metal for macOS and iPadOS: translator CLI, Swift runtime package (`MotifMetal`), WebGL-vs-Metal parity tests |
+| `metalKits/` | Generated Metal packages for the kits in `motifKits/` (`wallcast`, `infokit`, `kinetic-subdivision`) |
 | `agent-skills/` | 16 studio agent skills (SKILL.md), Claude Code subagent definitions, house-style template, README, and `motif-skills.zip` |
 
 ## Live links

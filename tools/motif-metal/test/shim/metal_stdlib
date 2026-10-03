@@ -1,0 +1,164 @@
+// CPU stand-in for <metal_stdlib>, enough of it to compile and run motif-metal's generated passes with clang on any OS.
+// Vectors are clang ext_vector_type (swizzles, component-wise operators, scalar broadcast). The test driver rewrites
+// vector constructors float3(a, b) → mk_float3(a, b) and float literals to float32 before compiling.
+#pragma once
+#include <cmath>
+#include <cstdint>
+#include <cstring>
+#include <algorithm>
+#include <type_traits>
+#include <utility>
+#include <array>
+#include <vector>
+
+#define fragment
+#define vertex
+#define constant const
+#define thread
+#define device
+#define threadgroup
+typedef unsigned int uint;
+typedef unsigned short ushort;
+typedef float float2 __attribute__((ext_vector_type(2)));
+typedef float float3 __attribute__((ext_vector_type(3)));
+typedef float float4 __attribute__((ext_vector_type(4)));
+typedef int int2 __attribute__((ext_vector_type(2)));
+typedef int int3 __attribute__((ext_vector_type(3)));
+typedef int int4 __attribute__((ext_vector_type(4)));
+typedef unsigned int uint2 __attribute__((ext_vector_type(2)));
+typedef unsigned int uint3 __attribute__((ext_vector_type(3)));
+typedef unsigned int uint4 __attribute__((ext_vector_type(4)));
+// Comparison results of ext vectors are signed int vectors; stand in for Metal's boolN.
+typedef int bool2 __attribute__((ext_vector_type(2)));
+typedef int bool3 __attribute__((ext_vector_type(3)));
+typedef int bool4 __attribute__((ext_vector_type(4)));
+
+namespace metal {
+template <class T, size_t N> using array = std::array<T, N>;
+
+template <class V> constexpr int lanes() { if constexpr (std::is_arithmetic_v<V>) return 1; else return __builtin_vectorelements(V); }
+template <class V> using elem_t = std::remove_cv_t<std::remove_reference_t<decltype(std::declval<V&>()[0])>>;
+template <class V> inline auto at(const V& v, int i) { if constexpr (std::is_arithmetic_v<V>) return v; else return v[i]; }
+
+// ---- constructors ----------------------------------------------------------------------------------------------
+template <class T> inline void push(T* out, int& n, T s) { out[n++] = s; }
+template <class T, class S, std::enable_if_t<std::is_arithmetic_v<S>, int> = 0> inline void flat(T* out, int& n, S s) { out[n++] = (T)s; }
+template <class T, class S, std::enable_if_t<!std::is_arithmetic_v<S>, int> = 0> inline void flat(T* out, int& n, S v) { for (int i = 0; i < lanes<S>(); i++) out[n++] = (T)v[i]; }
+template <class V, class... A> inline V mk(A... a) {
+  using T = elem_t<V>; constexpr int N = lanes<V>();
+  T tmp[16]; int n = 0; (flat<T>(tmp, n, a), ...);
+  V r{};
+  if (n == 1) { for (int i = 0; i < N; i++) r[i] = tmp[0]; } else { for (int i = 0; i < N && i < n; i++) r[i] = tmp[i]; }
+  return r;
+}
+#define MK(V) template <class... A> inline V mk_##V(A... a) { return mk<V>(a...); }
+MK(float2) MK(float3) MK(float4) MK(int2) MK(int3) MK(int4) MK(uint2) MK(uint3) MK(uint4) MK(bool2) MK(bool3) MK(bool4)
+
+// ---- matrices (column-major, like GLSL and Metal) ---------------------------------------------------------------
+template <class Col, int C> struct fmat {
+  Col c[C];
+  Col& operator[](int i) { return c[i]; }
+  const Col& operator[](int i) const { return c[i]; }
+};
+typedef fmat<float2, 2> float2x2; typedef fmat<float3, 3> float3x3; typedef fmat<float4, 4> float4x4;
+template <class... A> inline float2x2 mk_float2x2(A... a) { float2x2 m{}; if constexpr (sizeof...(A) == 1) { float2 d[] = {}; (void)d; float s[] = {(float)a...}; m.c[0][0] = s[0]; m.c[1][1] = s[0]; } else { float2 cols[] = {a...}; for (int i = 0; i < 2; i++) m.c[i] = cols[i]; } return m; }
+template <class... A> inline float3x3 mk_float3x3(A... a) { float3x3 m{}; if constexpr (sizeof...(A) == 1) { float s[] = {(float)a...}; for (int i = 0; i < 3; i++) m.c[i][i] = s[0]; } else { float3 cols[] = {a...}; for (int i = 0; i < 3; i++) m.c[i] = cols[i]; } return m; }
+template <class... A> inline float4x4 mk_float4x4(A... a) { float4x4 m{}; if constexpr (sizeof...(A) == 1) { float s[] = {(float)a...}; for (int i = 0; i < 4; i++) m.c[i][i] = s[0]; } else { float4 cols[] = {a...}; for (int i = 0; i < 4; i++) m.c[i] = cols[i]; } return m; }
+template <class Col, int C> inline Col operator*(const fmat<Col, C>& m, const Col& v) { Col r = m.c[0] * v[0]; for (int i = 1; i < C; i++) r += m.c[i] * v[i]; return r; }
+template <class Col, int C> inline Col operator*(const Col& v, const fmat<Col, C>& m) { Col r{}; for (int i = 0; i < C; i++) { float s = 0; for (int k = 0; k < C; k++) s += v[k] * m.c[i][k]; r[i] = s; } return r; }
+template <class Col, int C> inline fmat<Col, C> operator*(const fmat<Col, C>& a, const fmat<Col, C>& b) { fmat<Col, C> r{}; for (int i = 0; i < C; i++) r.c[i] = a * b.c[i]; return r; }
+template <class Col, int C> inline fmat<Col, C> operator*(const fmat<Col, C>& a, float s) { fmat<Col, C> r{}; for (int i = 0; i < C; i++) r.c[i] = a.c[i] * s; return r; }
+}  // namespace metal
+using namespace metal;
+namespace metal {
+
+// ---- component-wise maths --------------------------------------------------------------------------------------
+#define M1(name, expr) template <class V> inline V name(V x) { if constexpr (std::is_arithmetic_v<V>) { return (V)(expr(x)); } else { V r; for (int i = 0; i < lanes<V>(); i++) r[i] = (elem_t<V>)(expr(x[i])); return r; } }
+M1(floor, ::floorf) M1(ceil, ::ceilf) M1(trunc, ::truncf) M1(round, ::roundf) M1(rint, ::rintf) M1(sin, ::sinf) M1(cos, ::cosf) M1(tan, ::tanf)
+M1(asin, ::asinf) M1(acos, ::acosf) M1(atan, ::atanf) M1(exp, ::expf) M1(exp2, ::exp2f) M1(log, ::logf) M1(log2, ::log2f) M1(sqrt, ::sqrtf)
+M1(sinh, ::sinhf) M1(cosh, ::coshf) M1(tanh, ::tanhf)
+template <class V> inline V rsqrt(V x) { return V(1) / sqrt(x); }
+template <class V> inline V abs(V x) { if constexpr (std::is_arithmetic_v<V>) return x < 0 ? -x : x; else { V r; for (int i = 0; i < lanes<V>(); i++) r[i] = x[i] < 0 ? -x[i] : x[i]; return r; } }
+template <class V> inline V fract(V x) { return x - floor(x); }
+template <class V> inline V sign(V x) { if constexpr (std::is_arithmetic_v<V>) return x > 0 ? 1 : (x < 0 ? -1 : 0); else { V r; for (int i = 0; i < lanes<V>(); i++) r[i] = x[i] > 0 ? 1 : (x[i] < 0 ? -1 : 0); return r; } }
+template <class V> inline V pow(V a, V b) { if constexpr (std::is_arithmetic_v<V>) return ::powf(a, b); else { V r; for (int i = 0; i < lanes<V>(); i++) r[i] = ::powf(a[i], b[i]); return r; } }
+template <class V> inline V atan2(V y, V x) { if constexpr (std::is_arithmetic_v<V>) return ::atan2f(y, x); else { V r; for (int i = 0; i < lanes<V>(); i++) r[i] = ::atan2f(y[i], x[i]); return r; } }
+// SwiftShader (the reference renderer here) lowers min/max to SSE minps/maxps, which return the SECOND operand when either is NaN.
+template <class T> inline T min(T a, T b) { if constexpr (std::is_arithmetic_v<T>) return a < b ? a : b; else { T r; for (int i = 0; i < lanes<T>(); i++) r[i] = a[i] < b[i] ? a[i] : b[i]; return r; } }
+template <class T> inline T max(T a, T b) { if constexpr (std::is_arithmetic_v<T>) return a > b ? a : b; else { T r; for (int i = 0; i < lanes<T>(); i++) r[i] = a[i] > b[i] ? a[i] : b[i]; return r; } }
+template <class T> inline T fmin(T a, T b) { if constexpr (std::is_arithmetic_v<T>) return std::isnan(a) ? b : (std::isnan(b) ? a : (b < a ? b : a)); else { T r; for (int i = 0; i < lanes<T>(); i++) r[i] = fmin(a[i], b[i]); return r; } }
+template <class T> inline T fmax(T a, T b) { if constexpr (std::is_arithmetic_v<T>) return std::isnan(a) ? b : (std::isnan(b) ? a : (a < b ? b : a)); else { T r; for (int i = 0; i < lanes<T>(); i++) r[i] = fmax(a[i], b[i]); return r; } }
+template <class T> inline T clamp(T x, T lo, T hi) { return min(max(x, lo), hi); }
+template <class T> inline T mix(T a, T b, T t) { return a + (b - a) * t; }
+template <class T> inline T step(T e, T x) { if constexpr (std::is_arithmetic_v<T>) return x < e ? 0 : 1; else { T r; for (int i = 0; i < lanes<T>(); i++) r[i] = x[i] < e[i] ? 0 : 1; return r; } }
+template <class T> inline T smoothstep(T a, T b, T x) { T t = clamp((x - a) / (b - a), T(0), T(1)); return t * t * (T(3) - T(2) * t); }
+template <class V> inline float dot(V a, V b) { if constexpr (std::is_arithmetic_v<V>) return a * b; else { float s = 0; for (int i = 0; i < lanes<V>(); i++) s += a[i] * b[i]; return s; } }
+template <class V> inline float length(V a) { return ::sqrtf(dot(a, a)); }
+template <class V> inline float distance(V a, V b) { return length(a - b); }
+template <class V> inline V normalize(V a) { return a / length(a); }
+inline float3 cross(float3 a, float3 b) { return float3{a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x}; }
+template <class V> inline V refract(V i, V n, float eta) { float k = 1.0f - eta * eta * (1.0f - dot(n, i) * dot(n, i)); if (k < 0.0f) return V(0); return i * eta - n * (eta * dot(n, i) + ::sqrtf(k)); }
+template <class Col, int C> inline fmat<Col, C> transpose(const fmat<Col, C>& m) { fmat<Col, C> r{}; for (int i = 0; i < C; i++) for (int j = 0; j < C; j++) r.c[i][j] = m.c[j][i]; return r; }
+template <class V> inline V reflect(V i, V n) { return i - n * (2.0f * dot(n, i)); }
+template <class V> inline auto isnan(V x) { if constexpr (std::is_arithmetic_v<V>) return std::isnan(x); else return x != x; }
+template <class V> inline auto isinf(V x) { if constexpr (std::is_arithmetic_v<V>) return std::isinf(x); else { return abs(x) > 3.4e38f; } }
+template <class V> inline bool any(V x) { if constexpr (std::is_arithmetic_v<V>) return x != 0; else { for (int i = 0; i < lanes<V>(); i++) if (x[i]) return true; return false; } }
+template <class V> inline bool all(V x) { if constexpr (std::is_arithmetic_v<V>) return x != 0; else { for (int i = 0; i < lanes<V>(); i++) if (!x[i]) return false; return true; } }
+template <class V, class B> inline V select(V a, V b, B c) { if constexpr (std::is_arithmetic_v<V>) return c ? b : a; else { V r; for (int i = 0; i < lanes<V>(); i++) r[i] = c[i] ? b[i] : a[i]; return r; } }
+template <class V> inline V bool_norm(V x) { if constexpr (std::is_same_v<V, bool>) return x; else return -x; }
+// Derivatives need neighbouring fragments. The CPU driver renders a pass twice: the first run records every derivative
+// call's argument per pixel (in call order), the second replays 2x2-quad differences. Matches SwiftShader (what headless
+// Chromium uses): dFdx per row across the quad's column pair, dFdy down the quad's left column.
+struct DerivState { int mode = 0, w = 0, h = 0, x = 0, y = 0, k = 0; std::vector<std::vector<float>>* logs = nullptr; };
+inline DerivState g_deriv;
+template <class V> inline void d_store(std::vector<float>& l, V v) { float4 q = {0, 0, 0, 0}; for (int i = 0; i < lanes<V>(); i++) q[i] = at(v, i); for (int i = 0; i < 4; i++) l.push_back(q[i]); }
+template <class V> inline V d_load(int px, int py, int k) {
+  V r{}; const auto& l = (*g_deriv.logs)[(size_t)py * g_deriv.w + px]; if ((size_t)(4 * k + 4) > l.size()) return r;
+  if constexpr (std::is_arithmetic_v<V>) r = l[4 * k]; else for (int i = 0; i < lanes<V>(); i++) r[i] = l[4 * k + i];
+  return r;
+}
+// Quad geometry in GL window space (y up): the pair base is the even-y row, which is row h-1-(((h-1-y)) & ~1) top-down.
+inline int d_row0(const DerivState& D) { return D.h - 1 - ((D.h - 1 - D.y) & ~1); }
+inline int d_row1(const DerivState& D) { return std::max(0, d_row0(D) - 1); }
+template <class V> inline V d_diff(V v, bool horizontal) {
+  auto& D = g_deriv; int k = D.k++;
+  if (D.mode == 1) { d_store((*D.logs)[(size_t)D.y * D.w + D.x], v); return V(0); }
+  if (D.mode != 2) return V(0);
+  int x0 = D.x & ~1, x1 = std::min(D.w - 1, x0 + 1), r0 = d_row0(D), r1 = d_row1(D);
+  if (horizontal) return d_load<V>(x1, r0, k) - d_load<V>(x0, r0, k);
+  return d_load<V>(x0, r0, k) - d_load<V>(x0, r1, k);      // Metal's dfdy points down (+pos.y)
+}
+template <class V> inline V dfdx(V v) { return d_diff(v, true); }
+template <class V> inline V dfdy(V v) { return d_diff(v, false); }
+template <class V> inline V fwidth(V v) {
+  auto& D = g_deriv; int k = D.k++;
+  if (D.mode == 1) { d_store((*D.logs)[(size_t)D.y * D.w + D.x], v); return V(0); }
+  if (D.mode != 2) return V(0);
+  int x0 = D.x & ~1, x1 = std::min(D.w - 1, x0 + 1), r0 = d_row0(D), r1 = d_row1(D);
+  V dx = d_load<V>(x1, r0, k) - d_load<V>(x0, r0, k), dy = d_load<V>(x0, r0, k) - d_load<V>(x0, r1, k);
+  return abs(dx) + abs(dy);
+}
+template <class T, class S> inline T as_type(S x) { static_assert(sizeof(T) == sizeof(S), "as_type size"); return __builtin_bit_cast(T, x); }
+inline void discard_fragment() {}
+
+// ---- textures: float RGBA, row 0 = top (Metal's convention) -----------------------------------------------------
+namespace coord { struct normalized_t {}; constexpr normalized_t normalized; }
+namespace address { struct clamp_t {}; constexpr clamp_t clamp_to_edge; }
+namespace filter { struct linear_t {}; constexpr linear_t linear; }
+namespace mip_filter { struct linear_t {}; constexpr linear_t linear; }
+struct sampler { template <class... A> constexpr sampler(A...) {} };
+struct level { float v; level(float x) : v(x) {} };
+template <class T> struct texture2d {
+  const float* data = nullptr; int w = 1, h = 1;   // linear, premultiplied RGBA
+  float4 texel(int x, int y) const { x = std::max(0, std::min(w - 1, x)); y = std::max(0, std::min(h - 1, y)); if (!data) return float4{0, 0, 0, 0}; const float* p = data + 4 * (y * w + x); return float4{p[0], p[1], p[2], p[3]}; }
+  float4 sample(sampler, float2 uv) const {
+    float fx = uv.x * w - 0.5f, fy = uv.y * h - 0.5f; int x0 = (int)::floorf(fx), y0 = (int)::floorf(fy); float tx = fx - x0, ty = fy - y0;
+    float4 a = texel(x0, y0), b = texel(x0 + 1, y0), c = texel(x0, y0 + 1), d = texel(x0 + 1, y0 + 1);
+    return (a * (1 - tx) + b * tx) * (1 - ty) + (c * (1 - tx) + d * tx) * ty;
+  }
+  float4 sample(sampler s, float2 uv, level) const { return sample(s, uv); }
+  float4 read(uint2 p, uint) const { return texel((int)p.x, (int)p.y); }
+  uint get_width(uint = 0) const { return w; }
+  uint get_height(uint = 0) const { return h; }
+};
+}  // namespace metal
