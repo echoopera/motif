@@ -62,6 +62,14 @@ Each core states its field classes at the top of `core.glsl` (copied into each k
 smaller step multiplier: gyroid `k·√6·(1 + A·kw)`, Möbius `√(1 + (rmax / 2(R − rmax))²)`, folded plate `√(1 + (A·k)²)`, torus and ball exact.
 Volumes integrate with the ray-step length (`T *= exp(-σρ·ds)`), which is why Astral Threshold's exposure moves by less than 3 % between Live and Export.
 
+## Results at a glance
+
+* `motif-kit validate`: 9/9 kits ok; worst-case static budgets 85-17,481 loop iterations/px (limit 32,768) and <= 25 fetches/px (limit 2,048).
+* `motif-kit preview` (the SDK's own): 81/81 styles OK, no loop-seam, blank-frame or compile flags.
+* `tools/qa.mjs qa` at 180x320: 0 seam, pop or exposure failures; Delta0 is 0 for every style; 6 styles carry flash **warnings** (1-2 tiles at the 1 s / 4x worst case): Amber Antinodes, Octahedral Chapel, Emerald Colonies, Membrane Choir, Radial Organs, Mobius Current. Full table: `docs/QA-REPORT.md`.
+* Per-control check (`tools/qa.mjs controls`): every control of every style was swept at min/default/max; the dead controls it found were removed per style or made to work. Controls were not re-swept for the last round of edits.
+* Self-review (`docs/CRITIQUE.md`): 5 kits pass the critic rubric; Harmonic Matter, Astral Threshold, Cellular Cosmos and After Cyber are below the pass line and need another art-direction round.
+
 ## Known limitations and honesty notes
 
 * **No device performance is claimed.** All timings and metrics were produced in headless Chromium with SwiftShader (CPU) and are relative diagnostics. The < 4 ms live / < 16 ms broadcast targets are unverified on real hardware; heavy styles (Topological Tide at scale 1.0, Astral Threshold, Harmonic Matter) will need a lower render scale on phones.
