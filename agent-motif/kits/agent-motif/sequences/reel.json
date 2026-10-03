@@ -1,0 +1,82 @@
+{
+  "format": "motif-seq@1",
+  "id": "reel",
+  "name": "AgentMotif reel",
+  "loop": 24,
+  "bpm": 120,
+  "maxActive": 2,
+  "cues": [
+    {
+      "id": "c0",
+      "style": "silk-aurora",
+      "at": "0s",
+      "len": "3.6s",
+      "lane": 0,
+      "fadeIn": 0.15,
+      "fadeOut": 0.15
+    },
+    {
+      "id": "c1",
+      "style": "liquid-chrome",
+      "at": "3s",
+      "len": "3.6s",
+      "lane": 1,
+      "fadeIn": 0.15,
+      "fadeOut": 0.15
+    },
+    {
+      "id": "c2",
+      "style": "caustic-light",
+      "at": "6s",
+      "len": "3.6s",
+      "lane": 0,
+      "fadeIn": 0.15,
+      "fadeOut": 0.15
+    },
+    {
+      "id": "c3",
+      "style": "nebula-drift",
+      "at": "9s",
+      "len": "3.6s",
+      "lane": 1,
+      "fadeIn": 0.15,
+      "fadeOut": 0.15
+    },
+    {
+      "id": "c4",
+      "style": "astral-fold",
+      "at": "12s",
+      "len": "3.6s",
+      "lane": 0,
+      "fadeIn": 0.15,
+      "fadeOut": 0.15
+    },
+    {
+      "id": "c5",
+      "style": "monolith",
+      "at": "15s",
+      "len": "3.6s",
+      "lane": 1,
+      "fadeIn": 0.15,
+      "fadeOut": 0.15
+    },
+    {
+      "id": "c6",
+      "style": "cellspace",
+      "at": "18s",
+      "len": "3.6s",
+      "lane": 0,
+      "fadeIn": 0.15,
+      "fadeOut": 0.15
+    },
+    {
+      "id": "c7",
+      "style": "liquid-glass",
+      "at": "21s",
+      "len": "3.6s",
+      "lane": 1,
+      "fadeIn": 0.15,
+      "fadeOut": 0.15
+    }
+  ]
+}

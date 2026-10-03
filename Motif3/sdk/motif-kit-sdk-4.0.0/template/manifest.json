@@ -1,0 +1,210 @@
+{
+  "format": "motif-kit@1",
+  "id": "my-kit",
+  "name": "My Kit",
+  "version": "0.1.0",
+  "author": "You",
+  "description": "Describe what the kit is for in a sentence or two.",
+  "license": "",
+  "accent": "#35E0FF",
+  "common": "common.glsl",
+  "palettes": [
+    {
+      "id": "night",
+      "name": "Night",
+      "bg": "#05060A",
+      "ink": "#F2F5FF",
+      "a": [
+        "#35E0FF",
+        "#FF3D9A",
+        "#FFB547"
+      ]
+    }
+  ],
+  "styles": [
+    {
+      "id": "orbits",
+      "name": "Orbits",
+      "group": "Examples",
+      "palette": "night",
+      "tags": [
+        "example"
+      ],
+      "blurb": "Glowing bodies orbit a core; every loop closes exactly.",
+      "flash": false,
+      "passes": [
+        {
+          "src": "styles/orbits.glsl"
+        }
+      ],
+      "params": {
+        "rings": {
+          "type": "int",
+          "label": "Rings",
+          "min": 1,
+          "max": 12,
+          "def": 5
+        },
+        "speed": {
+          "type": "int",
+          "label": "Turns / loop",
+          "min": 1,
+          "max": 4,
+          "def": 1
+        },
+        "radius": {
+          "type": "range",
+          "label": "Radius",
+          "min": 0.1,
+          "max": 0.45,
+          "def": 0.3
+        },
+        "glow": {
+          "type": "range",
+          "label": "Glow",
+          "min": 0,
+          "max": 2,
+          "def": 1
+        },
+        "mode": {
+          "type": "select",
+          "label": "Mode",
+          "options": [
+            "rings",
+            "dots"
+          ],
+          "def": "rings"
+        },
+        "trails": {
+          "type": "toggle",
+          "label": "Trails",
+          "def": true
+        }
+      }
+    },
+    {
+      "id": "glitch-bars",
+      "name": "Glitch Bars",
+      "group": "Examples",
+      "palette": "night",
+      "tags": [
+        "example",
+        "multi-pass",
+        "flicker"
+      ],
+      "blurb": "A two-pass example: pass 1 draws bars, pass 2 displaces them in limiter-safe time slots.",
+      "flash": true,
+      "passes": [
+        {
+          "src": "styles/glitch-bars-scene.glsl",
+          "scale": 0.5
+        },
+        {
+          "src": "styles/glitch-bars.glsl"
+        }
+      ],
+      "params": {
+        "bars": {
+          "type": "int",
+          "label": "Bars",
+          "min": 3,
+          "max": 24,
+          "def": 9
+        },
+        "amount": {
+          "type": "range",
+          "label": "Glitch",
+          "min": 0,
+          "max": 1,
+          "def": 0.5
+        },
+        "rate": {
+          "type": "int",
+          "label": "Glitches / loop",
+          "min": 1,
+          "max": 48,
+          "def": 12
+        },
+        "split": {
+          "type": "range",
+          "label": "Colour split",
+          "min": 0,
+          "max": 1,
+          "def": 0.5
+        }
+      }
+    },
+    {
+      "id": "liquid-lens",
+      "name": "Liquid Lens",
+      "group": "Examples",
+      "palette": "night",
+      "tags": [
+        "example",
+        "media",
+        "image",
+        "video"
+      ],
+      "blurb": "A media example: warps an attached image or video with a looping flow field and a travelling lens.",
+      "flash": false,
+      "inputs": [
+        {
+          "id": "source",
+          "type": "media",
+          "label": "Source",
+          "fit": "fill",
+          "hint": "Drop a photo or clip on the stage."
+        }
+      ],
+      "passes": [
+        {
+          "src": "styles/liquid-lens.glsl"
+        }
+      ],
+      "params": {
+        "warp": {
+          "type": "range",
+          "label": "Warp",
+          "min": 0,
+          "max": 2,
+          "def": 0.8
+        },
+        "scale": {
+          "type": "range",
+          "label": "Flow scale",
+          "min": 0.5,
+          "max": 6,
+          "def": 2.2
+        },
+        "turns": {
+          "type": "int",
+          "label": "Cycles / loop",
+          "min": 1,
+          "max": 4,
+          "def": 1
+        },
+        "radius": {
+          "type": "range",
+          "label": "Lens size",
+          "min": 0.05,
+          "max": 0.6,
+          "def": 0.22
+        },
+        "bulge": {
+          "type": "range",
+          "label": "Lens bulge",
+          "min": -1,
+          "max": 1,
+          "def": 0.6
+        },
+        "glint": {
+          "type": "range",
+          "label": "Glint",
+          "min": 0,
+          "max": 1,
+          "def": 0.3
+        }
+      }
+    }
+  ]
+}

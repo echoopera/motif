@@ -1,0 +1,43 @@
+{
+  "format": "motif-kit@3",
+  "id": "type-lines",
+  "name": "Type Lines",
+  "version": "1.0.0",
+  "author": "Motif SDK",
+  "description": "Reference kit for SDK 3.0: one text input with three editable lines, read through textLine(), each line moved, scaled and turned by its own params.",
+  "license": "MIT",
+  "accent": "#7CF9C0",
+  "capabilities": ["text"],
+  "palettes": [
+    { "id": "night", "name": "Night", "bg": "#07080C", "ink": "#F4EFE6", "a": ["#7CF9C0", "#5B8CFF", "#F0A23B"] }
+  ],
+  "inputs": [
+    {
+      "id": "type", "type": "text", "label": "Type", "aspect": 8,
+      "lines": [
+        { "id": "line1", "label": "Line 1", "def": "FORM FOLLOWS", "font": { "family": "Instrument Sans", "weight": 700 } },
+        { "id": "line2", "label": "Line 2", "def": "FREQUENCY", "font": { "family": "Instrument Sans", "weight": 700 }, "size": 0.8 },
+        { "id": "line3", "label": "Line 3", "def": "TYPE IS SIGNAL", "font": { "family": "Instrument Sans", "weight": 500 }, "size": 0.5, "tracking": 0.12 }
+      ]
+    }
+  ],
+  "styles": [
+    {
+      "id": "stack",
+      "name": "Stack",
+      "group": "SDK 3.0",
+      "palette": "night",
+      "tags": ["example", "text"],
+      "blurb": "Three typed lines, stacked, drifting on integer loops.",
+      "passes": [{ "src": "styles/stack.glsl" }],
+      "params": {
+        "spacing": { "type": "range", "label": "Line spacing", "min": 0.05, "max": 0.5, "def": 0.16, "group": "Layout" },
+        "scale":   { "type": "range", "label": "Scale", "min": 0.2, "max": 2, "def": 1, "group": "Layout", "hint": "1 = a line's band spans the frame width." },
+        "drift":   { "type": "range", "label": "Drift", "min": 0, "max": 0.2, "def": 0.04, "group": "Motion" },
+        "turn":    { "type": "range", "label": "Turn", "min": 0, "max": 30, "def": 4, "unit": "°", "group": "Motion" },
+        "cycles":  { "type": "int", "label": "Cycles / loop", "min": 1, "max": 4, "def": 1, "group": "Motion" },
+        "accent":  { "type": "toggle", "label": "Accent line 2", "def": true, "group": "Look" }
+      }
+    }
+  ]
+}

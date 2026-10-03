@@ -1,0 +1,19 @@
+{
+  "format": "motif-seq@1",
+  "id": "showcase",
+  "name": "Showcase",
+  "description": "Six styles over one loop, never more than three at once. Lane 0 is the bed, lane 1 the accents, lane 2 the overlays.",
+  "loop": 12,
+  "bpm": 120,
+  "seed": 7,
+  "maxActive": 3,
+  "cues": [
+    { "id": "bed",    "style": "swirl", "at": 0,      "len": "6s",  "lane": 0, "fadeIn": 0.2, "fadeOut": 0.2, "cycles": 1, "opacity": 0.9 },
+    { "id": "bed2",   "style": "grid",  "at": "6s",   "len": "6s",  "lane": 0, "fadeIn": 0.2, "fadeOut": 0.2, "cycles": 2, "dir": "pingpong" },
+    { "id": "rings",  "style": "rings", "at": "1s",   "len": "3s",  "lane": 1, "cycles": 2, "blend": "screen" },
+    { "id": "bars",   "style": "bars",  "at": "4.5s", "len": "3s",  "lane": 1, "cycles": 1, "dir": "random", "blend": "add", "opacity": 0.8 },
+    { "id": "orbit",  "style": "dots",  "at": "8s",   "len": "4s",  "lane": 1, "cycles": 1, "dir": "backward", "blend": "screen" },
+    { "id": "scan",   "style": "scan",  "at": "2s",   "len": "1.5s","lane": 2, "cycles": 1, "repeat": { "every": "5s", "count": 2 }, "blend": "add", "fadeIn": 0.3, "fadeOut": 0.3 },
+    { "id": "maybe",  "style": "rings", "at": "10s",  "len": "2s",  "lane": 2, "cycles": 3, "chance": 0.5, "blend": "overlay" }
+  ]
+}

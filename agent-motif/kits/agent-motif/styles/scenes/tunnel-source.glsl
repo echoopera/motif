@@ -25,7 +25,7 @@ vec3 trail(vec2 uv) {
   float onL = step(d.x, 0.0) * step(uv.y, lTop) * step(lBot, uv.y);
   vec3 col = sky;
   vec3 bankR = scrub(uv, 0.75), bankL = scrub(uv + 11.0, 0.85);
-  float fl = smoothstep(0.62, 0.72, ln2(uv * vec2(26.0, 20.0) + 7.0, 0.0, 0.0)) * smoothstep(rTop - 0.02, rTop - 0.25, uv.y);
+  float fl = smoothstep(0.62, 0.72, ln2(uv * vec2(26.0, 20.0) + 7.0, 0.0, 0.0)) * (1.0 - smoothstep(rTop - 0.25, rTop - 0.02, uv.y));
   bankR = mix(bankR, vec3(1.0, 0.86, 0.04) * 0.95, fl);
   // Ground: bright grass and a pale path converging on the vanishing point.
   float gx = d.x / max(-d.y, 0.02);
@@ -34,7 +34,7 @@ vec3 trail(vec2 uv) {
   float grassN = lfbm(vec2(gx * 3.0, lgy * 6.0), 3, 0.0, 0.0) * 0.5 + 0.5;
   float blades = lridge(vec2(gx * 22.0, lgy * 2.0), 3, 0.0, 0.0);
   vec3 grass = am_mixOk(am_mixOk(u_a0, u_ink, 0.7), am_mixOk(u_a0, u_bg, 0.15), sat(grassN * 0.7 + blades * 0.6 - 0.15));
-  float path = smoothstep(0.16, 0.08, abs(gx + 0.02));
+  float path = (1.0 - smoothstep(0.08, 0.16, abs(gx + 0.02)));
   vec3 ground = mix(grass, am_mixOk(u_bg, u_a2, 0.45) * (0.85 + 0.25 * grassN), path);
   col = d.y < 0.0 ? ground : col;
   col = mix(col, bankL, onL);

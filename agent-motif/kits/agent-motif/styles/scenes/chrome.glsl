@@ -8,6 +8,8 @@ vec3 blobPos(int i) {
   vec2 a = lc(k1 * float(p_orbits), h.z), b = lc(k2 * float(p_orbits), h.x + 0.25);
   return vec3(a.x * 0.85, b.y * 0.32, a.y * 0.55) * p_spread;
 }
+// Field class: bound. Spheres + cubic smin are a lower bound of the true distance; the ripple adds a term with
+// |grad| <= 0.012 * ripple * sqrt(9^2 + 8^2 + 7^2), so dividing by that Lipschitz constant keeps it conservative.
 float chromeMap(vec3 p) {
   float d = 1e5;
   for (int i = 0; i < 8; i++) {
@@ -16,7 +18,7 @@ float chromeMap(vec3 p) {
     d = am_smin3(d, length(p - blobPos(i)) - r * p_size, p_blend * 0.18);
   }
   float rip = sin(9.0 * p.x + TAU * 2.0 * u_p) * sin(8.0 * p.y - TAU * u_p) * sin(7.0 * p.z + TAU * u_p);
-  return d + p_ripple * 0.012 * rip;
+  return (d + p_ripple * 0.012 * rip) / (1.0 + p_ripple * 0.012 * 13.928);
 }
 // The studio spin sweeps bright softboxes across the surface: route it through the limiter (safeCycles) so it
 // slows/freezes when tempo would push reflections past 3 flashes per second.

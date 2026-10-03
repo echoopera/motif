@@ -14,7 +14,9 @@
 import fs from 'node:fs'; import path from 'node:path'; import { fileURLToPath } from 'node:url'; import { createRequire } from 'node:module';
 const here = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(here, '..');
-const SDK = path.resolve(ROOT, '../Motif3/sdk/motif-kit-sdk');
+// SDK 4.0 (motif-kit@4; reads @1–@3). Override with AM_SDK=<path to a motif-kit-sdk folder>.
+const SDK = path.resolve(process.env.AM_SDK || path.resolve(ROOT, '../Motif3/sdk/motif-kit-sdk-4.0.0'));
+const FONT_B64 = (() => { try { return fs.readFileSync(path.join(SDK, 'lib/fonts/DejaVuSans-Bold.ttf')).toString('base64'); } catch (e) { return ''; } })();
 const LIB = path.join(ROOT, 'lib/glsl');
 const KG_SRC = fs.readFileSync(path.join(SDK, 'lib/kit-gl.js'), 'utf8');
 const KG = new Function(KG_SRC)();
@@ -22,7 +24,7 @@ const METRICS = fs.readFileSync(path.join(here, 'metrics.js'), 'utf8');
 
 const [cmd, ...rest] = process.argv.slice(2);
 const flags = {}, args = [];
-const VAL = ['out', 'id', 'ref', 'phase', 'mode', 'params', 'media', 'gens', 'pop', 'only', 'lock', 'palette', 'w', 'h', 'seconds', 'fps', 'chromium', 'append', 'modules', 'phases', 'seed', 'name', 'loops', 'format'];
+const VAL = ['text', 'out', 'id', 'ref', 'phase', 'mode', 'params', 'media', 'gens', 'pop', 'only', 'lock', 'palette', 'w', 'h', 'seconds', 'fps', 'chromium', 'append', 'modules', 'phases', 'seed', 'name', 'loops', 'format'];
 for (let i = 0; i < rest.length; i++) {
   const a = rest[i];
   if (!a.startsWith('--')) { args.push(a); continue; }
@@ -61,7 +63,7 @@ function buildCommon(names, append) {
 // ---------------------------------------------------------------- kits
 function readKitDir(dir) {
   const files = {};
-  const walk = d => { for (const f of fs.readdirSync(d)) { const p = path.join(d, f); if (fs.statSync(p).isDirectory()) walk(p); else if (!f.startsWith('.') && /\.(glsl|json|md|txt)$/i.test(f)) files[path.relative(dir, p).split(path.sep).join('/')] = fs.readFileSync(p, 'utf8'); } };
+  const walk = d => { for (const f of fs.readdirSync(d)) { const p = path.join(d, f); if (fs.statSync(p).isDirectory()) walk(p); else if (!f.startsWith('.') && /\.(glsl|json|md|txt|svg)$/i.test(f)) files[path.relative(dir, p).split(path.sep).join('/')] = fs.readFileSync(p, 'utf8'); } };
   walk(dir);
   if (!files['manifest.json']) die(`No manifest.json in ${dir}`);
   const manifest = JSON.parse(files['manifest.json']); delete files['manifest.json'];
@@ -69,8 +71,11 @@ function readKitDir(dir) {
 }
 function loadKit(dir) {
   const raw = readKitDir(dir); const v = KG.validateKit(raw.manifest, raw.files);
-  v.warnings.forEach(w => console.log('  warn ', w));
-  if (!v.ok) { v.errors.forEach(e => console.log('  error', e)); process.exit(1); }
+  const diags = v.diagnostics || [];
+  for (const d of diags) console.log(`  ${d.severity === 'error' ? 'error' : 'warn '} ${d.file || 'manifest.json'}${d.line ? ':' + d.line : ''}  ${d.message}${d.entry ? '  (' + d.entry + ')' : ''}`);
+  if (!diags.length) v.warnings.forEach(w => console.log('  warn ', w));
+  if (!v.ok) { if (!diags.length) v.errors.forEach(e => console.log('  error', e)); process.exit(1); }
+  v.kit.renderables = KG.renderables ? KG.renderables(v.kit) : v.kit.styles;
   return { kit: v.kit, manifest: raw.manifest };
 }
 function readParams() {
@@ -108,23 +113,61 @@ window.H = (() => {
   async function img(url) { if (imgs[url]) return imgs[url]; const im = new Image(); im.src = url; await im.decode(); imgs[url] = im; return im; }
   function bake(src, w, h) { const sw = src.naturalWidth || src.width, sh = src.naturalHeight || src.height, ar = w / h; let cw = sw, ch = sh; if (sw / sh > ar) cw = sh * ar; else ch = sw / ar; const c = document.createElement('canvas'); c.width = Math.round(cw); c.height = Math.round(ch); c.getContext('2d').drawImage(src, (sw - cw) / 2, (sh - ch) / 2, cw, ch, 0, 0, c.width, c.height); return { canvas: c, rev: 1, w: sw, h: sh, time: 0 }; }
   function testCard() { const c = document.createElement('canvas'); c.width = 1280; c.height = 720; const x = c.getContext('2d'); const g = x.createLinearGradient(0, 0, 1280, 720); g.addColorStop(0, '#1E3A8A'); g.addColorStop(0.5, '#DB2777'); g.addColorStop(1, '#F59E0B'); x.fillStyle = g; x.fillRect(0, 0, 1280, 720); x.strokeStyle = 'rgba(255,255,255,.55)'; x.lineWidth = 2; for (let i = 0; i <= 1280; i += 64) { x.beginPath(); x.moveTo(i, 0); x.lineTo(i, 720); x.stroke(); } for (let j = 0; j <= 720; j += 64) { x.beginPath(); x.moveTo(0, j); x.lineTo(1280, j); x.stroke(); } x.fillStyle = '#FFFFFF'; x.font = '700 150px sans-serif'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText('MOTIF', 640, 360); return c; }
-  function style(id) { const st = kit.styles.find(s => s.localId === id || s.id === id); if (!st) throw new Error('no style ' + id + ' (have ' + kit.styles.map(s => s.localId).join(', ') + ')'); return st; }
-  function compile(id) { const st = style(id); return rt.compile(st.id, { passes: st.passes, common: kit.common, params: st.params, inputs: st.inputs || [] }, true); }
+  function cardB() { const c = document.createElement('canvas'); c.width = 1280; c.height = 720; const x = c.getContext('2d'); const g = x.createLinearGradient(0, 0, 1280, 720); g.addColorStop(0, '#0B1E3B'); g.addColorStop(1, '#F2C14E'); x.fillStyle = g; x.fillRect(0, 0, 1280, 720); return c; }
+  // Fallback font for text inputs, as the SDK preview does (bundled DejaVu Sans Bold).
+  let fontReady = null;
+  function loadFont(b64) { if (fontReady || !b64) return fontReady; const bytes = Uint8Array.from(atob(b64), c => c.charCodeAt(0)); const face = new FontFace('Motif Preview Sans', bytes.buffer); fontReady = face.load().then(f => { document.fonts.add(f); return true; }); return fontReady; }
+  let textOverride = null;
+  function textAtlas(q, W) { const TA = KG.textAtlas; return TA.atlasFor(q, { lines: Object.fromEntries(q.lines.map((l, i) => [l.id, { ...l, text: textOverride && textOverride[i] != null ? textOverride[i] : l.def, font: { family: 'Motif Preview Sans', weight: l.font.weight } }])) }, Math.max(W, 1024), 'am'); }
+  const list = () => kit.renderables || kit.styles;
+  function style(id) { const st = list().find(s => s.localId === id || s.id === id); if (!st) throw new Error('no entry ' + id + ' (have ' + list().map(s => s.localId).join(', ') + ')'); return st; }
+  function compile(id) { const st = style(id); return rt.compile(st.id, { passes: st.passes, common: kit.common, params: st.params, inputs: st.inputs || [], ...(st.runtime || {}) }, true); }
   function defaults(st) { return Object.fromEntries(Object.entries(st.params).map(([k, s]) => [k, s.def])); }
   function pal(st, over) { return over || kit.palettes.find(p => p.id === st.palette) || kit.palettes[0] || { bg: '#000000', ink: '#ffffff', a: ['#35E0FF', '#FF3D9A', '#FFB547'] }; }
   const tmp = document.createElement('canvas'); const tx = tmp.getContext('2d', { willReadFrequently: true });
-  // Render to tmp (composited over the palette bg like Motif's stage) and return the ImageData.
+  // Inputs for one frame: media (user image or test card), stack layers (distinct cards), text atlases,
+  // svg and text distance fields (baked by the SDK's own v4 code), and effect/transition sources.
+  function inputsFor(st, W, H, o) {
+    const ins = st.inputs || []; if (!ins.length && !st.kind) return { media: null, ext: null };
+    const cardA = () => bake(o.mediaKey ? imgs[o.mediaKey] : (media.card || (media.card = testCard())), W, H);
+    const cards = [() => cardA(), () => bake(media.b || (media.b = cardB()), W, H), () => bake(media.card || (media.card = testCard()), W, H)];
+    let m = null;
+    if (ins.length) {
+      m = {};
+      for (const q of ins) {
+        if (q.type === 'svg' || q.type === 'sdf') continue;
+        if (q.type === 'text') { m[q.id] = textAtlas(q, W); continue; }
+        if (o.noMedia || window.__noMedia) continue;
+        m[q.id] = q.stack ? cards[(q.stack - 1) % 3]() : cardA();
+      }
+      if (KG.v4) Object.assign(m, KG.v4.resolveSvg(ins, { w: W, h: H }) || {}, KG.v4.resolveTextSdf(ins, m, { w: W, h: H }) || {});
+    }
+    const ext = st.kind === 'effect' ? { input: cardA() } : st.kind === 'transition' ? { from: cardA(), to: cards[1]() } : null;
+    return { media: m, ext };
+  }
   function render(id, o) {
     const st = style(id); const W = o.w, H = o.h; const P = pal(st, o.pal);
     const params = Object.assign(defaults(st), o.params || {});
-    let m = null; if ((st.inputs || []).length && !o.noMedia && !window.__noMedia) { const src = o.mediaKey ? imgs[o.mediaKey] : (media.card || (media.card = testCard())); const b = bake(src, W, H); m = Object.fromEntries(st.inputs.map(q => [q.id, b])); }
-    rt.draw(st.id, W, H, { p: o.p, L: o.L || 6, seed: o.seed || 417, safe: o.safe !== false, pal: P, params, spec: st.params, media: m });
+    const { media: m, ext } = inputsFor(st, W, H, o);
+    rt.draw(st.id, W, H, { p: o.p, L: o.L || 6, seed: o.seed || 417, safe: o.safe !== false, pal: P, params, spec: st.params, media: m, ext, progress: o.progress != null ? o.progress : o.p });
     tmp.width = W; tmp.height = H; tx.fillStyle = P.bg; tx.fillRect(0, 0, W, H); rt.blit(tx, W, H); return tx.getImageData(0, 0, W, H);
   }
   async function imageData(url, maxW) { const im = await img(url); const w = Math.min(maxW || 512, im.naturalWidth), h = Math.round(im.naturalHeight * w / im.naturalWidth); const c = document.createElement('canvas'); c.width = w; c.height = h; const x = c.getContext('2d'); x.drawImage(im, 0, 0, w, h); return x.getImageData(0, 0, w, h); }
   function sheet(tiles, labels, cols) { const W = tiles[0].width, Hh = tiles[0].height, pad = 6, lab = 18; cols = cols || tiles.length; const rows = Math.ceil(tiles.length / cols); const c = document.createElement('canvas'); c.width = cols * (W + pad) + pad; c.height = rows * (Hh + pad + lab) + pad; const x = c.getContext('2d'); x.fillStyle = '#141414'; x.fillRect(0, 0, c.width, c.height); tiles.forEach((t, i) => { const cx = pad + (i % cols) * (W + pad), cy = pad + Math.floor(i / cols) * (Hh + pad + lab); x.fillStyle = '#ddd'; x.font = '12px monospace'; x.fillText(labels[i] || '', cx, cy + 13); x.putImageData(t, cx, cy + lab); }); return c.toDataURL('image/png'); }
   function fit(idata, W, H) { const c = document.createElement('canvas'); c.width = idata.width; c.height = idata.height; c.getContext('2d').putImageData(idata, 0, 0); const d = document.createElement('canvas'); d.width = W; d.height = H; const x = d.getContext('2d'); x.drawImage(c, 0, 0, W, H); return x.getImageData(0, 0, W, H); }
-  return { rt, img, compile, render, imageData, sheet, fit, style, defaults, setKit(k) { kit = k; }, get kit() { return kit; } };
+  // Exact reference for transition endpoints: the same graph and inputs, with the pass replaced by a pass-through.
+  function identity(id, which, o) {
+    const st = style(id); const key = '__id_' + which + '_' + st.id;
+    const rtm = JSON.parse(JSON.stringify(st.runtime || {}));
+    const src = 'vec4 motif(vec2 uv, vec2 fc) { return g_' + which + 'At(fc / u_res); }';
+    if (rtm.graph) rtm.graph.passes.forEach(ps => { ps.src = src; });
+    const c = rt.compile(key, { passes: st.passes.map(ps => ({ ...ps, src })), common: '', params: st.params, inputs: [], ...rtm }, true); if (!c.ok) throw new Error(c.error);
+    const { ext } = inputsFor(st, o.w, o.h, o); const P = pal(st);
+    rt.draw(key, o.w, o.h, { p: o.p, L: 6, seed: 417, safe: true, pal: P, params: defaults(st), spec: st.params, media: null, ext, progress: 0 });
+    tmp.width = o.w; tmp.height = o.h; tx.fillStyle = P.bg; tx.fillRect(0, 0, o.w, o.h); rt.blit(tx, o.w, o.h); return tx.getImageData(0, 0, o.w, o.h);
+  }
+  function cardData(which, W, H) { const c = which === 'to' ? (media.b || (media.b = cardB())) : (media.card || (media.card = testCard())); let src = bake(c, W, H).canvas; while (src.width > 2 * W) { const h = document.createElement('canvas'); h.width = Math.max(W, Math.round(src.width / 2)); h.height = Math.max(H, Math.round(src.height / 2)); const hx = h.getContext('2d'); hx.imageSmoothingQuality = 'high'; hx.drawImage(src, 0, 0, h.width, h.height); src = h; } tmp.width = W; tmp.height = H; tx.imageSmoothingQuality = 'high'; tx.drawImage(src, 0, 0, W, H); return tx.getImageData(0, 0, W, H); } // mip-chain downscale, like the GPU's trilinear sampling
+  return { rt, img, compile, render, cardData, identity, imageData, sheet, fit, style, defaults, loadFont, setText(t) { textOverride = t; }, list, setKit(k) { kit = k; }, get kit() { return kit; } };
 })();
 `;
 const savePng = (file, url) => { fs.writeFileSync(file, Buffer.from(url.split(',')[1], 'base64')); return file; };
@@ -164,7 +207,7 @@ async function cmdAnalyze() {
 async function withKit(fn) {
   const kitDir = args[0]; if (!kitDir) die('kit folder required');
   const { kit, manifest } = loadKit(kitDir); const { browser, page } = await openPage();
-  await page.evaluate(([k, nm]) => { H.setKit(k); window.__noMedia = nm; }, [kit, !!flags['no-media']]);
+  await page.evaluate(async ([k, nm, font, text]) => { H.setKit(k); window.__noMedia = nm; H.setText(text); await H.loadFont(font); }, [kit, !!flags['no-media'], FONT_B64, flags.text && flags.text !== true ? String(flags.text).split('|') : null]);
   if (flags.media && flags.media !== true) await page.evaluate(u => H.img(u), dataUrl(flags.media));
   try { return await fn({ kit, manifest, page, kitDir }); } finally { await browser.close(); }
 }
@@ -213,7 +256,7 @@ async function cmdTune() {
   const styleId = args[1]; if (!styleId || !flags.ref) die('usage: am tune <kit> <style> --ref <image> [--gens 12 --pop 10]');
   ensureOut();
   await withKit(async ({ kit, page, kitDir }) => {
-    const st = kit.styles.find(s => s.localId === styleId); if (!st) die(`no style ${styleId}`);
+    const st = (kit.renderables || kit.styles).find(s => s.localId === styleId); if (!st) die(`no style ${styleId}`);
     const only = flags.only ? String(flags.only).split(',') : [], lock = flags.lock ? String(flags.lock).split(',') : [];
     const dims = paramSpace(st, only, lock); if (!dims.length) die('no tunable params');
     const start = Object.assign(Object.fromEntries(Object.entries(st.params).map(([k, s]) => [k, s.def])), readParams());
@@ -270,7 +313,7 @@ async function cmdTune() {
 async function cmdQa() {
   ensureOut();
   await withKit(async ({ kit, page }) => {
-    const only = args.slice(1); const styles = kit.styles.filter(s => !only.length || only.includes(s.localId)).map(s => s.localId);
+    const only = args.slice(1); const styles = (kit.renderables || kit.styles).filter(s => !only.length || only.includes(s.localId)).map(s => s.localId);
     const W = +(flags.w || 480), Hh = +(flags.h || 270);
     const res = await page.evaluate(({ styles, W, Hh, mk, params }) => {
       const out = [];
@@ -278,6 +321,16 @@ async function cmdQa() {
       const relLum = d => { const T = 4, tl = new Array(T * T).fill(0), n = new Array(T * T).fill(0); const w = d.width, h = d.height; const lin = v => { v /= 255; return v <= 0.04045 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); }; for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) { const i = (y * w + x) * 4; const k = Math.floor(y * T / h) * T + Math.floor(x * T / w); tl[k] += 0.2126 * lin(d.data[i]) + 0.7152 * lin(d.data[i + 1]) + 0.0722 * lin(d.data[i + 2]); n[k]++; } return tl.map((v, i) => v / n[i]); };
       for (const id of styles) {
         const c = H.compile(id); if (!c.ok) { out.push({ id, error: c.error }); continue; }
+        if (H.style(id).kind === 'transition') {
+          // Contract: progress 0 shows `from` exactly, progress 1 shows `to` exactly; the middle must differ from both.
+          const a = H.render(id, { w: 160, h: 90, p: 0.3, progress: 0, mediaKey: mk, params }), b = H.render(id, { w: 160, h: 90, p: 0.3, progress: 1, mediaKey: mk, params }), m = H.render(id, { w: 160, h: 90, p: 0.3, progress: 0.5, mediaKey: mk, params });
+          const fa = H.identity(id, 'from', { w: 160, h: 90, p: 0.3, mediaKey: mk }), fb = H.identity(id, 'to', { w: 160, h: 90, p: 0.3, mediaKey: mk });
+          // Compare 8x8 block means: robust to GPU-vs-canvas resampling of 1 px lines, still catches any real change.
+          const blk = im => { const o = []; for (let by = 0; by < 90; by += 8) for (let bx = 0; bx < 160; bx += 8) { let r = 0, g = 0, b2 = 0, n = 0; for (let y = by; y < Math.min(by + 8, 90); y++) for (let x = bx; x < bx + 8; x++) { const i = (y * 160 + x) * 4; r += im.data[i]; g += im.data[i + 1]; b2 += im.data[i + 2]; n++; } o.push(r / n, g / n, b2 / n, 0); } return o; };
+          const mdB = (x, y) => md(blk(x), blk(y)) * 4 / 3;
+          out.push({ id, transition: true, d0: +mdB(a, fa).toFixed(2), d1: +mdB(b, fb).toFixed(2), dm: +Math.min(mdB(m, fa), mdB(m, fb)).toFixed(2) });
+          continue;
+        }
         const N = 48; const frames = []; for (let i = 0; i <= N; i++) frames.push(H.render(id, { w: 160, h: 90, p: i / N, mediaKey: mk, params }).data.slice());
         const steps = []; for (let i = 1; i <= N; i++) steps.push(md(frames[i - 1], frames[i]));
         const seamExact = md(frames[0], frames[N]); const sorted = [...steps].sort((a, b) => a - b); const med = sorted[Math.floor(N / 2)];
@@ -294,19 +347,24 @@ async function cmdQa() {
         }
         // Cost at the requested size.
         const gl = H.rt.canvas.getContext('webgl2'); H.render(id, { w: W, h: Hh, p: 0.1, mediaKey: mk, params }); gl.finish(); const t0 = performance.now(); for (let i = 0; i < 3; i++) H.render(id, { w: W, h: Hh, p: 0.2 + i * 0.1, mediaKey: mk, params }); gl.finish(); const ms = (performance.now() - t0) / 3;
+        // Quality consistency (research acceptance): exposure should hold between the lowest and highest step count.
+        let qratio = null; const sp = H.style(id).params.steps;
+        if (sp && sp.type === 'int') { const lum = im => { let s = 0; for (let i = 0; i < im.data.length; i += 4) s += 0.2126 * im.data[i] + 0.7152 * im.data[i + 1] + 0.0722 * im.data[i + 2]; return s / (im.data.length / 4); }; const lo = lum(H.render(id, { w: 160, h: 90, p: 0.3, mediaKey: mk, params: { ...params, steps: sp.min } })), hi = lum(H.render(id, { w: 160, h: 90, p: 0.3, mediaKey: mk, params: { ...params, steps: sp.max } })); qratio = +(lo / Math.max(hi, 1e-3)).toFixed(3); }
         const strip = []; for (let i = 0; i < 6; i++) strip.push(H.render(id, { w: 240, h: 135, p: i / 6, mediaKey: mk, params }));
-        out.push({ id, seam: +(seamExact).toFixed(2), seamRatio: +(seamStep / Math.max(med, 0.05)).toFixed(2), motion: +med.toFixed(2), pop: +(maxStep / Math.max(med, 0.05)).toFixed(2), flashes: +worst.toFixed(2), tilesOver, ms: +ms.toFixed(1), strip: H.sheet(strip, ['0', '1/6', '2/6', '3/6', '4/6', '5/6'], 6) });
+        out.push({ id, seam: +(seamExact).toFixed(2), seamRatio: +(seamStep / Math.max(med, 0.05)).toFixed(2), motion: +med.toFixed(2), pop: +(maxStep / Math.max(med, 0.05)).toFixed(2), flashes: +worst.toFixed(2), tilesOver, qratio, ms: +ms.toFixed(1), strip: H.sheet(strip, ['0', '1/6', '2/6', '3/6', '4/6', '5/6'], 6) });
       }
       return out;
     }, { styles, W, Hh, mk: mediaKey(), params: readParams() });
     let bad = 0;
     for (const r of res) {
       if (r.error) { bad++; console.log(`  ✖ ${r.id}\n${r.error.replace(/^/gm, '      ')}`); continue; }
+      if (r.transition) { const ok = r.d0 < 2 && r.d1 < 2 && r.dm > 2; if (!ok) bad++; console.log(`  ${ok ? '✓' : '!'} ${r.id.padEnd(22)} transition  progress 0 vs from Δ${r.d0}  progress 1 vs to Δ${r.d1}  midpoint differs Δ${r.dm}${ok ? '' : '  ← endpoints must match from/to exactly'}`); continue; }
       const notes = [r.seam > 1.5 ? `frame 0 ≠ frame L (Δ${r.seam})` : '', r.seamRatio > 3 ? 'seam jump' : '', r.pop > 6 ? 'discontinuity mid-loop' : '', r.motion < 0.05 ? 'static?' : '', r.tilesOver >= 4 ? `${r.tilesOver} tiles > 3 flashes/s (fails WCAG 2.3.1 audit)` : ''].filter(Boolean);
       const warns = r.flashes > 3 && r.tilesOver < 4 ? [`${r.tilesOver} tile(s) reach ${r.flashes} flashes/s at worst-case tempo (audit passes below 4 tiles)`] : [];
+      if (r.qratio != null && Math.abs(r.qratio - 1) > 0.15) warns.push(`exposure shifts ${((r.qratio - 1) * 100).toFixed(0)}% between min and max Quality`);
       if (notes.length) bad++;
       savePng(path.join(OUT, `qa-${r.id}.png`), r.strip);
-      console.log(`  ${notes.length ? '!' : warns.length ? '~' : '✓'} ${r.id.padEnd(22)} ${String(r.ms).padStart(7)} ms@${W}x${Hh}  motion ${r.motion}  seam Δ${r.seam} (×${r.seamRatio})  pop ×${r.pop}  flashes ${r.flashes}/s (tiles>3: ${r.tilesOver})${notes.length ? '  ← ' + notes.join(', ') : warns.length ? '  ~ ' + warns.join(', ') : ''}`);
+      console.log(`  ${notes.length ? '!' : warns.length ? '~' : '✓'} ${r.id.padEnd(22)} ${String(r.ms).padStart(7)} ms@${W}x${Hh}  motion ${r.motion}  seam Δ${r.seam} (×${r.seamRatio})  pop ×${r.pop}  flashes ${r.flashes}/s (tiles>3: ${r.tilesOver})${r.qratio != null ? `  quality-exposure ×${r.qratio}` : ''}${notes.length ? '  ← ' + notes.join(', ') : warns.length ? '  ~ ' + warns.join(', ') : ''}`);
     }
     console.log(`  filmstrips in ${OUT}/qa-*.png  (ms are SwiftShader CPU numbers: a real GPU is 20–100× faster)`);
     process.exitCode = bad ? 1 : 0;
@@ -355,6 +413,12 @@ async function cmdLib() {
   }
   if (sub === 'test') {
     const all = Object.keys(modules()); const common = buildCommon(all);
+    // 1. The app's sandbox: static analysis of the whole library as a kit common (loops, budgets, directives).
+    const probe = { format: 'motif-kit@4', id: 'am-lib-test', name: 'am lib test', version: '0.0.1', common: 'common.glsl', palettes: [{ id: 'probe', name: 'P', bg: '#000000', ink: '#FFFFFF', a: ['#FF0000', '#00FF00', '#0000FF'] }], styles: [{ id: 'probe', name: 'T', passes: [{ src: 't.glsl' }], params: { a: { type: 'range', label: 'A', min: 0, max: 1, def: 0.5 }, b: { type: 'range', label: 'B', min: 0, max: 1, def: 0.5 }, c: { type: 'range', label: 'C', min: 0, max: 1, def: 0.5 }, d: { type: 'range', label: 'D', min: 0, max: 1, def: 0.5 } } }] };
+    const sv = KG.validateKit(probe, { 'common.glsl': common, 't.glsl': 'vec4 motif(vec2 uv, vec2 fc) { return vec4(am_agx(vec3(uv, p_a), 0.0), 1.0); }' });
+    (sv.diagnostics || []).forEach(d => console.log(`  ${d.severity === 'error' ? 'error' : 'warn '} ${d.file || ''}${d.line ? ':' + d.line : ''}  ${d.message}`));
+    console.log(sv.ok ? `  ✓ sandbox: library passes static analysis (SDK ${KG.SDK_VERSION || '?'})` : '  ✖ sandbox rejected the library');
+    if (!sv.ok) { process.exitCode = 1; return; }
     const { browser, page } = await openPage();
     const r = await page.evaluate(common => { const rt = KG.createGlRuntime(); return rt.compile('t', { passes: [{ src: 'vec4 motif(vec2 uv, vec2 fc) { return vec4(am_agx(vec3(uv, 0.5), 0.0), 1.0); }' }], common, params: {}, inputs: [] }, true); }, common);
     await browser.close();
@@ -365,28 +429,28 @@ async function cmdLib() {
 
 function cmdNew() {
   const dest = args[0]; if (!dest) die('usage: am new <dir> --id my-kit [--modules color,noise,post]'); if (fs.existsSync(dest)) die(`${dest} exists`);
-  const id = String(flags.id || path.basename(dest)); const mods = String(flags.modules || 'color,noise,post').split(',');
+  const id = String(flags.id || path.basename(dest)); const mods = String(flags.modules || 'color,noise,post,field').split(',');
   fs.mkdirSync(path.join(dest, 'styles'), { recursive: true });
   fs.writeFileSync(path.join(dest, 'kit.glsl'), '// Kit-specific helpers. Rebuild common.glsl after editing:\n//   am lib build ' + mods.join(' ') + ' --append kit.glsl --out common.glsl\n');
   fs.writeFileSync(path.join(dest, 'common.glsl'), buildCommon(mods, path.join(dest, 'kit.glsl')));
-  fs.writeFileSync(path.join(dest, 'styles/hero.glsl'), `// Pass 1 of 2 (scale 0.5): the HDR scene, linear light. Values above 1 bloom in the post pass.
+  fs.writeFileSync(path.join(dest, 'styles/hero.glsl'), `// Graph pass "scene" (scale 0.5): the HDR scene, linear light. Values above 1 bloom in the post pass.
 vec4 motif(vec2 uv, vec2 fc) {
   vec2 q, w; float f = am_warp(uv * p_scale, 5, 1.0, 0.6, 3.0, q, w);
   vec3 col = am_rampOk(sat(0.5 + 0.6 * f)) + am_accentLoop(length(w) + u_p) * pow(sat(f + 0.3), 3.0) * p_glow * 2.0;
   return vec4(col, 1.0);
 }
 `);
-  fs.writeFileSync(path.join(dest, 'styles/hero-post.glsl'), `// Pass 2 of 2 (full res): bloom, chromatic aberration, tone map, grain, vignette.
+  fs.writeFileSync(path.join(dest, 'styles/hero-post.glsl'), `// Graph output pass (full res, reads scene): bloom, chromatic aberration, tone map, grain, vignette.
 vec4 motif(vec2 uv, vec2 fc) {
   vec2 q = fc / u_res;
-  vec3 c = am_ca(u_buf0, q, 0.004, 5);
-  c += am_bloom(u_buf0, q, 3.0) * p_bloom;
+  vec3 c = am_ca(g_scene, q, 0.004, 5);
+  c += am_bloom(g_scene, q, 3.0) * p_bloom;
   c = am_tonemap(c, p_exposure, 0);
   c *= mix(1.0, am_vignette(uv, 1.0), 0.6);
   return vec4(am_grain(c, fc, 0.6, 1.0), 1.0);
 }
 `);
-  const manifest = { format: 'motif-kit@1', id, name: String(flags.name || id), version: '0.1.0', author: 'AgentMotif', description: 'Built with AgentMotif.', license: '', accent: '#7C5CFF', common: 'common.glsl', palettes: [{ id: 'night', name: 'Night', bg: '#06070C', ink: '#F4F1EA', a: ['#7C5CFF', '#FF4F8B', '#3DE0C8'] }], styles: [{ id: 'hero', name: 'Hero', group: 'AgentMotif', palette: 'night', tags: ['agentmotif'], blurb: 'Starter: warped field, HDR glow, lens finish.', flash: false, passes: [{ src: 'styles/hero.glsl', scale: 0.5 }, { src: 'styles/hero-post.glsl' }], params: { scale: { type: 'range', label: 'Scale', min: 0.5, max: 4, def: 1.6, group: 'Field' }, glow: { type: 'range', label: 'Glow', min: 0, max: 2, def: 0.8, group: 'Field' }, bloom: { type: 'range', label: 'Bloom', min: 0, max: 1.5, def: 0.5, group: 'Lens' }, exposure: { type: 'range', label: 'Exposure', min: -3, max: 3, def: 0, unit: 'EV', group: 'Lens' } } }] };
+  const manifest = { format: 'motif-kit@4', capabilities: [], id, name: String(flags.name || id), version: '0.1.0', author: 'AgentMotif', description: 'Built with AgentMotif.', license: '', accent: '#7C5CFF', common: 'common.glsl', palettes: [{ id: 'night', name: 'Night', bg: '#06070C', ink: '#F4F1EA', a: ['#7C5CFF', '#FF4F8B', '#3DE0C8'] }], styles: [{ id: 'hero', name: 'Hero', group: 'AgentMotif', palette: 'night', tags: ['agentmotif'], blurb: 'Starter: warped field, HDR glow, lens finish.', flash: false, cost: 1, graph: { buffers: { scene: { scale: 0.5 } }, passes: [{ src: 'styles/hero.glsl', writes: 'scene' }, { src: 'styles/hero-post.glsl', reads: ['scene'], writes: 'output' }] }, params: { scale: { type: 'range', label: 'Scale', min: 0.5, max: 4, def: 1.6, group: 'Field' }, glow: { type: 'range', label: 'Glow', min: 0, max: 2, def: 0.8, group: 'Field' }, bloom: { type: 'range', label: 'Bloom', min: 0, max: 1.5, def: 0.5, group: 'Lens' }, exposure: { type: 'range', label: 'Exposure', min: -3, max: 3, def: 0, unit: 'EV', group: 'Lens' } } }] };
   fs.writeFileSync(path.join(dest, 'manifest.json'), JSON.stringify(manifest, null, 2) + '\n');
   console.log(`  created ${dest} (modules: ${resolveModules(mods).map(m => m.id).join(', ')}). Next: am qa ${dest}`);
 }

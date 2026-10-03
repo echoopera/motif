@@ -84,3 +84,19 @@ Find the visual signature you see in the reference, then read across to the tech
 - **Distance aliasing**: fade high-frequency patterns toward their mean with distance, a hand-rolled mip (see `caustic-light`).
 - **Metric traps**: an optimiser will delete a defining feature if that improves the average score (`light-tunnel` lost its streaks). Lock structural parameters and let the eye overrule the number.
 - **Scrolling a cell grid doesn't loop**: shifting by whole cells changes every cell's hash id, so frame L ≠ frame 0. Wrap particles in a domain instead (`mod(seed + wraps * u_p, 1.0)` with integer `wraps`), as `caustic-light` does for its motes.
+
+## Fields and renderers (SDK 4 / Astral research)
+
+| Signature | Field class | Renderer | Library | Measured |
+| --- | --- | --- | --- | --- |
+| Luminous folded tunnels, recursive-looking filaments | glow | additive glow | `am_cosFold` + `AM_GLOW`, see `astral-fold` | exposure ×2.43 min→max steps raw; ×1.02 with fitted compensation |
+| The same, with stable exposure and translucent depth | density | absorption / emission | `AM_VOLUME`, `astral-fold` renderer = volume | ×0.96 |
+| Carved stone, hollow artifacts, eroded columns | bound | Lipschitz-scaled sphere trace | `AM_MARCH_L`, `am_cosFoldLip`, see `monolith` | ×0.999 |
+| Porous membranes, gyroid chambers | density | absorption / emission | `AM_VOLUME`, see `cellspace` | ×0.991 |
+| Gyroid as a solid surface | implicit (or bound via the √6 gradient bound) | `AM_SEGMENT`, or `am_sdGyroidShell` + `AM_MARCH` | `field`, `sdf` | — |
+| Neon / topographic / portal type | exact within spread | 2D coverage from `textDist_<id>` | see `lightscript` | — |
+| Speed-streak cut between shots | — | transition, `k = sin(pi * progress)` | `transitions/tunnel.glsl` | endpoints Δ0 |
+
+- **Sampled distance fields clamp beyond their spread.** A glow `exp(-d / w)` then keeps a constant floor across the whole text band and draws a box. Subtract the value at the spread and renormalise (`glowFall` in `lightscript`).
+- **Bloom pre-blur must match the buffer ratio.** A 1/4-res bright pass reading a full-res scene with a 1-texel kernel skips pixels and aliases highlights into blocks. Scale the radius by `textureSize(src) / u_res`.
+- **Transition endpoint checks need a GPU reference.** Canvas `drawImage` downscaling aliases thin lines differently from mipmapped texture sampling. Compare against the same graph with a pass-through shader (as `am qa` does).

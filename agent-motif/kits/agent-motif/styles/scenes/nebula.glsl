@@ -6,7 +6,7 @@ float nebDensity(vec3 p, out float dust) {
   float k = float(p_flow);
   float n = am_sinFbm3(p * p_scale * 2.2, 5, k, 0.6 * p_turb);
   float shell = length(p * vec3(1.0, 1.4, 1.0)) - 0.9 + n * 0.55;    // envelope, eroded by the noise
-  float env = smoothstep(0.25, -0.6, shell);
+  float env = (1.0 - smoothstep(-0.6, 0.25, shell));
   float fil = pow(sat(1.0 - abs(n) * 1.6), 5.0);                     // ridged: thin glowing filaments
   float soft = sat(n * 0.9 + 0.25);                                  // broad diffuse glow
   dust = sat(am_sinFbm3(p * p_scale * 3.4 + 7.1, 3, k, 0.4 * p_turb) * 1.6 - 0.15) * env;

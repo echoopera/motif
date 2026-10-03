@@ -28,10 +28,15 @@ float am_sdSphere(vec3 p, float r) { return length(p) - r; }
 float am_sdRoundBox3(vec3 p, vec3 b, float r) { vec3 q = abs(p) - b + r; return length(max(q, 0.0)) + min(max(q.x, max(q.y, q.z)), 0.0) - r; }
 float am_sdCapsule(vec3 p, vec3 a, vec3 b, float r) { vec3 pa = p - a, ba = b - a; float h = sat(dot(pa, ba) / dot(ba, ba)); return length(pa - ba * h) - r; }
 float am_sdOcta(vec3 p, float s) { p = abs(p); return (p.x + p.y + p.z - s) * 0.57735027; }
-float am_sdGyroidShell(vec3 p, float scale, float thick) { p *= scale; return (abs(dot(sin(p), cos(p.yzx))) - thick) / scale * 0.6; }
+// Gyroid sheet as a CONSERVATIVE bound (class: bound). |grad g| <= sqrt(6) for g = sin.cos sums, so dividing by
+// scale * sqrt(6) never overshoots the zero set. (The raw gyroid is only an implicit function, not a distance.)
+float am_sdGyroidShell(vec3 p, float scale, float thick) { p *= scale; return (abs(dot(sin(p), cos(p.yzx))) - thick) / (scale * 2.4494897); }
 // Smooth boolean with a blend factor for colour/material mixing: returns (d, h) where h = 0 -> a, 1 -> b.
 vec2 am_sminH(float a, float b, float k) { float h = sat(0.5 + 0.5 * (b - a) / k); return vec2(mix(b, a, h) - k * h * (1.0 - h), 1.0 - h); }
 float am_smin3(float a, float b, float k) { k *= 6.0; float h = max(k - abs(a - b), 0.0) / k; return min(a, b) - h * h * h * k * (1.0 / 6.0); } // cubic, C2
+// Twist and bend are not isometries: they stretch space by up to L = sqrt(1 + (k * r)^2) at radius r from the axis.
+// Divide the deformed distance by that L (am_twistLip) or the result is no longer a bound.
+float am_twistLip(float k, float rmax) { return sqrt(1.0 + k * k * rmax * rmax); }
 vec3 am_twist(vec3 p, float k) { float c = cos(k * p.y), s = sin(k * p.y); return vec3(mat2(c, -s, s, c) * p.xz, p.y).xzy; }
 vec3 am_bend(vec3 p, float k) { float c = cos(k * p.x), s = sin(k * p.x); return vec3(mat2(c, -s, s, c) * p.xy, p.z); }
 vec3 am_repLim(vec3 p, float s, vec3 l) { return p - s * clamp(floor(p / s + 0.5), -l, l); }
@@ -44,7 +49,8 @@ vec3 am_camRay(vec3 ro, vec3 ta, vec2 uv, float f, float roll) {
 }
 
 // ---- raymarch macros ----
-// AM_MARCH(MAP, ro, rd, tmax, STEPS, t, hit): sphere-trace with relaxation-free safety factor 0.9.
+// AM_MARCH(MAP, ro, rd, tmax, STEPS, t, hit): sphere tracing (Hart 1996). Correct ONLY when MAP is class `exact` or
+// `bound` (see the field module). The 0.9 factor absorbs float error; it is not a fix for a field that overestimates.
 #define AM_MARCH(MAP, RO, RD, TMAX, STEPS, T, HIT) { T = 0.0; HIT = false; for (int i_ = 0; i_ < 256; i_++) { if (i_ >= STEPS) break; float d_ = MAP(RO + RD * T); if (d_ < 0.0005 * T + 0.0005) { HIT = true; break; } T += d_ * 0.9; if (T > TMAX) break; } }
 // Tetrahedral normal (4 taps, Quílez).
 #define AM_NORMAL(MAP, P) normalize(vec3(1, -1, -1) * MAP(P + vec3(1, -1, -1) * 0.0007) + vec3(-1, -1, 1) * MAP(P + vec3(-1, -1, 1) * 0.0007) + vec3(-1, 1, -1) * MAP(P + vec3(-1, 1, -1) * 0.0007) + vec3(1, 1, 1) * MAP(P + vec3(1, 1, 1) * 0.0007))

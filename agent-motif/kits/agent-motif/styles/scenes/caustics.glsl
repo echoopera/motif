@@ -35,7 +35,7 @@ vec4 motif(vec2 uv, vec2 fc) {
   vec2 src = vec2(0.25 * sin(p_sun * PI), 0.95);
   vec2 dv = uv - src; float ang = atan(dv.x, -dv.y);
   float ray = ln2(vec2(ang * 9.0 * p_rayDensity, 0.0), float(p_flow), 0.6) * 0.5 + 0.5;
-  ray = pow(ray, 3.0) * smoothstep(1.6, 0.1, length(dv)) * smoothstep(0.0, 0.5, length(dv));
+  ray = pow(ray, 3.0) * (1.0 - smoothstep(0.1, 1.6, length(dv))) * smoothstep(0.0, 0.5, length(dv));
   col += am_mixOk(u_a0, u_ink, 0.6) * ray * p_rays * 1.2 * (0.6 + 0.4 * trans.g);
   // Motes: 32 particles in a wrapped column, each rising a whole number of wraps per loop (exact loop),
   // with seeded size, speed tier and soft defocus.
