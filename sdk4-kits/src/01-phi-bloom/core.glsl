@@ -59,13 +59,13 @@ Blade shadeBlade(vec2 b, float L, float W, float taper, float soft, float id, ve
   float tr = p_translucency * thin * (0.4 + 0.6 * clamp(0.5 - 0.5 * ndl, 0.0, 1.0));
   vec3 col = base * (0.22 + 1.15 * diff);
   col += u_ink * spec * 0.55;
-  col += tintA * fres * p_rim * 0.55 * (0.4 + 0.6 * diff) + tintA * edge * p_rim * 0.35;
+  col += tintA * fres * p_rim * 0.55 * (0.4 + 0.6 * diff) + tintA * edge * p_rim * 0.7;
   col += tintB * tr * 1.1;
   // copper caustic threads: thin curves that follow the blade (midrib-converging), brighter facing the key
   if (p_caustic > 0.001 && k_q() > 0) {
     float w = sin(ny * 11.0 + sin(u * 5.0 + id * 9.0) * 1.7 + id * 6.0);
     float th = pow(0.5 + 0.5 * w, 22.0) * smoothstep(0.0, 0.4, t) * (1.0 - smoothstep(0.7, 1.0, t));
-    col += tintB * th * p_caustic * (0.25 + 0.9 * diff) * (1.0 - far);
+    col += tintB * th * p_caustic * (0.45 + 1.6 * diff) * (1.0 - far);
   }
   // faint veins along the form
   if (k_q() > 0) {
@@ -279,7 +279,7 @@ vec4 scene_main(vec2 uv, vec2 fc, int variant) {
     if (variant == 8) { lk = lenK * 0.95; wk = 0.5; }                                                                 // Quiet Unfold
     float Rfa = Rf * (variant == 3 ? 1.05 : 1.0);
     L1 = phiLayer(pf * 1.22, sN * 0.8, Rfa, lk * 0.95, wk, px * 3.5, 21.0, rotFar, flowPh * 0.7, p_unfold * 0.5, 1.0, champ, copper, 0.0, tl, rd);
-    col = mix(col, L1.rgb * mix(vec3(1.0), u_a2 * 2.2 + 0.08, 0.55) * 0.5, L1.a);
+    col = mix(col, L1.rgb * (u_a2 * 1.5 + 0.03) * 0.55, L1.a * 0.55);       // far stratum: jade-tinted, never a grey haze
     L2 = phiLayer(pm, sN, Rfa, lk, wk, px * 1.2, 3.0, rotA, flowPh, p_unfold, 0.0, champ, copper, 0.0, tl, rd);
     if (variant == 6) {                                                 // Twin Phyllotaxis: counter-rotating second lattice
       vec4 T2 = phiLayer(pm * 1.0, sN * 0.618, Rfa * 0.96, lk * 1.2, wk, px * 1.2, 17.0, -turnsRot * 2.0 + 2.2, -flowPh, p_unfold, 0.0, copper, champ, 0.0, -tl, rd);

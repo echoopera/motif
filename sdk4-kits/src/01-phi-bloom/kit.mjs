@@ -8,7 +8,7 @@ const params = {
   depth: R('Depth spacing', 0.02, 0.3, 0.12, { group: 'Form', hint: 'Separation of the far, middle and foreground strata. Drives parallax and defocus.' }),
   translucency: R('Translucency', 0, 0.75, 0.3, { group: 'Material', hint: 'Light transmitted through thin edges and tips.' }),
   rim: R('Rim intensity', 0, 2, 0.7, { group: 'Material', hint: 'Champagne rim light on blade edges.', randMax: 1.4 }),
-  caustic: R('Copper caustics', 0, 1.5, 0.6, { group: 'Material', hint: 'Thin copper light threads that follow the blade form.', randMax: 1 }),
+  caustic: R('Copper caustics', 0, 1.5, 0.9, { group: 'Material', hint: 'Thin copper light threads that follow the blade form.', randMax: 1 }),
   core: R('Core glow', 0, 3, 0.7, { group: 'Light', hint: 'Seed light at the spiral centre. Keep low so the geometry stays visible.', randMax: 1.6 }),
   turns: I('Turns per loop', 0, 2, 1, { group: 'Motion', hint: 'Complete rotations of the whole field per loop (whole numbers only).', mutate: 0 }),
   breath: R('Breath amplitude', 0, 0.12, 0.035, { group: 'Motion', hint: 'Petal breathing, sin(theta + seed phase).' }),

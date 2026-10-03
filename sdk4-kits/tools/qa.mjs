@@ -70,6 +70,32 @@ if (cmd === 'sheet') {
   }
   const f = outFile || path.join(root, 'qa', kitId, 'qa.json'); fs.mkdirSync(path.dirname(f), { recursive: true });
   fs.writeFileSync(f, JSON.stringify({ kit: kit.id, version: kit.version, size: [W, Hh], renderer: 'SwiftShader (software GL, headless Chromium)', note: 'Metric definitions in tools/qa.mjs. Software timings and metrics are relative diagnostics, not device performance.', results }, null, 2)); console.log('wrote', f);
+} else if (cmd === 'controls') {
+  // per-control evidence: every parameter at min / default / max (select: each option) at one phase; reports mean abs 8-bit change vs default
+  const id = styles[0]; const cw = +(flags.cw || 120), chh = +(flags.ch || 213);
+  const res = await h.page.evaluate(({ kitId, id, cw, chh, PH }) => {
+    const st = H.prep(kitId, id); const keys = Object.keys(st.params);
+    const grabP = (set, p) => Uint8ClampedArray.from(H.grab(kitId, st, { p, set, L: 12, seed: 417, safe: true }, cw, chh));
+    const grab = (set) => grabP(set, PH);
+    const md = (a, b) => { let s = 0; for (let i = 0; i < a.length; i += 4) s += Math.abs(a[i] - b[i]) + Math.abs(a[i + 1] - b[i + 1]) + Math.abs(a[i + 2] - b[i + 2]); return s / (a.length / 4) / 3; };
+    const base = grab({}); const rows = [];
+    const cols = []; // canvases for the sheet
+    const mk = (data) => { const c = document.createElement('canvas'); c.width = cw; c.height = chh; c.getContext('2d').putImageData(new ImageData(data, cw, chh), 0, 0); return c; };
+    for (const k of keys) { const s = st.params[k]; let vals;
+      if (s.type === 'select') vals = s.options.map(o => o.v); else if (s.type === 'toggle') vals = [false, true]; else vals = [s.min, s.max];
+      const imgs = vals.map(v => grab({ [k]: v })); const base2 = grabP({}, 0.61); const diffs = imgs.map((d, i) => Math.max(md(d, base), md(grabP({ [k]: vals[i] }, 0.61), base2))); // two phases: integer-cycle controls are invisible at some phases
+      rows.push({ key: k, label: s.label, type: s.type, def: s.def, vals, diffs: diffs.map(d => +d.toFixed(2)), effect: +Math.max(...diffs).toFixed(2) });
+      cols.push({ k, base: mk(base), imgs: imgs.map(mk), vals }); }
+    const lab = 14, pad = 4; const maxc = Math.max(...cols.map(c => c.imgs.length)) + 1;
+    const sh = document.createElement('canvas'); sh.width = maxc * (cw + pad) + pad; sh.height = cols.length * (chh + pad + lab) + pad; const x = sh.getContext('2d'); x.fillStyle = '#161616'; x.fillRect(0, 0, sh.width, sh.height); x.font = '11px monospace';
+    cols.forEach((c, r) => { const y = pad + r * (chh + pad + lab); x.fillStyle = '#ddd'; x.fillText(c.k + '   ' + c.vals.map(String).join(' | ') + '   (default in the middle/first)', pad, y + 11);
+      const order = c.imgs.length === 2 ? [c.imgs[0], c.base, c.imgs[1]] : [c.base, ...c.imgs]; order.forEach((im, i) => x.drawImage(im, pad + i * (cw + pad), y + lab)); });
+    return { rows, png: sh.toDataURL('image/png').split(',')[1] };
+  }, { kitId, id, cw, chh, PH: +(flags.p || 0.37) });
+  const dir = path.join(root, 'qa', kitId); fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync(path.join(dir, `controls-${id}.png`), Buffer.from(res.png, 'base64'));
+  fs.writeFileSync(path.join(dir, `controls-${id}.json`), JSON.stringify({ kit: kitId, style: id, phase: +(flags.p || 0.37), size: [cw, chh], note: 'effect = max mean-abs 8-bit change vs the default frame over min/max (or every option)', rows: res.rows }, null, 2));
+  const dead = res.rows.filter(r => r.effect < 0.05); console.log(`${kitId}/${id}: ${res.rows.length} controls, ${dead.length ? 'NO VISIBLE EFFECT: ' + dead.map(r => r.key).join(', ') : 'every control changes the image'}`);
 } else if (cmd === 'film') {
   const fps = +(flags.fps || 30), secs = +(flags.seconds || 6), loops = +(flags.loops || 1), n = fps * secs;
   const FW = +(flags.w || 540), FH = +(flags.h || 960); const tmp = fs.mkdtempSync('/tmp/film-');

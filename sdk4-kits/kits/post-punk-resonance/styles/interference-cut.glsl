@@ -50,7 +50,7 @@ vec4 scene_main(vec2 uv, vec2 fc, int variant) {
   vec2 v = rot(0.2) * q;
   vec3 col = white;
   float acc = p_accent, blk = p_black;
-  float lw = p_trace * px;
+  float lw = px;
 
   if (variant == 0) {                                                            // hero
     // yellow slab, top right

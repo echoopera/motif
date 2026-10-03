@@ -60,13 +60,13 @@ float k_cover(float d, float soft) { float w = max(soft, 0.75 * k_px()); return 
 vec2 k_pol(vec2 p) { return vec2(length(p), atan(p.y, p.x)); }
 float k_wrapang(float a) { return a - TAU * floor((a + PI) / TAU); }
 
-// quality: 0 live, 1 balanced, 2 export (QUALITY_* defines come from the select param)
-int k_q() { return p_quality; }
+// quality: 0 live, 1 balanced, 2 export (QUALITY_* defines come from the select param). Macros, so a kit that does not declare
+// the parameter never compiles a reference to it.
+#define k_q() (p_quality)
 // soft key direction from the Light control (degrees, 0 = from right, counter-clockwise)
-vec3 k_key() { float a = radians(p_keyAngle); return normalize(vec3(cos(a) * 0.72, sin(a) * 0.72, 0.62)); }
-
+#define k_key() normalize(vec3(cos(radians(p_keyAngle)) * 0.72, sin(radians(p_keyAngle)) * 0.72, 0.62))
 // vignette that never touches the focal area
-float k_vig(vec2 uv) { float r = length(uv * vec2(1.0, 0.82)); return 1.0 - p_vignette * smoothstep(0.35, 1.05, r); }
+#define k_vig(uvv) (1.0 - p_vignette * smoothstep(0.35, 1.05, length((uvv) * vec2(1.0, 0.82))))
 
 // photosensitive safety for high-contrast motion: under the limiter, loops shorter than ~2.5 s calm their amplitude
 // (a 1 s loop at 4x tempo has u_L = 0.25 s). Never used for strobing; this only scales sweeping excursions.

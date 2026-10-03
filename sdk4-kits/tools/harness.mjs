@@ -57,8 +57,8 @@ export async function openHarness() {
       return { kit, report, warnings };
     },
     // render one frame to a PNG buffer (width/height in px)
-    async png(kitId, localId, o, W, Hh) {
-      const b64 = await page.evaluate(({ kitId, localId, o, W, Hh }) => { const st = H.prep(kitId, localId); H.grab(kitId, st, o, W, Hh); return H.tmp.toDataURL('image/png').split(',')[1]; }, { kitId, localId, o, W, Hh });
+    async png(kitId, localId, o, W, Hh, mime = 'image/png') {
+      const b64 = await page.evaluate(({ kitId, localId, o, W, Hh, mime }) => { const st = H.prep(kitId, localId); H.grab(kitId, st, o, W, Hh); return H.tmp.toDataURL(mime, 0.93).split(',')[1]; }, { kitId, localId, o, W, Hh, mime });
       return Buffer.from(b64, 'base64');
     },
     async close() { await browser.close(); },

@@ -203,28 +203,6 @@
           "hint": "Whole division and reintegration cycles per loop.",
           "mutate": 0
         },
-        "wobble": {
-          "type": "range",
-          "label": "Membrane wobble",
-          "min": 0,
-          "max": 0.3,
-          "def": 0.08,
-          "step": 0.0015,
-          "group": "Motion",
-          "hint": "Standing wave along the membranes (used by Membrane Choir)."
-        },
-        "keyAngle": {
-          "type": "range",
-          "label": "Key direction",
-          "min": -180,
-          "max": 180,
-          "def": 60,
-          "step": 1,
-          "unit": "°",
-          "group": "Light",
-          "hint": "Direction of the key light in the picture plane, degrees.",
-          "randMax": 180
-        },
         "exposure": {
           "type": "range",
           "label": "Exposure",
@@ -453,28 +431,6 @@
           "hint": "Whole division and reintegration cycles per loop.",
           "mutate": 0
         },
-        "wobble": {
-          "type": "range",
-          "label": "Membrane wobble",
-          "min": 0,
-          "max": 0.3,
-          "def": 0.08,
-          "step": 0.0015,
-          "group": "Motion",
-          "hint": "Standing wave along the membranes (used by Membrane Choir)."
-        },
-        "keyAngle": {
-          "type": "range",
-          "label": "Key direction",
-          "min": -180,
-          "max": 180,
-          "def": 60,
-          "step": 1,
-          "unit": "°",
-          "group": "Light",
-          "hint": "Direction of the key light in the picture plane, degrees.",
-          "randMax": 180
-        },
         "exposure": {
           "type": "range",
           "label": "Exposure",
@@ -702,28 +658,6 @@
           "group": "Motion",
           "hint": "Whole division and reintegration cycles per loop.",
           "mutate": 0
-        },
-        "wobble": {
-          "type": "range",
-          "label": "Membrane wobble",
-          "min": 0,
-          "max": 0.3,
-          "def": 0.08,
-          "step": 0.0015,
-          "group": "Motion",
-          "hint": "Standing wave along the membranes (used by Membrane Choir)."
-        },
-        "keyAngle": {
-          "type": "range",
-          "label": "Key direction",
-          "min": -180,
-          "max": 180,
-          "def": 60,
-          "step": 1,
-          "unit": "°",
-          "group": "Light",
-          "hint": "Direction of the key light in the picture plane, degrees.",
-          "randMax": 180
         },
         "exposure": {
           "type": "range",
@@ -963,18 +897,6 @@
           "group": "Motion",
           "hint": "Standing wave along the membranes (used by Membrane Choir)."
         },
-        "keyAngle": {
-          "type": "range",
-          "label": "Key direction",
-          "min": -180,
-          "max": 180,
-          "def": 60,
-          "step": 1,
-          "unit": "°",
-          "group": "Light",
-          "hint": "Direction of the key light in the picture plane, degrees.",
-          "randMax": 180
-        },
         "exposure": {
           "type": "range",
           "label": "Exposure",
@@ -1202,28 +1124,6 @@
           "group": "Motion",
           "hint": "Whole division and reintegration cycles per loop.",
           "mutate": 0
-        },
-        "wobble": {
-          "type": "range",
-          "label": "Membrane wobble",
-          "min": 0,
-          "max": 0.3,
-          "def": 0.08,
-          "step": 0.0015,
-          "group": "Motion",
-          "hint": "Standing wave along the membranes (used by Membrane Choir)."
-        },
-        "keyAngle": {
-          "type": "range",
-          "label": "Key direction",
-          "min": -180,
-          "max": 180,
-          "def": 60,
-          "step": 1,
-          "unit": "°",
-          "group": "Light",
-          "hint": "Direction of the key light in the picture plane, degrees.",
-          "randMax": 180
         },
         "exposure": {
           "type": "range",
@@ -1453,28 +1353,6 @@
           "hint": "Whole division and reintegration cycles per loop.",
           "mutate": 0
         },
-        "wobble": {
-          "type": "range",
-          "label": "Membrane wobble",
-          "min": 0,
-          "max": 0.3,
-          "def": 0.08,
-          "step": 0.0015,
-          "group": "Motion",
-          "hint": "Standing wave along the membranes (used by Membrane Choir)."
-        },
-        "keyAngle": {
-          "type": "range",
-          "label": "Key direction",
-          "min": -180,
-          "max": 180,
-          "def": 60,
-          "step": 1,
-          "unit": "°",
-          "group": "Light",
-          "hint": "Direction of the key light in the picture plane, degrees.",
-          "randMax": 180
-        },
         "exposure": {
           "type": "range",
           "label": "Exposure",
@@ -1702,28 +1580,6 @@
           "group": "Motion",
           "hint": "Whole division and reintegration cycles per loop.",
           "mutate": 0
-        },
-        "wobble": {
-          "type": "range",
-          "label": "Membrane wobble",
-          "min": 0,
-          "max": 0.3,
-          "def": 0.08,
-          "step": 0.0015,
-          "group": "Motion",
-          "hint": "Standing wave along the membranes (used by Membrane Choir)."
-        },
-        "keyAngle": {
-          "type": "range",
-          "label": "Key direction",
-          "min": -180,
-          "max": 180,
-          "def": 60,
-          "step": 1,
-          "unit": "°",
-          "group": "Light",
-          "hint": "Direction of the key light in the picture plane, degrees.",
-          "randMax": 180
         },
         "exposure": {
           "type": "range",
@@ -1953,28 +1809,6 @@
           "hint": "Whole division and reintegration cycles per loop.",
           "mutate": 0
         },
-        "wobble": {
-          "type": "range",
-          "label": "Membrane wobble",
-          "min": 0,
-          "max": 0.3,
-          "def": 0.08,
-          "step": 0.0015,
-          "group": "Motion",
-          "hint": "Standing wave along the membranes (used by Membrane Choir)."
-        },
-        "keyAngle": {
-          "type": "range",
-          "label": "Key direction",
-          "min": -180,
-          "max": 180,
-          "def": 60,
-          "step": 1,
-          "unit": "°",
-          "group": "Light",
-          "hint": "Direction of the key light in the picture plane, degrees.",
-          "randMax": 180
-        },
         "exposure": {
           "type": "range",
           "label": "Exposure",
@@ -2202,28 +2036,6 @@
           "group": "Motion",
           "hint": "Whole division and reintegration cycles per loop.",
           "mutate": 0
-        },
-        "wobble": {
-          "type": "range",
-          "label": "Membrane wobble",
-          "min": 0,
-          "max": 0.3,
-          "def": 0.08,
-          "step": 0.0015,
-          "group": "Motion",
-          "hint": "Standing wave along the membranes (used by Membrane Choir)."
-        },
-        "keyAngle": {
-          "type": "range",
-          "label": "Key direction",
-          "min": -180,
-          "max": 180,
-          "def": 60,
-          "step": 1,
-          "unit": "°",
-          "group": "Light",
-          "hint": "Direction of the key light in the picture plane, degrees.",
-          "randMax": 180
         },
         "exposure": {
           "type": "range",

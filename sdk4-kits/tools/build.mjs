@@ -39,12 +39,15 @@ for (const id of ids) {
       { src: file, reads: [], writes: 'scene' }, { src: 'styles/_glowA.glsl', reads: ['scene'], writes: 'glowA' },
       { src: 'styles/_glowB.glsl', reads: ['glowA'], writes: 'glowB' }, { src: 'styles/_out.glsl', reads: ['scene', 'glowA', 'glowB'], writes: 'output' }] };
     else e.passes = [{ src: file }];
-    e.params = merge(kit.params, s.over);
+    e.params = merge(kit.params, s.over); for (const k of s.drop || []) delete e.params[k];
     return e;
   });
   const manifest = { format: 'motif-kit@4', id: kit.id, name: kit.name, version: kit.version || '1.0.0', author: 'Motif', description: kit.description, license: '', accent: kit.accent, common: 'common.glsl', palettes: kit.palettes, styles };
   fs.writeFileSync(path.join(out, 'manifest.json'), JSON.stringify(manifest, null, 2) + '\n');
-  const md = [`# ${kit.name} ${manifest.version}`, '', kit.description, '', '## Styles', '', ...kit.styles.map((s, i) => `${i + 1}. **${s.name}** (\`${s.id}\`): ${s.fingerprint}`), ''].join('\n');
+  const header = core.split('\n').filter((l, i, arr) => arr.slice(0, i + 1).every(x => x.startsWith('//'))).map(l => l.replace(/^\/\/ ?/, '')).join('\n');
+  const p0 = styles[0].params;
+  const groups = {}; for (const [k, v] of Object.entries(p0)) (groups[v.group || 'Style'] ||= []).push(`${v.label} (\`${k}\`)`);
+  const md = [`# ${kit.name} ${manifest.version}`, '', kit.description, '', `Format \`motif-kit@4\` - no capabilities declared - ${luminous ? 'pass graph: scene (' + (kit.sceneScale ?? 0.75) + ') > glow A (0.25) > glow B (0.125) > output (1.0)' : 'single full-resolution analytic pass'}.`, '', '## Styles', '', ...kit.styles.map((s, i) => `${i + 1}. **${s.name}** (\`${s.id}\`): ${s.fingerprint}`), '', '## Construction notes (field classes and loop rules)', '', '```', header, '```', '', '## Controls', '', ...Object.entries(groups).map(([g, l]) => `- **${g}**: ${l.join(', ')}`), '', '## Palettes', '', ...kit.palettes.map(p => `- ${p.name} (\`${p.id}\`): bg ${p.bg}, ink ${p.ink}, accents ${p.a.join(' ')}`), ''].join('\n');
   fs.writeFileSync(path.join(out, 'README.md'), md);
   console.log(`built ${kit.id}: ${styles.length} styles, ${Object.keys(styles[0].params).length} params each`);
 }

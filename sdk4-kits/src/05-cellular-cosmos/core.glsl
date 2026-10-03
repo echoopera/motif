@@ -113,7 +113,9 @@ vec4 scene_main(vec2 uv, vec2 fc, int variant) {
   float sibK = sibling ? smoothstep(0.02, 0.25, S1.sc * p_divAmp * 4.0 + S2.sc * p_divAmp * 4.0) : 1.0;
   // membrane bending in the choir variant: border wobble follows a closed standing wave
   float wob = 0.0;
+//@if 3
   if (variant == 3) wob = p_wobble * cs * 0.22 * sin(6.0 * atan(p.y - S1.pos.y, p.x - S1.pos.x) + th * 2.0 + S1.ph) * smoothstep(0.0, 0.04 * cs, edge) * (1.0 - smoothstep(0.08 * cs, 0.26 * cs, edge));
+//@endif
   float e2 = max(edge + wob, 0.0);
   float species = step(h21(c1 * 1.9 + 7.0 + S1.sib * 0.37), speciesMix);
   float depthIn = e2 / (0.55 * cs);

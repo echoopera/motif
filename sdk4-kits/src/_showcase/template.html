@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Motif SDK 4 · Nine Kits</title>
+<meta name="description" content="Nine seamless-loop shader kits for Motif Kit SDK 4.0, running live in this page.">
+<style>
+:root{--bg:#07080b;--panel:#0e1015;--panel2:#13161d;--line:#232734;--ink:#e9ecf3;--mute:#8d94a6;--acc:#9dd6ff;--ok:#7fdca0;--warn:#f1c76a;--bad:#ff7a7a;--r:14px}
+:root[data-theme=light]{--bg:#f4f2ec;--panel:#fff;--panel2:#f0eee7;--line:#d9d5c8;--ink:#15161a;--mute:#666b78;--acc:#1f4ed8;--ok:#1d8a4a;--warn:#a87400;--bad:#c13030}
+@media (prefers-color-scheme:light){:root:not([data-theme=dark]){--bg:#f4f2ec;--panel:#fff;--panel2:#f0eee7;--line:#d9d5c8;--ink:#15161a;--mute:#666b78;--acc:#1f4ed8;--ok:#1d8a4a;--warn:#a87400;--bad:#c13030}}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 ui-sans-serif,system-ui,-apple-system,"Segoe UI",Inter,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:var(--acc)}
+.wrap{max-width:1240px;margin:0 auto;padding:0 16px}
+header.top{padding:34px 0 18px;display:flex;gap:24px;align-items:flex-end;justify-content:space-between;flex-wrap:wrap}
+h1{font-size:clamp(28px,5vw,52px);line-height:1.02;letter-spacing:-.03em;margin:0;font-weight:650}
+h1 span{color:var(--mute);font-weight:500}
+.lede{max-width:560px;color:var(--mute);margin:10px 0 0}
+.badges{display:flex;gap:8px;flex-wrap:wrap}
+.badge{border:1px solid var(--line);border-radius:99px;padding:4px 11px;font-size:12px;color:var(--mute)}
+.stage{display:grid;grid-template-columns:minmax(260px,420px) 1fr;gap:20px;align-items:start}
+@media(max-width:860px){.stage{grid-template-columns:1fr}}
+.view{position:sticky;top:12px}
+.frame{position:relative;border-radius:var(--r);overflow:hidden;background:#000;border:1px solid var(--line);aspect-ratio:9/16;max-height:82vh;margin:0 auto;width:min(100%,calc(82vh*9/16))}
+.frame canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.status{position:absolute;left:0;right:0;bottom:0;padding:10px 12px;font-size:12px;background:linear-gradient(transparent,rgba(0,0,0,.72));color:#fff;display:flex;justify-content:space-between;gap:8px;pointer-events:none}
+.overlay{position:absolute;inset:0;display:none;align-items:center;justify-content:center;flex-direction:column;gap:10px;background:rgba(0,0,0,.55);color:#fff;text-align:center;padding:20px}
+.overlay.on{display:flex}
+.overlay button{pointer-events:auto}
+.bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:12px 0 0}
+button,select{font:inherit;color:var(--ink);background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:7px 12px;cursor:pointer}
+button:hover{border-color:var(--acc)}
+button.pri{background:var(--acc);color:#04121f;border-color:transparent;font-weight:600}
+input[type=range]{width:100%;accent-color:var(--acc)}
+.scrub{margin-top:10px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:16px}
+.kits{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:8px;margin-bottom:16px}
+.kit{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--panel);cursor:pointer;text-align:left;padding:0;position:relative}
+.kit img{display:block;width:100%;aspect-ratio:9/12;object-fit:cover;background:#111}
+.kit b{display:block;font-size:12px;font-weight:600;padding:6px 8px 7px;line-height:1.2}
+.kit[aria-pressed=true]{border-color:var(--acc);box-shadow:0 0 0 1px var(--acc)}
+h2{font-size:22px;letter-spacing:-.02em;margin:0 0 4px}
+.sub{color:var(--mute);margin:0 0 14px;font-size:14px}
+.styles{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px;margin:12px 0 16px}
+.sty{border:1px solid var(--line);background:var(--panel2);border-radius:10px;padding:0;overflow:hidden;cursor:pointer;text-align:left}
+.sty img{display:block;width:100%;aspect-ratio:9/13;object-fit:cover;background:#111}
+.sty span{display:block;font-size:11.5px;padding:5px 7px;line-height:1.2}
+.sty[aria-pressed=true]{border-color:var(--acc);box-shadow:0 0 0 1px var(--acc)}
+.blurb{margin:0 0 6px}
+.fp{color:var(--mute);font-size:13px;margin:0 0 12px}
+details{border-top:1px solid var(--line);padding:10px 0}
+summary{cursor:pointer;font-weight:600;font-size:13px;letter-spacing:.02em;text-transform:uppercase;color:var(--mute)}
+.ctl{display:grid;grid-template-columns:130px 1fr 54px;gap:8px;align-items:center;margin:8px 0;font-size:13px}
+.ctl label{color:var(--mute)}
+.ctl output{font-variant-numeric:tabular-nums;text-align:right;font-size:12px}
+.ctl select{grid-column:2/4}
+table{width:100%;border-collapse:collapse;font-size:13px;font-variant-numeric:tabular-nums}
+th,td{padding:6px 8px;border-bottom:1px solid var(--line);text-align:left}
+th{color:var(--mute);font-weight:600;font-size:12px}
+.tag{display:inline-block;border-radius:6px;padding:1px 7px;font-size:11.5px}
+.ok{background:color-mix(in srgb,var(--ok) 18%,transparent);color:var(--ok)}
+.warn{background:color-mix(in srgb,var(--warn) 18%,transparent);color:var(--warn)}
+.bad{background:color-mix(in srgb,var(--bad) 18%,transparent);color:var(--bad)}
+section{margin:44px 0}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+.note{color:var(--mute);font-size:13px}
+footer{padding:30px 0 60px;color:var(--mute);font-size:13px}
+.dl a{margin-right:12px}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="top">
+  <div>
+    <h1>Nine kits.<br><span>Eighty-one infinite loops.</span></h1>
+    <p class="lede">Motif Kit SDK 4.0 shaders that loop seamlessly by construction. Everything on this page is rendering live from the packed kit sources, in your browser, through the SDK's own runtime.</p>
+  </div>
+  <div class="badges"><span class="badge">motif-kit@4</span><span class="badge">WebGL2 · GLSL ES 3.00</span><span class="badge">9 kits · 81 styles</span><button id="theme" aria-label="Toggle light or dark theme">Theme</button></div>
+</header>
+
+<div class="stage">
+  <div class="view">
+    <div class="frame" id="frame">
+      <canvas id="cv"></canvas>
+      <div class="overlay" id="ov"><div id="ovmsg">Preparing…</div><button id="retry" class="pri" hidden>Retry</button></div>
+      <div class="status"><span id="stName">–</span><span id="stInfo"></span></div>
+    </div>
+    <div class="bar">
+      <button id="play" class="pri" aria-label="Play or pause">Pause</button>
+      <label class="note">Loop <select id="loopSel"><option value="6">6 s</option><option value="12" selected>12 s</option><option value="20">20 s</option><option value="30">30 s</option><option value="1">1 s (stress)</option></select></label>
+      <label class="note">Tempo <select id="tempoSel"><option value="1" selected>1×</option><option value="4">4× (stress)</option></select></label>
+      <label class="note">Render <select id="scaleSel"><option value="0.5">50%</option><option value="0.75" selected>75%</option><option value="1">100%</option></select></label>
+    </div>
+    <div class="scrub"><input id="scrub" type="range" min="0" max="1" step="0.001" value="0" aria-label="Loop phase"></div>
+    <p class="note" id="perf">Software or hardware GL as your browser provides. No frame-rate or device-performance claims are made here.</p>
+  </div>
+  <div>
+    <div class="kits" id="kits" role="group" aria-label="Kits"></div>
+    <div class="panel">
+      <h2 id="kName">–</h2>
+      <p class="sub" id="kDesc"></p>
+      <div class="styles" id="styles" role="group" aria-label="Styles"></div>
+      <p class="blurb" id="sBlurb"></p>
+      <p class="fp" id="sFp"></p>
+      <div class="bar" style="margin:0 0 6px">
+        <label class="note">Palette <select id="palSel"></select></label>
+        <button id="rand">Randomize</button><button id="reset">Reset</button>
+        <label class="note"><input type="checkbox" id="safe" checked> Photosensitive limiter</label>
+      </div>
+      <div id="inspector"></div>
+    </div>
+  </div>
+</div>
+
+<section id="qa">
+  <h2>Evidence</h2>
+  <p class="sub">Loop and exposure checks run against the packed kits in the SDK's own runtime (headless Chromium, SwiftShader software GL). Metric definitions are in <code>tools/qa.mjs</code>; timings are relative diagnostics, never device performance.</p>
+  <div class="panel"><div id="qaTable"></div></div>
+</section>
+
+<section>
+  <h2>How these loop</h2>
+  <div class="cols">
+    <div class="panel"><b>Bounded periodic phase</b><p class="note">Time enters only as <code>θ = 2π·fract(u_p)</code>. Every temporal harmonic is an integer multiple of θ; static angles and phases are seeded constants. Particle lifecycles and cell divisions are deterministic closed choreography, not simulation.</p></div>
+    <div class="panel"><b>Proven field classes</b><p class="note">Each scene function is labelled exact, bound, implicit, density or glow, and only a matching renderer draws it. Lipschitz constants for the gyroid, warp, Möbius ribbon and folded plate are derived in the kit source, not tuned.</p></div>
+    <div class="panel"><b>One tone map</b><p class="note">Scenes write linear HDR; one output pass adds bloom, fringe, vignette and a single tone map. Volumes integrate with ray-step length so exposure holds across quality settings.</p></div>
+  </div>
+</section>
+
+<footer>
+  <div class="dl" id="downloads"></div>
+  <p>Known limits: no persistent simulation exists in the SDK contract (cell lifecycles are analytic); glass in Sacred Lattice and After Cyber is an approximation, not refraction; device GPU timings are not measured here.</p>
+</footer>
+</div>
+<script>
+/*SDK*/
+</script>
+<script>
+const DATA = /*DATA*/null;
+(function(){
+const $ = s => document.querySelector(s);
+const KGm = window.KG;
+let rt = KGm.createGlRuntime();
+const cv = $('#cv'), ctx = cv.getContext('2d');
+const S = { kit:null, kitId:null, st:null, params:{}, palId:null, L:12, tempo:1, scale:.75, playing:!matchMedia('(prefers-reduced-motion: reduce)').matches, safe:true, phase:0, t0:performance.now(), ready:false, pendingSince:0, kits:{} };
+const THUMBS = DATA.thumbs || {};
+function loadKit(id){
+  if(S.kits[id]) return S.kits[id];
+  const d = DATA.kits[id]; const v = KGm.validateKit(d.manifest, d.files);
+  if(!v.ok){ console.error(v.errors); return null; }
+  S.kits[id] = { kit:v.kit, items:KGm.renderables(v.kit) }; return S.kits[id];
+}
+function el(tag, attrs, ...kids){ const e=document.createElement(tag); for(const [k,v] of Object.entries(attrs||{})){ if(k==='on') for(const [ev,f] of Object.entries(v)) e.addEventListener(ev,f); else if(k==='class') e.className=v; else if(v===true) e.setAttribute(k,''); else if(v!==false&&v!=null) e.setAttribute(k,v);} for(const c of kids) e.append(c.nodeType?c:document.createTextNode(c)); return e; }
+// ---- kit tiles
+const kitsEl = $('#kits');
+for(const id of DATA.order){ const m = DATA.kits[id].manifest; const b = el('button',{class:'kit','aria-pressed':'false','data-kit':id,on:{click:()=>selectKit(id)}}, el('img',{src:THUMBS[id+'/'+m.styles[0].id]||'',alt:'',loading:'lazy'}), el('b',{},m.name)); kitsEl.append(b); }
+function selectKit(id, styleId){
+  const k = loadKit(id); if(!k) return; S.kitId=id; S.kit=k;
+  document.querySelectorAll('.kit').forEach(b=>b.setAttribute('aria-pressed',b.dataset.kit===id));
+  $('#kName').textContent=k.kit.name; $('#kDesc').textContent=k.kit.description;
+  const stEl=$('#styles'); stEl.textContent='';
+  for(const s of k.items){ stEl.append(el('button',{class:'sty','aria-pressed':'false','data-st':s.localId,on:{click:()=>selectStyle(s.localId)}}, el('img',{src:THUMBS[id+'/'+s.localId]||'',alt:'',loading:'lazy'}), el('span',{},s.name))); }
+  const pal=$('#palSel'); pal.textContent=''; for(const p of k.kit.palettes) pal.append(el('option',{value:p.id},p.name));
+  selectStyle(styleId||k.items[0].localId);
+}
+function selectStyle(localId){
+  const st = S.kit.items.find(s=>s.localId===localId); S.st=st;
+  document.querySelectorAll('.sty').forEach(b=>b.setAttribute('aria-pressed',b.dataset.st===localId));
+  $('#sBlurb').textContent=st.blurb||''; const meta=DATA.fingerprints[S.kitId+'/'+localId]; $('#sFp').textContent=meta||'';
+  $('#stName').textContent=S.kit.kit.name+' · '+st.name;
+  S.params=Object.fromEntries(Object.entries(st.params).map(([k,s])=>[k,s.def]));
+  S.palId=st.palette||S.kit.kit.palettes[0].id; $('#palSel').value=S.palId;
+  buildInspector(); begin();
+}
+// ---- compile with pending handling: poll on animation frames, 20 s deadline, then Retry (never an error)
+function begin(){
+  S.ready=false; S.pendingSince=performance.now(); S.token=(S.token||0)+1; showOv('Preparing…',false);
+}
+function tryCompile(){
+  const st=S.st; if(!st) return;
+  const c = rt.compile(st.id,{passes:st.passes,common:S.kit.kit.common,params:st.params,inputs:st.inputs||[],...(st.runtime||{})});
+  if(c.ok){ S.ready=true; hideOv(); S.t0=performance.now(); }
+  else if(c.pending){ if(performance.now()-S.pendingSince>20000) showOv('Still preparing this shader…',true); }
+  else if(c.lost){ showOv('Graphics context lost. Restoring…',true); }
+  else { showOv('This shader failed to compile on this GPU: '+String(c.error).split('\n')[0],true); }
+}
+function showOv(msg,retry){ $('#ov').classList.add('on'); $('#ovmsg').textContent=msg; $('#retry').hidden=!retry; }
+function hideOv(){ $('#ov').classList.remove('on'); }
+$('#retry').addEventListener('click',()=>{ try{ rt=KGm.createGlRuntime(); }catch(e){} begin(); });
+// ---- inspector
+function fmt(v,s){ if(s.type==='int') return String(Math.round(v)); const d=s.step&&s.step<0.01?3:s.step&&s.step<0.1?2:1; return (+v).toFixed(d)+(s.unit&&s.unit!=='×'?s.unit:''); }
+function buildInspector(){
+  const box=$('#inspector'); box.textContent=''; const groups=new Map();
+  for(const [k,s] of Object.entries(S.st.params)){ const g=s.group||'Style'; if(!groups.has(g)) groups.set(g,[]); groups.get(g).push([k,s]); }
+  let first=true;
+  for(const [g,items] of groups){ const d=el('details',{open:first?true:false},el('summary',{},g)); first=false;
+    for(const [k,s] of items){ const row=el('div',{class:'ctl',title:s.hint||''}); const id='p_'+k; row.append(el('label',{for:id},s.label));
+      if(s.type==='range'||s.type==='int'){
+        const log=s.log&&s.min>0; const toS=v=>log?Math.log(v/s.min)/Math.log(s.max/s.min):(v-s.min)/(s.max-s.min); const fromS=t=>log?s.min*Math.pow(s.max/s.min,t):s.min+t*(s.max-s.min);
+        const inp=el('input',{type:'range',id,min:0,max:1000,step:1,value:Math.round(toS(S.params[k])*1000)}); const out=el('output',{},fmt(S.params[k],s));
+        inp.addEventListener('input',()=>{ let v=fromS(inp.value/1000); if(s.type==='int') v=Math.round(v); else if(s.step) v=Math.round(v/s.step)*s.step; S.params[k]=v; out.textContent=fmt(v,s); });
+        inp.dataset.k=k; row.append(inp,out);
+      } else if(s.type==='toggle'){ const c=el('input',{type:'checkbox',id}); c.checked=!!S.params[k]; c.addEventListener('change',()=>S.params[k]=c.checked); row.append(c,el('span')); }
+      else if(s.type==='select'){ const sel=el('select',{id}); for(const o of s.options) sel.append(el('option',{value:o.v},o.l||o.v)); sel.value=S.params[k]; sel.addEventListener('change',()=>S.params[k]=sel.value); row.append(sel); }
+      d.append(row); }
+    box.append(d); }
+}
+function syncInspector(){ document.querySelectorAll('#inspector input[type=range]').forEach(inp=>{ const k=inp.dataset.k,s=S.st.params[k]; const log=s.log&&s.min>0; const t=log?Math.log(S.params[k]/s.min)/Math.log(s.max/s.min):(S.params[k]-s.min)/(s.max-s.min); inp.value=Math.round(t*1000); inp.nextSibling.textContent=fmt(S.params[k],s); }); }
+$('#reset').addEventListener('click',()=>{ for(const [k,s] of Object.entries(S.st.params)) S.params[k]=s.def; buildInspector(); });
+$('#rand').addEventListener('click',()=>{ for(const [k,s] of Object.entries(S.st.params)){ if(s.mutate===0||s.type==='select'||s.type==='toggle') continue; const hi=Math.min(s.max,s.randMax??s.max); const lo=s.min; const m=s.mutate??1; const t=Math.random(); let v=s.def+(lo+(hi-lo)*t-s.def)*0.6*m; v=Math.max(lo,Math.min(hi,v)); if(s.type==='int') v=Math.round(v); S.params[k]=v; } buildInspector(); });
+$('#palSel').addEventListener('change',e=>S.palId=e.target.value);
+$('#safe').addEventListener('change',e=>S.safe=e.target.checked);
+$('#loopSel').addEventListener('change',e=>{ S.L=+e.target.value; });
+$('#tempoSel').addEventListener('change',e=>{ S.tempo=+e.target.value; });
+$('#scaleSel').addEventListener('change',e=>{ S.scale=+e.target.value; });
+$('#play').addEventListener('click',()=>{ S.playing=!S.playing; $('#play').textContent=S.playing?'Pause':'Play'; if(S.playing) S.t0=performance.now()-S.phase*S.L/S.tempo*1000; });
+$('#scrub').addEventListener('input',e=>{ S.playing=false; $('#play').textContent='Play'; S.phase=+e.target.value; });
+$('#theme').addEventListener('click',()=>{ const r=document.documentElement; r.dataset.theme=r.dataset.theme==='dark'?'light':'dark'; });
+$('#play').textContent=S.playing?'Pause':'Play';
+// ---- draw loop: hidden tabs do no work
+let last=0, frames=0, fpsT=performance.now();
+function frame(now){
+  requestAnimationFrame(frame);
+  if(document.hidden||!S.st) return;
+  if(!S.ready){ tryCompile(); if(!S.ready) return; }
+  const r=cv.getBoundingClientRect(); const dpr=Math.min(window.devicePixelRatio||1,2); const W=Math.max(2,Math.round(r.width*dpr)), H=Math.max(2,Math.round(r.height*dpr));
+  if(cv.width!==W||cv.height!==H){ cv.width=W; cv.height=H; }
+  if(S.playing){ const Lr=S.L/S.tempo; S.phase=(((now-S.t0)/1000)/Lr)%1; $('#scrub').value=S.phase; }
+  const kit=S.kit.kit; const pal=kit.palettes.find(p=>p.id===S.palId)||kit.palettes[0];
+  const ok=rt.draw(S.st.id,W,H,{p:S.phase,L:S.L/S.tempo,seed:417,safe:S.safe,pal,params:S.params,spec:S.st.params,media:null},{scale:S.scale});
+  if(ok===null){ showOv('Graphics context unavailable. Restoring…',true); S.ready=false; return; }
+  rt.blit(ctx,W,H);
+  frames++; if(now-fpsT>1000){ $('#stInfo').textContent=Math.round(frames*1000/(now-fpsT))+' fps (this browser)'; frames=0; fpsT=now; }
+}
+document.addEventListener('visibilitychange',()=>{ if(!document.hidden&&S.playing) S.t0=performance.now()-S.phase*S.L/S.tempo*1000; });
+// ---- evidence table
+function buildQA(){
+  const out=el('div'); const tbl=el('table'); tbl.append(el('thead',{},el('tr',{},...['Kit','Style','Seam ×','Pop ×','Flash tiles','Exposure spread','Budget it/px · fetches'].map(h=>el('th',{},h)))));
+  const tb=el('tbody');
+  for(const id of DATA.order){ const q=(DATA.qa||{})[id]; const rep=(DATA.budgets||{})[id]||{};
+    for(const r of (q&&q.results)||[]){ const seam=r.seamRatio<=3?'ok':'bad', pop=r.popRatio<=3?'ok':r.popRatio<=6?'warn':'bad', fl=r.flashTilesOver3===0?'ok':r.flashTilesOver3<4?'warn':'bad', ex=(r.exposureSpread===undefined||r.exposureSpread<=.15)?'ok':'bad';
+      const b=rep[r.id]||{};
+      tb.append(el('tr',{},el('td',{},DATA.kits[id].manifest.name),el('td',{},r.id),el('td',{},el('span',{class:'tag '+seam},String(r.seamRatio))),el('td',{},el('span',{class:'tag '+pop},String(r.popRatio))),el('td',{},el('span',{class:'tag '+fl},String(r.flashTilesOver3))),el('td',{},el('span',{class:'tag '+ex},r.exposureSpread===undefined?'n/a':(r.exposureSpread*100).toFixed(1)+'%')),el('td',{},b.iterations!=null?Math.round(b.iterations)+' · '+Math.round(b.fetches):'')));
+    } }
+  tbl.append(tb); out.append(tbl); $('#qaTable').append(out);
+}
+buildQA();
+const dl=$('#downloads'); for(const id of DATA.order) dl.append(el('a',{href:'../dist/'+id+'-'+DATA.kits[id].manifest.version+'.motifkit',download:true},DATA.kits[id].manifest.name+'.motifkit'));
+selectKit(DATA.order[0]); requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
