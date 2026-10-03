@@ -1709,28 +1709,6 @@
           "group": "Lens",
           "hint": "Darkens the frame edge; never touches the focal area.",
           "randMax": 0.55
-        },
-        "quality": {
-          "type": "select",
-          "label": "Quality",
-          "options": [
-            {
-              "v": "live",
-              "l": "Live"
-            },
-            {
-              "v": "balanced",
-              "l": "Balanced"
-            },
-            {
-              "v": "export",
-              "l": "Export"
-            }
-          ],
-          "def": "balanced",
-          "mutate": 0,
-          "group": "Quality",
-          "hint": "Sample counts only. Composition, phase and exposure stay the same."
         }
       }
     },
