@@ -1,0 +1,2708 @@
+{
+  "format": "motif-kit@4",
+  "id": "phi-bloom",
+  "name": "Phi Bloom",
+  "version": "1.0.0",
+  "author": "Motif",
+  "description": "Golden-angle botanical sculpture: layered translucent blades, a readable logarithmic spiral, ivory and champagne against jade-black depth. Nine seamless infinite loops.",
+  "license": "",
+  "accent": "#E9CE97",
+  "common": "common.glsl",
+  "palettes": [
+    {
+      "id": "ivory-jade",
+      "name": "Ivory Jade",
+      "bg": "#02100F",
+      "ink": "#F6EBD0",
+      "a": [
+        "#E8CC93",
+        "#D9803F",
+        "#0F5B50"
+      ]
+    },
+    {
+      "id": "copper-night",
+      "name": "Copper Night",
+      "bg": "#0D0604",
+      "ink": "#F7E3CC",
+      "a": [
+        "#E9A864",
+        "#C8552B",
+        "#3E1D12"
+      ]
+    },
+    {
+      "id": "opal-dusk",
+      "name": "Opal Dusk",
+      "bg": "#05080F",
+      "ink": "#EEF1F6",
+      "a": [
+        "#B9D0EA",
+        "#E6A3C1",
+        "#1C2F55"
+      ]
+    },
+    {
+      "id": "verdant",
+      "name": "Verdant",
+      "bg": "#03100A",
+      "ink": "#EAF3DA",
+      "a": [
+        "#C9E39B",
+        "#E0B24C",
+        "#124F2F"
+      ]
+    },
+    {
+      "id": "rose-gold",
+      "name": "Rose Gold",
+      "bg": "#0F0609",
+      "ink": "#FBEAE4",
+      "a": [
+        "#F2BFA4",
+        "#E27C86",
+        "#4B1A2A"
+      ]
+    }
+  ],
+  "styles": [
+    {
+      "id": "phi-bloom-hero",
+      "name": "Phi Bloom Hero",
+      "group": "Phi Bloom",
+      "tags": [
+        "flagship",
+        "botanical",
+        "golden-angle"
+      ],
+      "blurb": "The flagship: 144 ivory blades on a golden-angle lattice, a champagne log-spiral thread and a copper-lit foreground.",
+      "palette": "ivory-jade",
+      "flash": false,
+      "cost": 2.5,
+      "graph": {
+        "buffers": {
+          "scene": {
+            "scale": 0.75
+          },
+          "glowA": {
+            "scale": 0.25
+          },
+          "glowB": {
+            "scale": 0.125
+          }
+        },
+        "passes": [
+          {
+            "src": "styles/phi-bloom-hero.glsl",
+            "reads": [],
+            "writes": "scene"
+          },
+          {
+            "src": "styles/_glowA.glsl",
+            "reads": [
+              "scene"
+            ],
+            "writes": "glowA"
+          },
+          {
+            "src": "styles/_glowB.glsl",
+            "reads": [
+              "glowA"
+            ],
+            "writes": "glowB"
+          },
+          {
+            "src": "styles/_out.glsl",
+            "reads": [
+              "scene",
+              "glowA",
+              "glowB"
+            ],
+            "writes": "output"
+          }
+        ]
+      },
+      "params": {
+        "petals": {
+          "type": "int",
+          "label": "Petal count",
+          "min": 48,
+          "max": 240,
+          "def": 144,
+          "group": "Form",
+          "hint": "Number of petals in each golden-angle spiral. Spatial count, not a motion rate.",
+          "mutate": 0.3
+        },
+        "pitch": {
+          "type": "range",
+          "label": "Spiral pitch",
+          "min": 0.08,
+          "max": 0.35,
+          "def": 0.18,
+          "step": 0.0013,
+          "group": "Form",
+          "hint": "Growth rate b of the glowing logarithmic scaffold r = r0·e^(b·a). Separate from the petal lattice."
+        },
+        "bladeLen": {
+          "type": "range",
+          "label": "Blade length",
+          "min": 0.03,
+          "max": 0.16,
+          "def": 0.075,
+          "step": 0.00065,
+          "group": "Form",
+          "hint": "Half length of a mid-field blade in scene units (short side = 1).",
+          "log": true
+        },
+        "taper": {
+          "type": "range",
+          "label": "Blade taper",
+          "min": 0.15,
+          "max": 0.9,
+          "def": 0.5,
+          "step": 0.0037,
+          "group": "Form",
+          "hint": "How sharply each blade narrows toward its tip."
+        },
+        "depth": {
+          "type": "range",
+          "label": "Depth spacing",
+          "min": 0.02,
+          "max": 0.3,
+          "def": 0.12,
+          "step": 0.0014,
+          "group": "Form",
+          "hint": "Separation of the far, middle and foreground strata. Drives parallax and defocus."
+        },
+        "translucency": {
+          "type": "range",
+          "label": "Translucency",
+          "min": 0,
+          "max": 0.75,
+          "def": 0.3,
+          "step": 0.0037,
+          "group": "Material",
+          "hint": "Light transmitted through thin edges and tips."
+        },
+        "rim": {
+          "type": "range",
+          "label": "Rim intensity",
+          "min": 0,
+          "max": 2,
+          "def": 0.7,
+          "step": 0.01,
+          "group": "Material",
+          "hint": "Champagne rim light on blade edges.",
+          "randMax": 1.4
+        },
+        "caustic": {
+          "type": "range",
+          "label": "Copper caustics",
+          "min": 0,
+          "max": 1.5,
+          "def": 0.6,
+          "step": 0.0075,
+          "group": "Material",
+          "hint": "Thin copper light threads that follow the blade form.",
+          "randMax": 1
+        },
+        "core": {
+          "type": "range",
+          "label": "Core glow",
+          "min": 0,
+          "max": 3,
+          "def": 0.7,
+          "step": 0.015,
+          "group": "Light",
+          "hint": "Seed light at the spiral centre. Keep low so the geometry stays visible.",
+          "randMax": 1.6
+        },
+        "turns": {
+          "type": "int",
+          "label": "Turns per loop",
+          "min": 0,
+          "max": 2,
+          "def": 1,
+          "group": "Motion",
+          "hint": "Complete rotations of the whole field per loop (whole numbers only).",
+          "mutate": 0
+        },
+        "breath": {
+          "type": "range",
+          "label": "Breath amplitude",
+          "min": 0,
+          "max": 0.12,
+          "def": 0.035,
+          "step": 0.0006,
+          "group": "Motion",
+          "hint": "Petal breathing, sin(theta + seed phase)."
+        },
+        "unfold": {
+          "type": "range",
+          "label": "Unfold",
+          "min": 0,
+          "max": 0.3,
+          "def": 0.08,
+          "step": 0.0015,
+          "group": "Motion",
+          "hint": "A radial unfold wave that returns through a fold. 0 holds the blooms open."
+        },
+        "flow": {
+          "type": "int",
+          "label": "Flow steps per loop",
+          "min": 0,
+          "max": 3,
+          "def": 0,
+          "group": "Motion",
+          "hint": "Whole lattice indices the petals travel along the spiral each loop. 0 = rotation only.",
+          "mutate": 0
+        },
+        "orbit": {
+          "type": "range",
+          "label": "Camera orbit",
+          "min": 0,
+          "max": 0.25,
+          "def": 0.06,
+          "step": 0.0013,
+          "group": "Motion",
+          "hint": "Closed camera orbit amplitude. Drives parallax between the strata."
+        },
+        "keyAngle": {
+          "type": "range",
+          "label": "Key direction",
+          "min": -180,
+          "max": 180,
+          "def": 125,
+          "step": 1,
+          "unit": "°",
+          "group": "Light",
+          "hint": "Direction of the key light in the picture plane, degrees.",
+          "randMax": 180
+        },
+        "exposure": {
+          "type": "range",
+          "label": "Exposure",
+          "min": 0.4,
+          "max": 2.4,
+          "def": 1,
+          "step": 0.01,
+          "unit": "×",
+          "log": true,
+          "group": "Light",
+          "hint": "Linear exposure before the single tone map.",
+          "randMax": 1.4
+        },
+        "bloom": {
+          "type": "range",
+          "label": "Bloom",
+          "min": 0,
+          "max": 1.6,
+          "def": 0.55,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Glow added around emissive light. 0 shows the bare geometry.",
+          "randMax": 0.9
+        },
+        "bloomRadius": {
+          "type": "range",
+          "label": "Bloom radius",
+          "min": 0.4,
+          "max": 2.2,
+          "def": 1,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Width of the glow relative to the frame.",
+          "randMax": 1.5
+        },
+        "lensCA": {
+          "type": "range",
+          "label": "Edge fringe",
+          "min": 0,
+          "max": 0.5,
+          "def": 0.12,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Spectral fringing toward the frame edge.",
+          "randMax": 0.25
+        },
+        "vignette": {
+          "type": "range",
+          "label": "Vignette",
+          "min": 0,
+          "max": 0.8,
+          "def": 0.38,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Darkens the frame edge; never touches the focal area.",
+          "randMax": 0.55
+        },
+        "quality": {
+          "type": "select",
+          "label": "Quality",
+          "options": [
+            {
+              "v": "live",
+              "l": "Live"
+            },
+            {
+              "v": "balanced",
+              "l": "Balanced"
+            },
+            {
+              "v": "export",
+              "l": "Export"
+            }
+          ],
+          "def": "balanced",
+          "mutate": 0,
+          "group": "Quality",
+          "hint": "Sample counts only. Composition, phase and exposure stay the same."
+        }
+      }
+    },
+    {
+      "id": "golden-seed",
+      "name": "Golden Seed",
+      "group": "Phi Bloom",
+      "tags": [
+        "seed head",
+        "macro"
+      ],
+      "blurb": "A dense seed-head of rounded florets; a bloom wave rolls out from the centre while the field holds still.",
+      "palette": "ivory-jade",
+      "flash": false,
+      "cost": 2.5,
+      "graph": {
+        "buffers": {
+          "scene": {
+            "scale": 0.75
+          },
+          "glowA": {
+            "scale": 0.25
+          },
+          "glowB": {
+            "scale": 0.125
+          }
+        },
+        "passes": [
+          {
+            "src": "styles/golden-seed.glsl",
+            "reads": [],
+            "writes": "scene"
+          },
+          {
+            "src": "styles/_glowA.glsl",
+            "reads": [
+              "scene"
+            ],
+            "writes": "glowA"
+          },
+          {
+            "src": "styles/_glowB.glsl",
+            "reads": [
+              "glowA"
+            ],
+            "writes": "glowB"
+          },
+          {
+            "src": "styles/_out.glsl",
+            "reads": [
+              "scene",
+              "glowA",
+              "glowB"
+            ],
+            "writes": "output"
+          }
+        ]
+      },
+      "params": {
+        "petals": {
+          "type": "int",
+          "label": "Petal count",
+          "min": 48,
+          "max": 240,
+          "def": 200,
+          "group": "Form",
+          "hint": "Number of petals in each golden-angle spiral. Spatial count, not a motion rate.",
+          "mutate": 0.3
+        },
+        "pitch": {
+          "type": "range",
+          "label": "Spiral pitch",
+          "min": 0.08,
+          "max": 0.35,
+          "def": 0.3,
+          "step": 0.0013,
+          "group": "Form",
+          "hint": "Growth rate b of the glowing logarithmic scaffold r = r0·e^(b·a). Separate from the petal lattice."
+        },
+        "bladeLen": {
+          "type": "range",
+          "label": "Blade length",
+          "min": 0.03,
+          "max": 0.16,
+          "def": 0.062,
+          "step": 0.00065,
+          "group": "Form",
+          "hint": "Half length of a mid-field blade in scene units (short side = 1).",
+          "log": true
+        },
+        "taper": {
+          "type": "range",
+          "label": "Blade taper",
+          "min": 0.15,
+          "max": 0.9,
+          "def": 0.5,
+          "step": 0.0037,
+          "group": "Form",
+          "hint": "How sharply each blade narrows toward its tip."
+        },
+        "depth": {
+          "type": "range",
+          "label": "Depth spacing",
+          "min": 0.02,
+          "max": 0.3,
+          "def": 0.08,
+          "step": 0.0014,
+          "group": "Form",
+          "hint": "Separation of the far, middle and foreground strata. Drives parallax and defocus."
+        },
+        "translucency": {
+          "type": "range",
+          "label": "Translucency",
+          "min": 0,
+          "max": 0.75,
+          "def": 0.2,
+          "step": 0.0037,
+          "group": "Material",
+          "hint": "Light transmitted through thin edges and tips."
+        },
+        "rim": {
+          "type": "range",
+          "label": "Rim intensity",
+          "min": 0,
+          "max": 2,
+          "def": 0.7,
+          "step": 0.01,
+          "group": "Material",
+          "hint": "Champagne rim light on blade edges.",
+          "randMax": 1.4
+        },
+        "caustic": {
+          "type": "range",
+          "label": "Copper caustics",
+          "min": 0,
+          "max": 1.5,
+          "def": 0.6,
+          "step": 0.0075,
+          "group": "Material",
+          "hint": "Thin copper light threads that follow the blade form.",
+          "randMax": 1
+        },
+        "core": {
+          "type": "range",
+          "label": "Core glow",
+          "min": 0,
+          "max": 3,
+          "def": 0.7,
+          "step": 0.015,
+          "group": "Light",
+          "hint": "Seed light at the spiral centre. Keep low so the geometry stays visible.",
+          "randMax": 1.6
+        },
+        "turns": {
+          "type": "int",
+          "label": "Turns per loop",
+          "min": 0,
+          "max": 2,
+          "def": 0,
+          "group": "Motion",
+          "hint": "Complete rotations of the whole field per loop (whole numbers only).",
+          "mutate": 0
+        },
+        "breath": {
+          "type": "range",
+          "label": "Breath amplitude",
+          "min": 0,
+          "max": 0.12,
+          "def": 0.06,
+          "step": 0.0006,
+          "group": "Motion",
+          "hint": "Petal breathing, sin(theta + seed phase)."
+        },
+        "unfold": {
+          "type": "range",
+          "label": "Unfold",
+          "min": 0,
+          "max": 0.3,
+          "def": 0.14,
+          "step": 0.0015,
+          "group": "Motion",
+          "hint": "A radial unfold wave that returns through a fold. 0 holds the blooms open."
+        },
+        "flow": {
+          "type": "int",
+          "label": "Flow steps per loop",
+          "min": 0,
+          "max": 3,
+          "def": 0,
+          "group": "Motion",
+          "hint": "Whole lattice indices the petals travel along the spiral each loop. 0 = rotation only.",
+          "mutate": 0
+        },
+        "orbit": {
+          "type": "range",
+          "label": "Camera orbit",
+          "min": 0,
+          "max": 0.25,
+          "def": 0.06,
+          "step": 0.0013,
+          "group": "Motion",
+          "hint": "Closed camera orbit amplitude. Drives parallax between the strata."
+        },
+        "keyAngle": {
+          "type": "range",
+          "label": "Key direction",
+          "min": -180,
+          "max": 180,
+          "def": 125,
+          "step": 1,
+          "unit": "°",
+          "group": "Light",
+          "hint": "Direction of the key light in the picture plane, degrees.",
+          "randMax": 180
+        },
+        "exposure": {
+          "type": "range",
+          "label": "Exposure",
+          "min": 0.4,
+          "max": 2.4,
+          "def": 1,
+          "step": 0.01,
+          "unit": "×",
+          "log": true,
+          "group": "Light",
+          "hint": "Linear exposure before the single tone map.",
+          "randMax": 1.4
+        },
+        "bloom": {
+          "type": "range",
+          "label": "Bloom",
+          "min": 0,
+          "max": 1.6,
+          "def": 0.55,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Glow added around emissive light. 0 shows the bare geometry.",
+          "randMax": 0.9
+        },
+        "bloomRadius": {
+          "type": "range",
+          "label": "Bloom radius",
+          "min": 0.4,
+          "max": 2.2,
+          "def": 1,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Width of the glow relative to the frame.",
+          "randMax": 1.5
+        },
+        "lensCA": {
+          "type": "range",
+          "label": "Edge fringe",
+          "min": 0,
+          "max": 0.5,
+          "def": 0.12,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Spectral fringing toward the frame edge.",
+          "randMax": 0.25
+        },
+        "vignette": {
+          "type": "range",
+          "label": "Vignette",
+          "min": 0,
+          "max": 0.8,
+          "def": 0.38,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Darkens the frame edge; never touches the focal area.",
+          "randMax": 0.55
+        },
+        "quality": {
+          "type": "select",
+          "label": "Quality",
+          "options": [
+            {
+              "v": "live",
+              "l": "Live"
+            },
+            {
+              "v": "balanced",
+              "l": "Balanced"
+            },
+            {
+              "v": "export",
+              "l": "Export"
+            }
+          ],
+          "def": "balanced",
+          "mutate": 0,
+          "group": "Quality",
+          "hint": "Sample counts only. Composition, phase and exposure stay the same."
+        }
+      }
+    },
+    {
+      "id": "copper-fern",
+      "name": "Copper Fern",
+      "group": "Phi Bloom",
+      "tags": [
+        "fern",
+        "log spiral"
+      ],
+      "blurb": "A copper frond curls along a logarithmic spiral and uncurls through a closed bell, twinned by a distant mirror frond.",
+      "palette": "copper-night",
+      "flash": false,
+      "cost": 2.5,
+      "graph": {
+        "buffers": {
+          "scene": {
+            "scale": 0.75
+          },
+          "glowA": {
+            "scale": 0.25
+          },
+          "glowB": {
+            "scale": 0.125
+          }
+        },
+        "passes": [
+          {
+            "src": "styles/copper-fern.glsl",
+            "reads": [],
+            "writes": "scene"
+          },
+          {
+            "src": "styles/_glowA.glsl",
+            "reads": [
+              "scene"
+            ],
+            "writes": "glowA"
+          },
+          {
+            "src": "styles/_glowB.glsl",
+            "reads": [
+              "glowA"
+            ],
+            "writes": "glowB"
+          },
+          {
+            "src": "styles/_out.glsl",
+            "reads": [
+              "scene",
+              "glowA",
+              "glowB"
+            ],
+            "writes": "output"
+          }
+        ]
+      },
+      "params": {
+        "petals": {
+          "type": "int",
+          "label": "Petal count",
+          "min": 48,
+          "max": 240,
+          "def": 120,
+          "group": "Form",
+          "hint": "Number of petals in each golden-angle spiral. Spatial count, not a motion rate.",
+          "mutate": 0.3
+        },
+        "pitch": {
+          "type": "range",
+          "label": "Spiral pitch",
+          "min": 0.08,
+          "max": 0.35,
+          "def": 0.2,
+          "step": 0.0013,
+          "group": "Form",
+          "hint": "Growth rate b of the glowing logarithmic scaffold r = r0·e^(b·a). Separate from the petal lattice."
+        },
+        "bladeLen": {
+          "type": "range",
+          "label": "Blade length",
+          "min": 0.03,
+          "max": 0.16,
+          "def": 0.055,
+          "step": 0.00065,
+          "group": "Form",
+          "hint": "Half length of a mid-field blade in scene units (short side = 1).",
+          "log": true
+        },
+        "taper": {
+          "type": "range",
+          "label": "Blade taper",
+          "min": 0.15,
+          "max": 0.9,
+          "def": 0.5,
+          "step": 0.0037,
+          "group": "Form",
+          "hint": "How sharply each blade narrows toward its tip."
+        },
+        "depth": {
+          "type": "range",
+          "label": "Depth spacing",
+          "min": 0.02,
+          "max": 0.3,
+          "def": 0.1,
+          "step": 0.0014,
+          "group": "Form",
+          "hint": "Separation of the far, middle and foreground strata. Drives parallax and defocus."
+        },
+        "translucency": {
+          "type": "range",
+          "label": "Translucency",
+          "min": 0,
+          "max": 0.75,
+          "def": 0.3,
+          "step": 0.0037,
+          "group": "Material",
+          "hint": "Light transmitted through thin edges and tips."
+        },
+        "rim": {
+          "type": "range",
+          "label": "Rim intensity",
+          "min": 0,
+          "max": 2,
+          "def": 0.9,
+          "step": 0.01,
+          "group": "Material",
+          "hint": "Champagne rim light on blade edges.",
+          "randMax": 1.4
+        },
+        "caustic": {
+          "type": "range",
+          "label": "Copper caustics",
+          "min": 0,
+          "max": 1.5,
+          "def": 0.9,
+          "step": 0.0075,
+          "group": "Material",
+          "hint": "Thin copper light threads that follow the blade form.",
+          "randMax": 1
+        },
+        "core": {
+          "type": "range",
+          "label": "Core glow",
+          "min": 0,
+          "max": 3,
+          "def": 0.7,
+          "step": 0.015,
+          "group": "Light",
+          "hint": "Seed light at the spiral centre. Keep low so the geometry stays visible.",
+          "randMax": 1.6
+        },
+        "turns": {
+          "type": "int",
+          "label": "Turns per loop",
+          "min": 0,
+          "max": 2,
+          "def": 0,
+          "group": "Motion",
+          "hint": "Complete rotations of the whole field per loop (whole numbers only).",
+          "mutate": 0
+        },
+        "breath": {
+          "type": "range",
+          "label": "Breath amplitude",
+          "min": 0,
+          "max": 0.12,
+          "def": 0.035,
+          "step": 0.0006,
+          "group": "Motion",
+          "hint": "Petal breathing, sin(theta + seed phase)."
+        },
+        "unfold": {
+          "type": "range",
+          "label": "Unfold",
+          "min": 0,
+          "max": 0.3,
+          "def": 0.14,
+          "step": 0.0015,
+          "group": "Motion",
+          "hint": "A radial unfold wave that returns through a fold. 0 holds the blooms open."
+        },
+        "flow": {
+          "type": "int",
+          "label": "Flow steps per loop",
+          "min": 0,
+          "max": 3,
+          "def": 0,
+          "group": "Motion",
+          "hint": "Whole lattice indices the petals travel along the spiral each loop. 0 = rotation only.",
+          "mutate": 0
+        },
+        "orbit": {
+          "type": "range",
+          "label": "Camera orbit",
+          "min": 0,
+          "max": 0.25,
+          "def": 0.06,
+          "step": 0.0013,
+          "group": "Motion",
+          "hint": "Closed camera orbit amplitude. Drives parallax between the strata."
+        },
+        "keyAngle": {
+          "type": "range",
+          "label": "Key direction",
+          "min": -180,
+          "max": 180,
+          "def": 125,
+          "step": 1,
+          "unit": "°",
+          "group": "Light",
+          "hint": "Direction of the key light in the picture plane, degrees.",
+          "randMax": 180
+        },
+        "exposure": {
+          "type": "range",
+          "label": "Exposure",
+          "min": 0.4,
+          "max": 2.4,
+          "def": 1,
+          "step": 0.01,
+          "unit": "×",
+          "log": true,
+          "group": "Light",
+          "hint": "Linear exposure before the single tone map.",
+          "randMax": 1.4
+        },
+        "bloom": {
+          "type": "range",
+          "label": "Bloom",
+          "min": 0,
+          "max": 1.6,
+          "def": 0.55,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Glow added around emissive light. 0 shows the bare geometry.",
+          "randMax": 0.9
+        },
+        "bloomRadius": {
+          "type": "range",
+          "label": "Bloom radius",
+          "min": 0.4,
+          "max": 2.2,
+          "def": 1,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Width of the glow relative to the frame.",
+          "randMax": 1.5
+        },
+        "lensCA": {
+          "type": "range",
+          "label": "Edge fringe",
+          "min": 0,
+          "max": 0.5,
+          "def": 0.12,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Spectral fringing toward the frame edge.",
+          "randMax": 0.25
+        },
+        "vignette": {
+          "type": "range",
+          "label": "Vignette",
+          "min": 0,
+          "max": 0.8,
+          "def": 0.38,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Darkens the frame edge; never touches the focal area.",
+          "randMax": 0.55
+        },
+        "quality": {
+          "type": "select",
+          "label": "Quality",
+          "options": [
+            {
+              "v": "live",
+              "l": "Live"
+            },
+            {
+              "v": "balanced",
+              "l": "Balanced"
+            },
+            {
+              "v": "export",
+              "l": "Export"
+            }
+          ],
+          "def": "balanced",
+          "mutate": 0,
+          "group": "Quality",
+          "hint": "Sample counts only. Composition, phase and exposure stay the same."
+        }
+      }
+    },
+    {
+      "id": "ivory-helix",
+      "name": "Ivory Helix",
+      "group": "Phi Bloom",
+      "tags": [
+        "helix",
+        "flow"
+      ],
+      "blurb": "Swept ivory blades travel one lattice step per loop along the spiral and dissolve into the seed.",
+      "palette": "ivory-jade",
+      "flash": false,
+      "cost": 2.5,
+      "graph": {
+        "buffers": {
+          "scene": {
+            "scale": 0.75
+          },
+          "glowA": {
+            "scale": 0.25
+          },
+          "glowB": {
+            "scale": 0.125
+          }
+        },
+        "passes": [
+          {
+            "src": "styles/ivory-helix.glsl",
+            "reads": [],
+            "writes": "scene"
+          },
+          {
+            "src": "styles/_glowA.glsl",
+            "reads": [
+              "scene"
+            ],
+            "writes": "glowA"
+          },
+          {
+            "src": "styles/_glowB.glsl",
+            "reads": [
+              "glowA"
+            ],
+            "writes": "glowB"
+          },
+          {
+            "src": "styles/_out.glsl",
+            "reads": [
+              "scene",
+              "glowA",
+              "glowB"
+            ],
+            "writes": "output"
+          }
+        ]
+      },
+      "params": {
+        "petals": {
+          "type": "int",
+          "label": "Petal count",
+          "min": 48,
+          "max": 240,
+          "def": 168,
+          "group": "Form",
+          "hint": "Number of petals in each golden-angle spiral. Spatial count, not a motion rate.",
+          "mutate": 0.3
+        },
+        "pitch": {
+          "type": "range",
+          "label": "Spiral pitch",
+          "min": 0.08,
+          "max": 0.35,
+          "def": 0.18,
+          "step": 0.0013,
+          "group": "Form",
+          "hint": "Growth rate b of the glowing logarithmic scaffold r = r0·e^(b·a). Separate from the petal lattice."
+        },
+        "bladeLen": {
+          "type": "range",
+          "label": "Blade length",
+          "min": 0.03,
+          "max": 0.16,
+          "def": 0.082,
+          "step": 0.00065,
+          "group": "Form",
+          "hint": "Half length of a mid-field blade in scene units (short side = 1).",
+          "log": true
+        },
+        "taper": {
+          "type": "range",
+          "label": "Blade taper",
+          "min": 0.15,
+          "max": 0.9,
+          "def": 0.62,
+          "step": 0.0037,
+          "group": "Form",
+          "hint": "How sharply each blade narrows toward its tip."
+        },
+        "depth": {
+          "type": "range",
+          "label": "Depth spacing",
+          "min": 0.02,
+          "max": 0.3,
+          "def": 0.12,
+          "step": 0.0014,
+          "group": "Form",
+          "hint": "Separation of the far, middle and foreground strata. Drives parallax and defocus."
+        },
+        "translucency": {
+          "type": "range",
+          "label": "Translucency",
+          "min": 0,
+          "max": 0.75,
+          "def": 0.3,
+          "step": 0.0037,
+          "group": "Material",
+          "hint": "Light transmitted through thin edges and tips."
+        },
+        "rim": {
+          "type": "range",
+          "label": "Rim intensity",
+          "min": 0,
+          "max": 2,
+          "def": 1,
+          "step": 0.01,
+          "group": "Material",
+          "hint": "Champagne rim light on blade edges.",
+          "randMax": 1.4
+        },
+        "caustic": {
+          "type": "range",
+          "label": "Copper caustics",
+          "min": 0,
+          "max": 1.5,
+          "def": 0.3,
+          "step": 0.0075,
+          "group": "Material",
+          "hint": "Thin copper light threads that follow the blade form.",
+          "randMax": 1
+        },
+        "core": {
+          "type": "range",
+          "label": "Core glow",
+          "min": 0,
+          "max": 3,
+          "def": 0.5,
+          "step": 0.015,
+          "group": "Light",
+          "hint": "Seed light at the spiral centre. Keep low so the geometry stays visible.",
+          "randMax": 1.6
+        },
+        "turns": {
+          "type": "int",
+          "label": "Turns per loop",
+          "min": 0,
+          "max": 2,
+          "def": 0,
+          "group": "Motion",
+          "hint": "Complete rotations of the whole field per loop (whole numbers only).",
+          "mutate": 0
+        },
+        "breath": {
+          "type": "range",
+          "label": "Breath amplitude",
+          "min": 0,
+          "max": 0.12,
+          "def": 0.035,
+          "step": 0.0006,
+          "group": "Motion",
+          "hint": "Petal breathing, sin(theta + seed phase)."
+        },
+        "unfold": {
+          "type": "range",
+          "label": "Unfold",
+          "min": 0,
+          "max": 0.3,
+          "def": 0.04,
+          "step": 0.0015,
+          "group": "Motion",
+          "hint": "A radial unfold wave that returns through a fold. 0 holds the blooms open."
+        },
+        "flow": {
+          "type": "int",
+          "label": "Flow steps per loop",
+          "min": 0,
+          "max": 3,
+          "def": 1,
+          "group": "Motion",
+          "hint": "Whole lattice indices the petals travel along the spiral each loop. 0 = rotation only.",
+          "mutate": 0
+        },
+        "orbit": {
+          "type": "range",
+          "label": "Camera orbit",
+          "min": 0,
+          "max": 0.25,
+          "def": 0.06,
+          "step": 0.0013,
+          "group": "Motion",
+          "hint": "Closed camera orbit amplitude. Drives parallax between the strata."
+        },
+        "keyAngle": {
+          "type": "range",
+          "label": "Key direction",
+          "min": -180,
+          "max": 180,
+          "def": 125,
+          "step": 1,
+          "unit": "°",
+          "group": "Light",
+          "hint": "Direction of the key light in the picture plane, degrees.",
+          "randMax": 180
+        },
+        "exposure": {
+          "type": "range",
+          "label": "Exposure",
+          "min": 0.4,
+          "max": 2.4,
+          "def": 1,
+          "step": 0.01,
+          "unit": "×",
+          "log": true,
+          "group": "Light",
+          "hint": "Linear exposure before the single tone map.",
+          "randMax": 1.4
+        },
+        "bloom": {
+          "type": "range",
+          "label": "Bloom",
+          "min": 0,
+          "max": 1.6,
+          "def": 0.55,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Glow added around emissive light. 0 shows the bare geometry.",
+          "randMax": 0.9
+        },
+        "bloomRadius": {
+          "type": "range",
+          "label": "Bloom radius",
+          "min": 0.4,
+          "max": 2.2,
+          "def": 1,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Width of the glow relative to the frame.",
+          "randMax": 1.5
+        },
+        "lensCA": {
+          "type": "range",
+          "label": "Edge fringe",
+          "min": 0,
+          "max": 0.5,
+          "def": 0.12,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Spectral fringing toward the frame edge.",
+          "randMax": 0.25
+        },
+        "vignette": {
+          "type": "range",
+          "label": "Vignette",
+          "min": 0,
+          "max": 0.8,
+          "def": 0.38,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Darkens the frame edge; never touches the focal area.",
+          "randMax": 0.55
+        },
+        "quality": {
+          "type": "select",
+          "label": "Quality",
+          "options": [
+            {
+              "v": "live",
+              "l": "Live"
+            },
+            {
+              "v": "balanced",
+              "l": "Balanced"
+            },
+            {
+              "v": "export",
+              "l": "Export"
+            }
+          ],
+          "def": "balanced",
+          "mutate": 0,
+          "group": "Quality",
+          "hint": "Sample counts only. Composition, phase and exposure stay the same."
+        }
+      }
+    },
+    {
+      "id": "jade-crown",
+      "name": "Jade Crown",
+      "group": "Phi Bloom",
+      "tags": [
+        "crown",
+        "rings"
+      ],
+      "blurb": "Concentric crowns of upright blades counter-rotate through whole turns, stepping down in depth.",
+      "palette": "verdant",
+      "flash": false,
+      "cost": 2.5,
+      "graph": {
+        "buffers": {
+          "scene": {
+            "scale": 0.75
+          },
+          "glowA": {
+            "scale": 0.25
+          },
+          "glowB": {
+            "scale": 0.125
+          }
+        },
+        "passes": [
+          {
+            "src": "styles/jade-crown.glsl",
+            "reads": [],
+            "writes": "scene"
+          },
+          {
+            "src": "styles/_glowA.glsl",
+            "reads": [
+              "scene"
+            ],
+            "writes": "glowA"
+          },
+          {
+            "src": "styles/_glowB.glsl",
+            "reads": [
+              "glowA"
+            ],
+            "writes": "glowB"
+          },
+          {
+            "src": "styles/_out.glsl",
+            "reads": [
+              "scene",
+              "glowA",
+              "glowB"
+            ],
+            "writes": "output"
+          }
+        ]
+      },
+      "params": {
+        "petals": {
+          "type": "int",
+          "label": "Petal count",
+          "min": 48,
+          "max": 240,
+          "def": 168,
+          "group": "Form",
+          "hint": "Number of petals in each golden-angle spiral. Spatial count, not a motion rate.",
+          "mutate": 0.3
+        },
+        "pitch": {
+          "type": "range",
+          "label": "Spiral pitch",
+          "min": 0.08,
+          "max": 0.35,
+          "def": 0.18,
+          "step": 0.0013,
+          "group": "Form",
+          "hint": "Growth rate b of the glowing logarithmic scaffold r = r0·e^(b·a). Separate from the petal lattice."
+        },
+        "bladeLen": {
+          "type": "range",
+          "label": "Blade length",
+          "min": 0.03,
+          "max": 0.16,
+          "def": 0.05,
+          "step": 0.00065,
+          "group": "Form",
+          "hint": "Half length of a mid-field blade in scene units (short side = 1).",
+          "log": true
+        },
+        "taper": {
+          "type": "range",
+          "label": "Blade taper",
+          "min": 0.15,
+          "max": 0.9,
+          "def": 0.7,
+          "step": 0.0037,
+          "group": "Form",
+          "hint": "How sharply each blade narrows toward its tip."
+        },
+        "depth": {
+          "type": "range",
+          "label": "Depth spacing",
+          "min": 0.02,
+          "max": 0.3,
+          "def": 0.14,
+          "step": 0.0014,
+          "group": "Form",
+          "hint": "Separation of the far, middle and foreground strata. Drives parallax and defocus."
+        },
+        "translucency": {
+          "type": "range",
+          "label": "Translucency",
+          "min": 0,
+          "max": 0.75,
+          "def": 0.4,
+          "step": 0.0037,
+          "group": "Material",
+          "hint": "Light transmitted through thin edges and tips."
+        },
+        "rim": {
+          "type": "range",
+          "label": "Rim intensity",
+          "min": 0,
+          "max": 2,
+          "def": 0.9,
+          "step": 0.01,
+          "group": "Material",
+          "hint": "Champagne rim light on blade edges.",
+          "randMax": 1.4
+        },
+        "caustic": {
+          "type": "range",
+          "label": "Copper caustics",
+          "min": 0,
+          "max": 1.5,
+          "def": 0.6,
+          "step": 0.0075,
+          "group": "Material",
+          "hint": "Thin copper light threads that follow the blade form.",
+          "randMax": 1
+        },
+        "core": {
+          "type": "range",
+          "label": "Core glow",
+          "min": 0,
+          "max": 3,
+          "def": 0.7,
+          "step": 0.015,
+          "group": "Light",
+          "hint": "Seed light at the spiral centre. Keep low so the geometry stays visible.",
+          "randMax": 1.6
+        },
+        "turns": {
+          "type": "int",
+          "label": "Turns per loop",
+          "min": 0,
+          "max": 2,
+          "def": 1,
+          "group": "Motion",
+          "hint": "Complete rotations of the whole field per loop (whole numbers only).",
+          "mutate": 0
+        },
+        "breath": {
+          "type": "range",
+          "label": "Breath amplitude",
+          "min": 0,
+          "max": 0.12,
+          "def": 0.035,
+          "step": 0.0006,
+          "group": "Motion",
+          "hint": "Petal breathing, sin(theta + seed phase)."
+        },
+        "unfold": {
+          "type": "range",
+          "label": "Unfold",
+          "min": 0,
+          "max": 0.3,
+          "def": 0.06,
+          "step": 0.0015,
+          "group": "Motion",
+          "hint": "A radial unfold wave that returns through a fold. 0 holds the blooms open."
+        },
+        "flow": {
+          "type": "int",
+          "label": "Flow steps per loop",
+          "min": 0,
+          "max": 3,
+          "def": 0,
+          "group": "Motion",
+          "hint": "Whole lattice indices the petals travel along the spiral each loop. 0 = rotation only.",
+          "mutate": 0
+        },
+        "orbit": {
+          "type": "range",
+          "label": "Camera orbit",
+          "min": 0,
+          "max": 0.25,
+          "def": 0.06,
+          "step": 0.0013,
+          "group": "Motion",
+          "hint": "Closed camera orbit amplitude. Drives parallax between the strata."
+        },
+        "keyAngle": {
+          "type": "range",
+          "label": "Key direction",
+          "min": -180,
+          "max": 180,
+          "def": 125,
+          "step": 1,
+          "unit": "°",
+          "group": "Light",
+          "hint": "Direction of the key light in the picture plane, degrees.",
+          "randMax": 180
+        },
+        "exposure": {
+          "type": "range",
+          "label": "Exposure",
+          "min": 0.4,
+          "max": 2.4,
+          "def": 1,
+          "step": 0.01,
+          "unit": "×",
+          "log": true,
+          "group": "Light",
+          "hint": "Linear exposure before the single tone map.",
+          "randMax": 1.4
+        },
+        "bloom": {
+          "type": "range",
+          "label": "Bloom",
+          "min": 0,
+          "max": 1.6,
+          "def": 0.55,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Glow added around emissive light. 0 shows the bare geometry.",
+          "randMax": 0.9
+        },
+        "bloomRadius": {
+          "type": "range",
+          "label": "Bloom radius",
+          "min": 0.4,
+          "max": 2.2,
+          "def": 1,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Width of the glow relative to the frame.",
+          "randMax": 1.5
+        },
+        "lensCA": {
+          "type": "range",
+          "label": "Edge fringe",
+          "min": 0,
+          "max": 0.5,
+          "def": 0.12,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Spectral fringing toward the frame edge.",
+          "randMax": 0.25
+        },
+        "vignette": {
+          "type": "range",
+          "label": "Vignette",
+          "min": 0,
+          "max": 0.8,
+          "def": 0.38,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Darkens the frame edge; never touches the focal area.",
+          "randMax": 0.55
+        },
+        "quality": {
+          "type": "select",
+          "label": "Quality",
+          "options": [
+            {
+              "v": "live",
+              "l": "Live"
+            },
+            {
+              "v": "balanced",
+              "l": "Balanced"
+            },
+            {
+              "v": "export",
+              "l": "Export"
+            }
+          ],
+          "def": "balanced",
+          "mutate": 0,
+          "group": "Quality",
+          "hint": "Sample counts only. Composition, phase and exposure stay the same."
+        }
+      }
+    },
+    {
+      "id": "spiral-canopy",
+      "name": "Spiral Canopy",
+      "group": "Phi Bloom",
+      "tags": [
+        "backlit",
+        "canopy"
+      ],
+      "blurb": "Seen from beneath: broad translucent leaves backlit by a bright seed, with defocused foreground leaves.",
+      "palette": "opal-dusk",
+      "flash": false,
+      "cost": 2.5,
+      "graph": {
+        "buffers": {
+          "scene": {
+            "scale": 0.75
+          },
+          "glowA": {
+            "scale": 0.25
+          },
+          "glowB": {
+            "scale": 0.125
+          }
+        },
+        "passes": [
+          {
+            "src": "styles/spiral-canopy.glsl",
+            "reads": [],
+            "writes": "scene"
+          },
+          {
+            "src": "styles/_glowA.glsl",
+            "reads": [
+              "scene"
+            ],
+            "writes": "glowA"
+          },
+          {
+            "src": "styles/_glowB.glsl",
+            "reads": [
+              "glowA"
+            ],
+            "writes": "glowB"
+          },
+          {
+            "src": "styles/_out.glsl",
+            "reads": [
+              "scene",
+              "glowA",
+              "glowB"
+            ],
+            "writes": "output"
+          }
+        ]
+      },
+      "params": {
+        "petals": {
+          "type": "int",
+          "label": "Petal count",
+          "min": 48,
+          "max": 240,
+          "def": 110,
+          "group": "Form",
+          "hint": "Number of petals in each golden-angle spiral. Spatial count, not a motion rate.",
+          "mutate": 0.3
+        },
+        "pitch": {
+          "type": "range",
+          "label": "Spiral pitch",
+          "min": 0.08,
+          "max": 0.35,
+          "def": 0.18,
+          "step": 0.0013,
+          "group": "Form",
+          "hint": "Growth rate b of the glowing logarithmic scaffold r = r0·e^(b·a). Separate from the petal lattice."
+        },
+        "bladeLen": {
+          "type": "range",
+          "label": "Blade length",
+          "min": 0.03,
+          "max": 0.16,
+          "def": 0.1,
+          "step": 0.00065,
+          "group": "Form",
+          "hint": "Half length of a mid-field blade in scene units (short side = 1).",
+          "log": true
+        },
+        "taper": {
+          "type": "range",
+          "label": "Blade taper",
+          "min": 0.15,
+          "max": 0.9,
+          "def": 0.4,
+          "step": 0.0037,
+          "group": "Form",
+          "hint": "How sharply each blade narrows toward its tip."
+        },
+        "depth": {
+          "type": "range",
+          "label": "Depth spacing",
+          "min": 0.02,
+          "max": 0.3,
+          "def": 0.22,
+          "step": 0.0014,
+          "group": "Form",
+          "hint": "Separation of the far, middle and foreground strata. Drives parallax and defocus."
+        },
+        "translucency": {
+          "type": "range",
+          "label": "Translucency",
+          "min": 0,
+          "max": 0.75,
+          "def": 0.62,
+          "step": 0.0037,
+          "group": "Material",
+          "hint": "Light transmitted through thin edges and tips."
+        },
+        "rim": {
+          "type": "range",
+          "label": "Rim intensity",
+          "min": 0,
+          "max": 2,
+          "def": 0.5,
+          "step": 0.01,
+          "group": "Material",
+          "hint": "Champagne rim light on blade edges.",
+          "randMax": 1.4
+        },
+        "caustic": {
+          "type": "range",
+          "label": "Copper caustics",
+          "min": 0,
+          "max": 1.5,
+          "def": 0.6,
+          "step": 0.0075,
+          "group": "Material",
+          "hint": "Thin copper light threads that follow the blade form.",
+          "randMax": 1
+        },
+        "core": {
+          "type": "range",
+          "label": "Core glow",
+          "min": 0,
+          "max": 3,
+          "def": 1.8,
+          "step": 0.015,
+          "group": "Light",
+          "hint": "Seed light at the spiral centre. Keep low so the geometry stays visible.",
+          "randMax": 1.6
+        },
+        "turns": {
+          "type": "int",
+          "label": "Turns per loop",
+          "min": 0,
+          "max": 2,
+          "def": 1,
+          "group": "Motion",
+          "hint": "Complete rotations of the whole field per loop (whole numbers only).",
+          "mutate": 0
+        },
+        "breath": {
+          "type": "range",
+          "label": "Breath amplitude",
+          "min": 0,
+          "max": 0.12,
+          "def": 0.035,
+          "step": 0.0006,
+          "group": "Motion",
+          "hint": "Petal breathing, sin(theta + seed phase)."
+        },
+        "unfold": {
+          "type": "range",
+          "label": "Unfold",
+          "min": 0,
+          "max": 0.3,
+          "def": 0.08,
+          "step": 0.0015,
+          "group": "Motion",
+          "hint": "A radial unfold wave that returns through a fold. 0 holds the blooms open."
+        },
+        "flow": {
+          "type": "int",
+          "label": "Flow steps per loop",
+          "min": 0,
+          "max": 3,
+          "def": 0,
+          "group": "Motion",
+          "hint": "Whole lattice indices the petals travel along the spiral each loop. 0 = rotation only.",
+          "mutate": 0
+        },
+        "orbit": {
+          "type": "range",
+          "label": "Camera orbit",
+          "min": 0,
+          "max": 0.25,
+          "def": 0.12,
+          "step": 0.0013,
+          "group": "Motion",
+          "hint": "Closed camera orbit amplitude. Drives parallax between the strata."
+        },
+        "keyAngle": {
+          "type": "range",
+          "label": "Key direction",
+          "min": -180,
+          "max": 180,
+          "def": 125,
+          "step": 1,
+          "unit": "°",
+          "group": "Light",
+          "hint": "Direction of the key light in the picture plane, degrees.",
+          "randMax": 180
+        },
+        "exposure": {
+          "type": "range",
+          "label": "Exposure",
+          "min": 0.4,
+          "max": 2.4,
+          "def": 1,
+          "step": 0.01,
+          "unit": "×",
+          "log": true,
+          "group": "Light",
+          "hint": "Linear exposure before the single tone map.",
+          "randMax": 1.4
+        },
+        "bloom": {
+          "type": "range",
+          "label": "Bloom",
+          "min": 0,
+          "max": 1.6,
+          "def": 0.8,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Glow added around emissive light. 0 shows the bare geometry.",
+          "randMax": 0.9
+        },
+        "bloomRadius": {
+          "type": "range",
+          "label": "Bloom radius",
+          "min": 0.4,
+          "max": 2.2,
+          "def": 1,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Width of the glow relative to the frame.",
+          "randMax": 1.5
+        },
+        "lensCA": {
+          "type": "range",
+          "label": "Edge fringe",
+          "min": 0,
+          "max": 0.5,
+          "def": 0.12,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Spectral fringing toward the frame edge.",
+          "randMax": 0.25
+        },
+        "vignette": {
+          "type": "range",
+          "label": "Vignette",
+          "min": 0,
+          "max": 0.8,
+          "def": 0.38,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Darkens the frame edge; never touches the focal area.",
+          "randMax": 0.55
+        },
+        "quality": {
+          "type": "select",
+          "label": "Quality",
+          "options": [
+            {
+              "v": "live",
+              "l": "Live"
+            },
+            {
+              "v": "balanced",
+              "l": "Balanced"
+            },
+            {
+              "v": "export",
+              "l": "Export"
+            }
+          ],
+          "def": "balanced",
+          "mutate": 0,
+          "group": "Quality",
+          "hint": "Sample counts only. Composition, phase and exposure stay the same."
+        }
+      }
+    },
+    {
+      "id": "twin-phyllotaxis",
+      "name": "Twin Phyllotaxis",
+      "group": "Phi Bloom",
+      "tags": [
+        "interference",
+        "twin"
+      ],
+      "blurb": "Two golden-angle lattices turn against each other, ivory over copper, and beat as they pass.",
+      "palette": "rose-gold",
+      "flash": false,
+      "cost": 2.5,
+      "graph": {
+        "buffers": {
+          "scene": {
+            "scale": 0.75
+          },
+          "glowA": {
+            "scale": 0.25
+          },
+          "glowB": {
+            "scale": 0.125
+          }
+        },
+        "passes": [
+          {
+            "src": "styles/twin-phyllotaxis.glsl",
+            "reads": [],
+            "writes": "scene"
+          },
+          {
+            "src": "styles/_glowA.glsl",
+            "reads": [
+              "scene"
+            ],
+            "writes": "glowA"
+          },
+          {
+            "src": "styles/_glowB.glsl",
+            "reads": [
+              "glowA"
+            ],
+            "writes": "glowB"
+          },
+          {
+            "src": "styles/_out.glsl",
+            "reads": [
+              "scene",
+              "glowA",
+              "glowB"
+            ],
+            "writes": "output"
+          }
+        ]
+      },
+      "params": {
+        "petals": {
+          "type": "int",
+          "label": "Petal count",
+          "min": 48,
+          "max": 240,
+          "def": 150,
+          "group": "Form",
+          "hint": "Number of petals in each golden-angle spiral. Spatial count, not a motion rate.",
+          "mutate": 0.3
+        },
+        "pitch": {
+          "type": "range",
+          "label": "Spiral pitch",
+          "min": 0.08,
+          "max": 0.35,
+          "def": 0.18,
+          "step": 0.0013,
+          "group": "Form",
+          "hint": "Growth rate b of the glowing logarithmic scaffold r = r0·e^(b·a). Separate from the petal lattice."
+        },
+        "bladeLen": {
+          "type": "range",
+          "label": "Blade length",
+          "min": 0.03,
+          "max": 0.16,
+          "def": 0.066,
+          "step": 0.00065,
+          "group": "Form",
+          "hint": "Half length of a mid-field blade in scene units (short side = 1).",
+          "log": true
+        },
+        "taper": {
+          "type": "range",
+          "label": "Blade taper",
+          "min": 0.15,
+          "max": 0.9,
+          "def": 0.55,
+          "step": 0.0037,
+          "group": "Form",
+          "hint": "How sharply each blade narrows toward its tip."
+        },
+        "depth": {
+          "type": "range",
+          "label": "Depth spacing",
+          "min": 0.02,
+          "max": 0.3,
+          "def": 0.1,
+          "step": 0.0014,
+          "group": "Form",
+          "hint": "Separation of the far, middle and foreground strata. Drives parallax and defocus."
+        },
+        "translucency": {
+          "type": "range",
+          "label": "Translucency",
+          "min": 0,
+          "max": 0.75,
+          "def": 0.3,
+          "step": 0.0037,
+          "group": "Material",
+          "hint": "Light transmitted through thin edges and tips."
+        },
+        "rim": {
+          "type": "range",
+          "label": "Rim intensity",
+          "min": 0,
+          "max": 2,
+          "def": 0.7,
+          "step": 0.01,
+          "group": "Material",
+          "hint": "Champagne rim light on blade edges.",
+          "randMax": 1.4
+        },
+        "caustic": {
+          "type": "range",
+          "label": "Copper caustics",
+          "min": 0,
+          "max": 1.5,
+          "def": 0.8,
+          "step": 0.0075,
+          "group": "Material",
+          "hint": "Thin copper light threads that follow the blade form.",
+          "randMax": 1
+        },
+        "core": {
+          "type": "range",
+          "label": "Core glow",
+          "min": 0,
+          "max": 3,
+          "def": 0.7,
+          "step": 0.015,
+          "group": "Light",
+          "hint": "Seed light at the spiral centre. Keep low so the geometry stays visible.",
+          "randMax": 1.6
+        },
+        "turns": {
+          "type": "int",
+          "label": "Turns per loop",
+          "min": 0,
+          "max": 2,
+          "def": 1,
+          "group": "Motion",
+          "hint": "Complete rotations of the whole field per loop (whole numbers only).",
+          "mutate": 0
+        },
+        "breath": {
+          "type": "range",
+          "label": "Breath amplitude",
+          "min": 0,
+          "max": 0.12,
+          "def": 0.035,
+          "step": 0.0006,
+          "group": "Motion",
+          "hint": "Petal breathing, sin(theta + seed phase)."
+        },
+        "unfold": {
+          "type": "range",
+          "label": "Unfold",
+          "min": 0,
+          "max": 0.3,
+          "def": 0.05,
+          "step": 0.0015,
+          "group": "Motion",
+          "hint": "A radial unfold wave that returns through a fold. 0 holds the blooms open."
+        },
+        "flow": {
+          "type": "int",
+          "label": "Flow steps per loop",
+          "min": 0,
+          "max": 3,
+          "def": 0,
+          "group": "Motion",
+          "hint": "Whole lattice indices the petals travel along the spiral each loop. 0 = rotation only.",
+          "mutate": 0
+        },
+        "orbit": {
+          "type": "range",
+          "label": "Camera orbit",
+          "min": 0,
+          "max": 0.25,
+          "def": 0.06,
+          "step": 0.0013,
+          "group": "Motion",
+          "hint": "Closed camera orbit amplitude. Drives parallax between the strata."
+        },
+        "keyAngle": {
+          "type": "range",
+          "label": "Key direction",
+          "min": -180,
+          "max": 180,
+          "def": 125,
+          "step": 1,
+          "unit": "°",
+          "group": "Light",
+          "hint": "Direction of the key light in the picture plane, degrees.",
+          "randMax": 180
+        },
+        "exposure": {
+          "type": "range",
+          "label": "Exposure",
+          "min": 0.4,
+          "max": 2.4,
+          "def": 1,
+          "step": 0.01,
+          "unit": "×",
+          "log": true,
+          "group": "Light",
+          "hint": "Linear exposure before the single tone map.",
+          "randMax": 1.4
+        },
+        "bloom": {
+          "type": "range",
+          "label": "Bloom",
+          "min": 0,
+          "max": 1.6,
+          "def": 0.55,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Glow added around emissive light. 0 shows the bare geometry.",
+          "randMax": 0.9
+        },
+        "bloomRadius": {
+          "type": "range",
+          "label": "Bloom radius",
+          "min": 0.4,
+          "max": 2.2,
+          "def": 1,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Width of the glow relative to the frame.",
+          "randMax": 1.5
+        },
+        "lensCA": {
+          "type": "range",
+          "label": "Edge fringe",
+          "min": 0,
+          "max": 0.5,
+          "def": 0.12,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Spectral fringing toward the frame edge.",
+          "randMax": 0.25
+        },
+        "vignette": {
+          "type": "range",
+          "label": "Vignette",
+          "min": 0,
+          "max": 0.8,
+          "def": 0.38,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Darkens the frame edge; never touches the focal area.",
+          "randMax": 0.55
+        },
+        "quality": {
+          "type": "select",
+          "label": "Quality",
+          "options": [
+            {
+              "v": "live",
+              "l": "Live"
+            },
+            {
+              "v": "balanced",
+              "l": "Balanced"
+            },
+            {
+              "v": "export",
+              "l": "Export"
+            }
+          ],
+          "def": "balanced",
+          "mutate": 0,
+          "group": "Quality",
+          "hint": "Sample counts only. Composition, phase and exposure stay the same."
+        }
+      }
+    },
+    {
+      "id": "orbital-petals",
+      "name": "Orbital Petals",
+      "group": "Phi Bloom",
+      "tags": [
+        "orbits",
+        "gyroscope"
+      ],
+      "blurb": "Tilted rings of tangent petals turn like a gyroscope, each at its own whole-number rate.",
+      "palette": "opal-dusk",
+      "flash": false,
+      "cost": 2.5,
+      "graph": {
+        "buffers": {
+          "scene": {
+            "scale": 0.75
+          },
+          "glowA": {
+            "scale": 0.25
+          },
+          "glowB": {
+            "scale": 0.125
+          }
+        },
+        "passes": [
+          {
+            "src": "styles/orbital-petals.glsl",
+            "reads": [],
+            "writes": "scene"
+          },
+          {
+            "src": "styles/_glowA.glsl",
+            "reads": [
+              "scene"
+            ],
+            "writes": "glowA"
+          },
+          {
+            "src": "styles/_glowB.glsl",
+            "reads": [
+              "glowA"
+            ],
+            "writes": "glowB"
+          },
+          {
+            "src": "styles/_out.glsl",
+            "reads": [
+              "scene",
+              "glowA",
+              "glowB"
+            ],
+            "writes": "output"
+          }
+        ]
+      },
+      "params": {
+        "petals": {
+          "type": "int",
+          "label": "Petal count",
+          "min": 48,
+          "max": 240,
+          "def": 180,
+          "group": "Form",
+          "hint": "Number of petals in each golden-angle spiral. Spatial count, not a motion rate.",
+          "mutate": 0.3
+        },
+        "pitch": {
+          "type": "range",
+          "label": "Spiral pitch",
+          "min": 0.08,
+          "max": 0.35,
+          "def": 0.18,
+          "step": 0.0013,
+          "group": "Form",
+          "hint": "Growth rate b of the glowing logarithmic scaffold r = r0·e^(b·a). Separate from the petal lattice."
+        },
+        "bladeLen": {
+          "type": "range",
+          "label": "Blade length",
+          "min": 0.03,
+          "max": 0.16,
+          "def": 0.05,
+          "step": 0.00065,
+          "group": "Form",
+          "hint": "Half length of a mid-field blade in scene units (short side = 1).",
+          "log": true
+        },
+        "taper": {
+          "type": "range",
+          "label": "Blade taper",
+          "min": 0.15,
+          "max": 0.9,
+          "def": 0.5,
+          "step": 0.0037,
+          "group": "Form",
+          "hint": "How sharply each blade narrows toward its tip."
+        },
+        "depth": {
+          "type": "range",
+          "label": "Depth spacing",
+          "min": 0.02,
+          "max": 0.3,
+          "def": 0.12,
+          "step": 0.0014,
+          "group": "Form",
+          "hint": "Separation of the far, middle and foreground strata. Drives parallax and defocus."
+        },
+        "translucency": {
+          "type": "range",
+          "label": "Translucency",
+          "min": 0,
+          "max": 0.75,
+          "def": 0.3,
+          "step": 0.0037,
+          "group": "Material",
+          "hint": "Light transmitted through thin edges and tips."
+        },
+        "rim": {
+          "type": "range",
+          "label": "Rim intensity",
+          "min": 0,
+          "max": 2,
+          "def": 1.1,
+          "step": 0.01,
+          "group": "Material",
+          "hint": "Champagne rim light on blade edges.",
+          "randMax": 1.4
+        },
+        "caustic": {
+          "type": "range",
+          "label": "Copper caustics",
+          "min": 0,
+          "max": 1.5,
+          "def": 0.6,
+          "step": 0.0075,
+          "group": "Material",
+          "hint": "Thin copper light threads that follow the blade form.",
+          "randMax": 1
+        },
+        "core": {
+          "type": "range",
+          "label": "Core glow",
+          "min": 0,
+          "max": 3,
+          "def": 0.7,
+          "step": 0.015,
+          "group": "Light",
+          "hint": "Seed light at the spiral centre. Keep low so the geometry stays visible.",
+          "randMax": 1.6
+        },
+        "turns": {
+          "type": "int",
+          "label": "Turns per loop",
+          "min": 0,
+          "max": 2,
+          "def": 1,
+          "group": "Motion",
+          "hint": "Complete rotations of the whole field per loop (whole numbers only).",
+          "mutate": 0
+        },
+        "breath": {
+          "type": "range",
+          "label": "Breath amplitude",
+          "min": 0,
+          "max": 0.12,
+          "def": 0.035,
+          "step": 0.0006,
+          "group": "Motion",
+          "hint": "Petal breathing, sin(theta + seed phase)."
+        },
+        "unfold": {
+          "type": "range",
+          "label": "Unfold",
+          "min": 0,
+          "max": 0.3,
+          "def": 0,
+          "step": 0.0015,
+          "group": "Motion",
+          "hint": "A radial unfold wave that returns through a fold. 0 holds the blooms open."
+        },
+        "flow": {
+          "type": "int",
+          "label": "Flow steps per loop",
+          "min": 0,
+          "max": 3,
+          "def": 0,
+          "group": "Motion",
+          "hint": "Whole lattice indices the petals travel along the spiral each loop. 0 = rotation only.",
+          "mutate": 0
+        },
+        "orbit": {
+          "type": "range",
+          "label": "Camera orbit",
+          "min": 0,
+          "max": 0.25,
+          "def": 0.06,
+          "step": 0.0013,
+          "group": "Motion",
+          "hint": "Closed camera orbit amplitude. Drives parallax between the strata."
+        },
+        "keyAngle": {
+          "type": "range",
+          "label": "Key direction",
+          "min": -180,
+          "max": 180,
+          "def": 125,
+          "step": 1,
+          "unit": "°",
+          "group": "Light",
+          "hint": "Direction of the key light in the picture plane, degrees.",
+          "randMax": 180
+        },
+        "exposure": {
+          "type": "range",
+          "label": "Exposure",
+          "min": 0.4,
+          "max": 2.4,
+          "def": 1,
+          "step": 0.01,
+          "unit": "×",
+          "log": true,
+          "group": "Light",
+          "hint": "Linear exposure before the single tone map.",
+          "randMax": 1.4
+        },
+        "bloom": {
+          "type": "range",
+          "label": "Bloom",
+          "min": 0,
+          "max": 1.6,
+          "def": 0.55,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Glow added around emissive light. 0 shows the bare geometry.",
+          "randMax": 0.9
+        },
+        "bloomRadius": {
+          "type": "range",
+          "label": "Bloom radius",
+          "min": 0.4,
+          "max": 2.2,
+          "def": 1,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Width of the glow relative to the frame.",
+          "randMax": 1.5
+        },
+        "lensCA": {
+          "type": "range",
+          "label": "Edge fringe",
+          "min": 0,
+          "max": 0.5,
+          "def": 0.12,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Spectral fringing toward the frame edge.",
+          "randMax": 0.25
+        },
+        "vignette": {
+          "type": "range",
+          "label": "Vignette",
+          "min": 0,
+          "max": 0.8,
+          "def": 0.38,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Darkens the frame edge; never touches the focal area.",
+          "randMax": 0.55
+        },
+        "quality": {
+          "type": "select",
+          "label": "Quality",
+          "options": [
+            {
+              "v": "live",
+              "l": "Live"
+            },
+            {
+              "v": "balanced",
+              "l": "Balanced"
+            },
+            {
+              "v": "export",
+              "l": "Export"
+            }
+          ],
+          "def": "balanced",
+          "mutate": 0,
+          "group": "Quality",
+          "hint": "Sample counts only. Composition, phase and exposure stay the same."
+        }
+      }
+    },
+    {
+      "id": "quiet-unfold",
+      "name": "Quiet Unfold",
+      "group": "Phi Bloom",
+      "tags": [
+        "calm",
+        "ambient"
+      ],
+      "blurb": "The calmest bloom: one slow unfold wave, low contrast, soft light. Made for text-safe backgrounds.",
+      "palette": "ivory-jade",
+      "flash": false,
+      "cost": 2.5,
+      "graph": {
+        "buffers": {
+          "scene": {
+            "scale": 0.75
+          },
+          "glowA": {
+            "scale": 0.25
+          },
+          "glowB": {
+            "scale": 0.125
+          }
+        },
+        "passes": [
+          {
+            "src": "styles/quiet-unfold.glsl",
+            "reads": [],
+            "writes": "scene"
+          },
+          {
+            "src": "styles/_glowA.glsl",
+            "reads": [
+              "scene"
+            ],
+            "writes": "glowA"
+          },
+          {
+            "src": "styles/_glowB.glsl",
+            "reads": [
+              "glowA"
+            ],
+            "writes": "glowB"
+          },
+          {
+            "src": "styles/_out.glsl",
+            "reads": [
+              "scene",
+              "glowA",
+              "glowB"
+            ],
+            "writes": "output"
+          }
+        ]
+      },
+      "params": {
+        "petals": {
+          "type": "int",
+          "label": "Petal count",
+          "min": 48,
+          "max": 240,
+          "def": 96,
+          "group": "Form",
+          "hint": "Number of petals in each golden-angle spiral. Spatial count, not a motion rate.",
+          "mutate": 0.3
+        },
+        "pitch": {
+          "type": "range",
+          "label": "Spiral pitch",
+          "min": 0.08,
+          "max": 0.35,
+          "def": 0.18,
+          "step": 0.0013,
+          "group": "Form",
+          "hint": "Growth rate b of the glowing logarithmic scaffold r = r0·e^(b·a). Separate from the petal lattice."
+        },
+        "bladeLen": {
+          "type": "range",
+          "label": "Blade length",
+          "min": 0.03,
+          "max": 0.16,
+          "def": 0.082,
+          "step": 0.00065,
+          "group": "Form",
+          "hint": "Half length of a mid-field blade in scene units (short side = 1).",
+          "log": true
+        },
+        "taper": {
+          "type": "range",
+          "label": "Blade taper",
+          "min": 0.15,
+          "max": 0.9,
+          "def": 0.5,
+          "step": 0.0037,
+          "group": "Form",
+          "hint": "How sharply each blade narrows toward its tip."
+        },
+        "depth": {
+          "type": "range",
+          "label": "Depth spacing",
+          "min": 0.02,
+          "max": 0.3,
+          "def": 0.12,
+          "step": 0.0014,
+          "group": "Form",
+          "hint": "Separation of the far, middle and foreground strata. Drives parallax and defocus."
+        },
+        "translucency": {
+          "type": "range",
+          "label": "Translucency",
+          "min": 0,
+          "max": 0.75,
+          "def": 0.3,
+          "step": 0.0037,
+          "group": "Material",
+          "hint": "Light transmitted through thin edges and tips."
+        },
+        "rim": {
+          "type": "range",
+          "label": "Rim intensity",
+          "min": 0,
+          "max": 2,
+          "def": 0.35,
+          "step": 0.01,
+          "group": "Material",
+          "hint": "Champagne rim light on blade edges.",
+          "randMax": 1.4
+        },
+        "caustic": {
+          "type": "range",
+          "label": "Copper caustics",
+          "min": 0,
+          "max": 1.5,
+          "def": 0.2,
+          "step": 0.0075,
+          "group": "Material",
+          "hint": "Thin copper light threads that follow the blade form.",
+          "randMax": 1
+        },
+        "core": {
+          "type": "range",
+          "label": "Core glow",
+          "min": 0,
+          "max": 3,
+          "def": 0.35,
+          "step": 0.015,
+          "group": "Light",
+          "hint": "Seed light at the spiral centre. Keep low so the geometry stays visible.",
+          "randMax": 1.6
+        },
+        "turns": {
+          "type": "int",
+          "label": "Turns per loop",
+          "min": 0,
+          "max": 2,
+          "def": 0,
+          "group": "Motion",
+          "hint": "Complete rotations of the whole field per loop (whole numbers only).",
+          "mutate": 0
+        },
+        "breath": {
+          "type": "range",
+          "label": "Breath amplitude",
+          "min": 0,
+          "max": 0.12,
+          "def": 0.02,
+          "step": 0.0006,
+          "group": "Motion",
+          "hint": "Petal breathing, sin(theta + seed phase)."
+        },
+        "unfold": {
+          "type": "range",
+          "label": "Unfold",
+          "min": 0,
+          "max": 0.3,
+          "def": 0.22,
+          "step": 0.0015,
+          "group": "Motion",
+          "hint": "A radial unfold wave that returns through a fold. 0 holds the blooms open."
+        },
+        "flow": {
+          "type": "int",
+          "label": "Flow steps per loop",
+          "min": 0,
+          "max": 3,
+          "def": 0,
+          "group": "Motion",
+          "hint": "Whole lattice indices the petals travel along the spiral each loop. 0 = rotation only.",
+          "mutate": 0
+        },
+        "orbit": {
+          "type": "range",
+          "label": "Camera orbit",
+          "min": 0,
+          "max": 0.25,
+          "def": 0.03,
+          "step": 0.0013,
+          "group": "Motion",
+          "hint": "Closed camera orbit amplitude. Drives parallax between the strata."
+        },
+        "keyAngle": {
+          "type": "range",
+          "label": "Key direction",
+          "min": -180,
+          "max": 180,
+          "def": 125,
+          "step": 1,
+          "unit": "°",
+          "group": "Light",
+          "hint": "Direction of the key light in the picture plane, degrees.",
+          "randMax": 180
+        },
+        "exposure": {
+          "type": "range",
+          "label": "Exposure",
+          "min": 0.4,
+          "max": 2.4,
+          "def": 0.92,
+          "step": 0.01,
+          "unit": "×",
+          "log": true,
+          "group": "Light",
+          "hint": "Linear exposure before the single tone map.",
+          "randMax": 1.4
+        },
+        "bloom": {
+          "type": "range",
+          "label": "Bloom",
+          "min": 0,
+          "max": 1.6,
+          "def": 0.3,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Glow added around emissive light. 0 shows the bare geometry.",
+          "randMax": 0.9
+        },
+        "bloomRadius": {
+          "type": "range",
+          "label": "Bloom radius",
+          "min": 0.4,
+          "max": 2.2,
+          "def": 1,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Width of the glow relative to the frame.",
+          "randMax": 1.5
+        },
+        "lensCA": {
+          "type": "range",
+          "label": "Edge fringe",
+          "min": 0,
+          "max": 0.5,
+          "def": 0.12,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Spectral fringing toward the frame edge.",
+          "randMax": 0.25
+        },
+        "vignette": {
+          "type": "range",
+          "label": "Vignette",
+          "min": 0,
+          "max": 0.8,
+          "def": 0.5,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Darkens the frame edge; never touches the focal area.",
+          "randMax": 0.55
+        },
+        "quality": {
+          "type": "select",
+          "label": "Quality",
+          "options": [
+            {
+              "v": "live",
+              "l": "Live"
+            },
+            {
+              "v": "balanced",
+              "l": "Balanced"
+            },
+            {
+              "v": "export",
+              "l": "Export"
+            }
+          ],
+          "def": "balanced",
+          "mutate": 0,
+          "group": "Quality",
+          "hint": "Sample counts only. Composition, phase and exposure stay the same."
+        }
+      }
+    }
+  ]
+}

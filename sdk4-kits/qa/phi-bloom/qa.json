@@ -1,0 +1,107 @@
+{
+  "kit": "phi-bloom",
+  "version": "1.0.0",
+  "size": [
+    90,
+    160
+  ],
+  "renderer": "SwiftShader (software GL, headless Chromium)",
+  "note": "Metric definitions in tools/qa.mjs. Software timings and metrics are relative diagnostics, not device performance.",
+  "results": [
+    {
+      "id": "phi-bloom-hero",
+      "delta0_p1": 0,
+      "seamStep": 2.396,
+      "seamStepAfter": 2.366,
+      "velMedian": 2.244,
+      "velMax": 2.392,
+      "seamRatio": 1.07,
+      "popRatio": 1.07,
+      "exposureByQuality": [
+        0.3132,
+        0.3124,
+        0.3124
+      ],
+      "exposureSpread": 0.003,
+      "meanLuma": 0.3124,
+      "flashTilesOver3": 0,
+      "flashPairsMaxPerSec": 0
+    },
+    {
+      "id": "copper-fern",
+      "delta0_p1": 0,
+      "seamStep": 0.043,
+      "seamStepAfter": 0.052,
+      "velMedian": 2.495,
+      "velMax": 2.896,
+      "seamRatio": 0.02,
+      "popRatio": 1.16,
+      "exposureByQuality": [
+        0.2027,
+        0.2043,
+        0.2043
+      ],
+      "exposureSpread": 0.008,
+      "meanLuma": 0.2043,
+      "flashTilesOver3": 0,
+      "flashPairsMaxPerSec": 0
+    },
+    {
+      "id": "spiral-canopy",
+      "delta0_p1": 0,
+      "seamStep": 1.426,
+      "seamStepAfter": 1.45,
+      "velMedian": 1.309,
+      "velMax": 1.463,
+      "seamRatio": 1.11,
+      "popRatio": 1.12,
+      "exposureByQuality": [
+        0.2991,
+        0.2986,
+        0.2986
+      ],
+      "exposureSpread": 0.002,
+      "meanLuma": 0.2986,
+      "flashTilesOver3": 0,
+      "flashPairsMaxPerSec": 0
+    },
+    {
+      "id": "twin-phyllotaxis",
+      "delta0_p1": 0,
+      "seamStep": 2.726,
+      "seamStepAfter": 2.66,
+      "velMedian": 2.863,
+      "velMax": 3.067,
+      "seamRatio": 0.95,
+      "popRatio": 1.07,
+      "exposureByQuality": [
+        0.2997,
+        0.301,
+        0.301
+      ],
+      "exposureSpread": 0.004,
+      "meanLuma": 0.301,
+      "flashTilesOver3": 0,
+      "flashPairsMaxPerSec": 0
+    },
+    {
+      "id": "ivory-helix",
+      "delta0_p1": 0,
+      "seamStep": 1.455,
+      "seamStepAfter": 0.89,
+      "velMedian": 0.82,
+      "velMax": 0.868,
+      "seamRatio": 1.77,
+      "popRatio": 1.06,
+      "exposureByQuality": [
+        0.3127,
+        0.3104,
+        0.3104
+      ],
+      "exposureSpread": 0.008,
+      "meanLuma": 0.3104,
+      "flashTilesOver3": 0,
+      "flashPairsMaxPerSec": 0
+    }
+  ]
+}
