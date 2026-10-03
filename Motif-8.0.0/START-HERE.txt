@@ -1,0 +1,9 @@
+Motif 8.0
+
+1. Open Motif.html in Chrome or Edge (Safari 17+ works with WebGL2 only). No install, no server, no network needed. (index.html just forwards to it.)
+2. New in 8: pick "Sequencer" in the library for a cue timeline that calls styles from your library at points of the loop; try Layers > Sequencer > Load a sequence > Sequence Demo. Stack Lab, Vector Type and Sequence Demo kits are bundled (Kits).
+3. Kits: Kits page > Install, then pick a file from kits/ (.motifkit).
+4. Build your own kits: sdk/ (CLI, schemas, docs). motif-kit@4 adds layer stacks, SVG inputs, text distance fields and sequences.
+5. Verify the files: shasum -a 256 -c SHA256SUMS
+
+Everything is local; media never leaves the browser.

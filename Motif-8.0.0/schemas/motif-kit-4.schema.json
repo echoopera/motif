@@ -1,0 +1,1690 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://motif.local/schemas/motif-kit-4.schema.json",
+  "title": "Motif kit manifest (motif-kit@3, reads motif-kit@1 and motif-kit@2)",
+  "description": "manifest.json of a .motifkit package. motif-kit@4 adds layer stacks (up to 3 media layers with blend modes and independent motion), svg inputs, text distance fields (\"sdf\": true on a text input), the vector shape / playhead / cue GLSL toolkit, the \"vector\" capability and kit-shipped sequences (motif-seq@1) to motif-kit@3. motif-kit@3 adds text inputs to motif-kit@2, which is a superset of motif-kit@1: every valid older manifest is accepted and read as before. The schema covers structure; the app additionally checks that files exist, GLSL analysis, generated-control name clashes, svg safety, sequence overlap limits and capability use.",
+  "type": "object",
+  "required": [
+    "format",
+    "id",
+    "name",
+    "version"
+  ],
+  "properties": {
+    "format": {
+      "enum": [
+        "motif-kit@1",
+        "motif-kit@2",
+        "motif-kit@3",
+        "motif-kit@4"
+      ]
+    },
+    "id": {
+      "$ref": "#/$defs/id",
+      "not": {
+        "enum": [
+          "core",
+          "motif",
+          "builtin",
+          "all"
+        ]
+      }
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 32
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "author": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "license": {
+      "type": "string"
+    },
+    "accent": {
+      "$ref": "#/$defs/hex"
+    },
+    "common": {
+      "$ref": "#/$defs/file"
+    },
+    "capabilities": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "media",
+          "audio",
+          "feedback",
+          "text",
+          "vector"
+        ]
+      },
+      "description": "motif-kit@2 and @3. Declared access the user approves at install (\"text\": @3 only, local font rasterization of text typed into the layer). Kits can never request network, DOM or script access. \"vector\": @4 only, svg inputs baked to distance fields on this device."
+    },
+    "inputs": {
+      "$ref": "#/$defs/inputs"
+    },
+    "palettes": {
+      "type": "array",
+      "maxItems": 8,
+      "items": {
+        "$ref": "#/$defs/palette"
+      }
+    },
+    "styles": {
+      "type": "array",
+      "maxItems": 40,
+      "items": {
+        "$ref": "#/$defs/style"
+      }
+    },
+    "effects": {
+      "type": "array",
+      "maxItems": 24,
+      "items": {
+        "$ref": "#/$defs/effect"
+      }
+    },
+    "transitions": {
+      "type": "array",
+      "maxItems": 24,
+      "items": {
+        "$ref": "#/$defs/transition"
+      }
+    },
+    "exporters": {
+      "type": "array",
+      "maxItems": 16,
+      "items": {
+        "$ref": "#/$defs/exporter"
+      }
+    },
+    "sequences": {
+      "type": "array",
+      "maxItems": 8,
+      "items": {
+        "$ref": "#/$defs/sequence"
+      },
+      "description": "motif-kit@4. Cue lists that call styles at points of the loop; they appear in the Sequencer layer's Load menu."
+    }
+  },
+  "propertyNames": {
+    "not": {
+      "enum": [
+        "__proto__",
+        "constructor",
+        "prototype"
+      ]
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "format": {
+            "const": "motif-kit@1"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "styles"
+        ],
+        "properties": {
+          "styles": {
+            "minItems": 1,
+            "items": {
+              "required": [
+                "passes"
+              ],
+              "not": {
+                "required": [
+                  "graph"
+                ]
+              }
+            }
+          }
+        },
+        "not": {
+          "anyOf": [
+            {
+              "required": [
+                "capabilities"
+              ]
+            },
+            {
+              "required": [
+                "effects"
+              ]
+            },
+            {
+              "required": [
+                "transitions"
+              ]
+            },
+            {
+              "required": [
+                "exporters"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "format": {
+            "const": "motif-kit@2"
+          }
+        }
+      },
+      "then": {
+        "anyOf": [
+          {
+            "required": [
+              "styles"
+            ],
+            "properties": {
+              "styles": {
+                "minItems": 1
+              }
+            }
+          },
+          {
+            "required": [
+              "effects"
+            ],
+            "properties": {
+              "effects": {
+                "minItems": 1
+              }
+            }
+          },
+          {
+            "required": [
+              "transitions"
+            ],
+            "properties": {
+              "transitions": {
+                "minItems": 1
+              }
+            }
+          },
+          {
+            "required": [
+              "exporters"
+            ],
+            "properties": {
+              "exporters": {
+                "minItems": 1
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "if": {
+        "not": {
+          "properties": {
+            "format": {
+              "enum": [
+                "motif-kit@3",
+                "motif-kit@4"
+              ]
+            }
+          }
+        }
+      },
+      "then": {
+        "not": {
+          "anyOf": [
+            {
+              "required": [
+                "capabilities"
+              ],
+              "properties": {
+                "capabilities": {
+                  "type": "array",
+                  "contains": {
+                    "const": "text"
+                  }
+                }
+              }
+            },
+            {
+              "required": [
+                "inputs"
+              ],
+              "properties": {
+                "inputs": {
+                  "type": "array",
+                  "contains": {
+                    "required": [
+                      "type"
+                    ],
+                    "properties": {
+                      "type": {
+                        "const": "text"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "required": [
+                "styles"
+              ],
+              "properties": {
+                "styles": {
+                  "type": "array",
+                  "contains": {
+                    "required": [
+                      "inputs"
+                    ],
+                    "properties": {
+                      "inputs": {
+                        "type": "array",
+                        "contains": {
+                          "required": [
+                            "type"
+                          ],
+                          "properties": {
+                            "type": {
+                              "const": "text"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "format": {
+            "enum": [
+              "motif-kit@3",
+              "motif-kit@4"
+            ]
+          }
+        }
+      },
+      "then": {
+        "anyOf": [
+          {
+            "required": [
+              "styles"
+            ],
+            "properties": {
+              "styles": {
+                "minItems": 1
+              }
+            }
+          },
+          {
+            "required": [
+              "effects"
+            ],
+            "properties": {
+              "effects": {
+                "minItems": 1
+              }
+            }
+          },
+          {
+            "required": [
+              "transitions"
+            ],
+            "properties": {
+              "transitions": {
+                "minItems": 1
+              }
+            }
+          },
+          {
+            "required": [
+              "exporters"
+            ],
+            "properties": {
+              "exporters": {
+                "minItems": 1
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "if": {
+        "not": {
+          "properties": {
+            "format": {
+              "const": "motif-kit@4"
+            }
+          }
+        }
+      },
+      "then": {
+        "not": {
+          "anyOf": [
+            {
+              "required": [
+                "sequences"
+              ]
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]{1,31}$"
+    },
+    "hex": {
+      "type": "string",
+      "pattern": "^#[0-9a-fA-F]{6}$"
+    },
+    "file": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_][A-Za-z0-9_./-]{0,127}$",
+      "not": {
+        "pattern": "\\.\\."
+      }
+    },
+    "palette": {
+      "type": "object",
+      "required": [
+        "id",
+        "bg",
+        "ink",
+        "a"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "name": {
+          "type": "string"
+        },
+        "bg": {
+          "$ref": "#/$defs/hex"
+        },
+        "ink": {
+          "$ref": "#/$defs/hex"
+        },
+        "a": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 3,
+          "items": {
+            "$ref": "#/$defs/hex"
+          }
+        }
+      }
+    },
+    "inputs": {
+      "type": "array",
+      "maxItems": 6,
+      "description": "motif-kit@4: up to 2 media, 2 svg and 2 text inputs (earlier formats: 2 in total).",
+      "items": {
+        "if": {
+          "required": [
+            "type"
+          ],
+          "properties": {
+            "type": {
+              "const": "text"
+            }
+          }
+        },
+        "then": {
+          "$ref": "#/$defs/textInput"
+        },
+        "else": {
+          "if": {
+            "required": [
+              "type"
+            ],
+            "properties": {
+              "type": {
+                "const": "svg"
+              }
+            }
+          },
+          "then": {
+            "$ref": "#/$defs/svgInput"
+          },
+          "else": {
+            "$ref": "#/$defs/mediaInput"
+          }
+        }
+      }
+    },
+    "show": {
+      "type": "object",
+      "required": [
+        "param"
+      ],
+      "properties": {
+        "param": {
+          "type": "string"
+        },
+        "is": {},
+        "not": {},
+        "gt": {
+          "type": "number"
+        },
+        "lt": {
+          "type": "number"
+        }
+      },
+      "oneOf": [
+        {
+          "required": [
+            "is"
+          ]
+        },
+        {
+          "required": [
+            "not"
+          ]
+        },
+        {
+          "required": [
+            "gt"
+          ]
+        },
+        {
+          "required": [
+            "lt"
+          ]
+        }
+      ]
+    },
+    "param": {
+      "type": "object",
+      "required": [
+        "type"
+      ],
+      "properties": {
+        "type": {
+          "enum": [
+            "range",
+            "int",
+            "toggle",
+            "select",
+            "color",
+            "point"
+          ]
+        },
+        "label": {
+          "type": "string"
+        },
+        "unit": {
+          "type": "string"
+        },
+        "group": {
+          "type": "string"
+        },
+        "hint": {
+          "type": "string"
+        },
+        "mutate": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "show": {
+          "$ref": "#/$defs/show"
+        },
+        "min": {
+          "type": "number"
+        },
+        "max": {
+          "type": "number"
+        },
+        "step": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "log": {
+          "type": "boolean"
+        },
+        "randMax": {
+          "type": "number"
+        },
+        "def": {},
+        "options": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 12,
+          "items": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9-]{0,23}$"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "v"
+                ],
+                "properties": {
+                  "v": {
+                    "type": "string",
+                    "pattern": "^[a-z][a-z0-9-]{0,23}$"
+                  },
+                  "l": {
+                    "type": "string"
+                  }
+                }
+              }
+            ]
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "enum": [
+                  "range",
+                  "int"
+                ]
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "min",
+              "max",
+              "def"
+            ],
+            "properties": {
+              "def": {
+                "type": "number"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "int"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "min": {
+                "type": "integer"
+              },
+              "max": {
+                "type": "integer"
+              },
+              "def": {
+                "type": "integer"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "toggle"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "def": {
+                "type": "boolean"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "select"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "options"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "color"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "def"
+            ],
+            "properties": {
+              "def": {
+                "$ref": "#/$defs/hex"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "point"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "def": {
+                "type": "array",
+                "minItems": 2,
+                "maxItems": 2,
+                "items": {
+                  "type": "number"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "params": {
+      "type": "object",
+      "maxProperties": 32,
+      "propertyNames": {
+        "pattern": "^[a-z][a-zA-Z0-9]{0,23}$",
+        "not": {
+          "enum": [
+            "palette",
+            "invert",
+            "tempo",
+            "phase",
+            "seed",
+            "zoom",
+            "rotate",
+            "loop"
+          ]
+        }
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/param"
+      }
+    },
+    "pass": {
+      "type": "object",
+      "required": [
+        "src"
+      ],
+      "properties": {
+        "src": {
+          "$ref": "#/$defs/file"
+        },
+        "scale": {
+          "type": "number",
+          "minimum": 0.125,
+          "maximum": 1
+        }
+      }
+    },
+    "passes": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 4,
+      "items": {
+        "$ref": "#/$defs/pass"
+      }
+    },
+    "bufferName": {
+      "type": "string",
+      "pattern": "^[a-z][a-zA-Z0-9]{0,15}$",
+      "not": {
+        "enum": [
+          "input",
+          "from",
+          "to",
+          "output"
+        ]
+      }
+    },
+    "graph": {
+      "type": "object",
+      "required": [
+        "passes"
+      ],
+      "additionalProperties": false,
+      "description": "Pass graph: named buffers, pass reads/writes, ping-pong feedback with bounded iteration (within one frame). Ordering rules (a buffer is read only after an earlier pass writes it, or by the pass that writes it; exactly one last pass writes output; ≤ 32 pass executions per frame) are checked by the app.",
+      "properties": {
+        "buffers": {
+          "type": "object",
+          "maxProperties": 8,
+          "propertyNames": {
+            "$ref": "#/$defs/bufferName"
+          },
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "scale": {
+                "type": "number",
+                "minimum": 0.125,
+                "maximum": 1
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "passes": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 8,
+          "items": {
+            "type": "object",
+            "required": [
+              "src"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "src": {
+                "$ref": "#/$defs/file"
+              },
+              "reads": {
+                "type": "array",
+                "maxItems": 6,
+                "items": {
+                  "type": "string",
+                  "pattern": "^[a-z][a-zA-Z0-9]{0,15}$"
+                }
+              },
+              "writes": {
+                "type": "string",
+                "pattern": "^[a-z][a-zA-Z0-9]{0,15}$"
+              },
+              "iterate": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 16
+              }
+            }
+          }
+        }
+      }
+    },
+    "entryBase": {
+      "type": "object",
+      "required": [
+        "id",
+        "name"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 32
+        },
+        "blurb": {
+          "type": "string"
+        },
+        "group": {
+          "type": "string"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "cost": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 24
+        },
+        "flash": {
+          "type": "boolean"
+        },
+        "params": {
+          "$ref": "#/$defs/params"
+        },
+        "inputs": {
+          "$ref": "#/$defs/inputs"
+        },
+        "passes": {
+          "$ref": "#/$defs/passes"
+        },
+        "graph": {
+          "$ref": "#/$defs/graph"
+        }
+      },
+      "not": {
+        "required": [
+          "passes",
+          "graph"
+        ]
+      }
+    },
+    "style": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/entryBase"
+        },
+        {
+          "anyOf": [
+            {
+              "required": [
+                "passes"
+              ]
+            },
+            {
+              "required": [
+                "graph"
+              ]
+            }
+          ]
+        }
+      ],
+      "properties": {
+        "palette": {
+          "$ref": "#/$defs/id"
+        },
+        "stack": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "motif-kit@4. Up to 3 media layers inside one shader; generates inputs layer1..N and a block of controls per layer (opacity, blend, offset, scale, rotate, edges, cycles per loop, direction, travel).",
+          "properties": {
+            "layers": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 3,
+              "default": 3
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[a-z][a-zA-Z0-9]{0,9}$",
+              "default": "layer"
+            },
+            "fit": {
+              "enum": [
+                "fill",
+                "fit",
+                "stretch"
+              ],
+              "default": "fill"
+            },
+            "labels": {
+              "type": "array",
+              "maxItems": 3,
+              "items": {
+                "type": "string",
+                "maxLength": 20
+              }
+            },
+            "defaults": {
+              "type": "array",
+              "maxItems": 3,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "blend": {
+                    "enum": [
+                      "normal",
+                      "multiply",
+                      "screen",
+                      "overlay",
+                      "softlight",
+                      "hardlight",
+                      "add",
+                      "darken",
+                      "lighten",
+                      "difference",
+                      "exclusion",
+                      "dodge"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "effect": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/entryBase"
+        },
+        {
+          "anyOf": [
+            {
+              "required": [
+                "passes"
+              ]
+            },
+            {
+              "required": [
+                "graph"
+              ]
+            }
+          ]
+        }
+      ],
+      "properties": {
+        "target": {
+          "enum": [
+            "layer",
+            "finish",
+            "any"
+          ]
+        }
+      }
+    },
+    "transition": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/entryBase"
+        },
+        {
+          "anyOf": [
+            {
+              "required": [
+                "passes"
+              ]
+            },
+            {
+              "required": [
+                "graph"
+              ]
+            }
+          ]
+        }
+      ],
+      "properties": {
+        "duration": {
+          "type": "number",
+          "minimum": 0.1,
+          "maximum": 10
+        }
+      }
+    },
+    "exporter": {
+      "type": "object",
+      "required": [
+        "id",
+        "name",
+        "preset"
+      ],
+      "additionalProperties": false,
+      "description": "Declarative export preset. Exporters never run code: only these settings, only these values.",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 32
+        },
+        "blurb": {
+          "type": "string"
+        },
+        "group": {
+          "type": "string"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "preset": {
+          "type": "object",
+          "required": [
+            "format"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "format": {
+              "enum": [
+                "webm",
+                "mp4",
+                "png",
+                "png-seq"
+              ]
+            },
+            "tier": {
+              "enum": [
+                720,
+                1080,
+                1440,
+                2160
+              ]
+            },
+            "fps": {
+              "enum": [
+                24,
+                25,
+                30,
+                50,
+                60
+              ]
+            },
+            "loops": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 8
+            },
+            "transparent": {
+              "type": "boolean"
+            },
+            "withAudio": {
+              "type": "boolean"
+            },
+            "quality": {
+              "enum": [
+                "standard",
+                "high",
+                "max"
+              ]
+            },
+            "aspect": {
+              "enum": [
+                "16x9",
+                "9x16",
+                "1x1",
+                "4x5",
+                "4x3",
+                "21x9"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "mediaInput": {
+      "type": "object",
+      "required": [
+        "id"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-zA-Z0-9]{0,15}$",
+          "not": {
+            "enum": [
+              "res",
+              "p",
+              "l",
+              "seed",
+              "safe",
+              "bg",
+              "ink",
+              "a0",
+              "a1",
+              "a2",
+              "buf0",
+              "buf1",
+              "buf2",
+              "buf3",
+              "out"
+            ]
+          }
+        },
+        "type": {
+          "enum": [
+            "image",
+            "video",
+            "media"
+          ]
+        },
+        "label": {
+          "type": "string"
+        },
+        "fit": {
+          "enum": [
+            "fill",
+            "fit",
+            "stretch"
+          ]
+        },
+        "required": {
+          "type": "boolean"
+        },
+        "hint": {
+          "type": "string"
+        }
+      }
+    },
+    "textInput": {
+      "type": "object",
+      "required": [
+        "id",
+        "type",
+        "lines"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-zA-Z0-9]{0,15}$",
+          "not": {
+            "enum": [
+              "res",
+              "p",
+              "l",
+              "seed",
+              "safe",
+              "bg",
+              "ink",
+              "a0",
+              "a1",
+              "a2",
+              "buf0",
+              "buf1",
+              "buf2",
+              "buf3",
+              "out"
+            ]
+          }
+        },
+        "type": {
+          "const": "text"
+        },
+        "label": {
+          "type": "string"
+        },
+        "hint": {
+          "type": "string"
+        },
+        "aspect": {
+          "type": "number",
+          "minimum": 2,
+          "maximum": 16,
+          "default": 8,
+          "description": "Band width : height of every line in the atlas."
+        },
+        "lines": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 3,
+          "items": {
+            "type": "object",
+            "required": [
+              "id"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z][a-zA-Z0-9]{0,15}$"
+              },
+              "label": {
+                "type": "string"
+              },
+              "def": {
+                "type": "string",
+                "maxLength": 128,
+                "pattern": "^[^\\u0000-\\u001F\\u007F-\\u009F\\u2028\\u2029]*$",
+                "description": "Default text: one line, no control characters, at most maxLength."
+              },
+              "maxLength": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 128,
+                "default": 64
+              },
+              "font": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "family": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 64,
+                    "pattern": "^[\\p{L}\\p{N} _.&+()-]{1,64}$"
+                  },
+                  "weight": {
+                    "enum": [
+                      100,
+                      200,
+                      300,
+                      400,
+                      500,
+                      600,
+                      700,
+                      800,
+                      900
+                    ]
+                  }
+                },
+                "description": "Default font. Fonts are never loaded from a kit: the family is looked up on the device, with a fallback."
+              },
+              "size": {
+                "type": "number",
+                "minimum": 0.1,
+                "maximum": 1,
+                "default": 0.72,
+                "description": "Em size as a fraction of the band height."
+              },
+              "tracking": {
+                "type": "number",
+                "minimum": -0.2,
+                "maximum": 0.8,
+                "default": 0,
+                "description": "Extra letter spacing in em."
+              },
+              "align": {
+                "enum": [
+                  "left",
+                  "center",
+                  "right"
+                ],
+                "default": "center"
+              }
+            }
+          }
+        },
+        "sdf": {
+          "type": "boolean",
+          "default": false,
+          "description": "motif-kit@4. Also build a signed-distance field of the atlas; GLSL gets textDist_<id>(i, q)."
+        },
+        "sdfSpread": {
+          "type": "number",
+          "minimum": 4,
+          "maximum": 32,
+          "default": 12,
+          "description": "Pixels of distance stored around glyph edges in a 1024-wide field."
+        }
+      }
+    },
+    "textLine": {
+      "type": "object",
+      "required": [
+        "id"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-zA-Z0-9]{0,15}$"
+        },
+        "label": {
+          "type": "string"
+        },
+        "def": {
+          "type": "string",
+          "maxLength": 128,
+          "pattern": "^[^\\u0000-\\u001F\\u007F-\\u009F\\u2028\\u2029]*$",
+          "description": "Default text: one line, no control characters, at most maxLength."
+        },
+        "maxLength": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 128,
+          "default": 64
+        },
+        "font": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "family": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64,
+              "pattern": "^[\\p{L}\\p{N} _.&+()-]{1,64}$"
+            },
+            "weight": {
+              "enum": [
+                100,
+                200,
+                300,
+                400,
+                500,
+                600,
+                700,
+                800,
+                900
+              ]
+            }
+          },
+          "description": "Default font. Fonts are never loaded from a kit: the family is looked up on the device, with a fallback."
+        },
+        "size": {
+          "type": "number",
+          "minimum": 0.1,
+          "maximum": 1,
+          "default": 0.72,
+          "description": "Em size as a fraction of the band height."
+        },
+        "tracking": {
+          "type": "number",
+          "minimum": -0.2,
+          "maximum": 0.8,
+          "default": 0,
+          "description": "Extra letter spacing in em."
+        },
+        "align": {
+          "enum": [
+            "left",
+            "center",
+            "right"
+          ],
+          "default": "center"
+        }
+      }
+    },
+    "svgInput": {
+      "type": "object",
+      "required": [
+        "id",
+        "type",
+        "src"
+      ],
+      "additionalProperties": false,
+      "description": "motif-kit@4. A vector file bundled in the kit, baked into a signed-distance texture; GLSL reads vec_<id>(uv).",
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-zA-Z0-9]{0,15}$",
+          "not": {
+            "enum": [
+              "res",
+              "p",
+              "l",
+              "seed",
+              "safe",
+              "bg",
+              "ink",
+              "a0",
+              "a1",
+              "a2",
+              "buf0",
+              "buf1",
+              "buf2",
+              "buf3",
+              "out"
+            ]
+          }
+        },
+        "type": {
+          "const": "svg"
+        },
+        "label": {
+          "type": "string"
+        },
+        "hint": {
+          "type": "string"
+        },
+        "src": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_][A-Za-z0-9_./-]{0,127}\\.svg$",
+          "description": "Path of an .svg file in the kit (up to 64 KB: path, rect, circle, ellipse, line, polyline, polygon, g, transform, fill, stroke, fill-rule; no script, text, image, gradient, use or external reference)."
+        },
+        "spread": {
+          "type": "number",
+          "minimum": 8,
+          "maximum": 64,
+          "default": 24,
+          "description": "Pixels of distance stored around the edge."
+        },
+        "margin": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 0.4,
+          "default": 0.08,
+          "description": "Fraction of the frame kept clear around the artwork."
+        }
+      }
+    },
+    "cue": {
+      "type": "object",
+      "required": [
+        "style",
+        "len"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Za-z][\\w-]{0,23}$"
+        },
+        "label": {
+          "type": "string",
+          "maxLength": 32
+        },
+        "style": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][\\w.-]{0,63}(/[A-Za-z0-9][\\w.-]{0,63})?$",
+          "description": "A style of this kit (\"mitosis\") or of any installed kit (\"neuro/mitosis\")."
+        },
+        "at": {
+          "oneOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "string",
+              "pattern": "^-?\\d+(\\.\\d+)?(/\\d+(\\.\\d+)?|%|s|b)?$"
+            }
+          ],
+          "description": "A fraction of the loop, or \"3/16\", \"25%\", \"1.5s\" (needs loop), \"2b\" (needs loop and bpm)."
+        },
+        "len": {
+          "oneOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "string",
+              "pattern": "^-?\\d+(\\.\\d+)?(/\\d+(\\.\\d+)?|%|s|b)?$"
+            }
+          ],
+          "description": "A fraction of the loop, or \"3/16\", \"25%\", \"1.5s\" (needs loop), \"2b\" (needs loop and bpm)."
+        },
+        "lane": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 7
+        },
+        "fadeIn": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 0.5
+        },
+        "fadeOut": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 0.5
+        },
+        "cycles": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 8
+        },
+        "dir": {
+          "enum": [
+            "forward",
+            "backward",
+            "pingpong",
+            "random"
+          ]
+        },
+        "blend": {
+          "enum": [
+            "normal",
+            "multiply",
+            "screen",
+            "overlay",
+            "softlight",
+            "hardlight",
+            "add",
+            "darken",
+            "lighten",
+            "difference",
+            "exclusion",
+            "dodge"
+          ]
+        },
+        "opacity": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "chance": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "mute": {
+          "type": "boolean"
+        },
+        "seed": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9999
+        },
+        "palette": {
+          "type": "string"
+        },
+        "params": {
+          "type": "object",
+          "maxProperties": 64,
+          "additionalProperties": {
+            "type": [
+              "number",
+              "string",
+              "boolean"
+            ]
+          }
+        },
+        "repeat": {
+          "type": "object",
+          "required": [
+            "every",
+            "count"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "every": {
+              "oneOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "string",
+                  "pattern": "^-?\\d+(\\.\\d+)?(/\\d+(\\.\\d+)?|%|s|b)?$"
+                }
+              ],
+              "description": "A fraction of the loop, or \"3/16\", \"25%\", \"1.5s\" (needs loop), \"2b\" (needs loop and bpm)."
+            },
+            "count": {
+              "type": "integer",
+              "minimum": 2,
+              "maximum": 16
+            }
+          }
+        }
+      }
+    },
+    "sequence": {
+      "type": "object",
+      "required": [
+        "id"
+      ],
+      "anyOf": [
+        {
+          "required": [
+            "cues"
+          ]
+        },
+        {
+          "required": [
+            "file"
+          ]
+        }
+      ],
+      "description": "motif-seq@1, inline or as { id, name, file }.",
+      "properties": {
+        "format": {
+          "const": "motif-seq@1"
+        },
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "name": {
+          "type": "string",
+          "maxLength": 32
+        },
+        "description": {
+          "type": "string",
+          "maxLength": 200
+        },
+        "file": {
+          "$ref": "#/$defs/file"
+        },
+        "loop": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 600
+        },
+        "bpm": {
+          "type": "number",
+          "minimum": 20,
+          "maximum": 400
+        },
+        "seed": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9999
+        },
+        "maxActive": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 4
+        },
+        "cues": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 64,
+          "items": {
+            "$ref": "#/$defs/cue"
+          }
+        }
+      }
+    }
+  },
+  "$comment": "GENERATED by build/gen_schemas.py from schemas/motif-kit-3.schema.json and the motif-kit@4 rules in the kit-v4 module. Do not edit by hand."
+}

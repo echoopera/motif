@@ -1,0 +1,1056 @@
+{
+  "format": "motif-kit@1",
+  "id": "kinetic-subdivision",
+  "name": "Kinetic Subdivision",
+  "version": "0.2.1",
+  "author": "Echo Opera",
+  "description": "Ten subdivision and image-displacement treatments with smooth looped motion. Attach an image or video to a layer to treat it; without one, a procedural source plays.",
+  "license": "All rights reserved",
+  "accent": "#E97445",
+  "common": "common.glsl",
+  "inputs": [
+    {
+      "id": "source",
+      "type": "media",
+      "label": "Source",
+      "fit": "fill",
+      "hint": "Photo or video to subdivide. Without one, the kit's procedural source plays."
+    }
+  ],
+  "palettes": [
+    {
+      "id": "field",
+      "name": "Field Orange",
+      "bg": "#111310",
+      "ink": "#F4F2E8",
+      "a": [
+        "#E97445",
+        "#65B4C3",
+        "#F2BD76"
+      ]
+    },
+    {
+      "id": "mono",
+      "name": "Technical Mono",
+      "bg": "#080A09",
+      "ink": "#FAFAF3",
+      "a": [
+        "#C5C9C2",
+        "#657069",
+        "#E8EBE2"
+      ]
+    }
+  ],
+  "styles": [
+    {
+      "id": "kinetic-treemap",
+      "name": "Kinetic Treemap",
+      "group": "Image systems",
+      "palette": "field",
+      "tags": [
+        "treemap",
+        "subdivision",
+        "editorial"
+      ],
+      "blurb": "Nested cells drift smoothly over a shifting image.",
+      "flash": false,
+      "passes": [
+        {
+          "src": "styles/source.glsl",
+          "scale": 0.5
+        },
+        {
+          "src": "styles/partition.glsl",
+          "scale": 1
+        },
+        {
+          "src": "styles/treatment.glsl"
+        }
+      ],
+      "params": {
+        "variant": {
+          "type": "int",
+          "label": "Treatment ID",
+          "min": 0,
+          "max": 9,
+          "def": 0,
+          "mutate": 0
+        },
+        "depth": {
+          "type": "int",
+          "label": "Subdivision depth",
+          "min": 2,
+          "max": 7,
+          "def": 5
+        },
+        "rate": {
+          "type": "int",
+          "label": "Changes / loop",
+          "min": 1,
+          "max": 12,
+          "def": 3,
+          "mutate": 0.6
+        },
+        "smoothness": {
+          "type": "range",
+          "label": "Smoothness",
+          "min": 0,
+          "max": 1,
+          "def": 0.9,
+          "step": 0.01,
+          "mutate": 0.4
+        },
+        "amount": {
+          "type": "range",
+          "label": "Displacement",
+          "min": 0,
+          "max": 0.2,
+          "def": 0.07,
+          "step": 0.005
+        },
+        "edge": {
+          "type": "range",
+          "label": "Edge width",
+          "min": 0.5,
+          "max": 4,
+          "def": 1.1,
+          "step": 0.1
+        },
+        "smear": {
+          "type": "range",
+          "label": "Smear",
+          "min": 0,
+          "max": 1,
+          "def": 0.55,
+          "step": 0.01
+        },
+        "ink": {
+          "type": "range",
+          "label": "Ink",
+          "min": 0,
+          "max": 1,
+          "def": 0.8,
+          "step": 0.01
+        },
+        "imageMix": {
+          "type": "range",
+          "label": "Media mix",
+          "min": 0,
+          "max": 1,
+          "def": 1,
+          "step": 0.01,
+          "mutate": 0
+        }
+      }
+    },
+    {
+      "id": "mondrian-drift",
+      "name": "Mondrian Drift",
+      "group": "Image systems",
+      "palette": "field",
+      "tags": [
+        "mondrian",
+        "blocks",
+        "composition"
+      ],
+      "blurb": "Hard-gutter composition with sparse orange panels.",
+      "flash": false,
+      "passes": [
+        {
+          "src": "styles/source.glsl",
+          "scale": 0.5
+        },
+        {
+          "src": "styles/partition.glsl",
+          "scale": 1
+        },
+        {
+          "src": "styles/treatment.glsl"
+        }
+      ],
+      "params": {
+        "variant": {
+          "type": "int",
+          "label": "Treatment ID",
+          "min": 0,
+          "max": 9,
+          "def": 1,
+          "mutate": 0
+        },
+        "depth": {
+          "type": "int",
+          "label": "Subdivision depth",
+          "min": 2,
+          "max": 7,
+          "def": 5
+        },
+        "rate": {
+          "type": "int",
+          "label": "Changes / loop",
+          "min": 1,
+          "max": 12,
+          "def": 3,
+          "mutate": 0.6
+        },
+        "smoothness": {
+          "type": "range",
+          "label": "Smoothness",
+          "min": 0,
+          "max": 1,
+          "def": 0.9,
+          "step": 0.01,
+          "mutate": 0.4
+        },
+        "amount": {
+          "type": "range",
+          "label": "Displacement",
+          "min": 0,
+          "max": 0.2,
+          "def": 0.07,
+          "step": 0.005
+        },
+        "edge": {
+          "type": "range",
+          "label": "Edge width",
+          "min": 0.5,
+          "max": 4,
+          "def": 1.1,
+          "step": 0.1
+        },
+        "smear": {
+          "type": "range",
+          "label": "Smear",
+          "min": 0,
+          "max": 1,
+          "def": 0.55,
+          "step": 0.01
+        },
+        "ink": {
+          "type": "range",
+          "label": "Ink",
+          "min": 0,
+          "max": 1,
+          "def": 0.8,
+          "step": 0.01
+        },
+        "imageMix": {
+          "type": "range",
+          "label": "Media mix",
+          "min": 0,
+          "max": 1,
+          "def": 1,
+          "step": 0.01,
+          "mutate": 0
+        }
+      }
+    },
+    {
+      "id": "barcode-cathedral",
+      "name": "Barcode Cathedral",
+      "group": "Image systems",
+      "palette": "field",
+      "tags": [
+        "barcode",
+        "smear",
+        "vertical"
+      ],
+      "blurb": "Vertical slices stretch into barcode-like streaks.",
+      "flash": true,
+      "passes": [
+        {
+          "src": "styles/source.glsl",
+          "scale": 0.5
+        },
+        {
+          "src": "styles/partition.glsl",
+          "scale": 1
+        },
+        {
+          "src": "styles/treatment.glsl"
+        }
+      ],
+      "params": {
+        "variant": {
+          "type": "int",
+          "label": "Treatment ID",
+          "min": 0,
+          "max": 9,
+          "def": 2,
+          "mutate": 0
+        },
+        "depth": {
+          "type": "int",
+          "label": "Subdivision depth",
+          "min": 2,
+          "max": 7,
+          "def": 6
+        },
+        "rate": {
+          "type": "int",
+          "label": "Changes / loop",
+          "min": 1,
+          "max": 12,
+          "def": 3,
+          "mutate": 0.6
+        },
+        "smoothness": {
+          "type": "range",
+          "label": "Smoothness",
+          "min": 0,
+          "max": 1,
+          "def": 0.9,
+          "step": 0.01,
+          "mutate": 0.4
+        },
+        "amount": {
+          "type": "range",
+          "label": "Displacement",
+          "min": 0,
+          "max": 0.2,
+          "def": 0.1,
+          "step": 0.005
+        },
+        "edge": {
+          "type": "range",
+          "label": "Edge width",
+          "min": 0.5,
+          "max": 4,
+          "def": 1.1,
+          "step": 0.1
+        },
+        "smear": {
+          "type": "range",
+          "label": "Smear",
+          "min": 0,
+          "max": 1,
+          "def": 0.55,
+          "step": 0.01
+        },
+        "ink": {
+          "type": "range",
+          "label": "Ink",
+          "min": 0,
+          "max": 1,
+          "def": 0.8,
+          "step": 0.01
+        },
+        "imageMix": {
+          "type": "range",
+          "label": "Media mix",
+          "min": 0,
+          "max": 1,
+          "def": 1,
+          "step": 0.01,
+          "mutate": 0
+        }
+      }
+    },
+    {
+      "id": "scanline-fault",
+      "name": "Scanline Fault",
+      "group": "Image systems",
+      "palette": "field",
+      "tags": [
+        "scanline",
+        "glitch",
+        "horizontal"
+      ],
+      "blurb": "Horizontal rows slide and form subtle scanlines.",
+      "flash": true,
+      "passes": [
+        {
+          "src": "styles/source.glsl",
+          "scale": 0.5
+        },
+        {
+          "src": "styles/partition.glsl",
+          "scale": 1
+        },
+        {
+          "src": "styles/treatment.glsl"
+        }
+      ],
+      "params": {
+        "variant": {
+          "type": "int",
+          "label": "Treatment ID",
+          "min": 0,
+          "max": 9,
+          "def": 3,
+          "mutate": 0
+        },
+        "depth": {
+          "type": "int",
+          "label": "Subdivision depth",
+          "min": 2,
+          "max": 7,
+          "def": 6
+        },
+        "rate": {
+          "type": "int",
+          "label": "Changes / loop",
+          "min": 1,
+          "max": 12,
+          "def": 3,
+          "mutate": 0.6
+        },
+        "smoothness": {
+          "type": "range",
+          "label": "Smoothness",
+          "min": 0,
+          "max": 1,
+          "def": 0.9,
+          "step": 0.01,
+          "mutate": 0.4
+        },
+        "amount": {
+          "type": "range",
+          "label": "Displacement",
+          "min": 0,
+          "max": 0.2,
+          "def": 0.1,
+          "step": 0.005
+        },
+        "edge": {
+          "type": "range",
+          "label": "Edge width",
+          "min": 0.5,
+          "max": 4,
+          "def": 1.1,
+          "step": 0.1
+        },
+        "smear": {
+          "type": "range",
+          "label": "Smear",
+          "min": 0,
+          "max": 1,
+          "def": 0.55,
+          "step": 0.01
+        },
+        "ink": {
+          "type": "range",
+          "label": "Ink",
+          "min": 0,
+          "max": 1,
+          "def": 0.8,
+          "step": 0.01
+        },
+        "imageMix": {
+          "type": "range",
+          "label": "Media mix",
+          "min": 0,
+          "max": 1,
+          "def": 1,
+          "step": 0.01,
+          "mutate": 0
+        }
+      }
+    },
+    {
+      "id": "chromatic-register",
+      "name": "Chromatic Register",
+      "group": "Image systems",
+      "palette": "field",
+      "tags": [
+        "chromatic",
+        "rgb",
+        "offset"
+      ],
+      "blurb": "Offset color channels split around moving partitions.",
+      "flash": false,
+      "passes": [
+        {
+          "src": "styles/source.glsl",
+          "scale": 0.5
+        },
+        {
+          "src": "styles/partition.glsl",
+          "scale": 1
+        },
+        {
+          "src": "styles/treatment.glsl"
+        }
+      ],
+      "params": {
+        "variant": {
+          "type": "int",
+          "label": "Treatment ID",
+          "min": 0,
+          "max": 9,
+          "def": 4,
+          "mutate": 0
+        },
+        "depth": {
+          "type": "int",
+          "label": "Subdivision depth",
+          "min": 2,
+          "max": 7,
+          "def": 5
+        },
+        "rate": {
+          "type": "int",
+          "label": "Changes / loop",
+          "min": 1,
+          "max": 12,
+          "def": 3,
+          "mutate": 0.6
+        },
+        "smoothness": {
+          "type": "range",
+          "label": "Smoothness",
+          "min": 0,
+          "max": 1,
+          "def": 0.9,
+          "step": 0.01,
+          "mutate": 0.4
+        },
+        "amount": {
+          "type": "range",
+          "label": "Displacement",
+          "min": 0,
+          "max": 0.2,
+          "def": 0.07,
+          "step": 0.005
+        },
+        "edge": {
+          "type": "range",
+          "label": "Edge width",
+          "min": 0.5,
+          "max": 4,
+          "def": 1.1,
+          "step": 0.1
+        },
+        "smear": {
+          "type": "range",
+          "label": "Smear",
+          "min": 0,
+          "max": 1,
+          "def": 0.55,
+          "step": 0.01
+        },
+        "ink": {
+          "type": "range",
+          "label": "Ink",
+          "min": 0,
+          "max": 1,
+          "def": 0.8,
+          "step": 0.01
+        },
+        "imageMix": {
+          "type": "range",
+          "label": "Media mix",
+          "min": 0,
+          "max": 1,
+          "def": 1,
+          "step": 0.01,
+          "mutate": 0
+        }
+      }
+    },
+    {
+      "id": "monolith-cut",
+      "name": "Monolith Cut",
+      "group": "Image systems",
+      "palette": "field",
+      "tags": [
+        "monolith",
+        "negative-space",
+        "blocks"
+      ],
+      "blurb": "Dark slabs interrupt large image fragments.",
+      "flash": false,
+      "passes": [
+        {
+          "src": "styles/source.glsl",
+          "scale": 0.5
+        },
+        {
+          "src": "styles/partition.glsl",
+          "scale": 1
+        },
+        {
+          "src": "styles/treatment.glsl"
+        }
+      ],
+      "params": {
+        "variant": {
+          "type": "int",
+          "label": "Treatment ID",
+          "min": 0,
+          "max": 9,
+          "def": 5,
+          "mutate": 0
+        },
+        "depth": {
+          "type": "int",
+          "label": "Subdivision depth",
+          "min": 2,
+          "max": 7,
+          "def": 4
+        },
+        "rate": {
+          "type": "int",
+          "label": "Changes / loop",
+          "min": 1,
+          "max": 12,
+          "def": 3,
+          "mutate": 0.6
+        },
+        "smoothness": {
+          "type": "range",
+          "label": "Smoothness",
+          "min": 0,
+          "max": 1,
+          "def": 0.9,
+          "step": 0.01,
+          "mutate": 0.4
+        },
+        "amount": {
+          "type": "range",
+          "label": "Displacement",
+          "min": 0,
+          "max": 0.2,
+          "def": 0.07,
+          "step": 0.005
+        },
+        "edge": {
+          "type": "range",
+          "label": "Edge width",
+          "min": 0.5,
+          "max": 4,
+          "def": 1.1,
+          "step": 0.1
+        },
+        "smear": {
+          "type": "range",
+          "label": "Smear",
+          "min": 0,
+          "max": 1,
+          "def": 0.55,
+          "step": 0.01
+        },
+        "ink": {
+          "type": "range",
+          "label": "Ink",
+          "min": 0,
+          "max": 1,
+          "def": 0.8,
+          "step": 0.01
+        },
+        "imageMix": {
+          "type": "range",
+          "label": "Media mix",
+          "min": 0,
+          "max": 1,
+          "def": 1,
+          "step": 0.01,
+          "mutate": 0
+        }
+      }
+    },
+    {
+      "id": "offset-press",
+      "name": "Offset Press",
+      "group": "Image systems",
+      "palette": "field",
+      "tags": [
+        "print",
+        "duotone",
+        "editorial"
+      ],
+      "blurb": "Ink-like duotone with dense editorial gutters.",
+      "flash": false,
+      "passes": [
+        {
+          "src": "styles/source.glsl",
+          "scale": 0.5
+        },
+        {
+          "src": "styles/partition.glsl",
+          "scale": 1
+        },
+        {
+          "src": "styles/treatment.glsl"
+        }
+      ],
+      "params": {
+        "variant": {
+          "type": "int",
+          "label": "Treatment ID",
+          "min": 0,
+          "max": 9,
+          "def": 6,
+          "mutate": 0
+        },
+        "depth": {
+          "type": "int",
+          "label": "Subdivision depth",
+          "min": 2,
+          "max": 7,
+          "def": 5
+        },
+        "rate": {
+          "type": "int",
+          "label": "Changes / loop",
+          "min": 1,
+          "max": 12,
+          "def": 3,
+          "mutate": 0.6
+        },
+        "smoothness": {
+          "type": "range",
+          "label": "Smoothness",
+          "min": 0,
+          "max": 1,
+          "def": 0.9,
+          "step": 0.01,
+          "mutate": 0.4
+        },
+        "amount": {
+          "type": "range",
+          "label": "Displacement",
+          "min": 0,
+          "max": 0.2,
+          "def": 0.07,
+          "step": 0.005
+        },
+        "edge": {
+          "type": "range",
+          "label": "Edge width",
+          "min": 0.5,
+          "max": 4,
+          "def": 1.1,
+          "step": 0.1
+        },
+        "smear": {
+          "type": "range",
+          "label": "Smear",
+          "min": 0,
+          "max": 1,
+          "def": 0.55,
+          "step": 0.01
+        },
+        "ink": {
+          "type": "range",
+          "label": "Ink",
+          "min": 0,
+          "max": 1,
+          "def": 0.8,
+          "step": 0.01
+        },
+        "imageMix": {
+          "type": "range",
+          "label": "Media mix",
+          "min": 0,
+          "max": 1,
+          "def": 1,
+          "step": 0.01,
+          "mutate": 0
+        }
+      }
+    },
+    {
+      "id": "signal-cascade",
+      "name": "Signal Cascade",
+      "group": "Image systems",
+      "palette": "field",
+      "tags": [
+        "signal",
+        "smear",
+        "glitch"
+      ],
+      "blurb": "Rhythmic row displacement and pixel-locked smears.",
+      "flash": true,
+      "passes": [
+        {
+          "src": "styles/source.glsl",
+          "scale": 0.5
+        },
+        {
+          "src": "styles/partition.glsl",
+          "scale": 1
+        },
+        {
+          "src": "styles/treatment.glsl"
+        }
+      ],
+      "params": {
+        "variant": {
+          "type": "int",
+          "label": "Treatment ID",
+          "min": 0,
+          "max": 9,
+          "def": 7,
+          "mutate": 0
+        },
+        "depth": {
+          "type": "int",
+          "label": "Subdivision depth",
+          "min": 2,
+          "max": 7,
+          "def": 6
+        },
+        "rate": {
+          "type": "int",
+          "label": "Changes / loop",
+          "min": 1,
+          "max": 12,
+          "def": 3,
+          "mutate": 0.6
+        },
+        "smoothness": {
+          "type": "range",
+          "label": "Smoothness",
+          "min": 0,
+          "max": 1,
+          "def": 0.9,
+          "step": 0.01,
+          "mutate": 0.4
+        },
+        "amount": {
+          "type": "range",
+          "label": "Displacement",
+          "min": 0,
+          "max": 0.2,
+          "def": 0.1,
+          "step": 0.005
+        },
+        "edge": {
+          "type": "range",
+          "label": "Edge width",
+          "min": 0.5,
+          "max": 4,
+          "def": 1.1,
+          "step": 0.1
+        },
+        "smear": {
+          "type": "range",
+          "label": "Smear",
+          "min": 0,
+          "max": 1,
+          "def": 0.55,
+          "step": 0.01
+        },
+        "ink": {
+          "type": "range",
+          "label": "Ink",
+          "min": 0,
+          "max": 1,
+          "def": 0.8,
+          "step": 0.01
+        },
+        "imageMix": {
+          "type": "range",
+          "label": "Media mix",
+          "min": 0,
+          "max": 1,
+          "def": 1,
+          "step": 0.01,
+          "mutate": 0
+        }
+      }
+    },
+    {
+      "id": "survey-grid",
+      "name": "Survey Grid",
+      "group": "Image systems",
+      "palette": "field",
+      "tags": [
+        "technical",
+        "grid",
+        "hud"
+      ],
+      "blurb": "Fine subdivision with ticks and survey marks.",
+      "flash": false,
+      "passes": [
+        {
+          "src": "styles/source.glsl",
+          "scale": 0.5
+        },
+        {
+          "src": "styles/partition.glsl",
+          "scale": 1
+        },
+        {
+          "src": "styles/treatment.glsl"
+        }
+      ],
+      "params": {
+        "variant": {
+          "type": "int",
+          "label": "Treatment ID",
+          "min": 0,
+          "max": 9,
+          "def": 8,
+          "mutate": 0
+        },
+        "depth": {
+          "type": "int",
+          "label": "Subdivision depth",
+          "min": 2,
+          "max": 7,
+          "def": 6
+        },
+        "rate": {
+          "type": "int",
+          "label": "Changes / loop",
+          "min": 1,
+          "max": 12,
+          "def": 3,
+          "mutate": 0.6
+        },
+        "smoothness": {
+          "type": "range",
+          "label": "Smoothness",
+          "min": 0,
+          "max": 1,
+          "def": 0.9,
+          "step": 0.01,
+          "mutate": 0.4
+        },
+        "amount": {
+          "type": "range",
+          "label": "Displacement",
+          "min": 0,
+          "max": 0.2,
+          "def": 0.07,
+          "step": 0.005
+        },
+        "edge": {
+          "type": "range",
+          "label": "Edge width",
+          "min": 0.5,
+          "max": 4,
+          "def": 1.1,
+          "step": 0.1
+        },
+        "smear": {
+          "type": "range",
+          "label": "Smear",
+          "min": 0,
+          "max": 1,
+          "def": 0.55,
+          "step": 0.01
+        },
+        "ink": {
+          "type": "range",
+          "label": "Ink",
+          "min": 0,
+          "max": 1,
+          "def": 0.8,
+          "step": 0.01
+        },
+        "imageMix": {
+          "type": "range",
+          "label": "Media mix",
+          "min": 0,
+          "max": 1,
+          "def": 1,
+          "step": 0.01,
+          "mutate": 0
+        }
+      }
+    },
+    {
+      "id": "afterimage-atlas",
+      "name": "Afterimage Atlas",
+      "group": "Image systems",
+      "palette": "field",
+      "tags": [
+        "echo",
+        "ghost",
+        "translucent"
+      ],
+      "blurb": "Layered echoes leave a translucent spatial memory.",
+      "flash": false,
+      "passes": [
+        {
+          "src": "styles/source.glsl",
+          "scale": 0.5
+        },
+        {
+          "src": "styles/partition.glsl",
+          "scale": 1
+        },
+        {
+          "src": "styles/treatment.glsl"
+        }
+      ],
+      "params": {
+        "variant": {
+          "type": "int",
+          "label": "Treatment ID",
+          "min": 0,
+          "max": 9,
+          "def": 9,
+          "mutate": 0
+        },
+        "depth": {
+          "type": "int",
+          "label": "Subdivision depth",
+          "min": 2,
+          "max": 7,
+          "def": 5
+        },
+        "rate": {
+          "type": "int",
+          "label": "Changes / loop",
+          "min": 1,
+          "max": 12,
+          "def": 3,
+          "mutate": 0.6
+        },
+        "smoothness": {
+          "type": "range",
+          "label": "Smoothness",
+          "min": 0,
+          "max": 1,
+          "def": 0.9,
+          "step": 0.01,
+          "mutate": 0.4
+        },
+        "amount": {
+          "type": "range",
+          "label": "Displacement",
+          "min": 0,
+          "max": 0.2,
+          "def": 0.07,
+          "step": 0.005
+        },
+        "edge": {
+          "type": "range",
+          "label": "Edge width",
+          "min": 0.5,
+          "max": 4,
+          "def": 1.1,
+          "step": 0.1
+        },
+        "smear": {
+          "type": "range",
+          "label": "Smear",
+          "min": 0,
+          "max": 1,
+          "def": 0.55,
+          "step": 0.01
+        },
+        "ink": {
+          "type": "range",
+          "label": "Ink",
+          "min": 0,
+          "max": 1,
+          "def": 0.8,
+          "step": 0.01
+        },
+        "imageMix": {
+          "type": "range",
+          "label": "Media mix",
+          "min": 0,
+          "max": 1,
+          "def": 1,
+          "step": 0.01,
+          "mutate": 0
+        }
+      }
+    }
+  ]
+}

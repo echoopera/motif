@@ -1,0 +1,8 @@
+{
+  "schema": 2,
+  "unit": "ms",
+  "note": "p95 wall time per frame in ms including GPU readback. `default` is a placeholder (one 60 fps frame), NOT a measurement. Real per-style budgets are written by `node tools/bench.mjs --update-budgets --runs 3 --write` on a real GPU; `reference` then names the device. styles[id] is a number (p95) or { p95, p50?, max? }.",
+  "default": 16.7,
+  "reference": null,
+  "styles": {}
+}
