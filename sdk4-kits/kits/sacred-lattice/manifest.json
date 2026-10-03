@@ -1,0 +1,2320 @@
+{
+  "format": "motif-kit@4",
+  "id": "sacred-lattice",
+  "name": "Sacred Lattice",
+  "version": "1.0.0",
+  "author": "Motif",
+  "description": "Gold connections, pale glass and obsidian blue: nested polyhedral cages, circles and chord networks in exact geometry. Nine seamless infinite loops.",
+  "license": "",
+  "accent": "#E9B24A",
+  "common": "common.glsl",
+  "palettes": [
+    {
+      "id": "gold-obsidian",
+      "name": "Gold Obsidian",
+      "bg": "#02040C",
+      "ink": "#E4EDFF",
+      "a": [
+        "#E9B24A",
+        "#7FB2FF",
+        "#1B2A66"
+      ]
+    },
+    {
+      "id": "rose-gold",
+      "name": "Rose Gold",
+      "bg": "#090409",
+      "ink": "#FCEAEC",
+      "a": [
+        "#F0B08C",
+        "#C99BE8",
+        "#3A1A4E"
+      ]
+    },
+    {
+      "id": "emerald-brass",
+      "name": "Emerald Brass",
+      "bg": "#010C0A",
+      "ink": "#E3F7EF",
+      "a": [
+        "#D9B253",
+        "#5FE0B8",
+        "#0B4A3F"
+      ]
+    },
+    {
+      "id": "silver-ice",
+      "name": "Silver Ice",
+      "bg": "#03060C",
+      "ink": "#EEF4FF",
+      "a": [
+        "#C4D2E6",
+        "#8FC4FF",
+        "#1E3358"
+      ]
+    }
+  ],
+  "styles": [
+    {
+      "id": "sacred-lattice-hero",
+      "name": "Sacred Lattice Hero",
+      "group": "Sacred Lattice",
+      "tags": [
+        "flagship",
+        "geometry",
+        "cages"
+      ],
+      "blurb": "Four nested octa/tetra cages turn against each other inside golden circles, pale glass faces catching the key.",
+      "palette": "gold-obsidian",
+      "flash": false,
+      "cost": 2,
+      "graph": {
+        "buffers": {
+          "scene": {
+            "scale": 0.75
+          },
+          "glowA": {
+            "scale": 0.25
+          },
+          "glowB": {
+            "scale": 0.125
+          }
+        },
+        "passes": [
+          {
+            "src": "styles/sacred-lattice-hero.glsl",
+            "reads": [],
+            "writes": "scene"
+          },
+          {
+            "src": "styles/_glowA.glsl",
+            "reads": [
+              "scene"
+            ],
+            "writes": "glowA"
+          },
+          {
+            "src": "styles/_glowB.glsl",
+            "reads": [
+              "glowA"
+            ],
+            "writes": "glowB"
+          },
+          {
+            "src": "styles/_out.glsl",
+            "reads": [
+              "scene",
+              "glowA",
+              "glowB"
+            ],
+            "writes": "output"
+          }
+        ]
+      },
+      "params": {
+        "levels": {
+          "type": "int",
+          "label": "Nesting levels",
+          "min": 2,
+          "max": 7,
+          "def": 4,
+          "group": "Form",
+          "hint": "Number of nested cages. Each is scaled by the nesting ratio.",
+          "mutate": 0.3
+        },
+        "ratio": {
+          "type": "range",
+          "label": "Nesting ratio",
+          "min": 0.45,
+          "max": 0.85,
+          "def": 0.618,
+          "step": 0.002,
+          "group": "Form",
+          "hint": "Scale of each cage relative to the one outside it. 0.618 is the golden ratio."
+        },
+        "depthSp": {
+          "type": "range",
+          "label": "Depth spacing",
+          "min": 0.05,
+          "max": 0.6,
+          "def": 0.22,
+          "step": 0.0027,
+          "group": "Form",
+          "hint": "Separation of the cages in depth. Drives perspective and parallax."
+        },
+        "circleLayers": {
+          "type": "int",
+          "label": "Circle layers",
+          "min": 0,
+          "max": 8,
+          "def": 4,
+          "group": "Form",
+          "hint": "Concentric circles with inscribed chord polygons. 0 removes them.",
+          "mutate": 0.3
+        },
+        "edgeR": {
+          "type": "range",
+          "label": "Edge radius",
+          "min": 0.001,
+          "max": 0.016,
+          "def": 0.004,
+          "step": 0.000075,
+          "group": "Material",
+          "hint": "Radius of gold edges in scene units.",
+          "log": true
+        },
+        "facet": {
+          "type": "range",
+          "label": "Facet opacity",
+          "min": 0,
+          "max": 0.55,
+          "def": 0.16,
+          "step": 0.0028,
+          "group": "Material",
+          "hint": "Pale glass faces on tetra and octahedra. Approximate glass, not refraction."
+        },
+        "core": {
+          "type": "range",
+          "label": "Core intensity",
+          "min": 0.1,
+          "max": 3,
+          "def": 0.7,
+          "step": 0.014,
+          "group": "Light",
+          "hint": "Central light. Kept small so geometry stays readable at the focus.",
+          "randMax": 1.6
+        },
+        "cageTurns": {
+          "type": "int",
+          "label": "Cage turns per loop",
+          "min": 0,
+          "max": 3,
+          "def": 1,
+          "group": "Motion",
+          "hint": "Whole revolutions of each cage per loop, alternating direction.",
+          "mutate": 0
+        },
+        "orbit": {
+          "type": "range",
+          "label": "Camera orbit amplitude",
+          "min": 0,
+          "max": 0.25,
+          "def": 0.08,
+          "step": 0.0013,
+          "group": "Motion",
+          "hint": "Closed camera orbit, radians."
+        },
+        "breath": {
+          "type": "range",
+          "label": "Breath",
+          "min": 0,
+          "max": 0.1,
+          "def": 0.03,
+          "step": 0.0005,
+          "group": "Motion",
+          "hint": "Scale and facet breathing, sin(theta + phase)."
+        },
+        "keyAngle": {
+          "type": "range",
+          "label": "Key direction",
+          "min": -180,
+          "max": 180,
+          "def": 130,
+          "step": 1,
+          "unit": "°",
+          "group": "Light",
+          "hint": "Direction of the key light in the picture plane, degrees.",
+          "randMax": 180
+        },
+        "exposure": {
+          "type": "range",
+          "label": "Exposure",
+          "min": 0.4,
+          "max": 2.4,
+          "def": 1,
+          "step": 0.01,
+          "unit": "×",
+          "log": true,
+          "group": "Light",
+          "hint": "Linear exposure before the single tone map.",
+          "randMax": 1.4
+        },
+        "bloom": {
+          "type": "range",
+          "label": "Bloom",
+          "min": 0,
+          "max": 1.6,
+          "def": 0.5,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Glow added around emissive light. 0 shows the bare geometry.",
+          "randMax": 0.9
+        },
+        "bloomRadius": {
+          "type": "range",
+          "label": "Bloom radius",
+          "min": 0.4,
+          "max": 2.2,
+          "def": 1,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Width of the glow relative to the frame.",
+          "randMax": 1.5
+        },
+        "lensCA": {
+          "type": "range",
+          "label": "Edge fringe",
+          "min": 0,
+          "max": 0.5,
+          "def": 0.12,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Spectral fringing toward the frame edge.",
+          "randMax": 0.25
+        },
+        "vignette": {
+          "type": "range",
+          "label": "Vignette",
+          "min": 0,
+          "max": 0.8,
+          "def": 0.38,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Darkens the frame edge; never touches the focal area.",
+          "randMax": 0.55
+        },
+        "quality": {
+          "type": "select",
+          "label": "Quality",
+          "options": [
+            {
+              "v": "live",
+              "l": "Live"
+            },
+            {
+              "v": "balanced",
+              "l": "Balanced"
+            },
+            {
+              "v": "export",
+              "l": "Export"
+            }
+          ],
+          "def": "balanced",
+          "mutate": 0,
+          "group": "Quality",
+          "hint": "Sample counts only. Composition, phase and exposure stay the same."
+        }
+      }
+    },
+    {
+      "id": "octahedral-chapel",
+      "name": "Octahedral Chapel",
+      "group": "Sacred Lattice",
+      "tags": [
+        "octahedron",
+        "chapel"
+      ],
+      "blurb": "Octahedra nest in deep perspective like arches; glass faces are strong and the vault feels tall.",
+      "palette": "silver-ice",
+      "flash": false,
+      "cost": 2,
+      "graph": {
+        "buffers": {
+          "scene": {
+            "scale": 0.75
+          },
+          "glowA": {
+            "scale": 0.25
+          },
+          "glowB": {
+            "scale": 0.125
+          }
+        },
+        "passes": [
+          {
+            "src": "styles/octahedral-chapel.glsl",
+            "reads": [],
+            "writes": "scene"
+          },
+          {
+            "src": "styles/_glowA.glsl",
+            "reads": [
+              "scene"
+            ],
+            "writes": "glowA"
+          },
+          {
+            "src": "styles/_glowB.glsl",
+            "reads": [
+              "glowA"
+            ],
+            "writes": "glowB"
+          },
+          {
+            "src": "styles/_out.glsl",
+            "reads": [
+              "scene",
+              "glowA",
+              "glowB"
+            ],
+            "writes": "output"
+          }
+        ]
+      },
+      "params": {
+        "levels": {
+          "type": "int",
+          "label": "Nesting levels",
+          "min": 2,
+          "max": 7,
+          "def": 5,
+          "group": "Form",
+          "hint": "Number of nested cages. Each is scaled by the nesting ratio.",
+          "mutate": 0.3
+        },
+        "ratio": {
+          "type": "range",
+          "label": "Nesting ratio",
+          "min": 0.45,
+          "max": 0.85,
+          "def": 0.7,
+          "step": 0.002,
+          "group": "Form",
+          "hint": "Scale of each cage relative to the one outside it. 0.618 is the golden ratio."
+        },
+        "depthSp": {
+          "type": "range",
+          "label": "Depth spacing",
+          "min": 0.05,
+          "max": 0.6,
+          "def": 0.42,
+          "step": 0.0027,
+          "group": "Form",
+          "hint": "Separation of the cages in depth. Drives perspective and parallax."
+        },
+        "circleLayers": {
+          "type": "int",
+          "label": "Circle layers",
+          "min": 0,
+          "max": 8,
+          "def": 2,
+          "group": "Form",
+          "hint": "Concentric circles with inscribed chord polygons. 0 removes them.",
+          "mutate": 0.3
+        },
+        "edgeR": {
+          "type": "range",
+          "label": "Edge radius",
+          "min": 0.001,
+          "max": 0.016,
+          "def": 0.004,
+          "step": 0.000075,
+          "group": "Material",
+          "hint": "Radius of gold edges in scene units.",
+          "log": true
+        },
+        "facet": {
+          "type": "range",
+          "label": "Facet opacity",
+          "min": 0,
+          "max": 0.55,
+          "def": 0.12,
+          "step": 0.0028,
+          "group": "Material",
+          "hint": "Pale glass faces on tetra and octahedra. Approximate glass, not refraction."
+        },
+        "core": {
+          "type": "range",
+          "label": "Core intensity",
+          "min": 0.1,
+          "max": 3,
+          "def": 0.7,
+          "step": 0.014,
+          "group": "Light",
+          "hint": "Central light. Kept small so geometry stays readable at the focus.",
+          "randMax": 1.6
+        },
+        "cageTurns": {
+          "type": "int",
+          "label": "Cage turns per loop",
+          "min": 0,
+          "max": 3,
+          "def": 1,
+          "group": "Motion",
+          "hint": "Whole revolutions of each cage per loop, alternating direction.",
+          "mutate": 0
+        },
+        "orbit": {
+          "type": "range",
+          "label": "Camera orbit amplitude",
+          "min": 0,
+          "max": 0.25,
+          "def": 0.08,
+          "step": 0.0013,
+          "group": "Motion",
+          "hint": "Closed camera orbit, radians."
+        },
+        "breath": {
+          "type": "range",
+          "label": "Breath",
+          "min": 0,
+          "max": 0.1,
+          "def": 0.03,
+          "step": 0.0005,
+          "group": "Motion",
+          "hint": "Scale and facet breathing, sin(theta + phase)."
+        },
+        "keyAngle": {
+          "type": "range",
+          "label": "Key direction",
+          "min": -180,
+          "max": 180,
+          "def": 130,
+          "step": 1,
+          "unit": "°",
+          "group": "Light",
+          "hint": "Direction of the key light in the picture plane, degrees.",
+          "randMax": 180
+        },
+        "exposure": {
+          "type": "range",
+          "label": "Exposure",
+          "min": 0.4,
+          "max": 2.4,
+          "def": 0.8,
+          "step": 0.01,
+          "unit": "×",
+          "log": true,
+          "group": "Light",
+          "hint": "Linear exposure before the single tone map.",
+          "randMax": 1.4
+        },
+        "bloom": {
+          "type": "range",
+          "label": "Bloom",
+          "min": 0,
+          "max": 1.6,
+          "def": 0.3,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Glow added around emissive light. 0 shows the bare geometry.",
+          "randMax": 0.9
+        },
+        "bloomRadius": {
+          "type": "range",
+          "label": "Bloom radius",
+          "min": 0.4,
+          "max": 2.2,
+          "def": 1,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Width of the glow relative to the frame.",
+          "randMax": 1.5
+        },
+        "lensCA": {
+          "type": "range",
+          "label": "Edge fringe",
+          "min": 0,
+          "max": 0.5,
+          "def": 0.12,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Spectral fringing toward the frame edge.",
+          "randMax": 0.25
+        },
+        "vignette": {
+          "type": "range",
+          "label": "Vignette",
+          "min": 0,
+          "max": 0.8,
+          "def": 0.38,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Darkens the frame edge; never touches the focal area.",
+          "randMax": 0.55
+        },
+        "quality": {
+          "type": "select",
+          "label": "Quality",
+          "options": [
+            {
+              "v": "live",
+              "l": "Live"
+            },
+            {
+              "v": "balanced",
+              "l": "Balanced"
+            },
+            {
+              "v": "export",
+              "l": "Export"
+            }
+          ],
+          "def": "balanced",
+          "mutate": 0,
+          "group": "Quality",
+          "hint": "Sample counts only. Composition, phase and exposure stay the same."
+        }
+      }
+    },
+    {
+      "id": "tetrahedral-orbit",
+      "name": "Tetrahedral Orbit",
+      "group": "Sacred Lattice",
+      "tags": [
+        "tetrahedron",
+        "orbit"
+      ],
+      "blurb": "Tetrahedra spin at different whole rates while small bodies orbit on tracks around them.",
+      "palette": "rose-gold",
+      "flash": false,
+      "cost": 2,
+      "graph": {
+        "buffers": {
+          "scene": {
+            "scale": 0.75
+          },
+          "glowA": {
+            "scale": 0.25
+          },
+          "glowB": {
+            "scale": 0.125
+          }
+        },
+        "passes": [
+          {
+            "src": "styles/tetrahedral-orbit.glsl",
+            "reads": [],
+            "writes": "scene"
+          },
+          {
+            "src": "styles/_glowA.glsl",
+            "reads": [
+              "scene"
+            ],
+            "writes": "glowA"
+          },
+          {
+            "src": "styles/_glowB.glsl",
+            "reads": [
+              "glowA"
+            ],
+            "writes": "glowB"
+          },
+          {
+            "src": "styles/_out.glsl",
+            "reads": [
+              "scene",
+              "glowA",
+              "glowB"
+            ],
+            "writes": "output"
+          }
+        ]
+      },
+      "params": {
+        "levels": {
+          "type": "int",
+          "label": "Nesting levels",
+          "min": 2,
+          "max": 7,
+          "def": 4,
+          "group": "Form",
+          "hint": "Number of nested cages. Each is scaled by the nesting ratio.",
+          "mutate": 0.3
+        },
+        "ratio": {
+          "type": "range",
+          "label": "Nesting ratio",
+          "min": 0.45,
+          "max": 0.85,
+          "def": 0.618,
+          "step": 0.002,
+          "group": "Form",
+          "hint": "Scale of each cage relative to the one outside it. 0.618 is the golden ratio."
+        },
+        "depthSp": {
+          "type": "range",
+          "label": "Depth spacing",
+          "min": 0.05,
+          "max": 0.6,
+          "def": 0.22,
+          "step": 0.0027,
+          "group": "Form",
+          "hint": "Separation of the cages in depth. Drives perspective and parallax."
+        },
+        "circleLayers": {
+          "type": "int",
+          "label": "Circle layers",
+          "min": 0,
+          "max": 8,
+          "def": 0,
+          "group": "Form",
+          "hint": "Concentric circles with inscribed chord polygons. 0 removes them.",
+          "mutate": 0.3
+        },
+        "edgeR": {
+          "type": "range",
+          "label": "Edge radius",
+          "min": 0.001,
+          "max": 0.016,
+          "def": 0.0035,
+          "step": 0.000075,
+          "group": "Material",
+          "hint": "Radius of gold edges in scene units.",
+          "log": true
+        },
+        "facet": {
+          "type": "range",
+          "label": "Facet opacity",
+          "min": 0,
+          "max": 0.55,
+          "def": 0.12,
+          "step": 0.0028,
+          "group": "Material",
+          "hint": "Pale glass faces on tetra and octahedra. Approximate glass, not refraction."
+        },
+        "core": {
+          "type": "range",
+          "label": "Core intensity",
+          "min": 0.1,
+          "max": 3,
+          "def": 0.7,
+          "step": 0.014,
+          "group": "Light",
+          "hint": "Central light. Kept small so geometry stays readable at the focus.",
+          "randMax": 1.6
+        },
+        "cageTurns": {
+          "type": "int",
+          "label": "Cage turns per loop",
+          "min": 0,
+          "max": 3,
+          "def": 1,
+          "group": "Motion",
+          "hint": "Whole revolutions of each cage per loop, alternating direction.",
+          "mutate": 0
+        },
+        "orbit": {
+          "type": "range",
+          "label": "Camera orbit amplitude",
+          "min": 0,
+          "max": 0.25,
+          "def": 0.08,
+          "step": 0.0013,
+          "group": "Motion",
+          "hint": "Closed camera orbit, radians."
+        },
+        "breath": {
+          "type": "range",
+          "label": "Breath",
+          "min": 0,
+          "max": 0.1,
+          "def": 0.03,
+          "step": 0.0005,
+          "group": "Motion",
+          "hint": "Scale and facet breathing, sin(theta + phase)."
+        },
+        "keyAngle": {
+          "type": "range",
+          "label": "Key direction",
+          "min": -180,
+          "max": 180,
+          "def": 130,
+          "step": 1,
+          "unit": "°",
+          "group": "Light",
+          "hint": "Direction of the key light in the picture plane, degrees.",
+          "randMax": 180
+        },
+        "exposure": {
+          "type": "range",
+          "label": "Exposure",
+          "min": 0.4,
+          "max": 2.4,
+          "def": 1,
+          "step": 0.01,
+          "unit": "×",
+          "log": true,
+          "group": "Light",
+          "hint": "Linear exposure before the single tone map.",
+          "randMax": 1.4
+        },
+        "bloom": {
+          "type": "range",
+          "label": "Bloom",
+          "min": 0,
+          "max": 1.6,
+          "def": 0.5,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Glow added around emissive light. 0 shows the bare geometry.",
+          "randMax": 0.9
+        },
+        "bloomRadius": {
+          "type": "range",
+          "label": "Bloom radius",
+          "min": 0.4,
+          "max": 2.2,
+          "def": 1,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Width of the glow relative to the frame.",
+          "randMax": 1.5
+        },
+        "lensCA": {
+          "type": "range",
+          "label": "Edge fringe",
+          "min": 0,
+          "max": 0.5,
+          "def": 0.12,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Spectral fringing toward the frame edge.",
+          "randMax": 0.25
+        },
+        "vignette": {
+          "type": "range",
+          "label": "Vignette",
+          "min": 0,
+          "max": 0.8,
+          "def": 0.38,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Darkens the frame edge; never touches the focal area.",
+          "randMax": 0.55
+        },
+        "quality": {
+          "type": "select",
+          "label": "Quality",
+          "options": [
+            {
+              "v": "live",
+              "l": "Live"
+            },
+            {
+              "v": "balanced",
+              "l": "Balanced"
+            },
+            {
+              "v": "export",
+              "l": "Export"
+            }
+          ],
+          "def": "balanced",
+          "mutate": 0,
+          "group": "Quality",
+          "hint": "Sample counts only. Composition, phase and exposure stay the same."
+        }
+      }
+    },
+    {
+      "id": "golden-icosahedron",
+      "name": "Golden Icosahedron",
+      "group": "Sacred Lattice",
+      "tags": [
+        "icosahedron",
+        "golden"
+      ],
+      "blurb": "Icosahedra built from golden-ratio coordinates, heavy gold edges with bright vertex jewels.",
+      "palette": "gold-obsidian",
+      "flash": false,
+      "cost": 2,
+      "graph": {
+        "buffers": {
+          "scene": {
+            "scale": 0.75
+          },
+          "glowA": {
+            "scale": 0.25
+          },
+          "glowB": {
+            "scale": 0.125
+          }
+        },
+        "passes": [
+          {
+            "src": "styles/golden-icosahedron.glsl",
+            "reads": [],
+            "writes": "scene"
+          },
+          {
+            "src": "styles/_glowA.glsl",
+            "reads": [
+              "scene"
+            ],
+            "writes": "glowA"
+          },
+          {
+            "src": "styles/_glowB.glsl",
+            "reads": [
+              "glowA"
+            ],
+            "writes": "glowB"
+          },
+          {
+            "src": "styles/_out.glsl",
+            "reads": [
+              "scene",
+              "glowA",
+              "glowB"
+            ],
+            "writes": "output"
+          }
+        ]
+      },
+      "params": {
+        "levels": {
+          "type": "int",
+          "label": "Nesting levels",
+          "min": 2,
+          "max": 7,
+          "def": 4,
+          "group": "Form",
+          "hint": "Number of nested cages. Each is scaled by the nesting ratio.",
+          "mutate": 0.3
+        },
+        "ratio": {
+          "type": "range",
+          "label": "Nesting ratio",
+          "min": 0.45,
+          "max": 0.85,
+          "def": 0.618,
+          "step": 0.002,
+          "group": "Form",
+          "hint": "Scale of each cage relative to the one outside it. 0.618 is the golden ratio."
+        },
+        "depthSp": {
+          "type": "range",
+          "label": "Depth spacing",
+          "min": 0.05,
+          "max": 0.6,
+          "def": 0.22,
+          "step": 0.0027,
+          "group": "Form",
+          "hint": "Separation of the cages in depth. Drives perspective and parallax."
+        },
+        "circleLayers": {
+          "type": "int",
+          "label": "Circle layers",
+          "min": 0,
+          "max": 8,
+          "def": 3,
+          "group": "Form",
+          "hint": "Concentric circles with inscribed chord polygons. 0 removes them.",
+          "mutate": 0.3
+        },
+        "edgeR": {
+          "type": "range",
+          "label": "Edge radius",
+          "min": 0.001,
+          "max": 0.016,
+          "def": 0.0065,
+          "step": 0.000075,
+          "group": "Material",
+          "hint": "Radius of gold edges in scene units.",
+          "log": true
+        },
+        "facet": {
+          "type": "range",
+          "label": "Facet opacity",
+          "min": 0,
+          "max": 0.55,
+          "def": 0,
+          "step": 0.0028,
+          "group": "Material",
+          "hint": "Pale glass faces on tetra and octahedra. Approximate glass, not refraction."
+        },
+        "core": {
+          "type": "range",
+          "label": "Core intensity",
+          "min": 0.1,
+          "max": 3,
+          "def": 1,
+          "step": 0.014,
+          "group": "Light",
+          "hint": "Central light. Kept small so geometry stays readable at the focus.",
+          "randMax": 1.6
+        },
+        "cageTurns": {
+          "type": "int",
+          "label": "Cage turns per loop",
+          "min": 0,
+          "max": 3,
+          "def": 1,
+          "group": "Motion",
+          "hint": "Whole revolutions of each cage per loop, alternating direction.",
+          "mutate": 0
+        },
+        "orbit": {
+          "type": "range",
+          "label": "Camera orbit amplitude",
+          "min": 0,
+          "max": 0.25,
+          "def": 0.08,
+          "step": 0.0013,
+          "group": "Motion",
+          "hint": "Closed camera orbit, radians."
+        },
+        "breath": {
+          "type": "range",
+          "label": "Breath",
+          "min": 0,
+          "max": 0.1,
+          "def": 0.03,
+          "step": 0.0005,
+          "group": "Motion",
+          "hint": "Scale and facet breathing, sin(theta + phase)."
+        },
+        "keyAngle": {
+          "type": "range",
+          "label": "Key direction",
+          "min": -180,
+          "max": 180,
+          "def": 130,
+          "step": 1,
+          "unit": "°",
+          "group": "Light",
+          "hint": "Direction of the key light in the picture plane, degrees.",
+          "randMax": 180
+        },
+        "exposure": {
+          "type": "range",
+          "label": "Exposure",
+          "min": 0.4,
+          "max": 2.4,
+          "def": 1,
+          "step": 0.01,
+          "unit": "×",
+          "log": true,
+          "group": "Light",
+          "hint": "Linear exposure before the single tone map.",
+          "randMax": 1.4
+        },
+        "bloom": {
+          "type": "range",
+          "label": "Bloom",
+          "min": 0,
+          "max": 1.6,
+          "def": 0.5,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Glow added around emissive light. 0 shows the bare geometry.",
+          "randMax": 0.9
+        },
+        "bloomRadius": {
+          "type": "range",
+          "label": "Bloom radius",
+          "min": 0.4,
+          "max": 2.2,
+          "def": 1,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Width of the glow relative to the frame.",
+          "randMax": 1.5
+        },
+        "lensCA": {
+          "type": "range",
+          "label": "Edge fringe",
+          "min": 0,
+          "max": 0.5,
+          "def": 0.12,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Spectral fringing toward the frame edge.",
+          "randMax": 0.25
+        },
+        "vignette": {
+          "type": "range",
+          "label": "Vignette",
+          "min": 0,
+          "max": 0.8,
+          "def": 0.38,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Darkens the frame edge; never touches the focal area.",
+          "randMax": 0.55
+        },
+        "quality": {
+          "type": "select",
+          "label": "Quality",
+          "options": [
+            {
+              "v": "live",
+              "l": "Live"
+            },
+            {
+              "v": "balanced",
+              "l": "Balanced"
+            },
+            {
+              "v": "export",
+              "l": "Export"
+            }
+          ],
+          "def": "balanced",
+          "mutate": 0,
+          "group": "Quality",
+          "hint": "Sample counts only. Composition, phase and exposure stay the same."
+        }
+      }
+    },
+    {
+      "id": "circle-cathedral",
+      "name": "Circle Cathedral",
+      "group": "Sacred Lattice",
+      "tags": [
+        "circles",
+        "flat",
+        "lattice"
+      ],
+      "blurb": "Seven interlocked circles and tick rings: a flat, luminous rose window with counter-turning bands.",
+      "palette": "emerald-brass",
+      "flash": false,
+      "cost": 2,
+      "graph": {
+        "buffers": {
+          "scene": {
+            "scale": 0.75
+          },
+          "glowA": {
+            "scale": 0.25
+          },
+          "glowB": {
+            "scale": 0.125
+          }
+        },
+        "passes": [
+          {
+            "src": "styles/circle-cathedral.glsl",
+            "reads": [],
+            "writes": "scene"
+          },
+          {
+            "src": "styles/_glowA.glsl",
+            "reads": [
+              "scene"
+            ],
+            "writes": "glowA"
+          },
+          {
+            "src": "styles/_glowB.glsl",
+            "reads": [
+              "glowA"
+            ],
+            "writes": "glowB"
+          },
+          {
+            "src": "styles/_out.glsl",
+            "reads": [
+              "scene",
+              "glowA",
+              "glowB"
+            ],
+            "writes": "output"
+          }
+        ]
+      },
+      "params": {
+        "levels": {
+          "type": "int",
+          "label": "Nesting levels",
+          "min": 2,
+          "max": 7,
+          "def": 4,
+          "group": "Form",
+          "hint": "Number of nested cages. Each is scaled by the nesting ratio.",
+          "mutate": 0.3
+        },
+        "ratio": {
+          "type": "range",
+          "label": "Nesting ratio",
+          "min": 0.45,
+          "max": 0.85,
+          "def": 0.618,
+          "step": 0.002,
+          "group": "Form",
+          "hint": "Scale of each cage relative to the one outside it. 0.618 is the golden ratio."
+        },
+        "depthSp": {
+          "type": "range",
+          "label": "Depth spacing",
+          "min": 0.05,
+          "max": 0.6,
+          "def": 0.22,
+          "step": 0.0027,
+          "group": "Form",
+          "hint": "Separation of the cages in depth. Drives perspective and parallax."
+        },
+        "circleLayers": {
+          "type": "int",
+          "label": "Circle layers",
+          "min": 0,
+          "max": 8,
+          "def": 5,
+          "group": "Form",
+          "hint": "Concentric circles with inscribed chord polygons. 0 removes them.",
+          "mutate": 0.3
+        },
+        "edgeR": {
+          "type": "range",
+          "label": "Edge radius",
+          "min": 0.001,
+          "max": 0.016,
+          "def": 0.0035,
+          "step": 0.000075,
+          "group": "Material",
+          "hint": "Radius of gold edges in scene units.",
+          "log": true
+        },
+        "facet": {
+          "type": "range",
+          "label": "Facet opacity",
+          "min": 0,
+          "max": 0.55,
+          "def": 0,
+          "step": 0.0028,
+          "group": "Material",
+          "hint": "Pale glass faces on tetra and octahedra. Approximate glass, not refraction."
+        },
+        "core": {
+          "type": "range",
+          "label": "Core intensity",
+          "min": 0.1,
+          "max": 3,
+          "def": 0.5,
+          "step": 0.014,
+          "group": "Light",
+          "hint": "Central light. Kept small so geometry stays readable at the focus.",
+          "randMax": 1.6
+        },
+        "cageTurns": {
+          "type": "int",
+          "label": "Cage turns per loop",
+          "min": 0,
+          "max": 3,
+          "def": 1,
+          "group": "Motion",
+          "hint": "Whole revolutions of each cage per loop, alternating direction.",
+          "mutate": 0
+        },
+        "orbit": {
+          "type": "range",
+          "label": "Camera orbit amplitude",
+          "min": 0,
+          "max": 0.25,
+          "def": 0.08,
+          "step": 0.0013,
+          "group": "Motion",
+          "hint": "Closed camera orbit, radians."
+        },
+        "breath": {
+          "type": "range",
+          "label": "Breath",
+          "min": 0,
+          "max": 0.1,
+          "def": 0.03,
+          "step": 0.0005,
+          "group": "Motion",
+          "hint": "Scale and facet breathing, sin(theta + phase)."
+        },
+        "keyAngle": {
+          "type": "range",
+          "label": "Key direction",
+          "min": -180,
+          "max": 180,
+          "def": 130,
+          "step": 1,
+          "unit": "°",
+          "group": "Light",
+          "hint": "Direction of the key light in the picture plane, degrees.",
+          "randMax": 180
+        },
+        "exposure": {
+          "type": "range",
+          "label": "Exposure",
+          "min": 0.4,
+          "max": 2.4,
+          "def": 1,
+          "step": 0.01,
+          "unit": "×",
+          "log": true,
+          "group": "Light",
+          "hint": "Linear exposure before the single tone map.",
+          "randMax": 1.4
+        },
+        "bloom": {
+          "type": "range",
+          "label": "Bloom",
+          "min": 0,
+          "max": 1.6,
+          "def": 0.5,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Glow added around emissive light. 0 shows the bare geometry.",
+          "randMax": 0.9
+        },
+        "bloomRadius": {
+          "type": "range",
+          "label": "Bloom radius",
+          "min": 0.4,
+          "max": 2.2,
+          "def": 1,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Width of the glow relative to the frame.",
+          "randMax": 1.5
+        },
+        "lensCA": {
+          "type": "range",
+          "label": "Edge fringe",
+          "min": 0,
+          "max": 0.5,
+          "def": 0.12,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Spectral fringing toward the frame edge.",
+          "randMax": 0.25
+        },
+        "vignette": {
+          "type": "range",
+          "label": "Vignette",
+          "min": 0,
+          "max": 0.8,
+          "def": 0.38,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Darkens the frame edge; never touches the focal area.",
+          "randMax": 0.55
+        },
+        "quality": {
+          "type": "select",
+          "label": "Quality",
+          "options": [
+            {
+              "v": "live",
+              "l": "Live"
+            },
+            {
+              "v": "balanced",
+              "l": "Balanced"
+            },
+            {
+              "v": "export",
+              "l": "Export"
+            }
+          ],
+          "def": "balanced",
+          "mutate": 0,
+          "group": "Quality",
+          "hint": "Sample counts only. Composition, phase and exposure stay the same."
+        }
+      }
+    },
+    {
+      "id": "nested-compass",
+      "name": "Nested Compass",
+      "group": "Sacred Lattice",
+      "tags": [
+        "compass",
+        "chords"
+      ],
+      "blurb": "Concentric compass rings carry ticks and inscribed chord polygons that turn like an astrolabe.",
+      "palette": "silver-ice",
+      "flash": false,
+      "cost": 2,
+      "graph": {
+        "buffers": {
+          "scene": {
+            "scale": 0.75
+          },
+          "glowA": {
+            "scale": 0.25
+          },
+          "glowB": {
+            "scale": 0.125
+          }
+        },
+        "passes": [
+          {
+            "src": "styles/nested-compass.glsl",
+            "reads": [],
+            "writes": "scene"
+          },
+          {
+            "src": "styles/_glowA.glsl",
+            "reads": [
+              "scene"
+            ],
+            "writes": "glowA"
+          },
+          {
+            "src": "styles/_glowB.glsl",
+            "reads": [
+              "glowA"
+            ],
+            "writes": "glowB"
+          },
+          {
+            "src": "styles/_out.glsl",
+            "reads": [
+              "scene",
+              "glowA",
+              "glowB"
+            ],
+            "writes": "output"
+          }
+        ]
+      },
+      "params": {
+        "levels": {
+          "type": "int",
+          "label": "Nesting levels",
+          "min": 2,
+          "max": 7,
+          "def": 5,
+          "group": "Form",
+          "hint": "Number of nested cages. Each is scaled by the nesting ratio.",
+          "mutate": 0.3
+        },
+        "ratio": {
+          "type": "range",
+          "label": "Nesting ratio",
+          "min": 0.45,
+          "max": 0.85,
+          "def": 0.8,
+          "step": 0.002,
+          "group": "Form",
+          "hint": "Scale of each cage relative to the one outside it. 0.618 is the golden ratio."
+        },
+        "depthSp": {
+          "type": "range",
+          "label": "Depth spacing",
+          "min": 0.05,
+          "max": 0.6,
+          "def": 0.22,
+          "step": 0.0027,
+          "group": "Form",
+          "hint": "Separation of the cages in depth. Drives perspective and parallax."
+        },
+        "circleLayers": {
+          "type": "int",
+          "label": "Circle layers",
+          "min": 0,
+          "max": 8,
+          "def": 7,
+          "group": "Form",
+          "hint": "Concentric circles with inscribed chord polygons. 0 removes them.",
+          "mutate": 0.3
+        },
+        "edgeR": {
+          "type": "range",
+          "label": "Edge radius",
+          "min": 0.001,
+          "max": 0.016,
+          "def": 0.0032,
+          "step": 0.000075,
+          "group": "Material",
+          "hint": "Radius of gold edges in scene units.",
+          "log": true
+        },
+        "facet": {
+          "type": "range",
+          "label": "Facet opacity",
+          "min": 0,
+          "max": 0.55,
+          "def": 0.16,
+          "step": 0.0028,
+          "group": "Material",
+          "hint": "Pale glass faces on tetra and octahedra. Approximate glass, not refraction."
+        },
+        "core": {
+          "type": "range",
+          "label": "Core intensity",
+          "min": 0.1,
+          "max": 3,
+          "def": 0.4,
+          "step": 0.014,
+          "group": "Light",
+          "hint": "Central light. Kept small so geometry stays readable at the focus.",
+          "randMax": 1.6
+        },
+        "cageTurns": {
+          "type": "int",
+          "label": "Cage turns per loop",
+          "min": 0,
+          "max": 3,
+          "def": 1,
+          "group": "Motion",
+          "hint": "Whole revolutions of each cage per loop, alternating direction.",
+          "mutate": 0
+        },
+        "orbit": {
+          "type": "range",
+          "label": "Camera orbit amplitude",
+          "min": 0,
+          "max": 0.25,
+          "def": 0.08,
+          "step": 0.0013,
+          "group": "Motion",
+          "hint": "Closed camera orbit, radians."
+        },
+        "breath": {
+          "type": "range",
+          "label": "Breath",
+          "min": 0,
+          "max": 0.1,
+          "def": 0.03,
+          "step": 0.0005,
+          "group": "Motion",
+          "hint": "Scale and facet breathing, sin(theta + phase)."
+        },
+        "keyAngle": {
+          "type": "range",
+          "label": "Key direction",
+          "min": -180,
+          "max": 180,
+          "def": 130,
+          "step": 1,
+          "unit": "°",
+          "group": "Light",
+          "hint": "Direction of the key light in the picture plane, degrees.",
+          "randMax": 180
+        },
+        "exposure": {
+          "type": "range",
+          "label": "Exposure",
+          "min": 0.4,
+          "max": 2.4,
+          "def": 1,
+          "step": 0.01,
+          "unit": "×",
+          "log": true,
+          "group": "Light",
+          "hint": "Linear exposure before the single tone map.",
+          "randMax": 1.4
+        },
+        "bloom": {
+          "type": "range",
+          "label": "Bloom",
+          "min": 0,
+          "max": 1.6,
+          "def": 0.5,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Glow added around emissive light. 0 shows the bare geometry.",
+          "randMax": 0.9
+        },
+        "bloomRadius": {
+          "type": "range",
+          "label": "Bloom radius",
+          "min": 0.4,
+          "max": 2.2,
+          "def": 1,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Width of the glow relative to the frame.",
+          "randMax": 1.5
+        },
+        "lensCA": {
+          "type": "range",
+          "label": "Edge fringe",
+          "min": 0,
+          "max": 0.5,
+          "def": 0.12,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Spectral fringing toward the frame edge.",
+          "randMax": 0.25
+        },
+        "vignette": {
+          "type": "range",
+          "label": "Vignette",
+          "min": 0,
+          "max": 0.8,
+          "def": 0.38,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Darkens the frame edge; never touches the focal area.",
+          "randMax": 0.55
+        },
+        "quality": {
+          "type": "select",
+          "label": "Quality",
+          "options": [
+            {
+              "v": "live",
+              "l": "Live"
+            },
+            {
+              "v": "balanced",
+              "l": "Balanced"
+            },
+            {
+              "v": "export",
+              "l": "Export"
+            }
+          ],
+          "def": "balanced",
+          "mutate": 0,
+          "group": "Quality",
+          "hint": "Sample counts only. Composition, phase and exposure stay the same."
+        }
+      }
+    },
+    {
+      "id": "glass-constellation",
+      "name": "Glass Constellation",
+      "group": "Sacred Lattice",
+      "tags": [
+        "constellation",
+        "nodes"
+      ],
+      "blurb": "Vertices become stars: fine hairline chords join icosa and cube nodes in a slowly turning constellation.",
+      "palette": "gold-obsidian",
+      "flash": false,
+      "cost": 2,
+      "graph": {
+        "buffers": {
+          "scene": {
+            "scale": 0.75
+          },
+          "glowA": {
+            "scale": 0.25
+          },
+          "glowB": {
+            "scale": 0.125
+          }
+        },
+        "passes": [
+          {
+            "src": "styles/glass-constellation.glsl",
+            "reads": [],
+            "writes": "scene"
+          },
+          {
+            "src": "styles/_glowA.glsl",
+            "reads": [
+              "scene"
+            ],
+            "writes": "glowA"
+          },
+          {
+            "src": "styles/_glowB.glsl",
+            "reads": [
+              "glowA"
+            ],
+            "writes": "glowB"
+          },
+          {
+            "src": "styles/_out.glsl",
+            "reads": [
+              "scene",
+              "glowA",
+              "glowB"
+            ],
+            "writes": "output"
+          }
+        ]
+      },
+      "params": {
+        "levels": {
+          "type": "int",
+          "label": "Nesting levels",
+          "min": 2,
+          "max": 7,
+          "def": 5,
+          "group": "Form",
+          "hint": "Number of nested cages. Each is scaled by the nesting ratio.",
+          "mutate": 0.3
+        },
+        "ratio": {
+          "type": "range",
+          "label": "Nesting ratio",
+          "min": 0.45,
+          "max": 0.85,
+          "def": 0.74,
+          "step": 0.002,
+          "group": "Form",
+          "hint": "Scale of each cage relative to the one outside it. 0.618 is the golden ratio."
+        },
+        "depthSp": {
+          "type": "range",
+          "label": "Depth spacing",
+          "min": 0.05,
+          "max": 0.6,
+          "def": 0.22,
+          "step": 0.0027,
+          "group": "Form",
+          "hint": "Separation of the cages in depth. Drives perspective and parallax."
+        },
+        "circleLayers": {
+          "type": "int",
+          "label": "Circle layers",
+          "min": 0,
+          "max": 8,
+          "def": 0,
+          "group": "Form",
+          "hint": "Concentric circles with inscribed chord polygons. 0 removes them.",
+          "mutate": 0.3
+        },
+        "edgeR": {
+          "type": "range",
+          "label": "Edge radius",
+          "min": 0.001,
+          "max": 0.016,
+          "def": 0.0035,
+          "step": 0.000075,
+          "group": "Material",
+          "hint": "Radius of gold edges in scene units.",
+          "log": true
+        },
+        "facet": {
+          "type": "range",
+          "label": "Facet opacity",
+          "min": 0,
+          "max": 0.55,
+          "def": 0,
+          "step": 0.0028,
+          "group": "Material",
+          "hint": "Pale glass faces on tetra and octahedra. Approximate glass, not refraction."
+        },
+        "core": {
+          "type": "range",
+          "label": "Core intensity",
+          "min": 0.1,
+          "max": 3,
+          "def": 0.5,
+          "step": 0.014,
+          "group": "Light",
+          "hint": "Central light. Kept small so geometry stays readable at the focus.",
+          "randMax": 1.6
+        },
+        "cageTurns": {
+          "type": "int",
+          "label": "Cage turns per loop",
+          "min": 0,
+          "max": 3,
+          "def": 1,
+          "group": "Motion",
+          "hint": "Whole revolutions of each cage per loop, alternating direction.",
+          "mutate": 0
+        },
+        "orbit": {
+          "type": "range",
+          "label": "Camera orbit amplitude",
+          "min": 0,
+          "max": 0.25,
+          "def": 0.14,
+          "step": 0.0013,
+          "group": "Motion",
+          "hint": "Closed camera orbit, radians."
+        },
+        "breath": {
+          "type": "range",
+          "label": "Breath",
+          "min": 0,
+          "max": 0.1,
+          "def": 0.03,
+          "step": 0.0005,
+          "group": "Motion",
+          "hint": "Scale and facet breathing, sin(theta + phase)."
+        },
+        "keyAngle": {
+          "type": "range",
+          "label": "Key direction",
+          "min": -180,
+          "max": 180,
+          "def": 130,
+          "step": 1,
+          "unit": "°",
+          "group": "Light",
+          "hint": "Direction of the key light in the picture plane, degrees.",
+          "randMax": 180
+        },
+        "exposure": {
+          "type": "range",
+          "label": "Exposure",
+          "min": 0.4,
+          "max": 2.4,
+          "def": 1,
+          "step": 0.01,
+          "unit": "×",
+          "log": true,
+          "group": "Light",
+          "hint": "Linear exposure before the single tone map.",
+          "randMax": 1.4
+        },
+        "bloom": {
+          "type": "range",
+          "label": "Bloom",
+          "min": 0,
+          "max": 1.6,
+          "def": 0.5,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Glow added around emissive light. 0 shows the bare geometry.",
+          "randMax": 0.9
+        },
+        "bloomRadius": {
+          "type": "range",
+          "label": "Bloom radius",
+          "min": 0.4,
+          "max": 2.2,
+          "def": 1,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Width of the glow relative to the frame.",
+          "randMax": 1.5
+        },
+        "lensCA": {
+          "type": "range",
+          "label": "Edge fringe",
+          "min": 0,
+          "max": 0.5,
+          "def": 0.12,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Spectral fringing toward the frame edge.",
+          "randMax": 0.25
+        },
+        "vignette": {
+          "type": "range",
+          "label": "Vignette",
+          "min": 0,
+          "max": 0.8,
+          "def": 0.38,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Darkens the frame edge; never touches the focal area.",
+          "randMax": 0.55
+        },
+        "quality": {
+          "type": "select",
+          "label": "Quality",
+          "options": [
+            {
+              "v": "live",
+              "l": "Live"
+            },
+            {
+              "v": "balanced",
+              "l": "Balanced"
+            },
+            {
+              "v": "export",
+              "l": "Export"
+            }
+          ],
+          "def": "balanced",
+          "mutate": 0,
+          "group": "Quality",
+          "hint": "Sample counts only. Composition, phase and exposure stay the same."
+        }
+      }
+    },
+    {
+      "id": "axial-halo",
+      "name": "Axial Halo",
+      "group": "Sacred Lattice",
+      "tags": [
+        "halo",
+        "axial"
+      ],
+      "blurb": "Cages spin about the view axis inside a bright halo ring: a mandala you look straight into.",
+      "palette": "rose-gold",
+      "flash": false,
+      "cost": 2,
+      "graph": {
+        "buffers": {
+          "scene": {
+            "scale": 0.75
+          },
+          "glowA": {
+            "scale": 0.25
+          },
+          "glowB": {
+            "scale": 0.125
+          }
+        },
+        "passes": [
+          {
+            "src": "styles/axial-halo.glsl",
+            "reads": [],
+            "writes": "scene"
+          },
+          {
+            "src": "styles/_glowA.glsl",
+            "reads": [
+              "scene"
+            ],
+            "writes": "glowA"
+          },
+          {
+            "src": "styles/_glowB.glsl",
+            "reads": [
+              "glowA"
+            ],
+            "writes": "glowB"
+          },
+          {
+            "src": "styles/_out.glsl",
+            "reads": [
+              "scene",
+              "glowA",
+              "glowB"
+            ],
+            "writes": "output"
+          }
+        ]
+      },
+      "params": {
+        "levels": {
+          "type": "int",
+          "label": "Nesting levels",
+          "min": 2,
+          "max": 7,
+          "def": 4,
+          "group": "Form",
+          "hint": "Number of nested cages. Each is scaled by the nesting ratio.",
+          "mutate": 0.3
+        },
+        "ratio": {
+          "type": "range",
+          "label": "Nesting ratio",
+          "min": 0.45,
+          "max": 0.85,
+          "def": 0.618,
+          "step": 0.002,
+          "group": "Form",
+          "hint": "Scale of each cage relative to the one outside it. 0.618 is the golden ratio."
+        },
+        "depthSp": {
+          "type": "range",
+          "label": "Depth spacing",
+          "min": 0.05,
+          "max": 0.6,
+          "def": 0.22,
+          "step": 0.0027,
+          "group": "Form",
+          "hint": "Separation of the cages in depth. Drives perspective and parallax."
+        },
+        "circleLayers": {
+          "type": "int",
+          "label": "Circle layers",
+          "min": 0,
+          "max": 8,
+          "def": 2,
+          "group": "Form",
+          "hint": "Concentric circles with inscribed chord polygons. 0 removes them.",
+          "mutate": 0.3
+        },
+        "edgeR": {
+          "type": "range",
+          "label": "Edge radius",
+          "min": 0.001,
+          "max": 0.016,
+          "def": 0.004,
+          "step": 0.000075,
+          "group": "Material",
+          "hint": "Radius of gold edges in scene units.",
+          "log": true
+        },
+        "facet": {
+          "type": "range",
+          "label": "Facet opacity",
+          "min": 0,
+          "max": 0.55,
+          "def": 0.22,
+          "step": 0.0028,
+          "group": "Material",
+          "hint": "Pale glass faces on tetra and octahedra. Approximate glass, not refraction."
+        },
+        "core": {
+          "type": "range",
+          "label": "Core intensity",
+          "min": 0.1,
+          "max": 3,
+          "def": 0.9,
+          "step": 0.014,
+          "group": "Light",
+          "hint": "Central light. Kept small so geometry stays readable at the focus.",
+          "randMax": 1.6
+        },
+        "cageTurns": {
+          "type": "int",
+          "label": "Cage turns per loop",
+          "min": 0,
+          "max": 3,
+          "def": 1,
+          "group": "Motion",
+          "hint": "Whole revolutions of each cage per loop, alternating direction.",
+          "mutate": 0
+        },
+        "orbit": {
+          "type": "range",
+          "label": "Camera orbit amplitude",
+          "min": 0,
+          "max": 0.25,
+          "def": 0.08,
+          "step": 0.0013,
+          "group": "Motion",
+          "hint": "Closed camera orbit, radians."
+        },
+        "breath": {
+          "type": "range",
+          "label": "Breath",
+          "min": 0,
+          "max": 0.1,
+          "def": 0.03,
+          "step": 0.0005,
+          "group": "Motion",
+          "hint": "Scale and facet breathing, sin(theta + phase)."
+        },
+        "keyAngle": {
+          "type": "range",
+          "label": "Key direction",
+          "min": -180,
+          "max": 180,
+          "def": 130,
+          "step": 1,
+          "unit": "°",
+          "group": "Light",
+          "hint": "Direction of the key light in the picture plane, degrees.",
+          "randMax": 180
+        },
+        "exposure": {
+          "type": "range",
+          "label": "Exposure",
+          "min": 0.4,
+          "max": 2.4,
+          "def": 1,
+          "step": 0.01,
+          "unit": "×",
+          "log": true,
+          "group": "Light",
+          "hint": "Linear exposure before the single tone map.",
+          "randMax": 1.4
+        },
+        "bloom": {
+          "type": "range",
+          "label": "Bloom",
+          "min": 0,
+          "max": 1.6,
+          "def": 0.7,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Glow added around emissive light. 0 shows the bare geometry.",
+          "randMax": 0.9
+        },
+        "bloomRadius": {
+          "type": "range",
+          "label": "Bloom radius",
+          "min": 0.4,
+          "max": 2.2,
+          "def": 1,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Width of the glow relative to the frame.",
+          "randMax": 1.5
+        },
+        "lensCA": {
+          "type": "range",
+          "label": "Edge fringe",
+          "min": 0,
+          "max": 0.5,
+          "def": 0.12,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Spectral fringing toward the frame edge.",
+          "randMax": 0.25
+        },
+        "vignette": {
+          "type": "range",
+          "label": "Vignette",
+          "min": 0,
+          "max": 0.8,
+          "def": 0.38,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Darkens the frame edge; never touches the focal area.",
+          "randMax": 0.55
+        },
+        "quality": {
+          "type": "select",
+          "label": "Quality",
+          "options": [
+            {
+              "v": "live",
+              "l": "Live"
+            },
+            {
+              "v": "balanced",
+              "l": "Balanced"
+            },
+            {
+              "v": "export",
+              "l": "Export"
+            }
+          ],
+          "def": "balanced",
+          "mutate": 0,
+          "group": "Quality",
+          "hint": "Sample counts only. Composition, phase and exposure stay the same."
+        }
+      }
+    },
+    {
+      "id": "silent-symmetry",
+      "name": "Silent Symmetry",
+      "group": "Sacred Lattice",
+      "tags": [
+        "calm",
+        "ambient"
+      ],
+      "blurb": "Cubes and octahedra at rest-like speed, thin lines, wide negative space: made for quiet backgrounds.",
+      "palette": "silver-ice",
+      "flash": false,
+      "cost": 2,
+      "graph": {
+        "buffers": {
+          "scene": {
+            "scale": 0.75
+          },
+          "glowA": {
+            "scale": 0.25
+          },
+          "glowB": {
+            "scale": 0.125
+          }
+        },
+        "passes": [
+          {
+            "src": "styles/silent-symmetry.glsl",
+            "reads": [],
+            "writes": "scene"
+          },
+          {
+            "src": "styles/_glowA.glsl",
+            "reads": [
+              "scene"
+            ],
+            "writes": "glowA"
+          },
+          {
+            "src": "styles/_glowB.glsl",
+            "reads": [
+              "glowA"
+            ],
+            "writes": "glowB"
+          },
+          {
+            "src": "styles/_out.glsl",
+            "reads": [
+              "scene",
+              "glowA",
+              "glowB"
+            ],
+            "writes": "output"
+          }
+        ]
+      },
+      "params": {
+        "levels": {
+          "type": "int",
+          "label": "Nesting levels",
+          "min": 2,
+          "max": 7,
+          "def": 3,
+          "group": "Form",
+          "hint": "Number of nested cages. Each is scaled by the nesting ratio.",
+          "mutate": 0.3
+        },
+        "ratio": {
+          "type": "range",
+          "label": "Nesting ratio",
+          "min": 0.45,
+          "max": 0.85,
+          "def": 0.618,
+          "step": 0.002,
+          "group": "Form",
+          "hint": "Scale of each cage relative to the one outside it. 0.618 is the golden ratio."
+        },
+        "depthSp": {
+          "type": "range",
+          "label": "Depth spacing",
+          "min": 0.05,
+          "max": 0.6,
+          "def": 0.22,
+          "step": 0.0027,
+          "group": "Form",
+          "hint": "Separation of the cages in depth. Drives perspective and parallax."
+        },
+        "circleLayers": {
+          "type": "int",
+          "label": "Circle layers",
+          "min": 0,
+          "max": 8,
+          "def": 1,
+          "group": "Form",
+          "hint": "Concentric circles with inscribed chord polygons. 0 removes them.",
+          "mutate": 0.3
+        },
+        "edgeR": {
+          "type": "range",
+          "label": "Edge radius",
+          "min": 0.001,
+          "max": 0.016,
+          "def": 0.0025,
+          "step": 0.000075,
+          "group": "Material",
+          "hint": "Radius of gold edges in scene units.",
+          "log": true
+        },
+        "facet": {
+          "type": "range",
+          "label": "Facet opacity",
+          "min": 0,
+          "max": 0.55,
+          "def": 0.1,
+          "step": 0.0028,
+          "group": "Material",
+          "hint": "Pale glass faces on tetra and octahedra. Approximate glass, not refraction."
+        },
+        "core": {
+          "type": "range",
+          "label": "Core intensity",
+          "min": 0.1,
+          "max": 3,
+          "def": 0.35,
+          "step": 0.014,
+          "group": "Light",
+          "hint": "Central light. Kept small so geometry stays readable at the focus.",
+          "randMax": 1.6
+        },
+        "cageTurns": {
+          "type": "int",
+          "label": "Cage turns per loop",
+          "min": 0,
+          "max": 3,
+          "def": 1,
+          "group": "Motion",
+          "hint": "Whole revolutions of each cage per loop, alternating direction.",
+          "mutate": 0
+        },
+        "orbit": {
+          "type": "range",
+          "label": "Camera orbit amplitude",
+          "min": 0,
+          "max": 0.25,
+          "def": 0.03,
+          "step": 0.0013,
+          "group": "Motion",
+          "hint": "Closed camera orbit, radians."
+        },
+        "breath": {
+          "type": "range",
+          "label": "Breath",
+          "min": 0,
+          "max": 0.1,
+          "def": 0.03,
+          "step": 0.0005,
+          "group": "Motion",
+          "hint": "Scale and facet breathing, sin(theta + phase)."
+        },
+        "keyAngle": {
+          "type": "range",
+          "label": "Key direction",
+          "min": -180,
+          "max": 180,
+          "def": 130,
+          "step": 1,
+          "unit": "°",
+          "group": "Light",
+          "hint": "Direction of the key light in the picture plane, degrees.",
+          "randMax": 180
+        },
+        "exposure": {
+          "type": "range",
+          "label": "Exposure",
+          "min": 0.4,
+          "max": 2.4,
+          "def": 0.9,
+          "step": 0.01,
+          "unit": "×",
+          "log": true,
+          "group": "Light",
+          "hint": "Linear exposure before the single tone map.",
+          "randMax": 1.4
+        },
+        "bloom": {
+          "type": "range",
+          "label": "Bloom",
+          "min": 0,
+          "max": 1.6,
+          "def": 0.3,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Glow added around emissive light. 0 shows the bare geometry.",
+          "randMax": 0.9
+        },
+        "bloomRadius": {
+          "type": "range",
+          "label": "Bloom radius",
+          "min": 0.4,
+          "max": 2.2,
+          "def": 1,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Width of the glow relative to the frame.",
+          "randMax": 1.5
+        },
+        "lensCA": {
+          "type": "range",
+          "label": "Edge fringe",
+          "min": 0,
+          "max": 0.5,
+          "def": 0.12,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Spectral fringing toward the frame edge.",
+          "randMax": 0.25
+        },
+        "vignette": {
+          "type": "range",
+          "label": "Vignette",
+          "min": 0,
+          "max": 0.8,
+          "def": 0.38,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Darkens the frame edge; never touches the focal area.",
+          "randMax": 0.55
+        },
+        "quality": {
+          "type": "select",
+          "label": "Quality",
+          "options": [
+            {
+              "v": "live",
+              "l": "Live"
+            },
+            {
+              "v": "balanced",
+              "l": "Balanced"
+            },
+            {
+              "v": "export",
+              "l": "Export"
+            }
+          ],
+          "def": "balanced",
+          "mutate": 0,
+          "group": "Quality",
+          "hint": "Sample counts only. Composition, phase and exposure stay the same."
+        }
+      }
+    }
+  ]
+}
