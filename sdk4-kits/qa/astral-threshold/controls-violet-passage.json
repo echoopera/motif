@@ -1,0 +1,254 @@
+{
+  "kit": "astral-threshold",
+  "style": "violet-passage",
+  "phase": 0.37,
+  "size": [
+    120,
+    213
+  ],
+  "note": "effect = max mean-abs 8-bit change vs the default frame over min/max (or every option)",
+  "rows": [
+    {
+      "key": "layers",
+      "label": "Membrane layers",
+      "type": "int",
+      "def": 10,
+      "vals": [
+        3,
+        12
+      ],
+      "diffs": [
+        42.94,
+        0
+      ],
+      "effect": 42.94
+    },
+    {
+      "key": "aperture",
+      "label": "Aperture radius",
+      "type": "range",
+      "def": 0.13,
+      "vals": [
+        0.08,
+        0.45
+      ],
+      "diffs": [
+        15.1,
+        22.83
+      ],
+      "effect": 22.83
+    },
+    {
+      "key": "filament",
+      "label": "Filament scale",
+      "type": "range",
+      "def": 0.09,
+      "vals": [
+        0.02,
+        0.3
+      ],
+      "diffs": [
+        2.11,
+        4.65
+      ],
+      "effect": 4.65
+    },
+    {
+      "key": "warp",
+      "label": "Warp amplitude",
+      "type": "range",
+      "def": 0.08,
+      "vals": [
+        0,
+        0.25
+      ],
+      "diffs": [
+        9.97,
+        11.75
+      ],
+      "effect": 11.75
+    },
+    {
+      "key": "density",
+      "label": "Density",
+      "type": "range",
+      "def": 0.8,
+      "vals": [
+        0.1,
+        2
+      ],
+      "diffs": [
+        49.2,
+        29.05
+      ],
+      "effect": 49.2
+    },
+    {
+      "key": "absorb",
+      "label": "Absorption",
+      "type": "range",
+      "def": 1.6,
+      "vals": [
+        0.1,
+        3
+      ],
+      "diffs": [
+        59.17,
+        19.82
+      ],
+      "effect": 59.17
+    },
+    {
+      "key": "emission",
+      "label": "Emission",
+      "type": "range",
+      "def": 1.6,
+      "vals": [
+        0.1,
+        5
+      ],
+      "diffs": [
+        62.44,
+        48.54
+      ],
+      "effect": 62.44
+    },
+    {
+      "key": "travel",
+      "label": "Depth travel",
+      "type": "range",
+      "def": 0.32,
+      "vals": [
+        0,
+        0.4
+      ],
+      "diffs": [
+        19.72,
+        15.59
+      ],
+      "effect": 19.72
+    },
+    {
+      "key": "advect",
+      "label": "Advection cycles per loo",
+      "type": "int",
+      "def": 1,
+      "vals": [
+        1,
+        3
+      ],
+      "diffs": [
+        0,
+        13.29
+      ],
+      "effect": 13.29
+    },
+    {
+      "key": "keyAngle",
+      "label": "Key direction",
+      "type": "range",
+      "def": 90,
+      "vals": [
+        -180,
+        180
+      ],
+      "diffs": [
+        0,
+        0
+      ],
+      "effect": 0
+    },
+    {
+      "key": "exposure",
+      "label": "Exposure",
+      "type": "range",
+      "def": 1,
+      "vals": [
+        0.4,
+        2.4
+      ],
+      "diffs": [
+        28.94,
+        37.96
+      ],
+      "effect": 37.96
+    },
+    {
+      "key": "bloom",
+      "label": "Bloom",
+      "type": "range",
+      "def": 0.6,
+      "vals": [
+        0,
+        1.6
+      ],
+      "diffs": [
+        0.94,
+        1.36
+      ],
+      "effect": 1.36
+    },
+    {
+      "key": "bloomRadius",
+      "label": "Bloom radius",
+      "type": "range",
+      "def": 1,
+      "vals": [
+        0.4,
+        2.2
+      ],
+      "diffs": [
+        0.31,
+        0.45
+      ],
+      "effect": 0.45
+    },
+    {
+      "key": "lensCA",
+      "label": "Edge fringe",
+      "type": "range",
+      "def": 0.12,
+      "vals": [
+        0,
+        0.5
+      ],
+      "diffs": [
+        0.19,
+        0.59
+      ],
+      "effect": 0.59
+    },
+    {
+      "key": "vignette",
+      "label": "Vignette",
+      "type": "range",
+      "def": 0.38,
+      "vals": [
+        0,
+        0.8
+      ],
+      "diffs": [
+        2.53,
+        3.41
+      ],
+      "effect": 3.41
+    },
+    {
+      "key": "quality",
+      "label": "Quality",
+      "type": "select",
+      "def": "balanced",
+      "vals": [
+        "live",
+        "balanced",
+        "export"
+      ],
+      "diffs": [
+        3.48,
+        0,
+        1.93
+      ],
+      "effect": 3.48
+    }
+  ]
+}
