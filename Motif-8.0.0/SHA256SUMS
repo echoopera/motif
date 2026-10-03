@@ -1,7 +1,7 @@
 8257c0f83673db6bd617dc43538507749c4e256e7e3bc40f675715a1ef686ed4  CHANGELOG-5.1.md
 b2697d7328cc20e54d06fb721902e2e1691df403e26ca5d40c147cdac86cd9ab  CHANGELOG-7.0.md
 3de84c3fffb70d81503e885253f3d1e3604d27d194af3ce02aa75579cdcb2405  CHANGELOG-8.0.md
-986fa3f32f3b1b1df2c2538d368f3d1a878b6d494261acb8814dbf57fa80c180  Motif.html
+ce7d6c434b5da26ac0df1f0fa7e7e38ab10bebb5cd7f754b2bd87d36495d6ff9  Motif.html
 a81827b7ff846e01bef9cdc15961a37fd7c361a19573a78423c9c6e9f81c2b97  README.md
 23a540c3033756b4eb967ad2e22bb10ef41115ec8311f6e91e25f47f16e9616b  START-HERE.txt
 73786313fef0d71ae5c6466c79f265b60852aecd878cca7201e3cb8a06dc38ce  docs/MOTIF-SDK-4.0-REVIEW.md
@@ -13,6 +13,7 @@ dcb45673816b86e3141b18418993d9cc45279bf597c6fdb2e38372301c27f9fb  docs/Motif-Com
 ec55200c7d7ded881cf2b3da2aed704c33cfe9a7c14fd93a29840a919a105212  docs/Motif-PRD-and-Engineering-Spec.docx
 8e24a1344cc59b342977963139c718307e8b2b38b5766d5cfc7d99562b2adb65  docs/Motif-PRD-and-Engineering-Spec.md
 082b0aeb9c5d2b416d2d2d23433de69e98ba8805e152c2b138ac876209a8756b  docs/Motif-PRD-and-Engineering-Spec.pdf
+1cdf205956f069273a40ac80e1070679370673939cabd01ab6779e47771dadcb  docs/Motif-SDK-4.0-overview.html
 560c87ee1bd5f7108939062064dd7dd190cb2bef13c170949e4299a58ae49536  docs/Motif-Style-Lab-Pro-Enhancements.md
 c50fecd3b45f2399425a92ba2d2cb55efae8b2b5bef6e16c421231caf166e5c3  docs/Wallcast-PRD-and-Engineering-Spec.docx
 19d765969929aa18e653deb482d59f7426f66a77c669f9c3f545cf53080a6b8a  docs/Wallcast-PRD-and-Engineering-Spec.md
@@ -37,7 +38,7 @@ eeca50f08993f3d34bf92efdaeef1e3a4d0bf9ac9bfff3a9b84041ee2ead0b13  kits/cyberpunk
 327ecd4effd30837ef8ca28a44fc773a639b0a7d1541f016cc77daf4e0ec3a7f  kits/neuro.motifkit.json
 12a88e070c889dc60cd656dee5b8249f212bcb97bf79b8b0c94ecf1fdeb0c9f0  kits/param-lab-0.1.0.motifkit
 32ecd9ed2f269d3a49639b72bf33d0898516a4e025fac66db420718668570f36  kits/quantum.motifkit.json
-c55af6ee6ca20d34bd5c8f3f85307a915992acc2ad391bfb7a5b2be74cf64b33  kits/sequence-demo-0.2.0.motifkit
+c52f287b79e0aefed9c048e1f888569d886c6115ea5494fddf7d3c5340202883  kits/sequence-demo-0.2.0.motifkit
 60818a91305b882cd405cd83e3b7dea00f2725717d0db0d9acb4b4aa19c107d8  kits/source/facetype/README.md
 0eeadad12c4e0704c2fb4823ca03c781997ec629846e56e294074d4e8916968e  kits/source/facetype/common.glsl
 0fffb3db3cf07422ea7f1b9fcab494f60090b01dfec8f7399b91f47ac66684c9  kits/source/facetype/manifest.json
@@ -91,8 +92,8 @@ d209dd51c21732f767cb8cacad447e12ec1c0443b7013d76e344db736d8b95bf  kits/source/wa
 6e131280007dc6658f56d81981d350cfa2976397000a1ee48e84d4a0be71674e  kits/source/wallcast/styles/shockwave.glsl
 0797f02a3bad6f8603ec738850229925ab766b98fbeab01a37c4befda1e0dd9c  kits/source/wallcast/styles/slice-shift.glsl
 532c4a11e416ea73fa7803beca25573e0e72840da44f02adace5d6bae30befa0  kits/source/wallcast/styles/source.glsl
-b262825fe0fe612aca24995f85ca5e6a3ee900968da5bf270f278a67a0d02f0e  kits/stack-lab-0.2.0.motifkit
-34801739338ede7e9c0851b906653d65e863c7c00a5aea8827db5f4884eac8c7  kits/vector-type-0.2.0.motifkit
+9aeb5d893084616f2c0cd3910d9b1466456cc65a1d3e350c3c527bc1432eb1b0  kits/stack-lab-0.2.0.motifkit
+6ad3b51ad45c31bbe200771462a1fe5d1ac71fc9411176d4618915986a51ff95  kits/vector-type-0.2.0.motifkit
 0672ea269a6abba81e9479a92b65f58e2297722f928da6a0af16c2233370b9c2  kits/wallcast-1.0.0.motifkit
 ebeeaa42430ba553e52d4f550ce10cea2e0aa7cb0cb6db79dc1726ea5115e0ee  preview.png
 588234acb8041fea7c7984c83f9fec93101a8b5d969bbebcf05b14c843e7e549  schemas/motif-kit-2.schema.json
@@ -140,7 +141,7 @@ e6bf83f8946e04a38ff208cfe07b40f618b15ee7e0af8a7abccb41290c2edae1  sdk/motif-kit-
 77a845655382577309c62f1d8bebc3bea0863cccd102fe643ebcf63375b476cf  sdk/motif-kit-sdk/examples/vector-type/styles/type-poster.glsl
 be2ddb7779e5265f620d00d9e8e4f5151bb289ba51ad42aaa36b3ac3eb4ad2fa  sdk/motif-kit-sdk/lib/fonts/DejaVuSans-Bold.LICENSE.txt
 5c1247acef7f2b8522a31742c76d6adcb5569bacc0be7ceaa4dc39dd252ce895  sdk/motif-kit-sdk/lib/fonts/DejaVuSans-Bold.ttf
-ed284a96ef3b3b3fb29296875433f985fa0df292966911685ef20925c25c955a  sdk/motif-kit-sdk/lib/kit-gl.js
+ea9266ed28892ae7f9b9e1354216c681bdb7bfe0090b24b568d051186d11c695  sdk/motif-kit-sdk/lib/kit-gl.js
 a42dfb7c782150bd9ab4ee0538607478d0b1fb5d3c67d236a25a1c4f8ca7827f  sdk/motif-kit-sdk/lib/preview.mjs
 2b3927eb8bf9b4cd14eac74bfb10e779db09f6abf17504e731ee75aa65726480  sdk/motif-kit-sdk/package.json
 5578043dd9e6a35cea2f59f0557dbef37761b51d0fed3e5aa0d2f1bf3e1c43c7  sdk/motif-kit-sdk/template/common.glsl
@@ -175,7 +176,7 @@ e6bf83f8946e04a38ff208cfe07b40f618b15ee7e0af8a7abccb41290c2edae1  src-v8/kits-sr
 7edb917f96724371560f9f3daa51e68800baefd0ae1e365add941256db9e7b40  src-v8/kits-src/vector-type/styles/logo-reveal.glsl
 674d0deba683ff98ac2db09bd338b7f6f6c62f6dc84e9c424893295db43fbcab  src-v8/kits-src/vector-type/styles/shape-field.glsl
 77a845655382577309c62f1d8bebc3bea0863cccd102fe643ebcf63375b476cf  src-v8/kits-src/vector-type/styles/type-poster.glsl
-099d64c23632f2b2766924b34f070d7ceb2714cc447fb55eab6cfd60f7cf076f  src-v8/modules/04a0-kit-v4.js
+d77cb2dae7a918bd7027705d6611d8effa4161fa70280652c8f1f06c9efa963c  src-v8/modules/04a0-kit-v4.js
 4e52e62d765ba8beba8b4096ba371b0d57fa93a6051f10d2f9d0a649728367db  src-v8/modules/shell-sequencer.js
 7111196dbd89538af72dc4e3e3bea2cdee228853e7ed989e04bc728e033df1e3  tests/v8/README.md
 7d6c7b6e3e04110a9c32084bff48827249181259f02d369c11e38bcb8af59c94  tests/v8/browser.mjs

@@ -191,7 +191,7 @@ function blockParams(q, kind, layer) {
   add('Rot', 'Rotate', { type: 'range', min: -180, max: 180, def: 0, step: 0.5, unit: '°', mutate: 0.3 });
   if (kind === 'layer') add('Edge', 'Edges', { type: 'select', options: optList(EDGE_MODES, EDGE_LABELS), def: 'clip', mutate: 0, hint: 'What shows beyond the image. Scrolling always repeats.' });
   add('Speed', 'Cycles / loop', { type: 'int', min: 0, max: 8, def: 0, step: 1, mutate: 0, hint: 'Whole cycles per loop, so the loop closes. 0 holds still (a video then plays on its own timing).' });
-  add('Dir', 'Direction', { type: 'select', options: optList(PLAY_MODES, PLAY_LABELS), def: 'forward', mutate: 0, show: moving, hint: 'Forward, backward, ping-pong, or every round trip goes a random way.' });
+  add('Dir', 'Direction', { type: 'select', options: optList(PLAY_MODES, PLAY_LABELS), def: 'forward', mutate: 0, hint: 'Takes effect when Cycles / loop is above 0. Forward, backward, ping-pong, or every round trip goes a random way.' });
   point('Motion', 'Travel', -3, 3, [0, 0], { show: moving, hint: 'Tiles the image moves per cycle (0 keeps it still; a video still plays through the playhead). Forward and backward snap to whole tiles so the loop closes; ping-pong and random use any distance.' });
   return P;
 }
