@@ -48,7 +48,8 @@ if (cmd === 'sheet') {
       const vs = []; for (let k = 0; k < 24; k++) { const p = (k + 0.37) / 24; vs.push(md(grab(p), grab(p + eps))); } vs.sort((a, b) => a - b);
       const med = vs[12], mx = vs[vs.length - 1]; out.velMedian = +med.toFixed(3); out.velMax = +mx.toFixed(3);
       out.seamRatio = +(Math.max(out.seamStep, out.seamStepAfter) / Math.max(med, 0.02)).toFixed(2); // seam step vs a typical step: ~1 means invisible
-      out.popRatio = +(mx / Math.max(med, 0.02)).toFixed(2);
+      const moving = vs.filter(v => v > 0.1 * mx), medMov = moving.length ? moving[Math.floor(moving.length / 2)] : med;
+      out.popRatio = +(mx / Math.max(medMov, 0.02)).toFixed(2); // max adjacent-frame change over the median among MOVING frames (holds excluded)
       // exposure at min / default / max quality (same phase, same params)
       const q = st.params.quality; if (q) { const ls = q.options.map(o => lumM(grab(0.31, { set: { quality: o.v } }))); out.exposureByQuality = ls.map(v => +v.toFixed(4)); out.exposureSpread = +(Math.max(...ls) / Math.max(Math.min(...ls), 1e-4) - 1).toFixed(3); }
       out.meanLuma = +lumM(grab(0.31)).toFixed(4);

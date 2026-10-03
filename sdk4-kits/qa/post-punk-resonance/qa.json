@@ -1,0 +1,129 @@
+{
+  "kit": "post-punk-resonance",
+  "version": "1.0.0",
+  "size": [
+    90,
+    160
+  ],
+  "renderer": "SwiftShader (software GL, headless Chromium)",
+  "note": "Metric definitions in tools/qa.mjs. Software timings and metrics are relative diagnostics, not device performance.",
+  "results": [
+    {
+      "id": "post-punk-hero",
+      "delta0_p1": 0,
+      "seamStep": 0,
+      "seamStepAfter": 0,
+      "velMedian": 0.848,
+      "velMax": 1.827,
+      "seamRatio": 0,
+      "popRatio": 1.36,
+      "meanLuma": 0.506,
+      "flashTilesOver3": 0,
+      "flashPairsMaxPerSec": 0
+    },
+    {
+      "id": "acid-carrier",
+      "delta0_p1": 0,
+      "seamStep": 0,
+      "seamStepAfter": 0,
+      "velMedian": 0.825,
+      "velMax": 2.377,
+      "seamRatio": 0,
+      "popRatio": 1.18,
+      "meanLuma": 0.5977,
+      "flashTilesOver3": 0,
+      "flashPairsMaxPerSec": 0
+    },
+    {
+      "id": "red-signal",
+      "delta0_p1": 0,
+      "seamStep": 0,
+      "seamStepAfter": 0,
+      "velMedian": 0.353,
+      "velMax": 0.89,
+      "seamRatio": 0,
+      "popRatio": 1.14,
+      "meanLuma": 0.5801,
+      "flashTilesOver3": 0,
+      "flashPairsMaxPerSec": 0
+    },
+    {
+      "id": "broken-ring",
+      "delta0_p1": 0,
+      "seamStep": 0,
+      "seamStepAfter": 0,
+      "velMedian": 1.228,
+      "velMax": 3.106,
+      "seamRatio": 0,
+      "popRatio": 1.36,
+      "meanLuma": 0.7057,
+      "flashTilesOver3": 0,
+      "flashPairsMaxPerSec": 0
+    },
+    {
+      "id": "blackout-geometry",
+      "delta0_p1": 0,
+      "seamStep": 0,
+      "seamStepAfter": 0,
+      "velMedian": 0.128,
+      "velMax": 0.409,
+      "seamRatio": 0,
+      "popRatio": 1.38,
+      "meanLuma": 0.7197,
+      "flashTilesOver3": 0,
+      "flashPairsMaxPerSec": 0
+    },
+    {
+      "id": "interference-cut",
+      "delta0_p1": 0,
+      "seamStep": 0,
+      "seamStepAfter": 0,
+      "velMedian": 1.243,
+      "velMax": 3.696,
+      "seamRatio": 0,
+      "popRatio": 1.46,
+      "meanLuma": 0.5042,
+      "flashTilesOver3": 0,
+      "flashPairsMaxPerSec": 0
+    },
+    {
+      "id": "stepped-oscillator",
+      "delta0_p1": 0,
+      "seamStep": 0,
+      "seamStepAfter": 0,
+      "velMedian": 0,
+      "velMax": 0,
+      "seamRatio": 0,
+      "popRatio": 0,
+      "meanLuma": 0.1773,
+      "flashTilesOver3": 0,
+      "flashPairsMaxPerSec": 0
+    },
+    {
+      "id": "graphic-feedback",
+      "delta0_p1": 0,
+      "seamStep": 0,
+      "seamStepAfter": 0,
+      "velMedian": 0.915,
+      "velMax": 4.282,
+      "seamRatio": 0,
+      "popRatio": 1.52,
+      "meanLuma": 0.6795,
+      "flashTilesOver3": 0,
+      "flashPairsMaxPerSec": 0
+    },
+    {
+      "id": "quiet-noise",
+      "delta0_p1": 0,
+      "seamStep": 0,
+      "seamStepAfter": 0,
+      "velMedian": 0.004,
+      "velMax": 0.266,
+      "seamRatio": 0,
+      "popRatio": 1.42,
+      "meanLuma": 0.7539,
+      "flashTilesOver3": 0,
+      "flashPairsMaxPerSec": 0
+    }
+  ]
+}

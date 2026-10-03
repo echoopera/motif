@@ -1,0 +1,1329 @@
+{
+  "format": "motif-kit@4",
+  "id": "post-punk-resonance",
+  "name": "Post-Punk Resonance",
+  "version": "1.0.0",
+  "author": "Motif",
+  "description": "Acid yellow, red, black and warm white: stripes, ring bands and wave traces with strong negative shapes, moved on two or four clear beats with long rests. No grain, no strobe. Nine seamless infinite loops.",
+  "license": "",
+  "accent": "#E6F000",
+  "common": "common.glsl",
+  "palettes": [
+    {
+      "id": "acid-warm",
+      "name": "Acid Warm",
+      "bg": "#EEE6AE",
+      "ink": "#05050A",
+      "a": [
+        "#F0120A",
+        "#F2E800",
+        "#8A8460"
+      ]
+    },
+    {
+      "id": "bone-red",
+      "name": "Bone Red",
+      "bg": "#EFEBE0",
+      "ink": "#0A0A0C",
+      "a": [
+        "#E1180E",
+        "#FFD400",
+        "#8E8A7A"
+      ]
+    },
+    {
+      "id": "signal-night",
+      "name": "Signal Night",
+      "bg": "#0B0B0F",
+      "ink": "#F4F0E4",
+      "a": [
+        "#FF2A1C",
+        "#E8F20A",
+        "#5A5A60"
+      ]
+    },
+    {
+      "id": "pink-black",
+      "name": "Pink Black",
+      "bg": "#F3E2DA",
+      "ink": "#0C0A0C",
+      "a": [
+        "#E82A6A",
+        "#F6E400",
+        "#9A8A86"
+      ]
+    }
+  ],
+  "styles": [
+    {
+      "id": "post-punk-hero",
+      "name": "Post-Punk Resonance Hero",
+      "group": "Post-Punk Resonance",
+      "tags": [
+        "flagship",
+        "stripes",
+        "rings"
+      ],
+      "blurb": "Stripes, black ring bands, a red wave cut and an acid-yellow slab step to new poses on two beats.",
+      "palette": "acid-warm",
+      "flash": false,
+      "cost": 1,
+      "passes": [
+        {
+          "src": "styles/post-punk-hero.glsl"
+        }
+      ],
+      "params": {
+        "pitch": {
+          "type": "range",
+          "label": "Stripe pitch",
+          "min": 4,
+          "max": 28,
+          "def": 12,
+          "step": 0.5,
+          "group": "Form",
+          "unit": "px",
+          "hint": "Stripe period in screen pixels. Filtered, so it stays clean as it changes."
+        },
+        "rings": {
+          "type": "int",
+          "label": "Ring count",
+          "min": 3,
+          "max": 12,
+          "def": 6,
+          "group": "Form",
+          "hint": "Number of black ring bands. A spatial count.",
+          "mutate": 0.3
+        },
+        "wave": {
+          "type": "range",
+          "label": "Wave amplitude",
+          "min": 0.02,
+          "max": 0.3,
+          "def": 0.14,
+          "step": 0.0014,
+          "group": "Form",
+          "hint": "Height of the wave traces, scene units."
+        },
+        "trace": {
+          "type": "range",
+          "label": "Trace width",
+          "min": 1,
+          "max": 8,
+          "def": 3,
+          "step": 0.1,
+          "group": "Material",
+          "unit": "px",
+          "hint": "Line weight of wave traces in screen pixels."
+        },
+        "black": {
+          "type": "range",
+          "label": "Black area",
+          "min": 0.2,
+          "max": 0.7,
+          "def": 0.45,
+          "step": 0.0025,
+          "group": "Material",
+          "hint": "How much of the composition is black."
+        },
+        "accent": {
+          "type": "range",
+          "label": "Accent area",
+          "min": 0.05,
+          "max": 0.35,
+          "def": 0.15,
+          "step": 0.0015,
+          "group": "Material",
+          "hint": "Size of the yellow and red accents."
+        },
+        "slice": {
+          "type": "range",
+          "label": "Slice displacement",
+          "min": 0,
+          "max": 0.25,
+          "def": 0.09,
+          "step": 0.0013,
+          "group": "Motion",
+          "hint": "Horizontal slices shift during moves and return to zero at rest."
+        },
+        "hold": {
+          "type": "range",
+          "label": "Hold fraction",
+          "min": 0.15,
+          "max": 0.65,
+          "def": 0.35,
+          "step": 0.0025,
+          "group": "Motion",
+          "hint": "Share of each beat spent at rest."
+        },
+        "beats": {
+          "type": "int",
+          "label": "Beats per loop",
+          "min": 1,
+          "max": 4,
+          "def": 2,
+          "group": "Motion",
+          "hint": "Rhythmic segments per loop. Each beat eases to the next pose.",
+          "mutate": 0
+        },
+        "stepped": {
+          "type": "toggle",
+          "label": "On twos",
+          "def": false,
+          "group": "Motion",
+          "hint": "Hold each move in six stepped poses, like animation on twos."
+        },
+        "exposure": {
+          "type": "range",
+          "label": "Exposure",
+          "min": 0.7,
+          "max": 1.4,
+          "def": 1,
+          "step": 0.01,
+          "unit": "×",
+          "group": "Light",
+          "hint": "Overall level of the printed colours."
+        },
+        "vignette": {
+          "type": "range",
+          "label": "Vignette",
+          "min": 0,
+          "max": 0.5,
+          "def": 0,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Darkens the frame edge. Off by default for graphic work.",
+          "randMax": 0.2
+        }
+      }
+    },
+    {
+      "id": "acid-carrier",
+      "name": "Acid Carrier",
+      "group": "Post-Punk Resonance",
+      "tags": [
+        "yellow",
+        "traces"
+      ],
+      "blurb": "An acid-yellow field carrying stacked black wave traces, each at its own phase.",
+      "palette": "acid-warm",
+      "flash": false,
+      "cost": 1,
+      "passes": [
+        {
+          "src": "styles/acid-carrier.glsl"
+        }
+      ],
+      "params": {
+        "pitch": {
+          "type": "range",
+          "label": "Stripe pitch",
+          "min": 4,
+          "max": 28,
+          "def": 12,
+          "step": 0.5,
+          "group": "Form",
+          "unit": "px",
+          "hint": "Stripe period in screen pixels. Filtered, so it stays clean as it changes."
+        },
+        "rings": {
+          "type": "int",
+          "label": "Ring count",
+          "min": 3,
+          "max": 12,
+          "def": 6,
+          "group": "Form",
+          "hint": "Number of black ring bands. A spatial count.",
+          "mutate": 0.3
+        },
+        "wave": {
+          "type": "range",
+          "label": "Wave amplitude",
+          "min": 0.02,
+          "max": 0.3,
+          "def": 0.06,
+          "step": 0.0014,
+          "group": "Form",
+          "hint": "Height of the wave traces, scene units."
+        },
+        "trace": {
+          "type": "range",
+          "label": "Trace width",
+          "min": 1,
+          "max": 8,
+          "def": 2.5,
+          "step": 0.1,
+          "group": "Material",
+          "unit": "px",
+          "hint": "Line weight of wave traces in screen pixels."
+        },
+        "black": {
+          "type": "range",
+          "label": "Black area",
+          "min": 0.2,
+          "max": 0.7,
+          "def": 0.45,
+          "step": 0.0025,
+          "group": "Material",
+          "hint": "How much of the composition is black."
+        },
+        "accent": {
+          "type": "range",
+          "label": "Accent area",
+          "min": 0.05,
+          "max": 0.35,
+          "def": 0.15,
+          "step": 0.0015,
+          "group": "Material",
+          "hint": "Size of the yellow and red accents."
+        },
+        "slice": {
+          "type": "range",
+          "label": "Slice displacement",
+          "min": 0,
+          "max": 0.25,
+          "def": 0.09,
+          "step": 0.0013,
+          "group": "Motion",
+          "hint": "Horizontal slices shift during moves and return to zero at rest."
+        },
+        "hold": {
+          "type": "range",
+          "label": "Hold fraction",
+          "min": 0.15,
+          "max": 0.65,
+          "def": 0.35,
+          "step": 0.0025,
+          "group": "Motion",
+          "hint": "Share of each beat spent at rest."
+        },
+        "beats": {
+          "type": "int",
+          "label": "Beats per loop",
+          "min": 1,
+          "max": 4,
+          "def": 2,
+          "group": "Motion",
+          "hint": "Rhythmic segments per loop. Each beat eases to the next pose.",
+          "mutate": 0
+        },
+        "stepped": {
+          "type": "toggle",
+          "label": "On twos",
+          "def": false,
+          "group": "Motion",
+          "hint": "Hold each move in six stepped poses, like animation on twos."
+        },
+        "exposure": {
+          "type": "range",
+          "label": "Exposure",
+          "min": 0.7,
+          "max": 1.4,
+          "def": 1,
+          "step": 0.01,
+          "unit": "×",
+          "group": "Light",
+          "hint": "Overall level of the printed colours."
+        },
+        "vignette": {
+          "type": "range",
+          "label": "Vignette",
+          "min": 0,
+          "max": 0.5,
+          "def": 0,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Darkens the frame edge. Off by default for graphic work.",
+          "randMax": 0.2
+        }
+      }
+    },
+    {
+      "id": "red-signal",
+      "name": "Red Signal",
+      "group": "Post-Punk Resonance",
+      "tags": [
+        "red",
+        "signal"
+      ],
+      "blurb": "A red disc behind triangular signal traces and a black bar; the signals shift on each beat.",
+      "palette": "bone-red",
+      "flash": false,
+      "cost": 1,
+      "passes": [
+        {
+          "src": "styles/red-signal.glsl"
+        }
+      ],
+      "params": {
+        "pitch": {
+          "type": "range",
+          "label": "Stripe pitch",
+          "min": 4,
+          "max": 28,
+          "def": 12,
+          "step": 0.5,
+          "group": "Form",
+          "unit": "px",
+          "hint": "Stripe period in screen pixels. Filtered, so it stays clean as it changes."
+        },
+        "rings": {
+          "type": "int",
+          "label": "Ring count",
+          "min": 3,
+          "max": 12,
+          "def": 6,
+          "group": "Form",
+          "hint": "Number of black ring bands. A spatial count.",
+          "mutate": 0.3
+        },
+        "wave": {
+          "type": "range",
+          "label": "Wave amplitude",
+          "min": 0.02,
+          "max": 0.3,
+          "def": 0.14,
+          "step": 0.0014,
+          "group": "Form",
+          "hint": "Height of the wave traces, scene units."
+        },
+        "trace": {
+          "type": "range",
+          "label": "Trace width",
+          "min": 1,
+          "max": 8,
+          "def": 3.5,
+          "step": 0.1,
+          "group": "Material",
+          "unit": "px",
+          "hint": "Line weight of wave traces in screen pixels."
+        },
+        "black": {
+          "type": "range",
+          "label": "Black area",
+          "min": 0.2,
+          "max": 0.7,
+          "def": 0.45,
+          "step": 0.0025,
+          "group": "Material",
+          "hint": "How much of the composition is black."
+        },
+        "accent": {
+          "type": "range",
+          "label": "Accent area",
+          "min": 0.05,
+          "max": 0.35,
+          "def": 0.2,
+          "step": 0.0015,
+          "group": "Material",
+          "hint": "Size of the yellow and red accents."
+        },
+        "slice": {
+          "type": "range",
+          "label": "Slice displacement",
+          "min": 0,
+          "max": 0.25,
+          "def": 0.09,
+          "step": 0.0013,
+          "group": "Motion",
+          "hint": "Horizontal slices shift during moves and return to zero at rest."
+        },
+        "hold": {
+          "type": "range",
+          "label": "Hold fraction",
+          "min": 0.15,
+          "max": 0.65,
+          "def": 0.35,
+          "step": 0.0025,
+          "group": "Motion",
+          "hint": "Share of each beat spent at rest."
+        },
+        "beats": {
+          "type": "int",
+          "label": "Beats per loop",
+          "min": 1,
+          "max": 4,
+          "def": 2,
+          "group": "Motion",
+          "hint": "Rhythmic segments per loop. Each beat eases to the next pose.",
+          "mutate": 0
+        },
+        "stepped": {
+          "type": "toggle",
+          "label": "On twos",
+          "def": false,
+          "group": "Motion",
+          "hint": "Hold each move in six stepped poses, like animation on twos."
+        },
+        "exposure": {
+          "type": "range",
+          "label": "Exposure",
+          "min": 0.7,
+          "max": 1.4,
+          "def": 1,
+          "step": 0.01,
+          "unit": "×",
+          "group": "Light",
+          "hint": "Overall level of the printed colours."
+        },
+        "vignette": {
+          "type": "range",
+          "label": "Vignette",
+          "min": 0,
+          "max": 0.5,
+          "def": 0,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Darkens the frame edge. Off by default for graphic work.",
+          "randMax": 0.2
+        }
+      }
+    },
+    {
+      "id": "broken-ring",
+      "name": "Broken Ring",
+      "group": "Post-Punk Resonance",
+      "tags": [
+        "rings",
+        "arcs"
+      ],
+      "blurb": "Concentric black rings broken into segments that turn to new positions beat by beat.",
+      "palette": "bone-red",
+      "flash": false,
+      "cost": 1,
+      "passes": [
+        {
+          "src": "styles/broken-ring.glsl"
+        }
+      ],
+      "params": {
+        "pitch": {
+          "type": "range",
+          "label": "Stripe pitch",
+          "min": 4,
+          "max": 28,
+          "def": 12,
+          "step": 0.5,
+          "group": "Form",
+          "unit": "px",
+          "hint": "Stripe period in screen pixels. Filtered, so it stays clean as it changes."
+        },
+        "rings": {
+          "type": "int",
+          "label": "Ring count",
+          "min": 3,
+          "max": 12,
+          "def": 8,
+          "group": "Form",
+          "hint": "Number of black ring bands. A spatial count.",
+          "mutate": 0.3
+        },
+        "wave": {
+          "type": "range",
+          "label": "Wave amplitude",
+          "min": 0.02,
+          "max": 0.3,
+          "def": 0.14,
+          "step": 0.0014,
+          "group": "Form",
+          "hint": "Height of the wave traces, scene units."
+        },
+        "trace": {
+          "type": "range",
+          "label": "Trace width",
+          "min": 1,
+          "max": 8,
+          "def": 3,
+          "step": 0.1,
+          "group": "Material",
+          "unit": "px",
+          "hint": "Line weight of wave traces in screen pixels."
+        },
+        "black": {
+          "type": "range",
+          "label": "Black area",
+          "min": 0.2,
+          "max": 0.7,
+          "def": 0.5,
+          "step": 0.0025,
+          "group": "Material",
+          "hint": "How much of the composition is black."
+        },
+        "accent": {
+          "type": "range",
+          "label": "Accent area",
+          "min": 0.05,
+          "max": 0.35,
+          "def": 0.15,
+          "step": 0.0015,
+          "group": "Material",
+          "hint": "Size of the yellow and red accents."
+        },
+        "slice": {
+          "type": "range",
+          "label": "Slice displacement",
+          "min": 0,
+          "max": 0.25,
+          "def": 0.09,
+          "step": 0.0013,
+          "group": "Motion",
+          "hint": "Horizontal slices shift during moves and return to zero at rest."
+        },
+        "hold": {
+          "type": "range",
+          "label": "Hold fraction",
+          "min": 0.15,
+          "max": 0.65,
+          "def": 0.3,
+          "step": 0.0025,
+          "group": "Motion",
+          "hint": "Share of each beat spent at rest."
+        },
+        "beats": {
+          "type": "int",
+          "label": "Beats per loop",
+          "min": 1,
+          "max": 4,
+          "def": 4,
+          "group": "Motion",
+          "hint": "Rhythmic segments per loop. Each beat eases to the next pose.",
+          "mutate": 0
+        },
+        "stepped": {
+          "type": "toggle",
+          "label": "On twos",
+          "def": false,
+          "group": "Motion",
+          "hint": "Hold each move in six stepped poses, like animation on twos."
+        },
+        "exposure": {
+          "type": "range",
+          "label": "Exposure",
+          "min": 0.7,
+          "max": 1.4,
+          "def": 1,
+          "step": 0.01,
+          "unit": "×",
+          "group": "Light",
+          "hint": "Overall level of the printed colours."
+        },
+        "vignette": {
+          "type": "range",
+          "label": "Vignette",
+          "min": 0,
+          "max": 0.5,
+          "def": 0,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Darkens the frame edge. Off by default for graphic work.",
+          "randMax": 0.2
+        }
+      }
+    },
+    {
+      "id": "blackout-geometry",
+      "name": "Blackout Geometry",
+      "group": "Post-Punk Resonance",
+      "tags": [
+        "black",
+        "negative"
+      ],
+      "blurb": "Black ground with warm-white geometry cut out of it: circle, triangle and a sliding red bar.",
+      "palette": "signal-night",
+      "flash": false,
+      "cost": 1,
+      "passes": [
+        {
+          "src": "styles/blackout-geometry.glsl"
+        }
+      ],
+      "params": {
+        "pitch": {
+          "type": "range",
+          "label": "Stripe pitch",
+          "min": 4,
+          "max": 28,
+          "def": 12,
+          "step": 0.5,
+          "group": "Form",
+          "unit": "px",
+          "hint": "Stripe period in screen pixels. Filtered, so it stays clean as it changes."
+        },
+        "rings": {
+          "type": "int",
+          "label": "Ring count",
+          "min": 3,
+          "max": 12,
+          "def": 6,
+          "group": "Form",
+          "hint": "Number of black ring bands. A spatial count.",
+          "mutate": 0.3
+        },
+        "wave": {
+          "type": "range",
+          "label": "Wave amplitude",
+          "min": 0.02,
+          "max": 0.3,
+          "def": 0.14,
+          "step": 0.0014,
+          "group": "Form",
+          "hint": "Height of the wave traces, scene units."
+        },
+        "trace": {
+          "type": "range",
+          "label": "Trace width",
+          "min": 1,
+          "max": 8,
+          "def": 3,
+          "step": 0.1,
+          "group": "Material",
+          "unit": "px",
+          "hint": "Line weight of wave traces in screen pixels."
+        },
+        "black": {
+          "type": "range",
+          "label": "Black area",
+          "min": 0.2,
+          "max": 0.7,
+          "def": 0.45,
+          "step": 0.0025,
+          "group": "Material",
+          "hint": "How much of the composition is black."
+        },
+        "accent": {
+          "type": "range",
+          "label": "Accent area",
+          "min": 0.05,
+          "max": 0.35,
+          "def": 0.18,
+          "step": 0.0015,
+          "group": "Material",
+          "hint": "Size of the yellow and red accents."
+        },
+        "slice": {
+          "type": "range",
+          "label": "Slice displacement",
+          "min": 0,
+          "max": 0.25,
+          "def": 0.09,
+          "step": 0.0013,
+          "group": "Motion",
+          "hint": "Horizontal slices shift during moves and return to zero at rest."
+        },
+        "hold": {
+          "type": "range",
+          "label": "Hold fraction",
+          "min": 0.15,
+          "max": 0.65,
+          "def": 0.4,
+          "step": 0.0025,
+          "group": "Motion",
+          "hint": "Share of each beat spent at rest."
+        },
+        "beats": {
+          "type": "int",
+          "label": "Beats per loop",
+          "min": 1,
+          "max": 4,
+          "def": 2,
+          "group": "Motion",
+          "hint": "Rhythmic segments per loop. Each beat eases to the next pose.",
+          "mutate": 0
+        },
+        "stepped": {
+          "type": "toggle",
+          "label": "On twos",
+          "def": false,
+          "group": "Motion",
+          "hint": "Hold each move in six stepped poses, like animation on twos."
+        },
+        "exposure": {
+          "type": "range",
+          "label": "Exposure",
+          "min": 0.7,
+          "max": 1.4,
+          "def": 1,
+          "step": 0.01,
+          "unit": "×",
+          "group": "Light",
+          "hint": "Overall level of the printed colours."
+        },
+        "vignette": {
+          "type": "range",
+          "label": "Vignette",
+          "min": 0,
+          "max": 0.5,
+          "def": 0,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Darkens the frame edge. Off by default for graphic work.",
+          "randMax": 0.2
+        }
+      }
+    },
+    {
+      "id": "interference-cut",
+      "name": "Interference Cut",
+      "group": "Post-Punk Resonance",
+      "tags": [
+        "stripes",
+        "interference"
+      ],
+      "blurb": "Two stripe fields at a slight angle, cut along a diagonal that moves; moiré is bounded by design.",
+      "palette": "pink-black",
+      "flash": false,
+      "cost": 1,
+      "passes": [
+        {
+          "src": "styles/interference-cut.glsl"
+        }
+      ],
+      "params": {
+        "pitch": {
+          "type": "range",
+          "label": "Stripe pitch",
+          "min": 4,
+          "max": 28,
+          "def": 9,
+          "step": 0.5,
+          "group": "Form",
+          "unit": "px",
+          "hint": "Stripe period in screen pixels. Filtered, so it stays clean as it changes."
+        },
+        "rings": {
+          "type": "int",
+          "label": "Ring count",
+          "min": 3,
+          "max": 12,
+          "def": 6,
+          "group": "Form",
+          "hint": "Number of black ring bands. A spatial count.",
+          "mutate": 0.3
+        },
+        "wave": {
+          "type": "range",
+          "label": "Wave amplitude",
+          "min": 0.02,
+          "max": 0.3,
+          "def": 0.14,
+          "step": 0.0014,
+          "group": "Form",
+          "hint": "Height of the wave traces, scene units."
+        },
+        "trace": {
+          "type": "range",
+          "label": "Trace width",
+          "min": 1,
+          "max": 8,
+          "def": 3,
+          "step": 0.1,
+          "group": "Material",
+          "unit": "px",
+          "hint": "Line weight of wave traces in screen pixels."
+        },
+        "black": {
+          "type": "range",
+          "label": "Black area",
+          "min": 0.2,
+          "max": 0.7,
+          "def": 0.45,
+          "step": 0.0025,
+          "group": "Material",
+          "hint": "How much of the composition is black."
+        },
+        "accent": {
+          "type": "range",
+          "label": "Accent area",
+          "min": 0.05,
+          "max": 0.35,
+          "def": 0.16,
+          "step": 0.0015,
+          "group": "Material",
+          "hint": "Size of the yellow and red accents."
+        },
+        "slice": {
+          "type": "range",
+          "label": "Slice displacement",
+          "min": 0,
+          "max": 0.25,
+          "def": 0.09,
+          "step": 0.0013,
+          "group": "Motion",
+          "hint": "Horizontal slices shift during moves and return to zero at rest."
+        },
+        "hold": {
+          "type": "range",
+          "label": "Hold fraction",
+          "min": 0.15,
+          "max": 0.65,
+          "def": 0.35,
+          "step": 0.0025,
+          "group": "Motion",
+          "hint": "Share of each beat spent at rest."
+        },
+        "beats": {
+          "type": "int",
+          "label": "Beats per loop",
+          "min": 1,
+          "max": 4,
+          "def": 2,
+          "group": "Motion",
+          "hint": "Rhythmic segments per loop. Each beat eases to the next pose.",
+          "mutate": 0
+        },
+        "stepped": {
+          "type": "toggle",
+          "label": "On twos",
+          "def": false,
+          "group": "Motion",
+          "hint": "Hold each move in six stepped poses, like animation on twos."
+        },
+        "exposure": {
+          "type": "range",
+          "label": "Exposure",
+          "min": 0.7,
+          "max": 1.4,
+          "def": 1,
+          "step": 0.01,
+          "unit": "×",
+          "group": "Light",
+          "hint": "Overall level of the printed colours."
+        },
+        "vignette": {
+          "type": "range",
+          "label": "Vignette",
+          "min": 0,
+          "max": 0.5,
+          "def": 0,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Darkens the frame edge. Off by default for graphic work.",
+          "randMax": 0.2
+        }
+      }
+    },
+    {
+      "id": "stepped-oscillator",
+      "name": "Stepped Oscillator",
+      "group": "Post-Punk Resonance",
+      "tags": [
+        "oscillator",
+        "stepped"
+      ],
+      "blurb": "Pixel-stepped oscilloscope traces that jump pose on every beat, always animated on twos.",
+      "palette": "signal-night",
+      "flash": false,
+      "cost": 1,
+      "passes": [
+        {
+          "src": "styles/stepped-oscillator.glsl"
+        }
+      ],
+      "params": {
+        "pitch": {
+          "type": "range",
+          "label": "Stripe pitch",
+          "min": 4,
+          "max": 28,
+          "def": 12,
+          "step": 0.5,
+          "group": "Form",
+          "unit": "px",
+          "hint": "Stripe period in screen pixels. Filtered, so it stays clean as it changes."
+        },
+        "rings": {
+          "type": "int",
+          "label": "Ring count",
+          "min": 3,
+          "max": 12,
+          "def": 6,
+          "group": "Form",
+          "hint": "Number of black ring bands. A spatial count.",
+          "mutate": 0.3
+        },
+        "wave": {
+          "type": "range",
+          "label": "Wave amplitude",
+          "min": 0.02,
+          "max": 0.3,
+          "def": 0.1,
+          "step": 0.0014,
+          "group": "Form",
+          "hint": "Height of the wave traces, scene units."
+        },
+        "trace": {
+          "type": "range",
+          "label": "Trace width",
+          "min": 1,
+          "max": 8,
+          "def": 2.2,
+          "step": 0.1,
+          "group": "Material",
+          "unit": "px",
+          "hint": "Line weight of wave traces in screen pixels."
+        },
+        "black": {
+          "type": "range",
+          "label": "Black area",
+          "min": 0.2,
+          "max": 0.7,
+          "def": 0.45,
+          "step": 0.0025,
+          "group": "Material",
+          "hint": "How much of the composition is black."
+        },
+        "accent": {
+          "type": "range",
+          "label": "Accent area",
+          "min": 0.05,
+          "max": 0.35,
+          "def": 0.15,
+          "step": 0.0015,
+          "group": "Material",
+          "hint": "Size of the yellow and red accents."
+        },
+        "slice": {
+          "type": "range",
+          "label": "Slice displacement",
+          "min": 0,
+          "max": 0.25,
+          "def": 0.09,
+          "step": 0.0013,
+          "group": "Motion",
+          "hint": "Horizontal slices shift during moves and return to zero at rest."
+        },
+        "hold": {
+          "type": "range",
+          "label": "Hold fraction",
+          "min": 0.15,
+          "max": 0.65,
+          "def": 0.35,
+          "step": 0.0025,
+          "group": "Motion",
+          "hint": "Share of each beat spent at rest."
+        },
+        "beats": {
+          "type": "int",
+          "label": "Beats per loop",
+          "min": 1,
+          "max": 4,
+          "def": 4,
+          "group": "Motion",
+          "hint": "Rhythmic segments per loop. Each beat eases to the next pose.",
+          "mutate": 0
+        },
+        "stepped": {
+          "type": "toggle",
+          "label": "On twos",
+          "def": true,
+          "group": "Motion",
+          "hint": "Hold each move in six stepped poses, like animation on twos."
+        },
+        "exposure": {
+          "type": "range",
+          "label": "Exposure",
+          "min": 0.7,
+          "max": 1.4,
+          "def": 1,
+          "step": 0.01,
+          "unit": "×",
+          "group": "Light",
+          "hint": "Overall level of the printed colours."
+        },
+        "vignette": {
+          "type": "range",
+          "label": "Vignette",
+          "min": 0,
+          "max": 0.5,
+          "def": 0,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Darkens the frame edge. Off by default for graphic work.",
+          "randMax": 0.2
+        }
+      }
+    },
+    {
+      "id": "graphic-feedback",
+      "name": "Graphic Feedback",
+      "group": "Post-Punk Resonance",
+      "tags": [
+        "tunnel",
+        "nested"
+      ],
+      "blurb": "Nested rectangles shrink toward the centre, one full level per loop, in black, red and yellow.",
+      "palette": "bone-red",
+      "flash": false,
+      "cost": 1,
+      "passes": [
+        {
+          "src": "styles/graphic-feedback.glsl"
+        }
+      ],
+      "params": {
+        "pitch": {
+          "type": "range",
+          "label": "Stripe pitch",
+          "min": 4,
+          "max": 28,
+          "def": 12,
+          "step": 0.5,
+          "group": "Form",
+          "unit": "px",
+          "hint": "Stripe period in screen pixels. Filtered, so it stays clean as it changes."
+        },
+        "rings": {
+          "type": "int",
+          "label": "Ring count",
+          "min": 3,
+          "max": 12,
+          "def": 6,
+          "group": "Form",
+          "hint": "Number of black ring bands. A spatial count.",
+          "mutate": 0.3
+        },
+        "wave": {
+          "type": "range",
+          "label": "Wave amplitude",
+          "min": 0.02,
+          "max": 0.3,
+          "def": 0.14,
+          "step": 0.0014,
+          "group": "Form",
+          "hint": "Height of the wave traces, scene units."
+        },
+        "trace": {
+          "type": "range",
+          "label": "Trace width",
+          "min": 1,
+          "max": 8,
+          "def": 3,
+          "step": 0.1,
+          "group": "Material",
+          "unit": "px",
+          "hint": "Line weight of wave traces in screen pixels."
+        },
+        "black": {
+          "type": "range",
+          "label": "Black area",
+          "min": 0.2,
+          "max": 0.7,
+          "def": 0.45,
+          "step": 0.0025,
+          "group": "Material",
+          "hint": "How much of the composition is black."
+        },
+        "accent": {
+          "type": "range",
+          "label": "Accent area",
+          "min": 0.05,
+          "max": 0.35,
+          "def": 0.2,
+          "step": 0.0015,
+          "group": "Material",
+          "hint": "Size of the yellow and red accents."
+        },
+        "slice": {
+          "type": "range",
+          "label": "Slice displacement",
+          "min": 0,
+          "max": 0.25,
+          "def": 0.09,
+          "step": 0.0013,
+          "group": "Motion",
+          "hint": "Horizontal slices shift during moves and return to zero at rest."
+        },
+        "hold": {
+          "type": "range",
+          "label": "Hold fraction",
+          "min": 0.15,
+          "max": 0.65,
+          "def": 0.35,
+          "step": 0.0025,
+          "group": "Motion",
+          "hint": "Share of each beat spent at rest."
+        },
+        "beats": {
+          "type": "int",
+          "label": "Beats per loop",
+          "min": 1,
+          "max": 4,
+          "def": 2,
+          "group": "Motion",
+          "hint": "Rhythmic segments per loop. Each beat eases to the next pose.",
+          "mutate": 0
+        },
+        "stepped": {
+          "type": "toggle",
+          "label": "On twos",
+          "def": false,
+          "group": "Motion",
+          "hint": "Hold each move in six stepped poses, like animation on twos."
+        },
+        "exposure": {
+          "type": "range",
+          "label": "Exposure",
+          "min": 0.7,
+          "max": 1.4,
+          "def": 1,
+          "step": 0.01,
+          "unit": "×",
+          "group": "Light",
+          "hint": "Overall level of the printed colours."
+        },
+        "vignette": {
+          "type": "range",
+          "label": "Vignette",
+          "min": 0,
+          "max": 0.5,
+          "def": 0,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Darkens the frame edge. Off by default for graphic work.",
+          "randMax": 0.2
+        }
+      }
+    },
+    {
+      "id": "quiet-noise",
+      "name": "Quiet Noise",
+      "group": "Post-Punk Resonance",
+      "tags": [
+        "halftone",
+        "calm"
+      ],
+      "blurb": "A structured halftone field that breathes slowly. Noise as pattern, never grain.",
+      "palette": "bone-red",
+      "flash": false,
+      "cost": 1,
+      "passes": [
+        {
+          "src": "styles/quiet-noise.glsl"
+        }
+      ],
+      "params": {
+        "pitch": {
+          "type": "range",
+          "label": "Stripe pitch",
+          "min": 4,
+          "max": 28,
+          "def": 12,
+          "step": 0.5,
+          "group": "Form",
+          "unit": "px",
+          "hint": "Stripe period in screen pixels. Filtered, so it stays clean as it changes."
+        },
+        "rings": {
+          "type": "int",
+          "label": "Ring count",
+          "min": 3,
+          "max": 12,
+          "def": 6,
+          "group": "Form",
+          "hint": "Number of black ring bands. A spatial count.",
+          "mutate": 0.3
+        },
+        "wave": {
+          "type": "range",
+          "label": "Wave amplitude",
+          "min": 0.02,
+          "max": 0.3,
+          "def": 0.14,
+          "step": 0.0014,
+          "group": "Form",
+          "hint": "Height of the wave traces, scene units."
+        },
+        "trace": {
+          "type": "range",
+          "label": "Trace width",
+          "min": 1,
+          "max": 8,
+          "def": 3,
+          "step": 0.1,
+          "group": "Material",
+          "unit": "px",
+          "hint": "Line weight of wave traces in screen pixels."
+        },
+        "black": {
+          "type": "range",
+          "label": "Black area",
+          "min": 0.2,
+          "max": 0.7,
+          "def": 0.45,
+          "step": 0.0025,
+          "group": "Material",
+          "hint": "How much of the composition is black."
+        },
+        "accent": {
+          "type": "range",
+          "label": "Accent area",
+          "min": 0.05,
+          "max": 0.35,
+          "def": 0.1,
+          "step": 0.0015,
+          "group": "Material",
+          "hint": "Size of the yellow and red accents."
+        },
+        "slice": {
+          "type": "range",
+          "label": "Slice displacement",
+          "min": 0,
+          "max": 0.25,
+          "def": 0,
+          "step": 0.0013,
+          "group": "Motion",
+          "hint": "Horizontal slices shift during moves and return to zero at rest."
+        },
+        "hold": {
+          "type": "range",
+          "label": "Hold fraction",
+          "min": 0.15,
+          "max": 0.65,
+          "def": 0.5,
+          "step": 0.0025,
+          "group": "Motion",
+          "hint": "Share of each beat spent at rest."
+        },
+        "beats": {
+          "type": "int",
+          "label": "Beats per loop",
+          "min": 1,
+          "max": 4,
+          "def": 1,
+          "group": "Motion",
+          "hint": "Rhythmic segments per loop. Each beat eases to the next pose.",
+          "mutate": 0
+        },
+        "stepped": {
+          "type": "toggle",
+          "label": "On twos",
+          "def": false,
+          "group": "Motion",
+          "hint": "Hold each move in six stepped poses, like animation on twos."
+        },
+        "exposure": {
+          "type": "range",
+          "label": "Exposure",
+          "min": 0.7,
+          "max": 1.4,
+          "def": 1,
+          "step": 0.01,
+          "unit": "×",
+          "group": "Light",
+          "hint": "Overall level of the printed colours."
+        },
+        "vignette": {
+          "type": "range",
+          "label": "Vignette",
+          "min": 0,
+          "max": 0.5,
+          "def": 0,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Darkens the frame edge. Off by default for graphic work.",
+          "randMax": 0.2
+        }
+      }
+    }
+  ]
+}
