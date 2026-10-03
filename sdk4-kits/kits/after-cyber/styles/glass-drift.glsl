@@ -43,7 +43,8 @@ vec3 ndPos(vec2 cid, float cs, int variant, float th, out float s, out float wgt
 }
 
 // project a sheet point through the pose matrix and perspective
-vec2 ndProj(vec3 p, mat3 M, out float z) { vec3 w = M * p; z = w.z; return w.xy / (1.0 + 0.45 * w.z) * 0.86; }
+const vec2 AOFF = vec2(0.0, -0.02);                                            // centres the tilted sheet under the glass
+vec2 ndProj(vec3 p, mat3 M, out float z) { vec3 w = M * p; z = w.z; return w.xy / (1.0 + 0.45 * w.z) * 0.86 + AOFF; }
 
 vec3 afterLattice(vec2 q, mat3 M, int variant, float th) {
   float px = k_px();
@@ -52,7 +53,7 @@ vec3 afterLattice(vec2 q, mat3 M, int variant, float th) {
   vec3 ro = vec3(0.0, 0.0, -1.0 / 0.45);                                       // matches ndProj: w.xy/(1+0.45 z)*1.12 -> camera at z = -1/0.45
   // plane z' = 0 in sheet space: n = M*(0,0,1), through the origin
   vec3 n = M * vec3(0.0, 0.0, 1.0);
-  vec3 d3 = vec3(q * 0.45 / 0.86, 1.0);                                          // ray through the pixel for ndProj's camera
+  vec3 d3 = vec3((q - AOFF) * 0.45 / 0.86, 1.0);                                          // ray through the pixel for ndProj's camera
   float den = dot(n, d3);
   float tt = dot(n, -ro) / max(abs(den), 1e-3) * sign(den + 1e-6);
   vec3 P = ro + d3 * tt;

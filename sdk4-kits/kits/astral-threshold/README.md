@@ -2,7 +2,7 @@
 
 Violet and ice-blue volumetric membranes: foreground curtains, middle sheets and a distant aperture. Step-normalised volume rendering. Nine seamless infinite loops.
 
-Format `motif-kit@4` - no capabilities declared - pass graph: scene (0.6) > glow A (0.25) > glow B (0.125) > output (1.0).
+Format `motif-kit@4` - no capabilities declared - pass graph: scene (0.85) > glow A (0.25) > glow B (0.125) > output (1.0).
 
 ## Styles
 

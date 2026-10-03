@@ -83,7 +83,7 @@ vec4 scene_main(vec2 uv, vec2 fc, int variant) {
   float emisK = p_emission * (variant == 8 ? 1.0 : 1.0);
   for (int i = 0; i < 56; i++) {
     if (i >= steps) break;
-    float t = (float(i) + 0.5 + (jit - 0.5) * 0.55) * ds;
+    float t = (float(i) + 0.5 + (jit - 0.5) * 0.9) * ds;
     vec3 pos = ro + rd * t;
     vec3 emc;
     float rho = astralRho(pos, layers, th, calm, emc, variant) * p_density;

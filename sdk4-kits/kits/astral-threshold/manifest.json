@@ -67,11 +67,11 @@
       "blurb": "Seven offset membranes recede to a distant aperture; the camera leans in and returns.",
       "palette": "violet-ice",
       "flash": false,
-      "cost": 3,
+      "cost": 4,
       "graph": {
         "buffers": {
           "scene": {
-            "scale": 0.6
+            "scale": 0.85
           },
           "glowA": {
             "scale": 0.25
@@ -296,11 +296,11 @@
       "blurb": "A longer, tighter passage: more layers and a deeper lean into the dark.",
       "palette": "violet-ice",
       "flash": false,
-      "cost": 3,
+      "cost": 4,
       "graph": {
         "buffers": {
           "scene": {
-            "scale": 0.6
+            "scale": 0.85
           },
           "glowA": {
             "scale": 0.25
@@ -525,11 +525,11 @@
       "blurb": "Wide, thin, cool veils: low emission and soft thickness, an airy threshold.",
       "palette": "mono-ice",
       "flash": false,
-      "cost": 3,
+      "cost": 4,
       "graph": {
         "buffers": {
           "scene": {
-            "scale": 0.6
+            "scale": 0.85
           },
           "glowA": {
             "scale": 0.25
@@ -754,11 +754,11 @@
       "blurb": "Sheets crease and fold like paper in light; glowing ridges follow the folds.",
       "palette": "ember-veil",
       "flash": false,
-      "cost": 3,
+      "cost": 4,
       "graph": {
         "buffers": {
           "scene": {
-            "scale": 0.6
+            "scale": 0.85
           },
           "glowA": {
             "scale": 0.25
@@ -983,11 +983,11 @@
       "blurb": "The structure is the strands: sparse long filaments streak toward a bright gate.",
       "palette": "aurora",
       "flash": false,
-      "cost": 3,
+      "cost": 4,
       "graph": {
         "buffers": {
           "scene": {
-            "scale": 0.6
+            "scale": 0.85
           },
           "glowA": {
             "scale": 0.25
@@ -1212,11 +1212,11 @@
       "blurb": "The tunnel opens into stacked horizontal curtains over a dark horizon, like a slow aurora.",
       "palette": "aurora",
       "flash": false,
-      "cost": 3,
+      "cost": 4,
       "graph": {
         "buffers": {
           "scene": {
-            "scale": 0.6
+            "scale": 0.85
           },
           "glowA": {
             "scale": 0.25
@@ -1441,11 +1441,11 @@
       "blurb": "The camera holds still while the membranes sway on closed orbits around each other.",
       "palette": "violet-ice",
       "flash": false,
-      "cost": 3,
+      "cost": 4,
       "graph": {
         "buffers": {
           "scene": {
-            "scale": 0.6
+            "scale": 0.85
           },
           "glowA": {
             "scale": 0.25
@@ -1670,11 +1670,11 @@
       "blurb": "Few membranes, almost black, one small brilliant aperture a long way off.",
       "palette": "mono-ice",
       "flash": false,
-      "cost": 3,
+      "cost": 4,
       "graph": {
         "buffers": {
           "scene": {
-            "scale": 0.6
+            "scale": 0.85
           },
           "glowA": {
             "scale": 0.25
@@ -1899,11 +1899,11 @@
       "blurb": "The softest crossing: low emission, small warp, slow pass. Made for text-safe backgrounds.",
       "palette": "violet-ice",
       "flash": false,
-      "cost": 3,
+      "cost": 4,
       "graph": {
         "buffers": {
           "scene": {
-            "scale": 0.6
+            "scale": 0.85
           },
           "glowA": {
             "scale": 0.25
