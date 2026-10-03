@@ -1,0 +1,2229 @@
+{
+  "format": "motif-kit@4",
+  "id": "after-cyber",
+  "name": "After Cyber",
+  "version": "1.0.0",
+  "author": "Motif",
+  "description": "Smoky glass, cyan hairlines, selective acid-lime particles in deep black: lattices that dissolve, travel and reassemble. Nine seamless infinite loops.",
+  "license": "",
+  "accent": "#C6F000",
+  "common": "common.glsl",
+  "palettes": [
+    {
+      "id": "smoke-cyan-lime",
+      "name": "Smoke Cyan Lime",
+      "bg": "#010608",
+      "ink": "#DDF8FF",
+      "a": [
+        "#22C8E8",
+        "#C6F000",
+        "#0B2A30"
+      ]
+    },
+    {
+      "id": "ink-ice",
+      "name": "Ink Ice",
+      "bg": "#02040A",
+      "ink": "#EAF2FF",
+      "a": [
+        "#7FB8FF",
+        "#E8FF6A",
+        "#101C36"
+      ]
+    },
+    {
+      "id": "dusk-magenta",
+      "name": "Dusk Magenta",
+      "bg": "#07030A",
+      "ink": "#F6E6FF",
+      "a": [
+        "#E04AD6",
+        "#B8FF3A",
+        "#2A0F3A"
+      ]
+    },
+    {
+      "id": "steel",
+      "name": "Steel",
+      "bg": "#040506",
+      "ink": "#E8EEF2",
+      "a": [
+        "#9FB4C0",
+        "#D4F23A",
+        "#1C262C"
+      ]
+    }
+  ],
+  "styles": [
+    {
+      "id": "after-cyber-hero",
+      "name": "After Cyber Hero",
+      "group": "After Cyber",
+      "tags": [
+        "flagship",
+        "lattice",
+        "glass"
+      ],
+      "blurb": "A cyan hairline lattice dissolves into lime particles, travels, and reassembles behind a smoky glass polyhedron.",
+      "palette": "smoke-cyan-lime",
+      "flash": false,
+      "cost": 3,
+      "graph": {
+        "buffers": {
+          "scene": {
+            "scale": 0.75
+          },
+          "glowA": {
+            "scale": 0.25
+          },
+          "glowB": {
+            "scale": 0.125
+          }
+        },
+        "passes": [
+          {
+            "src": "styles/after-cyber-hero.glsl",
+            "reads": [],
+            "writes": "scene"
+          },
+          {
+            "src": "styles/_glowA.glsl",
+            "reads": [
+              "scene"
+            ],
+            "writes": "glowA"
+          },
+          {
+            "src": "styles/_glowB.glsl",
+            "reads": [
+              "glowA"
+            ],
+            "writes": "glowB"
+          },
+          {
+            "src": "styles/_out.glsl",
+            "reads": [
+              "scene",
+              "glowA",
+              "glowB"
+            ],
+            "writes": "output"
+          }
+        ]
+      },
+      "params": {
+        "res": {
+          "type": "int",
+          "label": "Lattice resolution",
+          "min": 6,
+          "max": 18,
+          "def": 10,
+          "group": "Form",
+          "hint": "Nodes along each side of the lattice. A spatial count.",
+          "mutate": 0.3
+        },
+        "connect": {
+          "type": "range",
+          "label": "Connection radius",
+          "min": 0.03,
+          "max": 0.2,
+          "def": 0.09,
+          "step": 0.00085,
+          "group": "Form",
+          "hint": "Longest connection that stays fully drawn; longer links fade smoothly."
+        },
+        "disperse": {
+          "type": "range",
+          "label": "Dispersal radius",
+          "min": 0,
+          "max": 0.5,
+          "def": 0.2,
+          "step": 0.0025,
+          "group": "Form",
+          "hint": "How far nodes travel when they dissolve. Clamped to the lattice search window."
+        },
+        "edgeR": {
+          "type": "range",
+          "label": "Edge radius",
+          "min": 0.001,
+          "max": 0.01,
+          "def": 0.002,
+          "step": 0.000045,
+          "group": "Material",
+          "hint": "Radius of the cyan hairlines, scene units.",
+          "log": true
+        },
+        "glass": {
+          "type": "range",
+          "label": "Glass opacity",
+          "min": 0,
+          "max": 0.55,
+          "def": 0.16,
+          "step": 0.0028,
+          "group": "Material",
+          "hint": "Smoky tint inside the polyhedron."
+        },
+        "refr": {
+          "type": "range",
+          "label": "Refraction strength",
+          "min": 0,
+          "max": 0.12,
+          "def": 0.035,
+          "step": 0.0006,
+          "group": "Material",
+          "hint": "Screen-space offset of the lattice seen through facets. An approximation, not transport."
+        },
+        "particleR": {
+          "type": "range",
+          "label": "Particle radius",
+          "min": 0.001,
+          "max": 0.01,
+          "def": 0.003,
+          "step": 0.000045,
+          "group": "Particles",
+          "hint": "Node and particle radius, scene units.",
+          "log": true
+        },
+        "lime": {
+          "type": "range",
+          "label": "Lime fraction",
+          "min": 0,
+          "max": 0.35,
+          "def": 0.12,
+          "step": 0.0017,
+          "group": "Particles",
+          "hint": "Share of nodes that read as acid-lime particles."
+        },
+        "cycles": {
+          "type": "int",
+          "label": "Reconstructions per loop",
+          "min": 1,
+          "max": 3,
+          "def": 1,
+          "group": "Motion",
+          "hint": "Whole dissolve - transport - reassemble cycles per loop.",
+          "mutate": 0
+        },
+        "keyAngle": {
+          "type": "range",
+          "label": "Key direction",
+          "min": -180,
+          "max": 180,
+          "def": 60,
+          "step": 1,
+          "unit": "°",
+          "group": "Light",
+          "hint": "Direction of the key light in the picture plane, degrees.",
+          "randMax": 180
+        },
+        "exposure": {
+          "type": "range",
+          "label": "Exposure",
+          "min": 0.4,
+          "max": 2.4,
+          "def": 1,
+          "step": 0.01,
+          "unit": "×",
+          "log": true,
+          "group": "Light",
+          "hint": "Linear exposure before the single tone map.",
+          "randMax": 1.4
+        },
+        "bloom": {
+          "type": "range",
+          "label": "Bloom",
+          "min": 0,
+          "max": 1.6,
+          "def": 0.55,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Glow added around emissive light. 0 shows the bare geometry.",
+          "randMax": 0.9
+        },
+        "bloomRadius": {
+          "type": "range",
+          "label": "Bloom radius",
+          "min": 0.4,
+          "max": 2.2,
+          "def": 1,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Width of the glow relative to the frame.",
+          "randMax": 1.5
+        },
+        "lensCA": {
+          "type": "range",
+          "label": "Edge fringe",
+          "min": 0,
+          "max": 0.5,
+          "def": 0.12,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Spectral fringing toward the frame edge.",
+          "randMax": 0.25
+        },
+        "vignette": {
+          "type": "range",
+          "label": "Vignette",
+          "min": 0,
+          "max": 0.8,
+          "def": 0.38,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Darkens the frame edge; never touches the focal area.",
+          "randMax": 0.55
+        },
+        "quality": {
+          "type": "select",
+          "label": "Quality",
+          "options": [
+            {
+              "v": "live",
+              "l": "Live"
+            },
+            {
+              "v": "balanced",
+              "l": "Balanced"
+            },
+            {
+              "v": "export",
+              "l": "Export"
+            }
+          ],
+          "def": "balanced",
+          "mutate": 0,
+          "group": "Quality",
+          "hint": "Sample counts only. Composition, phase and exposure stay the same."
+        }
+      }
+    },
+    {
+      "id": "cyan-scaffold",
+      "name": "Cyan Scaffold",
+      "group": "After Cyber",
+      "tags": [
+        "scaffold",
+        "struts"
+      ],
+      "blurb": "A scaffold of long diagonal struts: no particles, just crisp hairlines that stretch and settle.",
+      "palette": "ink-ice",
+      "flash": false,
+      "cost": 3,
+      "graph": {
+        "buffers": {
+          "scene": {
+            "scale": 0.75
+          },
+          "glowA": {
+            "scale": 0.25
+          },
+          "glowB": {
+            "scale": 0.125
+          }
+        },
+        "passes": [
+          {
+            "src": "styles/cyan-scaffold.glsl",
+            "reads": [],
+            "writes": "scene"
+          },
+          {
+            "src": "styles/_glowA.glsl",
+            "reads": [
+              "scene"
+            ],
+            "writes": "glowA"
+          },
+          {
+            "src": "styles/_glowB.glsl",
+            "reads": [
+              "glowA"
+            ],
+            "writes": "glowB"
+          },
+          {
+            "src": "styles/_out.glsl",
+            "reads": [
+              "scene",
+              "glowA",
+              "glowB"
+            ],
+            "writes": "output"
+          }
+        ]
+      },
+      "params": {
+        "res": {
+          "type": "int",
+          "label": "Lattice resolution",
+          "min": 6,
+          "max": 18,
+          "def": 9,
+          "group": "Form",
+          "hint": "Nodes along each side of the lattice. A spatial count.",
+          "mutate": 0.3
+        },
+        "connect": {
+          "type": "range",
+          "label": "Connection radius",
+          "min": 0.03,
+          "max": 0.2,
+          "def": 0.16,
+          "step": 0.00085,
+          "group": "Form",
+          "hint": "Longest connection that stays fully drawn; longer links fade smoothly."
+        },
+        "disperse": {
+          "type": "range",
+          "label": "Dispersal radius",
+          "min": 0,
+          "max": 0.5,
+          "def": 0.1,
+          "step": 0.0025,
+          "group": "Form",
+          "hint": "How far nodes travel when they dissolve. Clamped to the lattice search window."
+        },
+        "edgeR": {
+          "type": "range",
+          "label": "Edge radius",
+          "min": 0.001,
+          "max": 0.01,
+          "def": 0.0018,
+          "step": 0.000045,
+          "group": "Material",
+          "hint": "Radius of the cyan hairlines, scene units.",
+          "log": true
+        },
+        "glass": {
+          "type": "range",
+          "label": "Glass opacity",
+          "min": 0,
+          "max": 0.55,
+          "def": 0.16,
+          "step": 0.0028,
+          "group": "Material",
+          "hint": "Smoky tint inside the polyhedron."
+        },
+        "refr": {
+          "type": "range",
+          "label": "Refraction strength",
+          "min": 0,
+          "max": 0.12,
+          "def": 0.035,
+          "step": 0.0006,
+          "group": "Material",
+          "hint": "Screen-space offset of the lattice seen through facets. An approximation, not transport."
+        },
+        "particleR": {
+          "type": "range",
+          "label": "Particle radius",
+          "min": 0.001,
+          "max": 0.01,
+          "def": 0.003,
+          "step": 0.000045,
+          "group": "Particles",
+          "hint": "Node and particle radius, scene units.",
+          "log": true
+        },
+        "lime": {
+          "type": "range",
+          "label": "Lime fraction",
+          "min": 0,
+          "max": 0.35,
+          "def": 0,
+          "step": 0.0017,
+          "group": "Particles",
+          "hint": "Share of nodes that read as acid-lime particles."
+        },
+        "cycles": {
+          "type": "int",
+          "label": "Reconstructions per loop",
+          "min": 1,
+          "max": 3,
+          "def": 1,
+          "group": "Motion",
+          "hint": "Whole dissolve - transport - reassemble cycles per loop.",
+          "mutate": 0
+        },
+        "keyAngle": {
+          "type": "range",
+          "label": "Key direction",
+          "min": -180,
+          "max": 180,
+          "def": 60,
+          "step": 1,
+          "unit": "°",
+          "group": "Light",
+          "hint": "Direction of the key light in the picture plane, degrees.",
+          "randMax": 180
+        },
+        "exposure": {
+          "type": "range",
+          "label": "Exposure",
+          "min": 0.4,
+          "max": 2.4,
+          "def": 1,
+          "step": 0.01,
+          "unit": "×",
+          "log": true,
+          "group": "Light",
+          "hint": "Linear exposure before the single tone map.",
+          "randMax": 1.4
+        },
+        "bloom": {
+          "type": "range",
+          "label": "Bloom",
+          "min": 0,
+          "max": 1.6,
+          "def": 0.55,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Glow added around emissive light. 0 shows the bare geometry.",
+          "randMax": 0.9
+        },
+        "bloomRadius": {
+          "type": "range",
+          "label": "Bloom radius",
+          "min": 0.4,
+          "max": 2.2,
+          "def": 1,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Width of the glow relative to the frame.",
+          "randMax": 1.5
+        },
+        "lensCA": {
+          "type": "range",
+          "label": "Edge fringe",
+          "min": 0,
+          "max": 0.5,
+          "def": 0.12,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Spectral fringing toward the frame edge.",
+          "randMax": 0.25
+        },
+        "vignette": {
+          "type": "range",
+          "label": "Vignette",
+          "min": 0,
+          "max": 0.8,
+          "def": 0.38,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Darkens the frame edge; never touches the focal area.",
+          "randMax": 0.55
+        },
+        "quality": {
+          "type": "select",
+          "label": "Quality",
+          "options": [
+            {
+              "v": "live",
+              "l": "Live"
+            },
+            {
+              "v": "balanced",
+              "l": "Balanced"
+            },
+            {
+              "v": "export",
+              "l": "Export"
+            }
+          ],
+          "def": "balanced",
+          "mutate": 0,
+          "group": "Quality",
+          "hint": "Sample counts only. Composition, phase and exposure stay the same."
+        }
+      }
+    },
+    {
+      "id": "glass-drift",
+      "name": "Glass Drift",
+      "group": "After Cyber",
+      "tags": [
+        "glass",
+        "refraction"
+      ],
+      "blurb": "A large polyhedron of smoky glass drifts over the lattice, bending it as it turns.",
+      "palette": "smoke-cyan-lime",
+      "flash": false,
+      "cost": 3,
+      "graph": {
+        "buffers": {
+          "scene": {
+            "scale": 0.75
+          },
+          "glowA": {
+            "scale": 0.25
+          },
+          "glowB": {
+            "scale": 0.125
+          }
+        },
+        "passes": [
+          {
+            "src": "styles/glass-drift.glsl",
+            "reads": [],
+            "writes": "scene"
+          },
+          {
+            "src": "styles/_glowA.glsl",
+            "reads": [
+              "scene"
+            ],
+            "writes": "glowA"
+          },
+          {
+            "src": "styles/_glowB.glsl",
+            "reads": [
+              "glowA"
+            ],
+            "writes": "glowB"
+          },
+          {
+            "src": "styles/_out.glsl",
+            "reads": [
+              "scene",
+              "glowA",
+              "glowB"
+            ],
+            "writes": "output"
+          }
+        ]
+      },
+      "params": {
+        "res": {
+          "type": "int",
+          "label": "Lattice resolution",
+          "min": 6,
+          "max": 18,
+          "def": 12,
+          "group": "Form",
+          "hint": "Nodes along each side of the lattice. A spatial count.",
+          "mutate": 0.3
+        },
+        "connect": {
+          "type": "range",
+          "label": "Connection radius",
+          "min": 0.03,
+          "max": 0.2,
+          "def": 0.09,
+          "step": 0.00085,
+          "group": "Form",
+          "hint": "Longest connection that stays fully drawn; longer links fade smoothly."
+        },
+        "disperse": {
+          "type": "range",
+          "label": "Dispersal radius",
+          "min": 0,
+          "max": 0.5,
+          "def": 0.12,
+          "step": 0.0025,
+          "group": "Form",
+          "hint": "How far nodes travel when they dissolve. Clamped to the lattice search window."
+        },
+        "edgeR": {
+          "type": "range",
+          "label": "Edge radius",
+          "min": 0.001,
+          "max": 0.01,
+          "def": 0.002,
+          "step": 0.000045,
+          "group": "Material",
+          "hint": "Radius of the cyan hairlines, scene units.",
+          "log": true
+        },
+        "glass": {
+          "type": "range",
+          "label": "Glass opacity",
+          "min": 0,
+          "max": 0.55,
+          "def": 0.3,
+          "step": 0.0028,
+          "group": "Material",
+          "hint": "Smoky tint inside the polyhedron."
+        },
+        "refr": {
+          "type": "range",
+          "label": "Refraction strength",
+          "min": 0,
+          "max": 0.12,
+          "def": 0.08,
+          "step": 0.0006,
+          "group": "Material",
+          "hint": "Screen-space offset of the lattice seen through facets. An approximation, not transport."
+        },
+        "particleR": {
+          "type": "range",
+          "label": "Particle radius",
+          "min": 0.001,
+          "max": 0.01,
+          "def": 0.003,
+          "step": 0.000045,
+          "group": "Particles",
+          "hint": "Node and particle radius, scene units.",
+          "log": true
+        },
+        "lime": {
+          "type": "range",
+          "label": "Lime fraction",
+          "min": 0,
+          "max": 0.35,
+          "def": 0.06,
+          "step": 0.0017,
+          "group": "Particles",
+          "hint": "Share of nodes that read as acid-lime particles."
+        },
+        "cycles": {
+          "type": "int",
+          "label": "Reconstructions per loop",
+          "min": 1,
+          "max": 3,
+          "def": 1,
+          "group": "Motion",
+          "hint": "Whole dissolve - transport - reassemble cycles per loop.",
+          "mutate": 0
+        },
+        "keyAngle": {
+          "type": "range",
+          "label": "Key direction",
+          "min": -180,
+          "max": 180,
+          "def": 60,
+          "step": 1,
+          "unit": "°",
+          "group": "Light",
+          "hint": "Direction of the key light in the picture plane, degrees.",
+          "randMax": 180
+        },
+        "exposure": {
+          "type": "range",
+          "label": "Exposure",
+          "min": 0.4,
+          "max": 2.4,
+          "def": 1,
+          "step": 0.01,
+          "unit": "×",
+          "log": true,
+          "group": "Light",
+          "hint": "Linear exposure before the single tone map.",
+          "randMax": 1.4
+        },
+        "bloom": {
+          "type": "range",
+          "label": "Bloom",
+          "min": 0,
+          "max": 1.6,
+          "def": 0.55,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Glow added around emissive light. 0 shows the bare geometry.",
+          "randMax": 0.9
+        },
+        "bloomRadius": {
+          "type": "range",
+          "label": "Bloom radius",
+          "min": 0.4,
+          "max": 2.2,
+          "def": 1,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Width of the glow relative to the frame.",
+          "randMax": 1.5
+        },
+        "lensCA": {
+          "type": "range",
+          "label": "Edge fringe",
+          "min": 0,
+          "max": 0.5,
+          "def": 0.12,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Spectral fringing toward the frame edge.",
+          "randMax": 0.25
+        },
+        "vignette": {
+          "type": "range",
+          "label": "Vignette",
+          "min": 0,
+          "max": 0.8,
+          "def": 0.38,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Darkens the frame edge; never touches the focal area.",
+          "randMax": 0.55
+        },
+        "quality": {
+          "type": "select",
+          "label": "Quality",
+          "options": [
+            {
+              "v": "live",
+              "l": "Live"
+            },
+            {
+              "v": "balanced",
+              "l": "Balanced"
+            },
+            {
+              "v": "export",
+              "l": "Export"
+            }
+          ],
+          "def": "balanced",
+          "mutate": 0,
+          "group": "Quality",
+          "hint": "Sample counts only. Composition, phase and exposure stay the same."
+        }
+      }
+    },
+    {
+      "id": "lime-assembly",
+      "name": "Lime Assembly",
+      "group": "After Cyber",
+      "tags": [
+        "lime",
+        "assembly"
+      ],
+      "blurb": "Lime-heavy: nodes fly in from far across the frame and click into the lattice, particles trailing.",
+      "palette": "smoke-cyan-lime",
+      "flash": false,
+      "cost": 3,
+      "graph": {
+        "buffers": {
+          "scene": {
+            "scale": 0.75
+          },
+          "glowA": {
+            "scale": 0.25
+          },
+          "glowB": {
+            "scale": 0.125
+          }
+        },
+        "passes": [
+          {
+            "src": "styles/lime-assembly.glsl",
+            "reads": [],
+            "writes": "scene"
+          },
+          {
+            "src": "styles/_glowA.glsl",
+            "reads": [
+              "scene"
+            ],
+            "writes": "glowA"
+          },
+          {
+            "src": "styles/_glowB.glsl",
+            "reads": [
+              "glowA"
+            ],
+            "writes": "glowB"
+          },
+          {
+            "src": "styles/_out.glsl",
+            "reads": [
+              "scene",
+              "glowA",
+              "glowB"
+            ],
+            "writes": "output"
+          }
+        ]
+      },
+      "params": {
+        "res": {
+          "type": "int",
+          "label": "Lattice resolution",
+          "min": 6,
+          "max": 18,
+          "def": 10,
+          "group": "Form",
+          "hint": "Nodes along each side of the lattice. A spatial count.",
+          "mutate": 0.3
+        },
+        "connect": {
+          "type": "range",
+          "label": "Connection radius",
+          "min": 0.03,
+          "max": 0.2,
+          "def": 0.1,
+          "step": 0.00085,
+          "group": "Form",
+          "hint": "Longest connection that stays fully drawn; longer links fade smoothly."
+        },
+        "disperse": {
+          "type": "range",
+          "label": "Dispersal radius",
+          "min": 0,
+          "max": 0.5,
+          "def": 0.5,
+          "step": 0.0025,
+          "group": "Form",
+          "hint": "How far nodes travel when they dissolve. Clamped to the lattice search window."
+        },
+        "edgeR": {
+          "type": "range",
+          "label": "Edge radius",
+          "min": 0.001,
+          "max": 0.01,
+          "def": 0.002,
+          "step": 0.000045,
+          "group": "Material",
+          "hint": "Radius of the cyan hairlines, scene units.",
+          "log": true
+        },
+        "glass": {
+          "type": "range",
+          "label": "Glass opacity",
+          "min": 0,
+          "max": 0.55,
+          "def": 0.16,
+          "step": 0.0028,
+          "group": "Material",
+          "hint": "Smoky tint inside the polyhedron."
+        },
+        "refr": {
+          "type": "range",
+          "label": "Refraction strength",
+          "min": 0,
+          "max": 0.12,
+          "def": 0.035,
+          "step": 0.0006,
+          "group": "Material",
+          "hint": "Screen-space offset of the lattice seen through facets. An approximation, not transport."
+        },
+        "particleR": {
+          "type": "range",
+          "label": "Particle radius",
+          "min": 0.001,
+          "max": 0.01,
+          "def": 0.0034,
+          "step": 0.000045,
+          "group": "Particles",
+          "hint": "Node and particle radius, scene units.",
+          "log": true
+        },
+        "lime": {
+          "type": "range",
+          "label": "Lime fraction",
+          "min": 0,
+          "max": 0.35,
+          "def": 0.32,
+          "step": 0.0017,
+          "group": "Particles",
+          "hint": "Share of nodes that read as acid-lime particles."
+        },
+        "cycles": {
+          "type": "int",
+          "label": "Reconstructions per loop",
+          "min": 1,
+          "max": 3,
+          "def": 1,
+          "group": "Motion",
+          "hint": "Whole dissolve - transport - reassemble cycles per loop.",
+          "mutate": 0
+        },
+        "keyAngle": {
+          "type": "range",
+          "label": "Key direction",
+          "min": -180,
+          "max": 180,
+          "def": 60,
+          "step": 1,
+          "unit": "°",
+          "group": "Light",
+          "hint": "Direction of the key light in the picture plane, degrees.",
+          "randMax": 180
+        },
+        "exposure": {
+          "type": "range",
+          "label": "Exposure",
+          "min": 0.4,
+          "max": 2.4,
+          "def": 1,
+          "step": 0.01,
+          "unit": "×",
+          "log": true,
+          "group": "Light",
+          "hint": "Linear exposure before the single tone map.",
+          "randMax": 1.4
+        },
+        "bloom": {
+          "type": "range",
+          "label": "Bloom",
+          "min": 0,
+          "max": 1.6,
+          "def": 0.55,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Glow added around emissive light. 0 shows the bare geometry.",
+          "randMax": 0.9
+        },
+        "bloomRadius": {
+          "type": "range",
+          "label": "Bloom radius",
+          "min": 0.4,
+          "max": 2.2,
+          "def": 1,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Width of the glow relative to the frame.",
+          "randMax": 1.5
+        },
+        "lensCA": {
+          "type": "range",
+          "label": "Edge fringe",
+          "min": 0,
+          "max": 0.5,
+          "def": 0.12,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Spectral fringing toward the frame edge.",
+          "randMax": 0.25
+        },
+        "vignette": {
+          "type": "range",
+          "label": "Vignette",
+          "min": 0,
+          "max": 0.8,
+          "def": 0.38,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Darkens the frame edge; never touches the focal area.",
+          "randMax": 0.55
+        },
+        "quality": {
+          "type": "select",
+          "label": "Quality",
+          "options": [
+            {
+              "v": "live",
+              "l": "Live"
+            },
+            {
+              "v": "balanced",
+              "l": "Balanced"
+            },
+            {
+              "v": "export",
+              "l": "Export"
+            }
+          ],
+          "def": "balanced",
+          "mutate": 0,
+          "group": "Quality",
+          "hint": "Sample counts only. Composition, phase and exposure stay the same."
+        }
+      }
+    },
+    {
+      "id": "particle-covenant",
+      "name": "Particle Covenant",
+      "group": "After Cyber",
+      "tags": [
+        "rings",
+        "particles"
+      ],
+      "blurb": "No lines at all: rings of particles hold a covenant, scatter on closed orbits and gather again.",
+      "palette": "dusk-magenta",
+      "flash": false,
+      "cost": 3,
+      "graph": {
+        "buffers": {
+          "scene": {
+            "scale": 0.75
+          },
+          "glowA": {
+            "scale": 0.25
+          },
+          "glowB": {
+            "scale": 0.125
+          }
+        },
+        "passes": [
+          {
+            "src": "styles/particle-covenant.glsl",
+            "reads": [],
+            "writes": "scene"
+          },
+          {
+            "src": "styles/_glowA.glsl",
+            "reads": [
+              "scene"
+            ],
+            "writes": "glowA"
+          },
+          {
+            "src": "styles/_glowB.glsl",
+            "reads": [
+              "glowA"
+            ],
+            "writes": "glowB"
+          },
+          {
+            "src": "styles/_out.glsl",
+            "reads": [
+              "scene",
+              "glowA",
+              "glowB"
+            ],
+            "writes": "output"
+          }
+        ]
+      },
+      "params": {
+        "res": {
+          "type": "int",
+          "label": "Lattice resolution",
+          "min": 6,
+          "max": 18,
+          "def": 14,
+          "group": "Form",
+          "hint": "Nodes along each side of the lattice. A spatial count.",
+          "mutate": 0.3
+        },
+        "connect": {
+          "type": "range",
+          "label": "Connection radius",
+          "min": 0.03,
+          "max": 0.2,
+          "def": 0.09,
+          "step": 0.00085,
+          "group": "Form",
+          "hint": "Longest connection that stays fully drawn; longer links fade smoothly."
+        },
+        "disperse": {
+          "type": "range",
+          "label": "Dispersal radius",
+          "min": 0,
+          "max": 0.5,
+          "def": 0.3,
+          "step": 0.0025,
+          "group": "Form",
+          "hint": "How far nodes travel when they dissolve. Clamped to the lattice search window."
+        },
+        "edgeR": {
+          "type": "range",
+          "label": "Edge radius",
+          "min": 0.001,
+          "max": 0.01,
+          "def": 0.002,
+          "step": 0.000045,
+          "group": "Material",
+          "hint": "Radius of the cyan hairlines, scene units.",
+          "log": true
+        },
+        "glass": {
+          "type": "range",
+          "label": "Glass opacity",
+          "min": 0,
+          "max": 0.55,
+          "def": 0.16,
+          "step": 0.0028,
+          "group": "Material",
+          "hint": "Smoky tint inside the polyhedron."
+        },
+        "refr": {
+          "type": "range",
+          "label": "Refraction strength",
+          "min": 0,
+          "max": 0.12,
+          "def": 0.035,
+          "step": 0.0006,
+          "group": "Material",
+          "hint": "Screen-space offset of the lattice seen through facets. An approximation, not transport."
+        },
+        "particleR": {
+          "type": "range",
+          "label": "Particle radius",
+          "min": 0.001,
+          "max": 0.01,
+          "def": 0.0036,
+          "step": 0.000045,
+          "group": "Particles",
+          "hint": "Node and particle radius, scene units.",
+          "log": true
+        },
+        "lime": {
+          "type": "range",
+          "label": "Lime fraction",
+          "min": 0,
+          "max": 0.35,
+          "def": 0.2,
+          "step": 0.0017,
+          "group": "Particles",
+          "hint": "Share of nodes that read as acid-lime particles."
+        },
+        "cycles": {
+          "type": "int",
+          "label": "Reconstructions per loop",
+          "min": 1,
+          "max": 3,
+          "def": 1,
+          "group": "Motion",
+          "hint": "Whole dissolve - transport - reassemble cycles per loop.",
+          "mutate": 0
+        },
+        "keyAngle": {
+          "type": "range",
+          "label": "Key direction",
+          "min": -180,
+          "max": 180,
+          "def": 60,
+          "step": 1,
+          "unit": "°",
+          "group": "Light",
+          "hint": "Direction of the key light in the picture plane, degrees.",
+          "randMax": 180
+        },
+        "exposure": {
+          "type": "range",
+          "label": "Exposure",
+          "min": 0.4,
+          "max": 2.4,
+          "def": 1,
+          "step": 0.01,
+          "unit": "×",
+          "log": true,
+          "group": "Light",
+          "hint": "Linear exposure before the single tone map.",
+          "randMax": 1.4
+        },
+        "bloom": {
+          "type": "range",
+          "label": "Bloom",
+          "min": 0,
+          "max": 1.6,
+          "def": 0.55,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Glow added around emissive light. 0 shows the bare geometry.",
+          "randMax": 0.9
+        },
+        "bloomRadius": {
+          "type": "range",
+          "label": "Bloom radius",
+          "min": 0.4,
+          "max": 2.2,
+          "def": 1,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Width of the glow relative to the frame.",
+          "randMax": 1.5
+        },
+        "lensCA": {
+          "type": "range",
+          "label": "Edge fringe",
+          "min": 0,
+          "max": 0.5,
+          "def": 0.12,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Spectral fringing toward the frame edge.",
+          "randMax": 0.25
+        },
+        "vignette": {
+          "type": "range",
+          "label": "Vignette",
+          "min": 0,
+          "max": 0.8,
+          "def": 0.38,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Darkens the frame edge; never touches the focal area.",
+          "randMax": 0.55
+        },
+        "quality": {
+          "type": "select",
+          "label": "Quality",
+          "options": [
+            {
+              "v": "live",
+              "l": "Live"
+            },
+            {
+              "v": "balanced",
+              "l": "Balanced"
+            },
+            {
+              "v": "export",
+              "l": "Export"
+            }
+          ],
+          "def": "balanced",
+          "mutate": 0,
+          "group": "Quality",
+          "hint": "Sample counts only. Composition, phase and exposure stay the same."
+        }
+      }
+    },
+    {
+      "id": "broken-polyhedron",
+      "name": "Broken Polyhedron",
+      "group": "After Cyber",
+      "tags": [
+        "polyhedron",
+        "broken"
+      ],
+      "blurb": "An octahedron whose faces slide in and out of true while a strut lattice floats behind it.",
+      "palette": "steel",
+      "flash": false,
+      "cost": 3,
+      "graph": {
+        "buffers": {
+          "scene": {
+            "scale": 0.75
+          },
+          "glowA": {
+            "scale": 0.25
+          },
+          "glowB": {
+            "scale": 0.125
+          }
+        },
+        "passes": [
+          {
+            "src": "styles/broken-polyhedron.glsl",
+            "reads": [],
+            "writes": "scene"
+          },
+          {
+            "src": "styles/_glowA.glsl",
+            "reads": [
+              "scene"
+            ],
+            "writes": "glowA"
+          },
+          {
+            "src": "styles/_glowB.glsl",
+            "reads": [
+              "glowA"
+            ],
+            "writes": "glowB"
+          },
+          {
+            "src": "styles/_out.glsl",
+            "reads": [
+              "scene",
+              "glowA",
+              "glowB"
+            ],
+            "writes": "output"
+          }
+        ]
+      },
+      "params": {
+        "res": {
+          "type": "int",
+          "label": "Lattice resolution",
+          "min": 6,
+          "max": 18,
+          "def": 8,
+          "group": "Form",
+          "hint": "Nodes along each side of the lattice. A spatial count.",
+          "mutate": 0.3
+        },
+        "connect": {
+          "type": "range",
+          "label": "Connection radius",
+          "min": 0.03,
+          "max": 0.2,
+          "def": 0.14,
+          "step": 0.00085,
+          "group": "Form",
+          "hint": "Longest connection that stays fully drawn; longer links fade smoothly."
+        },
+        "disperse": {
+          "type": "range",
+          "label": "Dispersal radius",
+          "min": 0,
+          "max": 0.5,
+          "def": 0.08,
+          "step": 0.0025,
+          "group": "Form",
+          "hint": "How far nodes travel when they dissolve. Clamped to the lattice search window."
+        },
+        "edgeR": {
+          "type": "range",
+          "label": "Edge radius",
+          "min": 0.001,
+          "max": 0.01,
+          "def": 0.002,
+          "step": 0.000045,
+          "group": "Material",
+          "hint": "Radius of the cyan hairlines, scene units.",
+          "log": true
+        },
+        "glass": {
+          "type": "range",
+          "label": "Glass opacity",
+          "min": 0,
+          "max": 0.55,
+          "def": 0.24,
+          "step": 0.0028,
+          "group": "Material",
+          "hint": "Smoky tint inside the polyhedron."
+        },
+        "refr": {
+          "type": "range",
+          "label": "Refraction strength",
+          "min": 0,
+          "max": 0.12,
+          "def": 0.07,
+          "step": 0.0006,
+          "group": "Material",
+          "hint": "Screen-space offset of the lattice seen through facets. An approximation, not transport."
+        },
+        "particleR": {
+          "type": "range",
+          "label": "Particle radius",
+          "min": 0.001,
+          "max": 0.01,
+          "def": 0.003,
+          "step": 0.000045,
+          "group": "Particles",
+          "hint": "Node and particle radius, scene units.",
+          "log": true
+        },
+        "lime": {
+          "type": "range",
+          "label": "Lime fraction",
+          "min": 0,
+          "max": 0.35,
+          "def": 0.1,
+          "step": 0.0017,
+          "group": "Particles",
+          "hint": "Share of nodes that read as acid-lime particles."
+        },
+        "cycles": {
+          "type": "int",
+          "label": "Reconstructions per loop",
+          "min": 1,
+          "max": 3,
+          "def": 1,
+          "group": "Motion",
+          "hint": "Whole dissolve - transport - reassemble cycles per loop.",
+          "mutate": 0
+        },
+        "keyAngle": {
+          "type": "range",
+          "label": "Key direction",
+          "min": -180,
+          "max": 180,
+          "def": 60,
+          "step": 1,
+          "unit": "°",
+          "group": "Light",
+          "hint": "Direction of the key light in the picture plane, degrees.",
+          "randMax": 180
+        },
+        "exposure": {
+          "type": "range",
+          "label": "Exposure",
+          "min": 0.4,
+          "max": 2.4,
+          "def": 1,
+          "step": 0.01,
+          "unit": "×",
+          "log": true,
+          "group": "Light",
+          "hint": "Linear exposure before the single tone map.",
+          "randMax": 1.4
+        },
+        "bloom": {
+          "type": "range",
+          "label": "Bloom",
+          "min": 0,
+          "max": 1.6,
+          "def": 0.55,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Glow added around emissive light. 0 shows the bare geometry.",
+          "randMax": 0.9
+        },
+        "bloomRadius": {
+          "type": "range",
+          "label": "Bloom radius",
+          "min": 0.4,
+          "max": 2.2,
+          "def": 1,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Width of the glow relative to the frame.",
+          "randMax": 1.5
+        },
+        "lensCA": {
+          "type": "range",
+          "label": "Edge fringe",
+          "min": 0,
+          "max": 0.5,
+          "def": 0.12,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Spectral fringing toward the frame edge.",
+          "randMax": 0.25
+        },
+        "vignette": {
+          "type": "range",
+          "label": "Vignette",
+          "min": 0,
+          "max": 0.8,
+          "def": 0.38,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Darkens the frame edge; never touches the focal area.",
+          "randMax": 0.55
+        },
+        "quality": {
+          "type": "select",
+          "label": "Quality",
+          "options": [
+            {
+              "v": "live",
+              "l": "Live"
+            },
+            {
+              "v": "balanced",
+              "l": "Balanced"
+            },
+            {
+              "v": "export",
+              "l": "Export"
+            }
+          ],
+          "def": "balanced",
+          "mutate": 0,
+          "group": "Quality",
+          "hint": "Sample counts only. Composition, phase and exposure stay the same."
+        }
+      }
+    },
+    {
+      "id": "organic-circuit",
+      "name": "Organic Circuit",
+      "group": "After Cyber",
+      "tags": [
+        "circuit",
+        "traces"
+      ],
+      "blurb": "Traces run in right-angled routes between slightly irregular pads, lime at the pads that wander off.",
+      "palette": "ink-ice",
+      "flash": false,
+      "cost": 3,
+      "graph": {
+        "buffers": {
+          "scene": {
+            "scale": 0.75
+          },
+          "glowA": {
+            "scale": 0.25
+          },
+          "glowB": {
+            "scale": 0.125
+          }
+        },
+        "passes": [
+          {
+            "src": "styles/organic-circuit.glsl",
+            "reads": [],
+            "writes": "scene"
+          },
+          {
+            "src": "styles/_glowA.glsl",
+            "reads": [
+              "scene"
+            ],
+            "writes": "glowA"
+          },
+          {
+            "src": "styles/_glowB.glsl",
+            "reads": [
+              "glowA"
+            ],
+            "writes": "glowB"
+          },
+          {
+            "src": "styles/_out.glsl",
+            "reads": [
+              "scene",
+              "glowA",
+              "glowB"
+            ],
+            "writes": "output"
+          }
+        ]
+      },
+      "params": {
+        "res": {
+          "type": "int",
+          "label": "Lattice resolution",
+          "min": 6,
+          "max": 18,
+          "def": 11,
+          "group": "Form",
+          "hint": "Nodes along each side of the lattice. A spatial count.",
+          "mutate": 0.3
+        },
+        "connect": {
+          "type": "range",
+          "label": "Connection radius",
+          "min": 0.03,
+          "max": 0.2,
+          "def": 0.15,
+          "step": 0.00085,
+          "group": "Form",
+          "hint": "Longest connection that stays fully drawn; longer links fade smoothly."
+        },
+        "disperse": {
+          "type": "range",
+          "label": "Dispersal radius",
+          "min": 0,
+          "max": 0.5,
+          "def": 0.14,
+          "step": 0.0025,
+          "group": "Form",
+          "hint": "How far nodes travel when they dissolve. Clamped to the lattice search window."
+        },
+        "edgeR": {
+          "type": "range",
+          "label": "Edge radius",
+          "min": 0.001,
+          "max": 0.01,
+          "def": 0.0022,
+          "step": 0.000045,
+          "group": "Material",
+          "hint": "Radius of the cyan hairlines, scene units.",
+          "log": true
+        },
+        "glass": {
+          "type": "range",
+          "label": "Glass opacity",
+          "min": 0,
+          "max": 0.55,
+          "def": 0.16,
+          "step": 0.0028,
+          "group": "Material",
+          "hint": "Smoky tint inside the polyhedron."
+        },
+        "refr": {
+          "type": "range",
+          "label": "Refraction strength",
+          "min": 0,
+          "max": 0.12,
+          "def": 0.035,
+          "step": 0.0006,
+          "group": "Material",
+          "hint": "Screen-space offset of the lattice seen through facets. An approximation, not transport."
+        },
+        "particleR": {
+          "type": "range",
+          "label": "Particle radius",
+          "min": 0.001,
+          "max": 0.01,
+          "def": 0.003,
+          "step": 0.000045,
+          "group": "Particles",
+          "hint": "Node and particle radius, scene units.",
+          "log": true
+        },
+        "lime": {
+          "type": "range",
+          "label": "Lime fraction",
+          "min": 0,
+          "max": 0.35,
+          "def": 0.16,
+          "step": 0.0017,
+          "group": "Particles",
+          "hint": "Share of nodes that read as acid-lime particles."
+        },
+        "cycles": {
+          "type": "int",
+          "label": "Reconstructions per loop",
+          "min": 1,
+          "max": 3,
+          "def": 1,
+          "group": "Motion",
+          "hint": "Whole dissolve - transport - reassemble cycles per loop.",
+          "mutate": 0
+        },
+        "keyAngle": {
+          "type": "range",
+          "label": "Key direction",
+          "min": -180,
+          "max": 180,
+          "def": 60,
+          "step": 1,
+          "unit": "°",
+          "group": "Light",
+          "hint": "Direction of the key light in the picture plane, degrees.",
+          "randMax": 180
+        },
+        "exposure": {
+          "type": "range",
+          "label": "Exposure",
+          "min": 0.4,
+          "max": 2.4,
+          "def": 1,
+          "step": 0.01,
+          "unit": "×",
+          "log": true,
+          "group": "Light",
+          "hint": "Linear exposure before the single tone map.",
+          "randMax": 1.4
+        },
+        "bloom": {
+          "type": "range",
+          "label": "Bloom",
+          "min": 0,
+          "max": 1.6,
+          "def": 0.55,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Glow added around emissive light. 0 shows the bare geometry.",
+          "randMax": 0.9
+        },
+        "bloomRadius": {
+          "type": "range",
+          "label": "Bloom radius",
+          "min": 0.4,
+          "max": 2.2,
+          "def": 1,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Width of the glow relative to the frame.",
+          "randMax": 1.5
+        },
+        "lensCA": {
+          "type": "range",
+          "label": "Edge fringe",
+          "min": 0,
+          "max": 0.5,
+          "def": 0.12,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Spectral fringing toward the frame edge.",
+          "randMax": 0.25
+        },
+        "vignette": {
+          "type": "range",
+          "label": "Vignette",
+          "min": 0,
+          "max": 0.8,
+          "def": 0.38,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Darkens the frame edge; never touches the focal area.",
+          "randMax": 0.55
+        },
+        "quality": {
+          "type": "select",
+          "label": "Quality",
+          "options": [
+            {
+              "v": "live",
+              "l": "Live"
+            },
+            {
+              "v": "balanced",
+              "l": "Balanced"
+            },
+            {
+              "v": "export",
+              "l": "Export"
+            }
+          ],
+          "def": "balanced",
+          "mutate": 0,
+          "group": "Quality",
+          "hint": "Sample counts only. Composition, phase and exposure stay the same."
+        }
+      }
+    },
+    {
+      "id": "smoky-network",
+      "name": "Smoky Network",
+      "group": "After Cyber",
+      "tags": [
+        "network",
+        "smoke"
+      ],
+      "blurb": "An irregular network in thick smoke: links appear only where nodes stay close, lime nodes drift.",
+      "palette": "steel",
+      "flash": false,
+      "cost": 3,
+      "graph": {
+        "buffers": {
+          "scene": {
+            "scale": 0.75
+          },
+          "glowA": {
+            "scale": 0.25
+          },
+          "glowB": {
+            "scale": 0.125
+          }
+        },
+        "passes": [
+          {
+            "src": "styles/smoky-network.glsl",
+            "reads": [],
+            "writes": "scene"
+          },
+          {
+            "src": "styles/_glowA.glsl",
+            "reads": [
+              "scene"
+            ],
+            "writes": "glowA"
+          },
+          {
+            "src": "styles/_glowB.glsl",
+            "reads": [
+              "glowA"
+            ],
+            "writes": "glowB"
+          },
+          {
+            "src": "styles/_out.glsl",
+            "reads": [
+              "scene",
+              "glowA",
+              "glowB"
+            ],
+            "writes": "output"
+          }
+        ]
+      },
+      "params": {
+        "res": {
+          "type": "int",
+          "label": "Lattice resolution",
+          "min": 6,
+          "max": 18,
+          "def": 10,
+          "group": "Form",
+          "hint": "Nodes along each side of the lattice. A spatial count.",
+          "mutate": 0.3
+        },
+        "connect": {
+          "type": "range",
+          "label": "Connection radius",
+          "min": 0.03,
+          "max": 0.2,
+          "def": 0.13,
+          "step": 0.00085,
+          "group": "Form",
+          "hint": "Longest connection that stays fully drawn; longer links fade smoothly."
+        },
+        "disperse": {
+          "type": "range",
+          "label": "Dispersal radius",
+          "min": 0,
+          "max": 0.5,
+          "def": 0.16,
+          "step": 0.0025,
+          "group": "Form",
+          "hint": "How far nodes travel when they dissolve. Clamped to the lattice search window."
+        },
+        "edgeR": {
+          "type": "range",
+          "label": "Edge radius",
+          "min": 0.001,
+          "max": 0.01,
+          "def": 0.002,
+          "step": 0.000045,
+          "group": "Material",
+          "hint": "Radius of the cyan hairlines, scene units.",
+          "log": true
+        },
+        "glass": {
+          "type": "range",
+          "label": "Glass opacity",
+          "min": 0,
+          "max": 0.55,
+          "def": 0.16,
+          "step": 0.0028,
+          "group": "Material",
+          "hint": "Smoky tint inside the polyhedron."
+        },
+        "refr": {
+          "type": "range",
+          "label": "Refraction strength",
+          "min": 0,
+          "max": 0.12,
+          "def": 0.035,
+          "step": 0.0006,
+          "group": "Material",
+          "hint": "Screen-space offset of the lattice seen through facets. An approximation, not transport."
+        },
+        "particleR": {
+          "type": "range",
+          "label": "Particle radius",
+          "min": 0.001,
+          "max": 0.01,
+          "def": 0.003,
+          "step": 0.000045,
+          "group": "Particles",
+          "hint": "Node and particle radius, scene units.",
+          "log": true
+        },
+        "lime": {
+          "type": "range",
+          "label": "Lime fraction",
+          "min": 0,
+          "max": 0.35,
+          "def": 0.1,
+          "step": 0.0017,
+          "group": "Particles",
+          "hint": "Share of nodes that read as acid-lime particles."
+        },
+        "cycles": {
+          "type": "int",
+          "label": "Reconstructions per loop",
+          "min": 1,
+          "max": 3,
+          "def": 1,
+          "group": "Motion",
+          "hint": "Whole dissolve - transport - reassemble cycles per loop.",
+          "mutate": 0
+        },
+        "keyAngle": {
+          "type": "range",
+          "label": "Key direction",
+          "min": -180,
+          "max": 180,
+          "def": 60,
+          "step": 1,
+          "unit": "°",
+          "group": "Light",
+          "hint": "Direction of the key light in the picture plane, degrees.",
+          "randMax": 180
+        },
+        "exposure": {
+          "type": "range",
+          "label": "Exposure",
+          "min": 0.4,
+          "max": 2.4,
+          "def": 0.95,
+          "step": 0.01,
+          "unit": "×",
+          "log": true,
+          "group": "Light",
+          "hint": "Linear exposure before the single tone map.",
+          "randMax": 1.4
+        },
+        "bloom": {
+          "type": "range",
+          "label": "Bloom",
+          "min": 0,
+          "max": 1.6,
+          "def": 0.55,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Glow added around emissive light. 0 shows the bare geometry.",
+          "randMax": 0.9
+        },
+        "bloomRadius": {
+          "type": "range",
+          "label": "Bloom radius",
+          "min": 0.4,
+          "max": 2.2,
+          "def": 1,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Width of the glow relative to the frame.",
+          "randMax": 1.5
+        },
+        "lensCA": {
+          "type": "range",
+          "label": "Edge fringe",
+          "min": 0,
+          "max": 0.5,
+          "def": 0.12,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Spectral fringing toward the frame edge.",
+          "randMax": 0.25
+        },
+        "vignette": {
+          "type": "range",
+          "label": "Vignette",
+          "min": 0,
+          "max": 0.8,
+          "def": 0.38,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Darkens the frame edge; never touches the focal area.",
+          "randMax": 0.55
+        },
+        "quality": {
+          "type": "select",
+          "label": "Quality",
+          "options": [
+            {
+              "v": "live",
+              "l": "Live"
+            },
+            {
+              "v": "balanced",
+              "l": "Balanced"
+            },
+            {
+              "v": "export",
+              "l": "Export"
+            }
+          ],
+          "def": "balanced",
+          "mutate": 0,
+          "group": "Quality",
+          "hint": "Sample counts only. Composition, phase and exposure stay the same."
+        }
+      }
+    },
+    {
+      "id": "quiet-reconstruction",
+      "name": "Quiet Reconstruction",
+      "group": "After Cyber",
+      "tags": [
+        "calm",
+        "ambient"
+      ],
+      "blurb": "Seven nodes a side, a dim glass shape and a slow, small dissolve. Made for quiet backgrounds.",
+      "palette": "smoke-cyan-lime",
+      "flash": false,
+      "cost": 3,
+      "graph": {
+        "buffers": {
+          "scene": {
+            "scale": 0.75
+          },
+          "glowA": {
+            "scale": 0.25
+          },
+          "glowB": {
+            "scale": 0.125
+          }
+        },
+        "passes": [
+          {
+            "src": "styles/quiet-reconstruction.glsl",
+            "reads": [],
+            "writes": "scene"
+          },
+          {
+            "src": "styles/_glowA.glsl",
+            "reads": [
+              "scene"
+            ],
+            "writes": "glowA"
+          },
+          {
+            "src": "styles/_glowB.glsl",
+            "reads": [
+              "glowA"
+            ],
+            "writes": "glowB"
+          },
+          {
+            "src": "styles/_out.glsl",
+            "reads": [
+              "scene",
+              "glowA",
+              "glowB"
+            ],
+            "writes": "output"
+          }
+        ]
+      },
+      "params": {
+        "res": {
+          "type": "int",
+          "label": "Lattice resolution",
+          "min": 6,
+          "max": 18,
+          "def": 7,
+          "group": "Form",
+          "hint": "Nodes along each side of the lattice. A spatial count.",
+          "mutate": 0.3
+        },
+        "connect": {
+          "type": "range",
+          "label": "Connection radius",
+          "min": 0.03,
+          "max": 0.2,
+          "def": 0.09,
+          "step": 0.00085,
+          "group": "Form",
+          "hint": "Longest connection that stays fully drawn; longer links fade smoothly."
+        },
+        "disperse": {
+          "type": "range",
+          "label": "Dispersal radius",
+          "min": 0,
+          "max": 0.5,
+          "def": 0.08,
+          "step": 0.0025,
+          "group": "Form",
+          "hint": "How far nodes travel when they dissolve. Clamped to the lattice search window."
+        },
+        "edgeR": {
+          "type": "range",
+          "label": "Edge radius",
+          "min": 0.001,
+          "max": 0.01,
+          "def": 0.002,
+          "step": 0.000045,
+          "group": "Material",
+          "hint": "Radius of the cyan hairlines, scene units.",
+          "log": true
+        },
+        "glass": {
+          "type": "range",
+          "label": "Glass opacity",
+          "min": 0,
+          "max": 0.55,
+          "def": 0.1,
+          "step": 0.0028,
+          "group": "Material",
+          "hint": "Smoky tint inside the polyhedron."
+        },
+        "refr": {
+          "type": "range",
+          "label": "Refraction strength",
+          "min": 0,
+          "max": 0.12,
+          "def": 0.02,
+          "step": 0.0006,
+          "group": "Material",
+          "hint": "Screen-space offset of the lattice seen through facets. An approximation, not transport."
+        },
+        "particleR": {
+          "type": "range",
+          "label": "Particle radius",
+          "min": 0.001,
+          "max": 0.01,
+          "def": 0.003,
+          "step": 0.000045,
+          "group": "Particles",
+          "hint": "Node and particle radius, scene units.",
+          "log": true
+        },
+        "lime": {
+          "type": "range",
+          "label": "Lime fraction",
+          "min": 0,
+          "max": 0.35,
+          "def": 0.05,
+          "step": 0.0017,
+          "group": "Particles",
+          "hint": "Share of nodes that read as acid-lime particles."
+        },
+        "cycles": {
+          "type": "int",
+          "label": "Reconstructions per loop",
+          "min": 1,
+          "max": 3,
+          "def": 1,
+          "group": "Motion",
+          "hint": "Whole dissolve - transport - reassemble cycles per loop.",
+          "mutate": 0
+        },
+        "keyAngle": {
+          "type": "range",
+          "label": "Key direction",
+          "min": -180,
+          "max": 180,
+          "def": 60,
+          "step": 1,
+          "unit": "°",
+          "group": "Light",
+          "hint": "Direction of the key light in the picture plane, degrees.",
+          "randMax": 180
+        },
+        "exposure": {
+          "type": "range",
+          "label": "Exposure",
+          "min": 0.4,
+          "max": 2.4,
+          "def": 0.9,
+          "step": 0.01,
+          "unit": "×",
+          "log": true,
+          "group": "Light",
+          "hint": "Linear exposure before the single tone map.",
+          "randMax": 1.4
+        },
+        "bloom": {
+          "type": "range",
+          "label": "Bloom",
+          "min": 0,
+          "max": 1.6,
+          "def": 0.3,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Glow added around emissive light. 0 shows the bare geometry.",
+          "randMax": 0.9
+        },
+        "bloomRadius": {
+          "type": "range",
+          "label": "Bloom radius",
+          "min": 0.4,
+          "max": 2.2,
+          "def": 1,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Width of the glow relative to the frame.",
+          "randMax": 1.5
+        },
+        "lensCA": {
+          "type": "range",
+          "label": "Edge fringe",
+          "min": 0,
+          "max": 0.5,
+          "def": 0.12,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Spectral fringing toward the frame edge.",
+          "randMax": 0.25
+        },
+        "vignette": {
+          "type": "range",
+          "label": "Vignette",
+          "min": 0,
+          "max": 0.8,
+          "def": 0.5,
+          "step": 0.01,
+          "group": "Lens",
+          "hint": "Darkens the frame edge; never touches the focal area.",
+          "randMax": 0.55
+        },
+        "quality": {
+          "type": "select",
+          "label": "Quality",
+          "options": [
+            {
+              "v": "live",
+              "l": "Live"
+            },
+            {
+              "v": "balanced",
+              "l": "Balanced"
+            },
+            {
+              "v": "export",
+              "l": "Export"
+            }
+          ],
+          "def": "balanced",
+          "mutate": 0,
+          "group": "Quality",
+          "hint": "Sample counts only. Composition, phase and exposure stay the same."
+        }
+      }
+    }
+  ]
+}
