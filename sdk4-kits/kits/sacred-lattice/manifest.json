@@ -644,16 +644,6 @@
           "group": "Form",
           "hint": "Separation of the cages in depth. Drives perspective and parallax."
         },
-        "circleLayers": {
-          "type": "int",
-          "label": "Circle layers",
-          "min": 0,
-          "max": 8,
-          "def": 0,
-          "group": "Form",
-          "hint": "Concentric circles with inscribed chord polygons. 0 removes them.",
-          "mutate": 0.3
-        },
         "edgeR": {
           "type": "range",
           "label": "Edge radius",
@@ -895,16 +885,6 @@
           "group": "Form",
           "hint": "Separation of the cages in depth. Drives perspective and parallax."
         },
-        "circleLayers": {
-          "type": "int",
-          "label": "Circle layers",
-          "min": 0,
-          "max": 8,
-          "def": 3,
-          "group": "Form",
-          "hint": "Concentric circles with inscribed chord polygons. 0 removes them.",
-          "mutate": 0.3
-        },
         "edgeR": {
           "type": "range",
           "label": "Edge radius",
@@ -915,16 +895,6 @@
           "group": "Material",
           "hint": "Radius of gold edges in scene units.",
           "log": true
-        },
-        "facet": {
-          "type": "range",
-          "label": "Facet opacity",
-          "min": 0,
-          "max": 0.55,
-          "def": 0,
-          "step": 0.0028,
-          "group": "Material",
-          "hint": "Pale glass faces on tetra and octahedra. Approximate glass, not refraction."
         },
         "core": {
           "type": "range",
@@ -966,18 +936,6 @@
           "step": 0.0005,
           "group": "Motion",
           "hint": "Scale and facet breathing, sin(theta + phase)."
-        },
-        "keyAngle": {
-          "type": "range",
-          "label": "Key direction",
-          "min": -180,
-          "max": 180,
-          "def": 130,
-          "step": 1,
-          "unit": "°",
-          "group": "Light",
-          "hint": "Direction of the key light in the picture plane, degrees.",
-          "randMax": 180
         },
         "exposure": {
           "type": "range",
@@ -1117,16 +1075,6 @@
         ]
       },
       "params": {
-        "levels": {
-          "type": "int",
-          "label": "Nesting levels",
-          "min": 2,
-          "max": 7,
-          "def": 4,
-          "group": "Form",
-          "hint": "Number of nested cages. Each is scaled by the nesting ratio.",
-          "mutate": 0.3
-        },
         "ratio": {
           "type": "range",
           "label": "Nesting ratio",
@@ -1136,16 +1084,6 @@
           "step": 0.002,
           "group": "Form",
           "hint": "Scale of each cage relative to the one outside it. 0.618 is the golden ratio."
-        },
-        "depthSp": {
-          "type": "range",
-          "label": "Depth spacing",
-          "min": 0.05,
-          "max": 0.6,
-          "def": 0.22,
-          "step": 0.0027,
-          "group": "Form",
-          "hint": "Separation of the cages in depth. Drives perspective and parallax."
         },
         "circleLayers": {
           "type": "int",
@@ -1168,16 +1106,6 @@
           "hint": "Radius of gold edges in scene units.",
           "log": true
         },
-        "facet": {
-          "type": "range",
-          "label": "Facet opacity",
-          "min": 0,
-          "max": 0.55,
-          "def": 0,
-          "step": 0.0028,
-          "group": "Material",
-          "hint": "Pale glass faces on tetra and octahedra. Approximate glass, not refraction."
-        },
         "core": {
           "type": "range",
           "label": "Core intensity",
@@ -1198,38 +1126,6 @@
           "group": "Motion",
           "hint": "Whole revolutions of each cage per loop, alternating direction.",
           "mutate": 0
-        },
-        "orbit": {
-          "type": "range",
-          "label": "Camera orbit amplitude",
-          "min": 0,
-          "max": 0.25,
-          "def": 0.08,
-          "step": 0.0013,
-          "group": "Motion",
-          "hint": "Closed camera orbit, radians."
-        },
-        "breath": {
-          "type": "range",
-          "label": "Breath",
-          "min": 0,
-          "max": 0.1,
-          "def": 0.03,
-          "step": 0.0005,
-          "group": "Motion",
-          "hint": "Scale and facet breathing, sin(theta + phase)."
-        },
-        "keyAngle": {
-          "type": "range",
-          "label": "Key direction",
-          "min": -180,
-          "max": 180,
-          "def": 130,
-          "step": 1,
-          "unit": "°",
-          "group": "Light",
-          "hint": "Direction of the key light in the picture plane, degrees.",
-          "randMax": 180
         },
         "exposure": {
           "type": "range",
@@ -1287,28 +1183,6 @@
           "group": "Lens",
           "hint": "Darkens the frame edge; never touches the focal area.",
           "randMax": 0.55
-        },
-        "quality": {
-          "type": "select",
-          "label": "Quality",
-          "options": [
-            {
-              "v": "live",
-              "l": "Live"
-            },
-            {
-              "v": "balanced",
-              "l": "Balanced"
-            },
-            {
-              "v": "export",
-              "l": "Export"
-            }
-          ],
-          "def": "balanced",
-          "mutate": 0,
-          "group": "Quality",
-          "hint": "Sample counts only. Composition, phase and exposure stay the same."
         }
       }
     },
@@ -1388,16 +1262,6 @@
           "group": "Form",
           "hint": "Scale of each cage relative to the one outside it. 0.618 is the golden ratio."
         },
-        "depthSp": {
-          "type": "range",
-          "label": "Depth spacing",
-          "min": 0.05,
-          "max": 0.6,
-          "def": 0.22,
-          "step": 0.0027,
-          "group": "Form",
-          "hint": "Separation of the cages in depth. Drives perspective and parallax."
-        },
         "circleLayers": {
           "type": "int",
           "label": "Circle layers",
@@ -1419,16 +1283,6 @@
           "hint": "Radius of gold edges in scene units.",
           "log": true
         },
-        "facet": {
-          "type": "range",
-          "label": "Facet opacity",
-          "min": 0,
-          "max": 0.55,
-          "def": 0.16,
-          "step": 0.0028,
-          "group": "Material",
-          "hint": "Pale glass faces on tetra and octahedra. Approximate glass, not refraction."
-        },
         "core": {
           "type": "range",
           "label": "Core intensity",
@@ -1449,38 +1303,6 @@
           "group": "Motion",
           "hint": "Whole revolutions of each cage per loop, alternating direction.",
           "mutate": 0
-        },
-        "orbit": {
-          "type": "range",
-          "label": "Camera orbit amplitude",
-          "min": 0,
-          "max": 0.25,
-          "def": 0.08,
-          "step": 0.0013,
-          "group": "Motion",
-          "hint": "Closed camera orbit, radians."
-        },
-        "breath": {
-          "type": "range",
-          "label": "Breath",
-          "min": 0,
-          "max": 0.1,
-          "def": 0.03,
-          "step": 0.0005,
-          "group": "Motion",
-          "hint": "Scale and facet breathing, sin(theta + phase)."
-        },
-        "keyAngle": {
-          "type": "range",
-          "label": "Key direction",
-          "min": -180,
-          "max": 180,
-          "def": 130,
-          "step": 1,
-          "unit": "°",
-          "group": "Light",
-          "hint": "Direction of the key light in the picture plane, degrees.",
-          "randMax": 180
         },
         "exposure": {
           "type": "range",
@@ -1538,28 +1360,6 @@
           "group": "Lens",
           "hint": "Darkens the frame edge; never touches the focal area.",
           "randMax": 0.55
-        },
-        "quality": {
-          "type": "select",
-          "label": "Quality",
-          "options": [
-            {
-              "v": "live",
-              "l": "Live"
-            },
-            {
-              "v": "balanced",
-              "l": "Balanced"
-            },
-            {
-              "v": "export",
-              "l": "Export"
-            }
-          ],
-          "def": "balanced",
-          "mutate": 0,
-          "group": "Quality",
-          "hint": "Sample counts only. Composition, phase and exposure stay the same."
         }
       }
     },
@@ -1649,16 +1449,6 @@
           "group": "Form",
           "hint": "Separation of the cages in depth. Drives perspective and parallax."
         },
-        "circleLayers": {
-          "type": "int",
-          "label": "Circle layers",
-          "min": 0,
-          "max": 8,
-          "def": 0,
-          "group": "Form",
-          "hint": "Concentric circles with inscribed chord polygons. 0 removes them.",
-          "mutate": 0.3
-        },
         "edgeR": {
           "type": "range",
           "label": "Edge radius",
@@ -1669,16 +1459,6 @@
           "group": "Material",
           "hint": "Radius of gold edges in scene units.",
           "log": true
-        },
-        "facet": {
-          "type": "range",
-          "label": "Facet opacity",
-          "min": 0,
-          "max": 0.55,
-          "def": 0,
-          "step": 0.0028,
-          "group": "Material",
-          "hint": "Pale glass faces on tetra and octahedra. Approximate glass, not refraction."
         },
         "core": {
           "type": "range",
@@ -1720,18 +1500,6 @@
           "step": 0.0005,
           "group": "Motion",
           "hint": "Scale and facet breathing, sin(theta + phase)."
-        },
-        "keyAngle": {
-          "type": "range",
-          "label": "Key direction",
-          "min": -180,
-          "max": 180,
-          "def": 130,
-          "step": 1,
-          "unit": "°",
-          "group": "Light",
-          "hint": "Direction of the key light in the picture plane, degrees.",
-          "randMax": 180
         },
         "exposure": {
           "type": "range",

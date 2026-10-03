@@ -6,6 +6,11 @@
 // part of the beat and rests for the hold fraction. Closing is by construction (targets are indexed mod B). Slices displace in space only
 // during moves (envelope sin(pi*e)), and no form change depends on brightness: no strobing, no grain.
 
+#define Q_ACCENT p_accent
+#define Q_PITCH p_pitch
+#define Q_RINGS 6
+#define Q_WAVE p_wave
+#define Q_BLACK 0.45
 struct Bt { float k; float e; float env; };
 
 float bN() { return max(safeCycles(float(p_beats)), 1.0); }                       // photosensitive limiter: beats per loop capped at 3 changes per second
@@ -49,7 +54,7 @@ vec4 scene_main(vec2 uv, vec2 fc, int variant) {
   vec2 q = uv + vec2(sdisp, 0.0);
   vec2 v = rot(0.2) * q;
   vec3 col = white;
-  float acc = p_accent, blk = p_black;
+  float acc = Q_ACCENT, blk = Q_BLACK;
   float lw = p_trace * px;
 
   if (variant == 0) {                                                            // hero
@@ -59,19 +64,19 @@ vec4 scene_main(vec2 uv, vec2 fc, int variant) {
     // ring bands (negative space bands cut a disc)
     vec2 cc = vec2(-0.07, 0.0); float r = length(q - cc);
     float off = (b.k + b.e) * 1.0 * 0.0 + (b.k + b.e) / B;
-    float ringBand = band(r * float(p_rings) * 1.6 - off * float(p_rings) * 0.0 - off, 0.46 * (0.4 + blk));
+    float ringBand = band(r * float(Q_RINGS) * 1.6 - off * float(Q_RINGS) * 0.0 - off, 0.46 * (0.4 + blk));
     float ringMask = smoothstep(0.58 + px, 0.58 - px, r) * smoothstep(0.24 - px, 0.24 + px, r);
     // black bar
     float bx = -0.18 + 0.10 * (bpos(b, 3.0) - 0.5);
     float dbar = sdBox(v - vec2(bx, 0.0), vec2(0.095, 0.73));
     // stripe block
     float y0 = -0.24 + 0.14 * (bpos(b, 4.0) - 0.5) - (blk - 0.45) * 0.4;
-    float stripeBlock = stripes(v.x + 0.07 * b.env * 0.0, p_pitch, 0.5) * smoothstep(y0 + px, y0 - px, v.y);
+    float stripeBlock = stripes(v.x + 0.07 * b.env * 0.0, Q_PITCH, 0.5) * smoothstep(y0 + px, y0 - px, v.y);
     // red wave trace band
     float ph = TAU * (b.k + b.e) / B;
-    float wave = (0.16 * sin(q.x * 14.0 + ph * 1.0) + 0.05 * sin(q.x * 31.0 - ph * 2.0)) * (p_wave / 0.14);
+    float wave = (0.16 * sin(q.x * 14.0 + ph * 1.0) + 0.05 * sin(q.x * 31.0 - ph * 2.0)) * (Q_WAVE / 0.14);
     float slope = 0.16 * 14.0 * cos(q.x * 14.0 + ph) + 0.05 * 31.0 * cos(q.x * 31.0 - ph * 2.0);
-    float wd = (q.y - wave - 0.27 - 0.1 * (bpos(b, 5.0) - 0.5)) / sqrt(1.0 + slope * slope * (p_wave / 0.14) * (p_wave / 0.14));
+    float wd = (q.y - wave - 0.27 - 0.1 * (bpos(b, 5.0) - 0.5)) / sqrt(1.0 + slope * slope * (Q_WAVE / 0.14) * (Q_WAVE / 0.14));
     float redBand = smoothstep(-px, px, wd + 0.09 * (0.6 + acc * 2.0)) * smoothstep(px, -px, wd);
     col = mix(col, yel, k_cover(dy, 0.0));
     col = mix(col, red, redBand);
@@ -84,19 +89,19 @@ vec4 scene_main(vec2 uv, vec2 fc, int variant) {
     for (int j = 0; j < 7; j++) {
       float fj = float(j);
       float y = -0.62 + fj * 0.2;
-      float w = p_wave * 1.8 * sin(q.x * (9.0 + fj * 2.0) + ph * (1.0 + mod(fj, 2.0)) + fj) + 0.02 * sin(q.x * 40.0 - ph);
+      float w = Q_WAVE * 1.8 * sin(q.x * (9.0 + fj * 2.0) + ph * (1.0 + mod(fj, 2.0)) + fj) + 0.02 * sin(q.x * 40.0 - ph);
       float d = abs(q.y - y - w) - 0.5 * lw * (1.0 + 2.0 * mod(fj, 2.0));
       col = mix(col, black, k_cover(d, 0.0));
     }
     float dsl = sdBox(v - vec2(0.2 * (bpos(b, 1.0) - 0.5) - 0.12, 0.35), vec2(0.20, 0.5));
-    col = mix(col, black, stripes(v.y, p_pitch, 0.5) * k_cover(dsl, 0.0));
+    col = mix(col, black, stripes(v.y, Q_PITCH, 0.5) * k_cover(dsl, 0.0));
     col = mix(col, red, k_cover(sdBox(v - vec2(0.3 + 0.1 * (bpos(b, 2.0) - 0.5), -0.5), vec2(0.1 + acc * 0.4, 0.25)), 0.0));
   } else if (variant == 2) {                                                     // Red Signal
     col = white;
     float ph = TAU * (b.k + b.e) / B;
     float disc = length(q - vec2(0.05 * (bpos(b, 1.0) - 0.5), 0.1)) - (0.30 + acc * 0.5);
     col = mix(col, red, k_cover(disc, 0.0));
-    float sq = 0.12 * p_wave / 0.14;
+    float sq = 0.12 * Q_WAVE / 0.14;
     for (int j = 0; j < 5; j++) {
       float fj = float(j);
       float y = -0.5 + fj * 0.25;
@@ -107,7 +112,7 @@ vec4 scene_main(vec2 uv, vec2 fc, int variant) {
     col = mix(col, black, k_cover(sdBox(v - vec2(-0.22 + 0.1 * (bpos(b, 2.0) - 0.5), 0.0), vec2(0.09, 0.7)), 0.0));
   } else if (variant == 3) {                                                     // Broken Ring
     vec2 cc = vec2(0.0, 0.0); float r = length(q - cc); float a = atan(q.y, q.x);
-    float rings = float(p_rings);
+    float rings = float(Q_RINGS);
     float ri = floor(r * rings * 1.7);
     float inRing = band(r * rings * 1.7, 0.55);
     float turnR = (h11(ri * 3.7) > 0.5 ? 1.0 : -1.0) * (b.k + b.e) / B;
@@ -131,8 +136,8 @@ vec4 scene_main(vec2 uv, vec2 fc, int variant) {
   } else if (variant == 5) {                                                     // Interference Cut
     float a1 = 0.25, a2 = 0.25 + 0.06 + 0.04 * (bpos(b, 1.0));
     vec2 u1 = rot(a1) * q, u2 = rot(a2) * q;
-    float m1 = stripes(u1.x + (b.k + b.e) / B * p_pitch * px * 2.0, p_pitch, 0.5);
-    float m2 = stripes(u2.x, p_pitch * 1.06, 0.5);
+    float m1 = stripes(u1.x + (b.k + b.e) / B * Q_PITCH * px * 2.0, Q_PITCH, 0.5);
+    float m2 = stripes(u2.x, Q_PITCH * 1.06, 0.5);
     float cutm = smoothstep(-px, px, sin(v.y * 3.0 + 1.0 + TAU * (b.k + b.e) / B) * 0.0 + (q.x + 0.2 * (bpos(b, 2.0) - 0.5)) * 0.9 - q.y * 0.4);
     float st = mix(m1, m2, cutm);
     col = mix(white, black, st);
@@ -144,7 +149,7 @@ vec4 scene_main(vec2 uv, vec2 fc, int variant) {
       float fj = float(j);
       float y = -0.72 + fj * 0.18;
       float stepx = floor(q.x * 40.0) / 40.0;
-      float w = p_wave * 1.2 * sin(stepx * (7.0 + fj) + TAU * s * (1.0 + mod(fj, 2.0)) + fj * 0.8);
+      float w = Q_WAVE * 1.2 * sin(stepx * (7.0 + fj) + TAU * s * (1.0 + mod(fj, 2.0)) + fj * 0.8);
       float d = abs(q.y - y - floor(w * 24.0 + 0.5) / 24.0) - 0.5 * lw;
       col = mix(col, (j == 3 ? red : black), k_cover(d, 0.0));
     }

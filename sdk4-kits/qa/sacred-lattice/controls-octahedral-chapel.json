@@ -1,6 +1,6 @@
 {
   "kit": "sacred-lattice",
-  "style": "sacred-lattice-hero",
+  "style": "octahedral-chapel",
   "phase": 0.37,
   "size": [
     120,
@@ -12,61 +12,61 @@
       "key": "levels",
       "label": "Nesting levels",
       "type": "int",
-      "def": 4,
+      "def": 5,
       "vals": [
         2,
         7
       ],
       "diffs": [
-        10.46,
-        17.64
+        49.25,
+        28.19
       ],
-      "effect": 17.64
+      "effect": 49.25
     },
     {
       "key": "ratio",
       "label": "Nesting ratio",
       "type": "range",
-      "def": 0.618,
+      "def": 0.7,
       "vals": [
         0.45,
         0.85
       ],
       "diffs": [
-        5.42,
-        11.5
+        16.35,
+        17.37
       ],
-      "effect": 11.5
+      "effect": 17.37
     },
     {
       "key": "depthSp",
       "label": "Depth spacing",
       "type": "range",
-      "def": 0.22,
+      "def": 0.42,
       "vals": [
         0.05,
         0.6
       ],
       "diffs": [
-        8.83,
-        21.31
+        49.07,
+        26.69
       ],
-      "effect": 21.31
+      "effect": 49.07
     },
     {
       "key": "circleLayers",
       "label": "Circle layers",
       "type": "int",
-      "def": 4,
+      "def": 2,
       "vals": [
         0,
         8
       ],
       "diffs": [
-        7.47,
-        0.39
+        3.17,
+        1.31
       ],
-      "effect": 7.47
+      "effect": 3.17
     },
     {
       "key": "edgeR",
@@ -78,25 +78,25 @@
         0.016
       ],
       "diffs": [
-        13.16,
-        56.07
+        15.6,
+        55.31
       ],
-      "effect": 56.07
+      "effect": 55.31
     },
     {
       "key": "facet",
       "label": "Facet opacity",
       "type": "range",
-      "def": 0.16,
+      "def": 0.12,
       "vals": [
         0,
         0.55
       ],
       "diffs": [
-        3.36,
-        5.62
+        31.97,
+        45.47
       ],
-      "effect": 5.62
+      "effect": 45.47
     },
     {
       "key": "core",
@@ -108,10 +108,10 @@
         3
       ],
       "diffs": [
-        0.85,
-        2.95
+        0.48,
+        1.68
       ],
-      "effect": 2.95
+      "effect": 1.68
     },
     {
       "key": "cageTurns",
@@ -123,10 +123,10 @@
         3
       ],
       "diffs": [
-        17.44,
-        16.81
+        27.77,
+        19.88
       ],
-      "effect": 17.44
+      "effect": 27.77
     },
     {
       "key": "orbit",
@@ -138,10 +138,10 @@
         0.25
       ],
       "diffs": [
-        2.76,
-        4.63
+        11.3,
+        17.09
       ],
-      "effect": 4.63
+      "effect": 17.09
     },
     {
       "key": "breath",
@@ -153,10 +153,10 @@
         0.1
       ],
       "diffs": [
-        2.34,
-        4.61
+        4.91,
+        12.4
       ],
-      "effect": 4.61
+      "effect": 12.4
     },
     {
       "key": "keyAngle",
@@ -168,40 +168,40 @@
         180
       ],
       "diffs": [
-        0.06,
-        0.06
+        0.37,
+        0.37
       ],
-      "effect": 0.06
+      "effect": 0.37
     },
     {
       "key": "exposure",
       "label": "Exposure",
       "type": "range",
-      "def": 1,
+      "def": 0.8,
       "vals": [
         0.4,
         2.4
       ],
       "diffs": [
-        20.4,
-        26.94
+        25.74,
+        48.08
       ],
-      "effect": 26.94
+      "effect": 48.08
     },
     {
       "key": "bloom",
       "label": "Bloom",
       "type": "range",
-      "def": 0.5,
+      "def": 0.3,
       "vals": [
         0,
         1.6
       ],
       "diffs": [
-        2.62,
-        4.6
+        2.42,
+        8.23
       ],
-      "effect": 4.6
+      "effect": 8.23
     },
     {
       "key": "bloomRadius",
@@ -213,10 +213,10 @@
         2.2
       ],
       "diffs": [
-        1.25,
-        2.2
+        0.92,
+        1.18
       ],
-      "effect": 2.2
+      "effect": 1.18
     },
     {
       "key": "lensCA",
@@ -228,10 +228,10 @@
         0.5
       ],
       "diffs": [
-        0.29,
-        0.9
+        0.51,
+        1.58
       ],
-      "effect": 0.9
+      "effect": 1.58
     },
     {
       "key": "vignette",
@@ -243,10 +243,10 @@
         0.8
       ],
       "diffs": [
-        0.79,
-        0.94
+        2.61,
+        3.4
       ],
-      "effect": 0.94
+      "effect": 3.4
     },
     {
       "key": "quality",
@@ -259,11 +259,11 @@
         "export"
       ],
       "diffs": [
-        1.67,
+        1.22,
         0,
         0
       ],
-      "effect": 1.67
+      "effect": 1.22
     }
   ]
 }

@@ -215,16 +215,6 @@
           "unit": "px",
           "hint": "Stripe period in screen pixels. Filtered, so it stays clean as it changes."
         },
-        "rings": {
-          "type": "int",
-          "label": "Ring count",
-          "min": 3,
-          "max": 12,
-          "def": 6,
-          "group": "Form",
-          "hint": "Number of black ring bands. A spatial count.",
-          "mutate": 0.3
-        },
         "wave": {
           "type": "range",
           "label": "Wave amplitude",
@@ -245,16 +235,6 @@
           "group": "Material",
           "unit": "px",
           "hint": "Line weight of wave traces in screen pixels."
-        },
-        "black": {
-          "type": "range",
-          "label": "Black area",
-          "min": 0.2,
-          "max": 0.7,
-          "def": 0.45,
-          "step": 0.0025,
-          "group": "Material",
-          "hint": "How much of the composition is black."
         },
         "accent": {
           "type": "range",
@@ -345,27 +325,6 @@
         }
       ],
       "params": {
-        "pitch": {
-          "type": "range",
-          "label": "Stripe pitch",
-          "min": 4,
-          "max": 28,
-          "def": 12,
-          "step": 0.5,
-          "group": "Form",
-          "unit": "px",
-          "hint": "Stripe period in screen pixels. Filtered, so it stays clean as it changes."
-        },
-        "rings": {
-          "type": "int",
-          "label": "Ring count",
-          "min": 3,
-          "max": 12,
-          "def": 6,
-          "group": "Form",
-          "hint": "Number of black ring bands. A spatial count.",
-          "mutate": 0.3
-        },
         "wave": {
           "type": "range",
           "label": "Wave amplitude",
@@ -386,16 +345,6 @@
           "group": "Material",
           "unit": "px",
           "hint": "Line weight of wave traces in screen pixels."
-        },
-        "black": {
-          "type": "range",
-          "label": "Black area",
-          "min": 0.2,
-          "max": 0.7,
-          "def": 0.45,
-          "step": 0.0025,
-          "group": "Material",
-          "hint": "How much of the composition is black."
         },
         "accent": {
           "type": "range",
@@ -486,17 +435,6 @@
         }
       ],
       "params": {
-        "pitch": {
-          "type": "range",
-          "label": "Stripe pitch",
-          "min": 4,
-          "max": 28,
-          "def": 12,
-          "step": 0.5,
-          "group": "Form",
-          "unit": "px",
-          "hint": "Stripe period in screen pixels. Filtered, so it stays clean as it changes."
-        },
         "rings": {
           "type": "int",
           "label": "Ring count",
@@ -506,16 +444,6 @@
           "group": "Form",
           "hint": "Number of black ring bands. A spatial count.",
           "mutate": 0.3
-        },
-        "wave": {
-          "type": "range",
-          "label": "Wave amplitude",
-          "min": 0.02,
-          "max": 0.3,
-          "def": 0.14,
-          "step": 0.0014,
-          "group": "Form",
-          "hint": "Height of the wave traces, scene units."
         },
         "black": {
           "type": "range",
@@ -616,47 +544,6 @@
         }
       ],
       "params": {
-        "pitch": {
-          "type": "range",
-          "label": "Stripe pitch",
-          "min": 4,
-          "max": 28,
-          "def": 12,
-          "step": 0.5,
-          "group": "Form",
-          "unit": "px",
-          "hint": "Stripe period in screen pixels. Filtered, so it stays clean as it changes."
-        },
-        "rings": {
-          "type": "int",
-          "label": "Ring count",
-          "min": 3,
-          "max": 12,
-          "def": 6,
-          "group": "Form",
-          "hint": "Number of black ring bands. A spatial count.",
-          "mutate": 0.3
-        },
-        "wave": {
-          "type": "range",
-          "label": "Wave amplitude",
-          "min": 0.02,
-          "max": 0.3,
-          "def": 0.14,
-          "step": 0.0014,
-          "group": "Form",
-          "hint": "Height of the wave traces, scene units."
-        },
-        "black": {
-          "type": "range",
-          "label": "Black area",
-          "min": 0.2,
-          "max": 0.7,
-          "def": 0.45,
-          "step": 0.0025,
-          "group": "Material",
-          "hint": "How much of the composition is black."
-        },
         "accent": {
           "type": "range",
           "label": "Accent area",
@@ -757,36 +644,6 @@
           "unit": "px",
           "hint": "Stripe period in screen pixels. Filtered, so it stays clean as it changes."
         },
-        "rings": {
-          "type": "int",
-          "label": "Ring count",
-          "min": 3,
-          "max": 12,
-          "def": 6,
-          "group": "Form",
-          "hint": "Number of black ring bands. A spatial count.",
-          "mutate": 0.3
-        },
-        "wave": {
-          "type": "range",
-          "label": "Wave amplitude",
-          "min": 0.02,
-          "max": 0.3,
-          "def": 0.14,
-          "step": 0.0014,
-          "group": "Form",
-          "hint": "Height of the wave traces, scene units."
-        },
-        "black": {
-          "type": "range",
-          "label": "Black area",
-          "min": 0.2,
-          "max": 0.7,
-          "def": 0.45,
-          "step": 0.0025,
-          "group": "Material",
-          "hint": "How much of the composition is black."
-        },
         "accent": {
           "type": "range",
           "label": "Accent area",
@@ -876,27 +733,6 @@
         }
       ],
       "params": {
-        "pitch": {
-          "type": "range",
-          "label": "Stripe pitch",
-          "min": 4,
-          "max": 28,
-          "def": 12,
-          "step": 0.5,
-          "group": "Form",
-          "unit": "px",
-          "hint": "Stripe period in screen pixels. Filtered, so it stays clean as it changes."
-        },
-        "rings": {
-          "type": "int",
-          "label": "Ring count",
-          "min": 3,
-          "max": 12,
-          "def": 6,
-          "group": "Form",
-          "hint": "Number of black ring bands. A spatial count.",
-          "mutate": 0.3
-        },
         "wave": {
           "type": "range",
           "label": "Wave amplitude",
@@ -917,16 +753,6 @@
           "group": "Material",
           "unit": "px",
           "hint": "Line weight of wave traces in screen pixels."
-        },
-        "black": {
-          "type": "range",
-          "label": "Black area",
-          "min": 0.2,
-          "max": 0.7,
-          "def": 0.45,
-          "step": 0.0025,
-          "group": "Material",
-          "hint": "How much of the composition is black."
         },
         "accent": {
           "type": "range",
@@ -1017,57 +843,6 @@
         }
       ],
       "params": {
-        "pitch": {
-          "type": "range",
-          "label": "Stripe pitch",
-          "min": 4,
-          "max": 28,
-          "def": 12,
-          "step": 0.5,
-          "group": "Form",
-          "unit": "px",
-          "hint": "Stripe period in screen pixels. Filtered, so it stays clean as it changes."
-        },
-        "rings": {
-          "type": "int",
-          "label": "Ring count",
-          "min": 3,
-          "max": 12,
-          "def": 6,
-          "group": "Form",
-          "hint": "Number of black ring bands. A spatial count.",
-          "mutate": 0.3
-        },
-        "wave": {
-          "type": "range",
-          "label": "Wave amplitude",
-          "min": 0.02,
-          "max": 0.3,
-          "def": 0.14,
-          "step": 0.0014,
-          "group": "Form",
-          "hint": "Height of the wave traces, scene units."
-        },
-        "black": {
-          "type": "range",
-          "label": "Black area",
-          "min": 0.2,
-          "max": 0.7,
-          "def": 0.45,
-          "step": 0.0025,
-          "group": "Material",
-          "hint": "How much of the composition is black."
-        },
-        "accent": {
-          "type": "range",
-          "label": "Accent area",
-          "min": 0.05,
-          "max": 0.35,
-          "def": 0.2,
-          "step": 0.0015,
-          "group": "Material",
-          "hint": "Size of the yellow and red accents."
-        },
         "slice": {
           "type": "range",
           "label": "Slice displacement",
@@ -1147,47 +922,6 @@
         }
       ],
       "params": {
-        "pitch": {
-          "type": "range",
-          "label": "Stripe pitch",
-          "min": 4,
-          "max": 28,
-          "def": 12,
-          "step": 0.5,
-          "group": "Form",
-          "unit": "px",
-          "hint": "Stripe period in screen pixels. Filtered, so it stays clean as it changes."
-        },
-        "rings": {
-          "type": "int",
-          "label": "Ring count",
-          "min": 3,
-          "max": 12,
-          "def": 6,
-          "group": "Form",
-          "hint": "Number of black ring bands. A spatial count.",
-          "mutate": 0.3
-        },
-        "wave": {
-          "type": "range",
-          "label": "Wave amplitude",
-          "min": 0.02,
-          "max": 0.3,
-          "def": 0.14,
-          "step": 0.0014,
-          "group": "Form",
-          "hint": "Height of the wave traces, scene units."
-        },
-        "black": {
-          "type": "range",
-          "label": "Black area",
-          "min": 0.2,
-          "max": 0.7,
-          "def": 0.45,
-          "step": 0.0025,
-          "group": "Material",
-          "hint": "How much of the composition is black."
-        },
         "accent": {
           "type": "range",
           "label": "Accent area",

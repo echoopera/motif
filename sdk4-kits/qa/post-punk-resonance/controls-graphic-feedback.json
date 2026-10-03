@@ -1,0 +1,177 @@
+{
+  "kit": "post-punk-resonance",
+  "style": "graphic-feedback",
+  "phase": 0.37,
+  "size": [
+    120,
+    213
+  ],
+  "note": "effect = max mean-abs 8-bit change vs the default frame over min/max (or every option)",
+  "rows": [
+    {
+      "key": "pitch",
+      "label": "Stripe pitch",
+      "type": "range",
+      "def": 12,
+      "vals": [
+        4,
+        28
+      ],
+      "diffs": [
+        0,
+        0
+      ],
+      "effect": 0
+    },
+    {
+      "key": "rings",
+      "label": "Ring count",
+      "type": "int",
+      "def": 6,
+      "vals": [
+        3,
+        12
+      ],
+      "diffs": [
+        0,
+        0
+      ],
+      "effect": 0
+    },
+    {
+      "key": "wave",
+      "label": "Wave amplitude",
+      "type": "range",
+      "def": 0.14,
+      "vals": [
+        0.02,
+        0.3
+      ],
+      "diffs": [
+        0,
+        0
+      ],
+      "effect": 0
+    },
+    {
+      "key": "black",
+      "label": "Black area",
+      "type": "range",
+      "def": 0.45,
+      "vals": [
+        0.2,
+        0.7
+      ],
+      "diffs": [
+        0,
+        0
+      ],
+      "effect": 0
+    },
+    {
+      "key": "accent",
+      "label": "Accent area",
+      "type": "range",
+      "def": 0.2,
+      "vals": [
+        0.05,
+        0.35
+      ],
+      "diffs": [
+        0,
+        0
+      ],
+      "effect": 0
+    },
+    {
+      "key": "slice",
+      "label": "Slice displacement",
+      "type": "range",
+      "def": 0.09,
+      "vals": [
+        0,
+        0.25
+      ],
+      "diffs": [
+        2.61,
+        4.46
+      ],
+      "effect": 4.46
+    },
+    {
+      "key": "hold",
+      "label": "Hold fraction",
+      "type": "range",
+      "def": 0.35,
+      "vals": [
+        0.15,
+        0.65
+      ],
+      "diffs": [
+        24.1,
+        7.92
+      ],
+      "effect": 24.1
+    },
+    {
+      "key": "beats",
+      "label": "Beats per loop",
+      "type": "int",
+      "def": 2,
+      "vals": [
+        1,
+        4
+      ],
+      "diffs": [
+        74.75,
+        98.95
+      ],
+      "effect": 98.95
+    },
+    {
+      "key": "stepped",
+      "label": "On twos",
+      "type": "toggle",
+      "def": false,
+      "vals": [
+        false,
+        true
+      ],
+      "diffs": [
+        0,
+        66.75
+      ],
+      "effect": 66.75
+    },
+    {
+      "key": "exposure",
+      "label": "Exposure",
+      "type": "range",
+      "def": 1,
+      "vals": [
+        0.7,
+        1.4
+      ],
+      "diffs": [
+        25.15,
+        16.3
+      ],
+      "effect": 25.15
+    },
+    {
+      "key": "vignette",
+      "label": "Vignette",
+      "type": "range",
+      "def": 0,
+      "vals": [
+        0,
+        0.5
+      ],
+      "diffs": [
+        0,
+        8.09
+      ],
+      "effect": 8.09
+    }
+  ]
+}

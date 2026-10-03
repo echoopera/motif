@@ -1,6 +1,6 @@
 {
   "kit": "sacred-lattice",
-  "style": "sacred-lattice-hero",
+  "style": "circle-cathedral",
   "phase": 0.37,
   "size": [
     120,
@@ -18,10 +18,10 @@
         7
       ],
       "diffs": [
-        10.46,
-        17.64
+        0,
+        0
       ],
-      "effect": 17.64
+      "effect": 0
     },
     {
       "key": "ratio",
@@ -33,10 +33,10 @@
         0.85
       ],
       "diffs": [
-        5.42,
-        11.5
+        11.99,
+        16.39
       ],
-      "effect": 11.5
+      "effect": 16.39
     },
     {
       "key": "depthSp",
@@ -48,70 +48,70 @@
         0.6
       ],
       "diffs": [
-        8.83,
-        21.31
+        0,
+        0
       ],
-      "effect": 21.31
+      "effect": 0
     },
     {
       "key": "circleLayers",
       "label": "Circle layers",
       "type": "int",
-      "def": 4,
+      "def": 5,
       "vals": [
         0,
         8
       ],
       "diffs": [
-        7.47,
-        0.39
+        8.26,
+        1.45
       ],
-      "effect": 7.47
+      "effect": 8.26
     },
     {
       "key": "edgeR",
       "label": "Edge radius",
       "type": "range",
-      "def": 0.004,
+      "def": 0.0035,
       "vals": [
         0.001,
         0.016
       ],
       "diffs": [
-        13.16,
-        56.07
+        7.08,
+        33.81
       ],
-      "effect": 56.07
+      "effect": 33.81
     },
     {
       "key": "facet",
       "label": "Facet opacity",
       "type": "range",
-      "def": 0.16,
+      "def": 0,
       "vals": [
         0,
         0.55
       ],
       "diffs": [
-        3.36,
-        5.62
+        0,
+        0
       ],
-      "effect": 5.62
+      "effect": 0
     },
     {
       "key": "core",
       "label": "Core intensity",
       "type": "range",
-      "def": 0.7,
+      "def": 0.5,
       "vals": [
         0.1,
         3
       ],
       "diffs": [
-        0.85,
-        2.95
+        0.74,
+        3.82
       ],
-      "effect": 2.95
+      "effect": 3.82
     },
     {
       "key": "cageTurns",
@@ -123,10 +123,10 @@
         3
       ],
       "diffs": [
-        17.44,
-        16.81
+        4.5,
+        4.88
       ],
-      "effect": 17.44
+      "effect": 4.88
     },
     {
       "key": "orbit",
@@ -138,10 +138,10 @@
         0.25
       ],
       "diffs": [
-        2.76,
-        4.63
+        0,
+        0
       ],
-      "effect": 4.63
+      "effect": 0
     },
     {
       "key": "breath",
@@ -153,10 +153,10 @@
         0.1
       ],
       "diffs": [
-        2.34,
-        4.61
+        0,
+        0
       ],
-      "effect": 4.61
+      "effect": 0
     },
     {
       "key": "keyAngle",
@@ -168,10 +168,10 @@
         180
       ],
       "diffs": [
-        0.06,
-        0.06
+        0,
+        0
       ],
-      "effect": 0.06
+      "effect": 0
     },
     {
       "key": "exposure",
@@ -183,10 +183,10 @@
         2.4
       ],
       "diffs": [
-        20.4,
-        26.94
+        17.02,
+        27.6
       ],
-      "effect": 26.94
+      "effect": 27.6
     },
     {
       "key": "bloom",
@@ -198,10 +198,10 @@
         1.6
       ],
       "diffs": [
-        2.62,
-        4.6
+        0.56,
+        1.16
       ],
-      "effect": 4.6
+      "effect": 1.16
     },
     {
       "key": "bloomRadius",
@@ -213,10 +213,10 @@
         2.2
       ],
       "diffs": [
-        1.25,
-        2.2
+        0.32,
+        0.41
       ],
-      "effect": 2.2
+      "effect": 0.41
     },
     {
       "key": "lensCA",
@@ -228,10 +228,10 @@
         0.5
       ],
       "diffs": [
-        0.29,
-        0.9
+        0.43,
+        1.36
       ],
-      "effect": 0.9
+      "effect": 1.36
     },
     {
       "key": "vignette",
@@ -243,10 +243,10 @@
         0.8
       ],
       "diffs": [
-        0.79,
-        0.94
+        0.77,
+        0.92
       ],
-      "effect": 0.94
+      "effect": 0.92
     },
     {
       "key": "quality",
@@ -259,11 +259,11 @@
         "export"
       ],
       "diffs": [
-        1.67,
+        0,
         0,
         0
       ],
-      "effect": 1.67
+      "effect": 0
     }
   ]
 }

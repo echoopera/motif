@@ -8,6 +8,14 @@
 // Loop: cage rotations are integer turns of theta about a fixed tilted axis; static tilts and offsets are seeded; the camera
 // orbit is a closed ellipse; facet breathing is sin(theta + seeded phase).
 
+#define Q_CIRCLES 0
+#define Q_ORBIT p_orbit
+#define Q_BREATH p_breath
+#define Q_DEPTHSP p_depthSp
+#define Q_QUALITY p_quality
+#define Q_FACET p_facet
+#define Q_KEY k_key()
+#define Q_LEVELS p_levels
 const float PHI = 1.618033988749895;
 
 // polyhedra: type 0 tetra, 1 octa, 2 cube, 3 icosa (vertices normalised; edges where dot(vi,vj) == polyDot)
@@ -43,7 +51,7 @@ vec3 cage(vec2 q, int type, float Rk, mat3 M, float zoff, float edgeR, float fac
   vec3 acc = vec3(0.0);
   float ed = polyDot(type);
   float px = k_px();
-  vec3 K = k_key();
+  vec3 K = Q_KEY;
   for (int i = 0; i < 12; i++) {
     if (i >= N) break;
     for (int j = 0; j < 12; j++) {
@@ -68,7 +76,7 @@ vec3 cage(vec2 q, int type, float Rk, mat3 M, float zoff, float edgeR, float fac
     float depthK = clamp(0.62 - 0.55 * P[i].z / max(Rk, 0.05), 0.15, 1.2);
     float d = length(q - P[i].xy);
     float rr = edgeR * (1.8 + 1.4 * depthK) * nodeK;
-    acc += mix(u_a1, u_ink, 0.6) * (exp(-(d * d) / (rr * rr)) * 2.2 + (k_q() > 0 ? exp(-d / (rr * 4.0)) * 0.12 : 0.0)) * depthK * lum * nodeK;
+    acc += mix(u_a1, u_ink, 0.6) * (exp(-(d * d) / (rr * rr)) * 2.2 + (Q_QUALITY > 0 ? exp(-d / (rr * 4.0)) * 0.12 : 0.0)) * depthK * lum * nodeK;
   }
   if (glassOn && facet > 0.001) {
     // glass facets: additive, view-dependent. every vertex triple whose pairwise dots equal the edge dot is a face.
@@ -142,12 +150,12 @@ vec4 scene_main(vec2 uv, vec2 fc, int variant) {
   vec2 q = uv - c0;
   vec3 col = latticeGround(uv, c0);
   float calm = k_calm();
-  float orb = p_orbit * calm;
+  float orb = Q_ORBIT * calm;
   mat3 O = rotX(orb * sin(th)) * rotY(orb * 0.8 * cos(th));
-  float breath = 1.0 + p_breath * calm * sin(th + 1.7);
-  int levels = p_levels;
+  float breath = 1.0 + Q_BREATH * calm * sin(th + 1.7);
+  int levels = Q_LEVELS;
   float R0 = 0.44 * (variant == 3 ? 1.06 : 1.0);
-  float facet = p_facet * (0.75 + 0.25 * sin(th + 0.6));
+  float facet = Q_FACET * (0.75 + 0.25 * sin(th + 0.6));
   float lum = 1.0;
   float turns = float(p_cageTurns);
   float edgeR = p_edgeR;
@@ -169,7 +177,7 @@ vec4 scene_main(vec2 uv, vec2 fc, int variant) {
       mat3 M = O * rotX(tiltA) * rotY(spin + tiltB) * rotZ(fk * 0.37);
       if (variant == 7) M = O * rotY(spin * 0.0 + tiltB) * rotX(0.0) * rotZ(turns * th * dir + fk * 0.4);   // axial halo: spin about the view axis
       if (variant == 7) M = O * rotX(0.35) * rotZ(turns * th * dir + fk * 0.4) * rotY(0.3 * fk);
-      float zoff = (fk - 0.5 * float(levels - 1)) * p_depthSp * (variant == 1 ? 1.8 : 1.0);
+      float zoff = (fk - 0.5 * float(levels - 1)) * Q_DEPTHSP * (variant == 1 ? 1.8 : 1.0);
       float inner = 0.55 + 0.45 * fk / max(float(levels - 1), 1.0);
       float nodeK = variant == 6 ? 1.8 : 1.0;
       bool glass = (type <= 1) && variant != 6;
@@ -180,7 +188,7 @@ vec4 scene_main(vec2 uv, vec2 fc, int variant) {
     }
   }
   // circle layers (hero: a few under the cages; variants 4/5/7: the subject)
-  int cl = p_circleLayers;
+  int cl = Q_CIRCLES;
   if (variant == 4) {                                                          // Circle Cathedral: overlapping rings on a 6-fold lattice
     float Rc = 0.17 * (1.0 + 0.06 * sin(th));
     for (int a = 0; a < 7; a++) {
