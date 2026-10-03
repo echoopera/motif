@@ -2,47 +2,156 @@
   "kit": "cellular-cosmos",
   "version": "1.0.0",
   "size": [
-    72,
-    128
+    180,
+    320
   ],
   "renderer": "SwiftShader (software GL, headless Chromium)",
   "note": "Metric definitions in tools/qa.mjs. Software timings and metrics are relative diagnostics, not device performance.",
   "results": [
     {
-      "id": "radial-organs",
+      "id": "cellular-cosmos-hero",
       "delta0_p1": 0,
-      "seamStep": 1.125,
-      "seamStepAfter": 1.07,
-      "velMedian": 0.898,
-      "velMax": 1.507,
-      "seamRatio": 1.25,
-      "popRatio": 1.68,
+      "seamStep": 1.58,
+      "seamStepAfter": 1.607,
+      "velMedian": 1.632,
+      "velMax": 1.806,
+      "seamRatio": 0.98,
+      "popRatio": 1.11,
       "exposureByQuality": [
-        0.3394,
-        0.3409,
-        0.3409
+        0.2938,
+        0.2944,
+        0.2944
       ],
-      "exposureSpread": 0.004,
-      "meanLuma": 0.3409,
-      "flashTilesOver3": 3,
+      "exposureSpread": 0.002,
+      "meanLuma": 0.2944,
+      "flashTilesOver3": 0,
+      "flashPairsMaxPerSec": 0
+    },
+    {
+      "id": "emerald-colonies",
+      "delta0_p1": 0,
+      "seamStep": 1.203,
+      "seamStepAfter": 1.158,
+      "velMedian": 1.126,
+      "velMax": 1.425,
+      "seamRatio": 1.07,
+      "popRatio": 1.27,
+      "exposureByQuality": [
+        0.305,
+        0.3056,
+        0.3056
+      ],
+      "exposureSpread": 0.002,
+      "meanLuma": 0.3056,
+      "flashTilesOver3": 1,
       "flashPairsMaxPerSec": 3
     },
     {
-      "id": "cellular-cosmos-hero",
+      "id": "coral-division",
       "delta0_p1": 0,
-      "seamStep": 2.039,
-      "seamStepAfter": 1.88,
-      "velMedian": 1.951,
-      "velMax": 2.307,
-      "seamRatio": 1.05,
-      "popRatio": 1.18,
+      "seamStep": 0.752,
+      "seamStepAfter": 0.748,
+      "velMedian": 0.855,
+      "velMax": 0.983,
+      "seamRatio": 0.88,
+      "popRatio": 1.15,
       "exposureByQuality": [
-        0.3156,
-        0.3163,
-        0.3163
+        0.2764,
+        0.2772,
+        0.2772
+      ],
+      "exposureSpread": 0.003,
+      "meanLuma": 0.2772,
+      "flashTilesOver3": 0,
+      "flashPairsMaxPerSec": 0
+    },
+    {
+      "id": "membrane-choir",
+      "delta0_p1": 0,
+      "seamStep": 0.752,
+      "seamStepAfter": 0.763,
+      "velMedian": 0.786,
+      "velMax": 0.898,
+      "seamRatio": 0.97,
+      "popRatio": 1.14,
+      "meanLuma": 0.3799,
+      "flashTilesOver3": 1,
+      "flashPairsMaxPerSec": 3
+    },
+    {
+      "id": "spore-drift",
+      "delta0_p1": 0,
+      "seamStep": 1.761,
+      "seamStepAfter": 1.778,
+      "velMedian": 1.762,
+      "velMax": 1.912,
+      "seamRatio": 1.01,
+      "popRatio": 1.08,
+      "meanLuma": 0.3642,
+      "flashTilesOver3": 0,
+      "flashPairsMaxPerSec": 0
+    },
+    {
+      "id": "symbiotic-web",
+      "delta0_p1": 0,
+      "seamStep": 2.185,
+      "seamStepAfter": 2.201,
+      "velMedian": 2.343,
+      "velMax": 2.647,
+      "seamRatio": 0.94,
+      "popRatio": 1.13,
+      "meanLuma": 0.344,
+      "flashTilesOver3": 0,
+      "flashPairsMaxPerSec": 0
+    },
+    {
+      "id": "radial-organs",
+      "delta0_p1": 0,
+      "seamStep": 0.905,
+      "seamStepAfter": 0.901,
+      "velMedian": 0.771,
+      "velMax": 1.367,
+      "seamRatio": 1.17,
+      "popRatio": 1.77,
+      "exposureByQuality": [
+        0.3212,
+        0.3225,
+        0.3225
+      ],
+      "exposureSpread": 0.004,
+      "meanLuma": 0.3225,
+      "flashTilesOver3": 2,
+      "flashPairsMaxPerSec": 3
+    },
+    {
+      "id": "quiet-mitosis",
+      "delta0_p1": 0,
+      "seamStep": 0.463,
+      "seamStepAfter": 0.453,
+      "velMedian": 0.56,
+      "velMax": 0.878,
+      "seamRatio": 0.83,
+      "popRatio": 1.57,
+      "meanLuma": 0.2498,
+      "flashTilesOver3": 0,
+      "flashPairsMaxPerSec": 0
+    },
+    {
+      "id": "tidal-habitat",
+      "delta0_p1": 0,
+      "seamStep": 2.774,
+      "seamStepAfter": 2.737,
+      "velMedian": 2.595,
+      "velMax": 3.385,
+      "seamRatio": 1.07,
+      "popRatio": 1.3,
+      "exposureByQuality": [
+        0.3356,
+        0.3362,
+        0.3362
       ],
       "exposureSpread": 0.002,
-      "meanLuma": 0.3163,
+      "meanLuma": 0.3362,
       "flashTilesOver3": 0,
       "flashPairsMaxPerSec": 0
     }
