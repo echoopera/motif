@@ -228,7 +228,7 @@ vec3 phiGround(vec2 uv, vec2 c, float fogK) {
 vec4 scene_main(vec2 uv, vec2 fc, int variant) {
   float th = k_theta();
   vec2 asp = M_asp();
-  vec2 c0 = vec2(-0.05, 0.12);
+  vec2 c0 = vec2(-0.05, 0.12) * smoothstep(1.0, 1.45, asp.y);   // slight off-centre composition in portrait; exactly centred in landscape and square
   vec2 orb = p_orbit * k_calm() * vec2(cos(th), sin(th) * 0.8);                 // closed camera orbit
   float N = float(P_PETALS);
   float px = k_px();
