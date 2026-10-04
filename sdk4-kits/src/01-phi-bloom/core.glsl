@@ -101,7 +101,7 @@ Blade shadeBlade(vec2 b, float L, float W, float taper, float soft, float id, ve
 // Reach proof: a blade of half length L at radius r touches indices within dn = 2 r L / (e... s^2) (for e=0.5);
 // the half window KJ covers L <= KJ*s^2/(2r); L is clamped to 0.9 of that.
 vec4 phiLayer(vec2 p, float N, float Rf, float lenK, float widK, float soft, float salt, float rotA, float flowPh,
-              float unfold, float far, vec3 tintA, vec3 tintB, float minR, float tilt, float roundness) {
+              float unfold, float far, vec3 tintA, vec3 tintB, float minR, float tilt, float roundness, int jm) {
   float r = length(p);
   float s = Rf / sqrt(N);
   float r2 = (r / s) * (r / s);
@@ -109,23 +109,28 @@ vec4 phiLayer(vec2 p, float N, float Rf, float lenK, float widK, float soft, flo
   vec3 acc = vec3(0.0); float cov = 0.0;
   float th = k_theta();
   vec3 K = k_key();
-  float reachCap = 0.9 * float(KJ) * s * s / max(2.0 * r, 0.12);
+  float reachCap = 0.9 * float(jm) * s * s / max(2.0 * r, 0.12);
+  float uf = unfold * k_calm();
+  float Lmax = min(lenK * 1.55 * 1.22 * (1.0 + p_breath) * 1.0, reachCap);
+  float R2max = (Lmax * 1.15 + soft * 2.0) * (Lmax * 1.15 + soft * 2.0);
   for (int j = -KJ; j <= KJ; j++) {
+    if (j > jm || j < -jm) continue;
     float m = n0 + float(j);
     float ne = m + flowPh;
     if (ne < 0.0 || ne > N) continue;
     float vis = smoothstep(N, N * 0.86, ne) * smoothstep(0.0, 5.0, ne);
     float rel = ne / N;
     float wave = 0.5 - 0.5 * cos(th - TAU * 0.35 * sqrt(rel));      // unfold wave travelling out along the radius
-    unfold *= k_calm();
-    float rn = s * sqrt(ne) * (1.0 + unfold * wave * 0.5);
+    float rn = s * sqrt(ne) * (1.0 + uf * wave * 0.5);
     if (rn < minR) continue;
     float an = ne * GA + rotA;
     vec2 cs = vec2(cos(an), sin(an));
     vec2 c = rn * cs;
+    vec2 dq = p - c;
+    if (dot(dq, dq) > R2max) continue;                              // cheap reject before any hashing
     float ph = nh(ne, 1.0);
     float breathe = 1.0 + p_breath * k_calm() * sin(th + TAU * ph);
-    float L = min(lenK * (0.45 + 1.1 * sqrt(rel)) * (0.82 + 0.4 * nh(ne, 2.0)) * breathe * (1.0 - 0.38 * unfold * wave), reachCap);
+    float L = min(lenK * (0.45 + 1.1 * sqrt(rel)) * (0.82 + 0.4 * nh(ne, 2.0)) * breathe * (1.0 - 0.38 * uf * wave), reachCap);
     float W = L * widK * (0.8 + 0.4 * nh(ne, 3.0));
     vec2 d = p - c;
     if (dot(d, d) > (L * 1.15 + soft * 2.0) * (L * 1.15 + soft * 2.0)) continue;
@@ -298,11 +303,11 @@ vec4 scene_main(vec2 uv, vec2 fc, int variant) {
     if (variant == 5) { lk = lenK * 1.35; wk = 0.5; tl = 0.35; }                                                      // Spiral Canopy
     if (variant == 8) { lk = lenK * 0.95; wk = 0.5; }                                                                 // Quiet Unfold
     float Rfa = Rf * (variant == 3 ? 1.05 : 1.0);
-    L1 = phiLayer(pf * 1.22, sN * 0.8, Rfa, lk * 0.95, wk, px * 3.5, 21.0, rotFar, flowPh * 0.7, P_UNFOLD * 0.5, 1.0, champ, copper, 0.0, tl, rd);
+    L1 = phiLayer(pf * 1.22, sN * 0.8, Rfa, lk * 0.95, wk, px * 3.5, 21.0, rotFar, flowPh * 0.7, P_UNFOLD * 0.5, 1.0, champ, copper, 0.0, tl, rd, 18);
     col = mix(col, L1.rgb * (u_a2 * 1.5 + 0.03) * 0.55, L1.a * 0.55);       // far stratum: jade-tinted, never a grey haze
-    L2 = phiLayer(pm, sN, Rfa, lk, wk, px * 1.2, 3.0, rotA, flowPh, P_UNFOLD, 0.0, champ, copper, 0.0, tl, rd);
+    L2 = phiLayer(pm, sN, Rfa, lk, wk, px * 1.2, 3.0, rotA, flowPh, P_UNFOLD, 0.0, champ, copper, 0.0, tl, rd, KJ);
     if (variant == 6) {                                                 // Twin Phyllotaxis: counter-rotating second lattice
-      vec4 T2 = phiLayer(pm * 1.0, sN * 0.618, Rfa * 0.96, lk * 1.2, wk, px * 1.2, 17.0, -turnsRot * 2.0 + 2.2, -flowPh, P_UNFOLD, 0.0, copper, champ, 0.0, -tl, rd);
+      vec4 T2 = phiLayer(pm * 1.0, sN * 0.618, Rfa * 0.96, lk * 1.2, wk, px * 1.2, 17.0, -turnsRot * 2.0 + 2.2, -flowPh, P_UNFOLD, 0.0, copper, champ, 0.0, -tl, rd, 20);
       col = mix(col, T2.rgb * 0.8, T2.a);
     }
     col = mix(col, L2.rgb, L2.a);
@@ -326,7 +331,7 @@ vec4 scene_main(vec2 uv, vec2 fc, int variant) {
     // near stratum: few large defocused blades that occlude the lower frame
     {
       float soft = px * 9.0 * (1.0 + 0.4 * ds / 0.12);
-      L3 = phiLayer(pn * 0.92, 9.0, 1.05, lk * 4.6, 0.40, soft, 41.0, 0.7 + 0.10 * sin(th), flowPh * 0.0, 0.0, 0.0, champ, copper, 0.52, 0.4, rd);
+      L3 = phiLayer(pn * 0.92, 9.0, 1.05, lk * 4.6, 0.40, soft, 41.0, 0.7 + 0.10 * sin(th), flowPh * 0.0, 0.0, 0.0, champ, copper, 0.52, 0.4, rd, 9);
       vec3 nc = L3.rgb * (vec3(0.11) + u_a2 * 0.55);
       col = mix(col, nc, L3.a * 0.95);
     }

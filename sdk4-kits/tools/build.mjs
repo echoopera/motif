@@ -26,6 +26,8 @@ for (const id of ids) {
   const kit = (await import(pathToFileURL(path.join(dir, 'kit.mjs')).href + '?t=' + Date.now())).default;
   const out = path.join(root, 'kits', kit.id); fs.rmSync(out, { recursive: true, force: true }); fs.mkdirSync(path.join(out, 'styles'), { recursive: true });
   const core = fs.readFileSync(path.join(dir, 'core.glsl'), 'utf8');
+  // LINT: pow() of a negative base is undefined in GLSL and yields NaN (black) on many GPUs; squares must use k_sq()
+  if (/pow\([^;]*,\s*2(\.0)?\s*\)/.test(core)) throw new Error(kit.id + ': pow(x, 2.0) found; use k_sq(x)');
   const luminous = kit.post === 'luminous';
   const common = shared('lib.glsl');
   fs.writeFileSync(path.join(out, 'common.glsl'), common);

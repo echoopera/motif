@@ -30,7 +30,7 @@ float tideMap(vec3 p, float th, float calm, out float graw) {
   float c = 0.0;
   float fa = 0.20 * (0.55 + 0.45 * sin(th)) * (0.6 + p_morph * 6.0) * calm + 0.06;
   float f = fa * sin(p.x * 3.2) + 0.5 * fa * sin(p.z * 2.6 + 1.0);
-  float Lp = sqrt(1.0 + pow(fa * 3.2 + 0.5 * fa * 2.6, 2.0));
+  float Lp = sqrt(1.0 + k_sq(fa * 3.2 + 0.5 * fa * 2.6));
   float plate = (abs(p.y - f) - thick * 0.45) / Lp;
   float hk = p_freq * 2.25;
   vec2 hq = vec2(cos(p.x * hk), cos(p.z * hk));

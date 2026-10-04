@@ -54,13 +54,13 @@ vec3 cellBody(vec2 l, float F1, float F2, Site S, float species, float th, float
   // coral colony: scalloped rim and polyp tips
   if (species > 0.5) {
     float sc = 0.5 + 0.5 * cos(ang * 9.0 + S.ph);
-    float rim = exp(-pow((r - (0.30 + 0.06 * sc) * cs) / (0.012 * cs + 0.002), 2.0));
+    float rim = exp(-k_sq((r - (0.30 + 0.06 * sc) * cs) / (0.012 * cs + 0.002)));
     col += coral * 1.0 * rim * inside * 1.2;
-    float tip = pow(sc, 8.0) * exp(-pow((r - 0.36 * cs) / (0.03 * cs + 0.002), 2.0));
+    float tip = pow(sc, 8.0) * exp(-k_sq((r - 0.36 * cs) / (0.03 * cs + 0.002)));
     col += mix(coral, u_ink, 0.5) * tip * 1.6 * inside;
   }
   // nucleus: warm, controlled
-  col += (u_ink * 0.6 + mem * 0.7) * 1.8 * exp(-r * r / pow(0.055 * cs + 0.002, 2.0)) * (0.55 + 0.45 * inside);
+  col += (u_ink * 0.6 + mem * 0.7) * 1.8 * exp(-r * r / k_sq(0.055 * cs + 0.002)) * (0.55 + 0.45 * inside);
   col += mem * 0.15 * exp(-r / (0.2 * cs));
   return col;
 }
@@ -109,9 +109,9 @@ vec4 scene_main(vec2 uv, vec2 fc, int variant) {
   col += mix(u_a0, u_a1, species) * 0.55 * exp(-e2 / (0.07 * cs)) * 0.8 * aliveOwn * (0.4 + 0.6 * sibK);   // inner rim light
   // dark channel and bright membrane
   float mw = p_membrane * (variant == 3 ? 1.6 : 1.0);
-  float chan = exp(-pow(e2 / (mw * 3.2 + 1e-4), 2.0)) * sibK * aliveOwn;
+  float chan = exp(-k_sq(e2 / (mw * 3.2 + 1e-4))) * sibK * aliveOwn;
   col *= 1.0 - 0.80 * chan;
-  float mem = exp(-pow(e2 / max(mw * 0.55, 1e-4), 2.0)) * sibK;
+  float mem = exp(-k_sq(e2 / max(mw * 0.55, 1e-4))) * sibK;
   vec3 mc = mix(u_a0, u_a1, species);
   col += mix(mc, u_ink, 0.35) * mem * (variant == 3 ? 1.7 : 1.7) * (0.35 + 0.65 * smoothstep(0.0, 0.6, S1.sib > 0.5 ? S1.sc + 0.4 : 1.0));
   col += mc * 0.22 * exp(-e2 / (mw * 5.0 + 1e-4)) * (1.0 - chan * 0.6);
@@ -127,7 +127,7 @@ vec4 scene_main(vec2 uv, vec2 fc, int variant) {
         float lenAB = length(B.pos - A.pos);
         float d = sdSeg(p, A.pos, B.pos);
         float fade = 1.0 - smoothstep(1.0 * cs, 1.7 * cs, lenAB);
-        web += exp(-pow(d / (0.0035 + 0.003 * sin(th + lenAB * 30.0 + A.ph)), 2.0)) * fade;
+        web += exp(-k_sq(d / (0.0035 + 0.003 * sin(th + lenAB * 30.0 + A.ph)))) * fade;
         web += 0.0;
       }
     }

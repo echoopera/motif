@@ -15,7 +15,7 @@ const params = {
 const NOGLASS = ['glass', 'refr', 'keyAngle'];
 
 export default {
-  id: 'after-cyber', name: 'After Cyber', version: '1.0.0', accent: '#C6F000', post: 'luminous', sceneScale: 1, ssaa: 2, cost: 3,
+  id: 'after-cyber', name: 'After Cyber', version: '1.0.0', accent: '#C6F000', post: 'luminous', sceneScale: 1, ssaa: 1, cost: 3,
   description: 'Smoky glass, cyan hairlines, selective acid-lime particles in deep black: lattices that dissolve, travel and reassemble. Nine seamless infinite loops.',
   palettes: [
     { id: 'smoke-cyan-lime', name: 'Smoke Cyan Lime', bg: '#010608', ink: '#DDF8FF', a: ['#22C8E8', '#C6F000', '#0B2A30'] },

@@ -8,7 +8,7 @@
 // Loop: every temporal term is an integer multiple of theta (standing waves cos(k*theta + phase)); static phases are seeded.
 
 const int KMODES = 6;
-const int MAXS = 56;
+const int MAXS = 30;
 
 // kind 0: separable standing modes, analytic gradient.  kind 1: crossing families (odd modes rotated 90 deg), analytic.
 // kind 2: radial basin (FD gradient).  kind 3: two-source interference (FD gradient).
@@ -72,7 +72,7 @@ float sheetHit(vec3 ro, vec3 rd, float yoff, int kind, float amp, int steps, out
 vec3 hmSky(vec2 uv) {
   float g = smoothstep(-0.9, 0.7, uv.y);
   vec3 c = mix(u_a2 * 0.28, u_bg, g);
-  c += u_a0 * 0.035 * exp(-pow(uv.y - 0.05, 2.0) * 6.0);
+  c += u_a0 * 0.035 * exp(-k_sq(uv.y - 0.05) * 6.0);
   return c;
 }
 
@@ -100,7 +100,7 @@ vec3 hmRidges(vec2 uv, int variant) {
     vec3 body = mix(u_bg * 1.2, u_a2 * (0.5 + 0.8 * (1.0 - zj)), 0.55 + 0.4 * (-below < 0.2 ? 1.0 : 0.0));
     body *= 0.45 + 0.8 * (1.0 - zj) + p_opacity;
     col = mix(col, body, inside * (0.7 + 0.3 * p_opacity * 2.0));
-    float rim = exp(-pow(below / (p_nodeWidth * (1.0 + 2.2 * (1.0 - zj))), 2.0));
+    float rim = exp(-k_sq(below / (p_nodeWidth * (1.0 + 2.2 * (1.0 - zj)))));
     float crest = smoothstep(0.3, 1.0, h / (p_amp * 2.2));
     vec3 rc = mix(mix(u_a0, u_ink, 0.6), u_a1 * 2.0, crest * p_warmth);
     col += rc * rim * (0.35 + 1.8 * (1.0 - zj) * (1.0 - zj));

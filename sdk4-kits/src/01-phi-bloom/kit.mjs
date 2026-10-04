@@ -15,7 +15,7 @@ const params = {
   unfold: R('Unfold', 0, 0.3, 0.08, { group: 'Motion', hint: 'A radial unfold wave that returns through a fold. 0 holds the blooms open.' }),
   flow: I('Flow steps per loop', 0, 3, 0, { group: 'Motion', hint: 'Whole lattice indices the petals travel along the spiral each loop. 0 = rotation only.', mutate: 0 }),
   orbit: R('Camera orbit', 0, 0.25, 0.06, { group: 'Motion', hint: 'Closed camera orbit amplitude. Drives parallax between the strata.' }),
-  ...lens({ keyAngle: 125, exposure: 1.0, bloom: 0.55 }),
+  ...lens({ keyAngle: 125, exposure: 1.0, bloom: 0.55, quality: 'live' }),
 };
 
 export default {

@@ -3,6 +3,9 @@
 // Contract: time enters only through u_p. Every temporal harmonic is an integer
 // multiple of theta. Output is linear, tone-mapped once in the final pass.
 // ---------------------------------------------------------------------------
+// square without pow(): pow() of a negative base is undefined in GLSL (NaN on many GPUs)
+float k_sq(float x) { return x * x; }
+
 float k_phase() { return fract(u_p); }
 float k_theta() { return TAU * fract(u_p); }
 

@@ -207,7 +207,7 @@ vec4 scene_main(vec2 uv, vec2 fc, int variant) {
     float spec = pow(max(dot(reflect(normalize(vec3(uv * 0.85, -1.0)), hn), K), 0.0), 36.0);
     vec3 tint = mix(u_a2 * 0.7, u_a0 * 0.15, 0.4);
     vec3 glass = inner * (1.0 - p_glass * 0.6) + tint * p_glass * 1.5 + u_a0 * fres * (0.25 + p_glass) * 0.6 + u_ink * spec * 0.5;
-    float hair = exp(-pow(edgeD / (p_edgeR * 1.1 + px), 2.0));
+    float hair = exp(-k_sq(edgeD / (p_edgeR * 1.1 + px)));
     glass += u_a0 * hair * 1.5 + u_ink * hair * 0.25;
     col = col * (1.0 - p_glass * 0.3) + glass;
     col += lat * 0.0;

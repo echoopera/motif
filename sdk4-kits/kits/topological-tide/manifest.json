@@ -298,7 +298,7 @@
               "l": "Export"
             }
           ],
-          "def": "export",
+          "def": "balanced",
           "mutate": 0,
           "group": "Quality",
           "hint": "Sample counts only. Composition, phase and exposure stay the same."
@@ -547,7 +547,7 @@
               "l": "Export"
             }
           ],
-          "def": "export",
+          "def": "balanced",
           "mutate": 0,
           "group": "Quality",
           "hint": "Sample counts only. Composition, phase and exposure stay the same."
@@ -796,7 +796,7 @@
               "l": "Export"
             }
           ],
-          "def": "export",
+          "def": "balanced",
           "mutate": 0,
           "group": "Quality",
           "hint": "Sample counts only. Composition, phase and exposure stay the same."
@@ -1045,7 +1045,7 @@
               "l": "Export"
             }
           ],
-          "def": "export",
+          "def": "balanced",
           "mutate": 0,
           "group": "Quality",
           "hint": "Sample counts only. Composition, phase and exposure stay the same."
@@ -1274,7 +1274,7 @@
               "l": "Export"
             }
           ],
-          "def": "export",
+          "def": "balanced",
           "mutate": 0,
           "group": "Quality",
           "hint": "Sample counts only. Composition, phase and exposure stay the same."
@@ -1513,7 +1513,7 @@
               "l": "Export"
             }
           ],
-          "def": "export",
+          "def": "balanced",
           "mutate": 0,
           "group": "Quality",
           "hint": "Sample counts only. Composition, phase and exposure stay the same."
@@ -1762,7 +1762,7 @@
               "l": "Export"
             }
           ],
-          "def": "export",
+          "def": "balanced",
           "mutate": 0,
           "group": "Quality",
           "hint": "Sample counts only. Composition, phase and exposure stay the same."
@@ -2011,7 +2011,7 @@
               "l": "Export"
             }
           ],
-          "def": "export",
+          "def": "balanced",
           "mutate": 0,
           "group": "Quality",
           "hint": "Sample counts only. Composition, phase and exposure stay the same."
@@ -2260,7 +2260,7 @@
               "l": "Export"
             }
           ],
-          "def": "export",
+          "def": "balanced",
           "mutate": 0,
           "group": "Quality",
           "hint": "Sample counts only. Composition, phase and exposure stay the same."

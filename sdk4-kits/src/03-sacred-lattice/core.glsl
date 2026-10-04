@@ -121,7 +121,7 @@ vec3 cage(vec2 q, int type, float Rk, mat3 M, float zoff, float edgeR, float fac
           if (inside <= 0.0) continue;
           vec3 nrm = normalize(M * normalize(a + b + c));
           float lit = 0.35 + 0.65 * max(dot(nrm, K), 0.0);
-          float fr = pow(1.0 - clamp(abs(nrm.z), 0.0, 1.0), 2.0);
+          float fr = k_sq(1.0 - clamp(abs(nrm.z), 0.0, 1.0));
           float edgeGlow = 1.0 - smoothstep(0.0, 0.35, min(w0, min(u, v)));
           acc += mix(u_a1, u_ink, 0.5) * facet * inside * (0.20 * lit + 0.9 * fr * 0.4 + 0.35 * edgeGlow) * lum;
         }
@@ -240,7 +240,7 @@ vec4 scene_main(vec2 uv, vec2 fc, int variant) {
       float a = atan(q.y, q.x) - turns * th * ((j % 2 == 0) ? 1.0 : -1.0);
       float ticks = float(24 - 2 * j);
       float tk = smoothstep(0.9, 1.0, 0.5 + 0.5 * cos(a * ticks));
-      float band = exp(-pow((length(q) - r * 1.035) / 0.006, 2.0));
+      float band = exp(-k_sq((length(q) - r * 1.035) / 0.006));
       col += u_ink * tk * band * 0.8;
     }
     for (int k = 0; k < 7; k++) {                                              // inner compass needle cage
@@ -261,12 +261,12 @@ vec4 scene_main(vec2 uv, vec2 fc, int variant) {
       float d = length(q - P);
       col += u_a1 * exp(-d * d / (0.0009)) * 1.8;
       float ring = abs(length(q * vec2(1.0, 1.0 / 0.55)) - r);
-      col += u_a0 * exp(-pow(ring / (edgeR * 1.2), 2.0)) * 0.35;
+      col += u_a0 * exp(-k_sq(ring / (edgeR * 1.2))) * 0.35;
     }
   }
   if (variant == 7) {                                                          // halo: bright ring around the axis
     float r = length(q); float ring = abs(r - 0.36);
-    col += mix(u_a0, u_ink, 0.4) * (exp(-pow(ring / 0.004, 2.0)) * 1.4 + exp(-ring / 0.05) * 0.18) * (0.8 + 0.2 * sin(th + atan(q.y, q.x) * 3.0));
+    col += mix(u_a0, u_ink, 0.4) * (exp(-k_sq(ring / 0.004)) * 1.4 + exp(-ring / 0.05) * 0.18) * (0.8 + 0.2 * sin(th + atan(q.y, q.x) * 3.0));
   }
   // core light: controlled so the geometry stays visible at the focal point
   float rc = length(q);

@@ -68,7 +68,7 @@ float astralRho(vec3 p, int layers, float th, float calm, out vec3 emc, int vari
 vec4 scene_main(vec2 uv, vec2 fc, int variant) {
   float th = k_theta(); float calm = k_calm();
   int layers = p_layers;
-  int steps = k_q() == 0 ? 26 : k_q() == 1 ? 38 : 56;
+  int steps = k_q() == 0 ? 12 : k_q() == 1 ? 18 : 30;
   float zfar = 7.0;
   float travel = p_travel * (variant == 1 ? 2.2 : variant == 7 ? 0.4 : 1.0) * (variant == 8 ? 1.4 : 1.0);
   float z0 = travel * 5.0 * calm * (0.5 - 0.5 * cos(th));                     // closed camera excursion
@@ -80,7 +80,7 @@ vec4 scene_main(vec2 uv, vec2 fc, int variant) {
   vec3 C = vec3(0.0); float T = 1.0;
   float sigma = p_absorb * (variant == 3 ? 1.5 : 1.0);
   float emisK = p_emission * (variant == 8 ? 1.0 : 1.0);
-  for (int i = 0; i < 56; i++) {
+  for (int i = 0; i < 30; i++) {
     if (i >= steps) break;
     float t = (float(i) + 0.5 + (jit - 0.5) * 0.9) * ds;
     vec3 pos = ro + rd * t;
@@ -99,8 +99,8 @@ vec4 scene_main(vec2 uv, vec2 fc, int variant) {
   vec2 apc = vec2(0.06, 0.13);
   float rA = length(pf.xy - apc);
   float Ra = p_aperture * (variant == 7 ? 1.0 : 1.0);
-  float disc = exp(-pow(rA / max(Ra * 0.9, 1e-3), 2.0));
-  float rim = exp(-pow((rA - Ra) / (0.03 + 0.05 * Ra), 2.0));
+  float disc = exp(-k_sq(rA / max(Ra * 0.9, 1e-3)));
+  float rim = exp(-k_sq((rA - Ra) / (0.03 + 0.05 * Ra)));
   vec3 apertureC = mix(u_a1, u_ink, 0.65) * (1.8 * disc + 0.7 * rim) * (variant == 8 ? 0.8 : 1.0) * (variant == 5 ? 0.45 : 1.0);
   vec3 bg = mix(u_a2 * 0.25, u_bg, smoothstep(0.0, 0.9, length(uv)));
   C += T * (apertureC + bg);

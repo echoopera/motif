@@ -34,7 +34,7 @@ float tideMap(vec3 p, float th, float calm, out float graw) {
   vec2 rq = vec2(ca * rho - sa * p.y, sa * rho + ca * p.y);                              // half twist: continuous because the box is 180-degree symmetric
   vec2 bx = vec2(0.30 + 0.04 * calm * sin(th) + p_morph * 1.5 * calm * sin(th), 0.045 + 0.3 * p_shell * 0.5);   // shell = ribbon thickness, morph = width pulse
   float d = sdBox(rq, bx);
-  float Lm = sqrt(1.0 + pow(rmax / (2.0 * (R - rmax)), 2.0));
+  float Lm = sqrt(1.0 + k_sq(rmax / (2.0 * (R - rmax))));
   graw = gyroidG(w, k * 0.0 + 1.0) * 0.0 + sin(ph * 6.0 + th * 2.0) * 0.5 + 0.0;       // inlay current: integer 6 around, travelling at 2 theta
   return max(d / Lm, length(p) - p_bound);
 }

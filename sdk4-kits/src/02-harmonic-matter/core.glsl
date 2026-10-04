@@ -8,10 +8,10 @@
 
 const int KMODES = 6;
 //@if 4 5
-const int MAXS = 34;      // FD-gradient fields cost 3 evaluations per step: smaller bound keeps work under half of the sandbox limit
+const int MAXS = 22;      // FD-gradient fields cost 3 evaluations per step: smaller bound keeps work under half of the sandbox limit
 //@endif
 //@if 0 1 2 3 6 7 8
-const int MAXS = 56;
+const int MAXS = 30;
 //@endif
 
 //@if 0 1 2 3 6 7 8
@@ -122,6 +122,7 @@ float sheetHit(vec3 ro, vec3 rd, float yoff, int kind, float amp, int steps, out
 //@if 0 1 2 3 4 5
 // attached particles on the sheet: returns (core, halo, peakness)
 vec3 particles(vec2 xz, vec3 hg, float tdist, float kindW, float sheetId) {
+  vec2 gd = hg.yz;                                   // field gradient at the hit: one analytic derivative shared by the neighbourhood (cells are tiny against the wavelength)
   float cs = 0.06;
   vec2 cell = floor(xz / cs);
   float th = k_theta();
@@ -135,7 +136,6 @@ vec3 particles(vec2 xz, vec3 hg, float tdist, float kindW, float sheetId) {
     vec2 c = (cid + 0.25 + 0.5 * h22(cid * 1.7 + 3.0 + sheetId)) * cs;
     // displacement follows the field's own gradient with a fixed per-particle phase (closed in theta)
     float ph = TAU * h21(cid + sheetId * 7.0);
-    vec2 gd; hField(c, int(kindW), th, p_amp, gd);
     c += gd * p_drift * 0.4 * cos(float(p_osc) * th + ph) ;
     vec2 d = xz - c;
     float dd = length(d);
@@ -150,7 +150,7 @@ vec3 particles(vec2 xz, vec3 hg, float tdist, float kindW, float sheetId) {
 vec3 hmSky(vec2 uv) {
   float g = smoothstep(-0.9, 0.7, uv.y);
   vec3 c = mix(u_a2 * 0.28, u_bg, g);
-  c += u_a0 * 0.035 * exp(-pow(uv.y - 0.05, 2.0) * 6.0);
+  c += u_a0 * 0.035 * exp(-k_sq(uv.y - 0.05) * 6.0);
   return c;
 }
 
@@ -180,7 +180,7 @@ vec3 hmRibbons(vec2 uv, int variant) {
     y += 0.03 * sin(xw * (TAU / p_wavelength) * 0.6 + float(p_osc) * th + ph) / depth;
     float dy = abs(uv.y - y);
     float w = p_nodeWidth * (1.5 + 2.0 * (1.0 - zj));
-    float line = exp(-pow(dy / w, 2.0));
+    float line = exp(-k_sq(dy / w));
     float fillm = smoothstep(0.0, 0.5, (y - uv.y)) * p_opacity * 0.6 * exp(-(y - uv.y) * 3.0);
     vec3 c = mix(u_a0, u_ink, 0.5) * (0.5 + 1.5 * (1.0 - zj));
     float peak = smoothstep(0.4, 1.0, h / (p_amp * 2.6 + 1e-3)) * p_warmth;
@@ -223,7 +223,7 @@ vec3 hmRidges(vec2 uv, int variant) {
     vec3 body = mix(u_bg * 1.2, u_a2 * (0.5 + 0.8 * (1.0 - zj)), 0.55 + 0.4 * (-below < 0.2 ? 1.0 : 0.0));
     body *= 0.45 + 0.8 * (1.0 - zj) + p_opacity;
     col = mix(col, body, inside * (0.7 + 0.3 * p_opacity * 2.0));
-    float rim = exp(-pow(below / (p_nodeWidth * (1.0 + 2.2 * (1.0 - zj))), 2.0));
+    float rim = exp(-k_sq(below / (p_nodeWidth * (1.0 + 2.2 * (1.0 - zj)))));
     float crest = smoothstep(0.3, 1.0, h / (p_amp * 2.2));
     vec3 rc = mix(mix(u_a0, u_ink, 0.6), u_a1 * 2.0, crest * p_warmth);
     col += rc * rim * (0.35 + 1.8 * (1.0 - zj) * (1.0 - zj));
@@ -264,7 +264,7 @@ vec3 hmChladni(vec2 uv, int variant) {
   vec3 pc = mix(u_bg * 1.6, u_a2 * 0.5, 0.5);
   col = mix(col, pc + u_a0 * 0.035 * (0.5 + 0.5 * pm), plate);
   // sand grains gather on the node lines: bright with a narrow core, glow follows the field
-  float line = exp(-pow(distNode / (p_nodeWidth * 1.4), 2.0));
+  float line = exp(-k_sq(distNode / (p_nodeWidth * 1.4)));
   col += mix(u_a0, u_ink, 0.55) * line * plate * 1.5;
   col += u_a0 * exp(-distNode / (p_nodeWidth * 5.0)) * 0.2 * plate;
   float cs = 0.014;
@@ -282,7 +282,7 @@ vec3 hmChladni(vec2 uv, int variant) {
       pv += w * (cos(a * pq.x) * cos(b * pq.y) - cos(b * pq.x) * cos(a * pq.y)); sw += w;
     }
     pv /= max(sw, 1e-3);
-    float near = exp(-pow(pv * 2.4, 2.0));                                   // grains settle near nodes, smoothly
+    float near = exp(-k_sq(pv * 2.4));                                   // grains settle near nodes, smoothly
     if (hh.x > p_density * (0.15 + 0.85 * near)) continue;
     vec2 d = uv - c;
     col += mix(u_ink, u_a1, p_warmth * 0.6) * (0.8 + 0.8 * hh.y) * exp(-dot(d, d) / (p_particleR * p_particleR * 0.9)) * plate * (0.3 + near);
@@ -312,7 +312,7 @@ vec4 scene_main(vec2 uv, vec2 fc, int variant) {
   if (variant == 3) { kind = 1; sheets = 2; }                                      // Crosswave Veil
   if (variant == 4) { kind = 2; sheets = 2; }                                      // Resonant Basin
   if (variant == 5) { kind = 3; sheets = 1; pitch = max(p_tilt, 0.95); }           // Silver Interference
-  int steps = min(k_q() == 0 ? 24 : k_q() == 1 ? 38 : 56, MAXS);
+  int steps = min(k_q() == 0 ? 14 : k_q() == 1 ? 22 : 30, MAXS);
   float yaw = p_orbit * k_calm() * sin(th);
   camH = sin(pitch) * dist;
   vec3 ro = vec3(sin(yaw) * dist * cos(pitch), camH, -cos(yaw) * dist * cos(pitch));
@@ -353,7 +353,7 @@ vec4 scene_main(vec2 uv, vec2 fc, int variant) {
 //@if 0 1 3 4 5
     float nodeW = p_nodeWidth * (variant == 1 ? 1.6 : 1.0);
 //@endif
-    float node = nodeW > 0.0 ? exp(-pow(nd / max(nodeW, 1e-4), 2.0)) : 0.0;
+    float node = nodeW > 0.0 ? exp(-k_sq(nd / max(nodeW, 1e-4))) : 0.0;
     node *= 1.0 - smoothstep(0.0, 0.5, t * k_px() * 5.0 / max(nodeW, 1e-3) * 0.02);
     vec3 em = mix(u_a0, u_ink, 0.6) * node * (s == 0 ? 0.7 : 0.18);       // contours read on the top sheet; lower sheets stay quiet
     em += u_a1 * pow(smoothstep(0.25, 0.65, hnorm), 1.5) * clamp(warm, 0.0, 1.0) * (variant == 2 ? 4.2 : 2.4);              // amber light concentrated at the peaks

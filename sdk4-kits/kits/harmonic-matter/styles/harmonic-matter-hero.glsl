@@ -8,7 +8,7 @@
 // Loop: every temporal term is an integer multiple of theta (standing waves cos(k*theta + phase)); static phases are seeded.
 
 const int KMODES = 6;
-const int MAXS = 56;
+const int MAXS = 30;
 
 // kind 0: separable standing modes, analytic gradient.  kind 1: crossing families (odd modes rotated 90 deg), analytic.
 // kind 2: radial basin (FD gradient).  kind 3: two-source interference (FD gradient).
@@ -71,6 +71,7 @@ float sheetHit(vec3 ro, vec3 rd, float yoff, int kind, float amp, int steps, out
 
 // attached particles on the sheet: returns (core, halo, peakness)
 vec3 particles(vec2 xz, vec3 hg, float tdist, float kindW, float sheetId) {
+  vec2 gd = hg.yz;                                   // field gradient at the hit: one analytic derivative shared by the neighbourhood (cells are tiny against the wavelength)
   float cs = 0.06;
   vec2 cell = floor(xz / cs);
   float th = k_theta();
@@ -84,7 +85,6 @@ vec3 particles(vec2 xz, vec3 hg, float tdist, float kindW, float sheetId) {
     vec2 c = (cid + 0.25 + 0.5 * h22(cid * 1.7 + 3.0 + sheetId)) * cs;
     // displacement follows the field's own gradient with a fixed per-particle phase (closed in theta)
     float ph = TAU * h21(cid + sheetId * 7.0);
-    vec2 gd; hField(c, int(kindW), th, p_amp, gd);
     c += gd * p_drift * 0.4 * cos(float(p_osc) * th + ph) ;
     vec2 d = xz - c;
     float dd = length(d);
@@ -98,7 +98,7 @@ vec3 particles(vec2 xz, vec3 hg, float tdist, float kindW, float sheetId) {
 vec3 hmSky(vec2 uv) {
   float g = smoothstep(-0.9, 0.7, uv.y);
   vec3 c = mix(u_a2 * 0.28, u_bg, g);
-  c += u_a0 * 0.035 * exp(-pow(uv.y - 0.05, 2.0) * 6.0);
+  c += u_a0 * 0.035 * exp(-k_sq(uv.y - 0.05) * 6.0);
   return c;
 }
 
@@ -117,7 +117,7 @@ vec4 scene_main(vec2 uv, vec2 fc, int variant) {
   if (variant == 3) { kind = 1; sheets = 2; }                                      // Crosswave Veil
   if (variant == 4) { kind = 2; sheets = 2; }                                      // Resonant Basin
   if (variant == 5) { kind = 3; sheets = 1; pitch = max(p_tilt, 0.95); }           // Silver Interference
-  int steps = min(k_q() == 0 ? 24 : k_q() == 1 ? 38 : 56, MAXS);
+  int steps = min(k_q() == 0 ? 14 : k_q() == 1 ? 22 : 30, MAXS);
   float yaw = p_orbit * k_calm() * sin(th);
   camH = sin(pitch) * dist;
   vec3 ro = vec3(sin(yaw) * dist * cos(pitch), camH, -cos(yaw) * dist * cos(pitch));
@@ -153,7 +153,7 @@ vec4 scene_main(vec2 uv, vec2 fc, int variant) {
     float gl = max(length(hg.yz), 0.06);
     float nd = abs(hg.x) / gl;
     float nodeW = p_nodeWidth * (variant == 1 ? 1.6 : 1.0);
-    float node = nodeW > 0.0 ? exp(-pow(nd / max(nodeW, 1e-4), 2.0)) : 0.0;
+    float node = nodeW > 0.0 ? exp(-k_sq(nd / max(nodeW, 1e-4))) : 0.0;
     node *= 1.0 - smoothstep(0.0, 0.5, t * k_px() * 5.0 / max(nodeW, 1e-3) * 0.02);
     vec3 em = mix(u_a0, u_ink, 0.6) * node * (s == 0 ? 0.7 : 0.18);       // contours read on the top sheet; lower sheets stay quiet
     em += u_a1 * pow(smoothstep(0.25, 0.65, hnorm), 1.5) * clamp(warm, 0.0, 1.0) * (variant == 2 ? 4.2 : 2.4);              // amber light concentrated at the peaks

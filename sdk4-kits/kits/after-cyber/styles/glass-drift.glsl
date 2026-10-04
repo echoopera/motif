@@ -191,7 +191,7 @@ vec4 scene_main(vec2 uv, vec2 fc, int variant) {
     float spec = pow(max(dot(reflect(normalize(vec3(uv * 0.85, -1.0)), hn), K), 0.0), 36.0);
     vec3 tint = mix(u_a2 * 0.7, u_a0 * 0.15, 0.4);
     vec3 glass = inner * (1.0 - p_glass * 0.6) + tint * p_glass * 1.5 + u_a0 * fres * (0.25 + p_glass) * 0.6 + u_ink * spec * 0.5;
-    float hair = exp(-pow(edgeD / (p_edgeR * 1.1 + px), 2.0));
+    float hair = exp(-k_sq(edgeD / (p_edgeR * 1.1 + px)));
     glass += u_a0 * hair * 1.5 + u_ink * hair * 0.25;
     col = col * (1.0 - p_glass * 0.3) + glass;
     col += lat * 0.0;
@@ -200,14 +200,5 @@ vec4 scene_main(vec2 uv, vec2 fc, int variant) {
 }
 
 vec4 motif(vec2 uv, vec2 fc) {
-  int want = p_quality == QUALITY_LIVE ? 1 : (p_quality == QUALITY_BALANCED ? 2 : 4);
-  int n = min(want, 2);
-  float px = 1.0 / min(u_res.x, u_res.y);
-  vec3 acc = vec3(0.0);
-  for (int i = 0; i < 2; i++) {
-    if (i >= n) break;
-    vec2 o = i == 0 ? vec2(-0.125, -0.375) : (i == 1 ? vec2(0.125, 0.375) : (i == 2 ? vec2(0.375, -0.125) : vec2(-0.375, 0.125)));
-    acc += scene_main(uv + o * px, fc, 2).rgb;
-  }
-  return vec4(acc / float(n), 1.0);
+  return scene_main(uv, fc, 2);
 }

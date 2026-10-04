@@ -8,7 +8,7 @@
 // Loop: every temporal term is an integer multiple of theta (standing waves cos(k*theta + phase)); static phases are seeded.
 
 const int KMODES = 6;
-const int MAXS = 56;
+const int MAXS = 30;
 
 // kind 0: separable standing modes, analytic gradient.  kind 1: crossing families (odd modes rotated 90 deg), analytic.
 // kind 2: radial basin (FD gradient).  kind 3: two-source interference (FD gradient).
@@ -72,7 +72,7 @@ float sheetHit(vec3 ro, vec3 rd, float yoff, int kind, float amp, int steps, out
 vec3 hmSky(vec2 uv) {
   float g = smoothstep(-0.9, 0.7, uv.y);
   vec3 c = mix(u_a2 * 0.28, u_bg, g);
-  c += u_a0 * 0.035 * exp(-pow(uv.y - 0.05, 2.0) * 6.0);
+  c += u_a0 * 0.035 * exp(-k_sq(uv.y - 0.05) * 6.0);
   return c;
 }
 
@@ -106,7 +106,7 @@ vec3 hmChladni(vec2 uv, int variant) {
   vec3 pc = mix(u_bg * 1.6, u_a2 * 0.5, 0.5);
   col = mix(col, pc + u_a0 * 0.035 * (0.5 + 0.5 * pm), plate);
   // sand grains gather on the node lines: bright with a narrow core, glow follows the field
-  float line = exp(-pow(distNode / (p_nodeWidth * 1.4), 2.0));
+  float line = exp(-k_sq(distNode / (p_nodeWidth * 1.4)));
   col += mix(u_a0, u_ink, 0.55) * line * plate * 1.5;
   col += u_a0 * exp(-distNode / (p_nodeWidth * 5.0)) * 0.2 * plate;
   float cs = 0.014;
@@ -124,7 +124,7 @@ vec3 hmChladni(vec2 uv, int variant) {
       pv += w * (cos(a * pq.x) * cos(b * pq.y) - cos(b * pq.x) * cos(a * pq.y)); sw += w;
     }
     pv /= max(sw, 1e-3);
-    float near = exp(-pow(pv * 2.4, 2.0));                                   // grains settle near nodes, smoothly
+    float near = exp(-k_sq(pv * 2.4));                                   // grains settle near nodes, smoothly
     if (hh.x > p_density * (0.15 + 0.85 * near)) continue;
     vec2 d = uv - c;
     col += mix(u_ink, u_a1, p_warmth * 0.6) * (0.8 + 0.8 * hh.y) * exp(-dot(d, d) / (p_particleR * p_particleR * 0.9)) * plate * (0.3 + near);
