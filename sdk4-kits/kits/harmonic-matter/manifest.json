@@ -155,10 +155,10 @@
         "nodeWidth": {
           "type": "range",
           "label": "Node width",
-          "min": 0.002,
-          "max": 0.03,
-          "def": 0.006,
-          "step": 0.0005,
+          "min": 0.2,
+          "max": 3,
+          "def": 0.6,
+          "step": 0.05,
           "group": "Material",
           "hint": "Width of the glowing nodal contours, measured on the surface."
         },
@@ -195,10 +195,10 @@
         "particleR": {
           "type": "range",
           "label": "Particle radius",
-          "min": 0.001,
-          "max": 0.012,
-          "def": 0.003,
-          "step": 0.0005,
+          "min": 1,
+          "max": 12,
+          "def": 3,
+          "step": 0.5,
           "group": "Particles",
           "hint": "Particle radius in scene units."
         },
@@ -423,10 +423,10 @@
         "nodeWidth": {
           "type": "range",
           "label": "Node width",
-          "min": 0.002,
-          "max": 0.03,
-          "def": 0.014,
-          "step": 0.0005,
+          "min": 0.2,
+          "max": 3,
+          "def": 1.4,
+          "step": 0.05,
           "group": "Material",
           "hint": "Width of the glowing nodal contours, measured on the surface."
         },
@@ -463,10 +463,10 @@
         "particleR": {
           "type": "range",
           "label": "Particle radius",
-          "min": 0.001,
-          "max": 0.012,
-          "def": 0.003,
-          "step": 0.0005,
+          "min": 1,
+          "max": 12,
+          "def": 3,
+          "step": 0.5,
           "group": "Particles",
           "hint": "Particle radius in scene units."
         },
@@ -721,10 +721,10 @@
         "particleR": {
           "type": "range",
           "label": "Particle radius",
-          "min": 0.001,
-          "max": 0.012,
-          "def": 0.005,
-          "step": 0.0005,
+          "min": 1,
+          "max": 12,
+          "def": 5,
+          "step": 0.5,
           "group": "Particles",
           "hint": "Particle radius in scene units."
         },
@@ -949,10 +949,10 @@
         "nodeWidth": {
           "type": "range",
           "label": "Node width",
-          "min": 0.002,
-          "max": 0.03,
-          "def": 0.006,
-          "step": 0.0005,
+          "min": 0.2,
+          "max": 3,
+          "def": 0.6,
+          "step": 0.05,
           "group": "Material",
           "hint": "Width of the glowing nodal contours, measured on the surface."
         },
@@ -989,10 +989,10 @@
         "particleR": {
           "type": "range",
           "label": "Particle radius",
-          "min": 0.001,
-          "max": 0.012,
-          "def": 0.003,
-          "step": 0.0005,
+          "min": 1,
+          "max": 12,
+          "def": 3,
+          "step": 0.5,
           "group": "Particles",
           "hint": "Particle radius in scene units."
         },
@@ -1217,10 +1217,10 @@
         "nodeWidth": {
           "type": "range",
           "label": "Node width",
-          "min": 0.002,
-          "max": 0.03,
-          "def": 0.008,
-          "step": 0.0005,
+          "min": 0.2,
+          "max": 3,
+          "def": 0.8,
+          "step": 0.05,
           "group": "Material",
           "hint": "Width of the glowing nodal contours, measured on the surface."
         },
@@ -1257,10 +1257,10 @@
         "particleR": {
           "type": "range",
           "label": "Particle radius",
-          "min": 0.001,
-          "max": 0.012,
-          "def": 0.003,
-          "step": 0.0005,
+          "min": 1,
+          "max": 12,
+          "def": 3,
+          "step": 0.5,
           "group": "Particles",
           "hint": "Particle radius in scene units."
         },
@@ -1485,10 +1485,10 @@
         "nodeWidth": {
           "type": "range",
           "label": "Node width",
-          "min": 0.002,
-          "max": 0.03,
-          "def": 0.006,
-          "step": 0.0005,
+          "min": 0.2,
+          "max": 3,
+          "def": 0.6,
+          "step": 0.05,
           "group": "Material",
           "hint": "Width of the glowing nodal contours, measured on the surface."
         },
@@ -1525,10 +1525,10 @@
         "particleR": {
           "type": "range",
           "label": "Particle radius",
-          "min": 0.001,
-          "max": 0.012,
-          "def": 0.003,
-          "step": 0.0005,
+          "min": 1,
+          "max": 12,
+          "def": 3,
+          "step": 0.5,
           "group": "Particles",
           "hint": "Particle radius in scene units."
         },
@@ -1743,10 +1743,10 @@
         "nodeWidth": {
           "type": "range",
           "label": "Node width",
-          "min": 0.002,
-          "max": 0.03,
-          "def": 0.004,
-          "step": 0.0005,
+          "min": 0.2,
+          "max": 3,
+          "def": 0.4,
+          "step": 0.05,
           "group": "Material",
           "hint": "Width of the glowing nodal contours, measured on the surface."
         },
@@ -1783,10 +1783,10 @@
         "particleR": {
           "type": "range",
           "label": "Particle radius",
-          "min": 0.001,
-          "max": 0.012,
-          "def": 0.003,
-          "step": 0.0005,
+          "min": 1,
+          "max": 12,
+          "def": 3,
+          "step": 0.5,
           "group": "Particles",
           "hint": "Particle radius in scene units."
         },
@@ -1969,10 +1969,10 @@
         "nodeWidth": {
           "type": "range",
           "label": "Node width",
-          "min": 0.002,
-          "max": 0.03,
-          "def": 0.005,
-          "step": 0.0005,
+          "min": 0.2,
+          "max": 3,
+          "def": 0.5,
+          "step": 0.05,
           "group": "Material",
           "hint": "Width of the glowing nodal contours, measured on the surface."
         },
@@ -2009,10 +2009,10 @@
         "particleR": {
           "type": "range",
           "label": "Particle radius",
-          "min": 0.001,
-          "max": 0.012,
-          "def": 0.003,
-          "step": 0.0005,
+          "min": 1,
+          "max": 12,
+          "def": 3,
+          "step": 0.5,
           "group": "Particles",
           "hint": "Particle radius in scene units."
         },
@@ -2185,10 +2185,10 @@
         "nodeWidth": {
           "type": "range",
           "label": "Node width",
-          "min": 0.002,
-          "max": 0.03,
-          "def": 0.006,
-          "step": 0.0005,
+          "min": 0.2,
+          "max": 3,
+          "def": 0.6,
+          "step": 0.05,
           "group": "Material",
           "hint": "Width of the glowing nodal contours, measured on the surface."
         },
@@ -2215,10 +2215,10 @@
         "particleR": {
           "type": "range",
           "label": "Particle radius",
-          "min": 0.001,
-          "max": 0.012,
-          "def": 0.0035,
-          "step": 0.0005,
+          "min": 1,
+          "max": 12,
+          "def": 3.5,
+          "step": 0.5,
           "group": "Particles",
           "hint": "Particle radius in scene units."
         },

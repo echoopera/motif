@@ -109,7 +109,7 @@ vec4 scene_main(vec2 uv, vec2 fc, int variant) {
   col += body * 0.30;
   col += mix(u_a0, u_a1, species) * 0.55 * exp(-e2 / (0.07 * cs)) * 0.8 * aliveOwn * (0.4 + 0.6 * sibK);   // inner rim light
   // dark channel and bright membrane
-  float mw = p_membrane * (variant == 3 ? 1.6 : 1.0);
+  float mw = (p_membrane*0.01) * (variant == 3 ? 1.6 : 1.0);
   float chan = exp(-k_sq(e2 / (mw * 3.2 + 1e-4))) * sibK * aliveOwn;
   col *= 1.0 - 0.80 * chan;
   float mem = exp(-k_sq(e2 / max(mw * 0.55, 1e-4))) * sibK;

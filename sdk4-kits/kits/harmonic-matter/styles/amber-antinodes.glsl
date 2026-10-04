@@ -76,7 +76,7 @@ vec3 particles(vec2 xz, vec3 hg, float tdist, float kindW, float sheetId) {
   vec2 cell = floor(xz / cs);
   float th = k_theta();
   float core = 0.0, halo = 0.0;
-  float rad = max(p_particleR, tdist * k_px() * 0.55);
+  float rad = max((p_particleR*0.001), tdist * k_px() * 0.55);
   for (int j = -1; j <= 1; j++) for (int i = -1; i <= 1; i++) {
     vec2 cid = cell + vec2(float(i), float(j));
     vec2 hh = h22(cid + sheetId * 19.0);

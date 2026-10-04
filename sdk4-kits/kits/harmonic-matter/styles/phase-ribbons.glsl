@@ -99,7 +99,7 @@ vec3 hmRibbons(vec2 uv, int variant) {
     // second harmonic travelling term with an integer harmonic of theta, offset per ribbon
     y += 0.03 * sin(xw * (TAU / p_wavelength) * 0.6 + float(p_osc) * th + ph) / depth;
     float dy = abs(uv.y - y);
-    float w = p_nodeWidth * (1.5 + 2.0 * (1.0 - zj));
+    float w = (p_nodeWidth*0.01) * (1.5 + 2.0 * (1.0 - zj));
     float line = exp(-k_sq(dy / w));
     float fillm = smoothstep(0.0, 0.5, (y - uv.y)) * p_opacity * 0.6 * exp(-(y - uv.y) * 3.0);
     vec3 c = mix(u_a0, u_ink, 0.5) * (0.5 + 1.5 * (1.0 - zj));
@@ -107,7 +107,7 @@ vec3 hmRibbons(vec2 uv, int variant) {
     c = mix(c, u_a1 * 2.0, peak);
     col += c * line * (0.6 + 1.4 * (1.0 - zj) * (1.0 - zj)) + u_a2 * fillm * (1.0 - zj * 0.6);
     // pearls riding the ribbon
-    float pr = p_particleR * 1.2;
+    float pr = (p_particleR*0.001) * 1.2;
     float cs = 0.06 + 0.1 * zj;
     float cid = floor(xw / cs + 0.0);
     for (int k = -1; k <= 1; k++) {

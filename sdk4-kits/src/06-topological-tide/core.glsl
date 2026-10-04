@@ -134,7 +134,7 @@ vec4 scene_main(vec2 uv, vec2 fc, int variant) {
     }
     if (!hit) {
       float pxA = k_px() * 0.55;                                              // angular size of one pixel for this camera
-      cov = 1.0 - smoothstep(0.0, pxA * 2.2, best);                          // ~2 px smooth ramp, continuous with the hit side
+      cov = 1.0 - smoothstep(0.0, pxA * 1.5, best);                          // ~2 px smooth ramp, continuous with the hit side
       if (cov > 0.03) { hit = true; pos = ro + rd * tbest; tideMap(Minv * pos, th, calm, graw); }
     }
     if (hit) {

@@ -25,7 +25,14 @@ for (const id of ids) {
   const dir = path.join(root, 'src', id);
   const kit = (await import(pathToFileURL(path.join(dir, 'kit.mjs')).href + '?t=' + Date.now())).default;
   const out = path.join(root, 'kits', kit.id); fs.rmSync(out, { recursive: true, force: true }); fs.mkdirSync(path.join(out, 'styles'), { recursive: true });
-  const core = fs.readFileSync(path.join(dir, 'core.glsl'), 'utf8');
+  let core = fs.readFileSync(path.join(dir, 'core.glsl'), 'utf8');
+  // Tiny-valued sliders (radii, widths) are exposed x100 / x1000 so the app shows readable numbers and usable steps;
+  // the shader multiplies the uniform back so the maths is unchanged.
+  const SCALE = {};
+  for (const [k, p] of Object.entries(kit.params)) if (p.type === 'range' && p.max <= 0.2) SCALE[k] = p.max <= 0.02 ? 1000 : 100;
+  for (const [k, sc] of Object.entries(SCALE)) core = core.replace(new RegExp('\\bp_' + k + '\\b', 'g'), `(p_${k}*${1 / sc})`);
+  const rnd = x => +x.toPrecision(6);
+  const scaleParam = (k, p) => { const sc = SCALE[k]; if (!sc || p.type !== 'range') return p; const q = { ...p, min: rnd(p.min * sc), max: rnd(p.max * sc), def: rnd(p.def * sc), step: rnd(Math.max((p.step ?? 0.01 / sc) * sc, 0.01)) }; if (p.randMax != null) q.randMax = rnd(p.randMax * sc); return q; };
   // LINT: pow() of a negative base is undefined in GLSL and yields NaN (black) on many GPUs; squares must use k_sq()
   if (/pow\([^;]*,\s*2(\.0)?\s*\)/.test(core)) throw new Error(kit.id + ': pow(x, 2.0) found; use k_sq(x)');
   const luminous = kit.post === 'luminous';
@@ -63,7 +70,7 @@ vec4 motif(vec2 uv, vec2 fc) {
       { src: file, reads: [], writes: 'scene' }, { src: 'styles/_glowA.glsl', reads: ['scene'], writes: 'glowA' },
       { src: 'styles/_glowB.glsl', reads: ['glowA'], writes: 'glowB' }, { src: 'styles/_out.glsl', reads: ['scene', 'glowA', 'glowB'], writes: 'output' }] };
     else e.passes = [{ src: file }];
-    e.params = merge(kit.params, s.over); for (const k of s.drop || []) delete e.params[k];
+    e.params = merge(kit.params, s.over); for (const k of s.drop || []) delete e.params[k]; for (const k of Object.keys(e.params)) e.params[k] = scaleParam(k, e.params[k]);
     return e;
   });
   const manifest = { format: 'motif-kit@4', id: kit.id, name: kit.name, version: kit.version || '1.0.0', author: 'Motif', description: kit.description, license: '', accent: kit.accent, common: 'common.glsl', palettes: kit.palettes, styles };

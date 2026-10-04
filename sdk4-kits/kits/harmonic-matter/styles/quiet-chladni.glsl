@@ -106,9 +106,9 @@ vec3 hmChladni(vec2 uv, int variant) {
   vec3 pc = mix(u_bg * 1.6, u_a2 * 0.5, 0.5);
   col = mix(col, pc + u_a0 * 0.035 * (0.5 + 0.5 * pm), plate);
   // sand grains gather on the node lines: bright with a narrow core, glow follows the field
-  float line = exp(-k_sq(distNode / (p_nodeWidth * 1.4)));
+  float line = exp(-k_sq(distNode / ((p_nodeWidth*0.01) * 1.4)));
   col += mix(u_a0, u_ink, 0.55) * line * plate * 1.5;
-  col += u_a0 * exp(-distNode / (p_nodeWidth * 5.0)) * 0.2 * plate;
+  col += u_a0 * exp(-distNode / ((p_nodeWidth*0.01) * 5.0)) * 0.2 * plate;
   float cs = 0.014;
   vec2 cell = floor(uv / cs);
   for (int j = -1; j <= 1; j++) for (int i = -1; i <= 1; i++) {
@@ -127,7 +127,7 @@ vec3 hmChladni(vec2 uv, int variant) {
     float near = exp(-k_sq(pv * 2.4));                                   // grains settle near nodes, smoothly
     if (hh.x > p_density * (0.15 + 0.85 * near)) continue;
     vec2 d = uv - c;
-    col += mix(u_ink, u_a1, p_warmth * 0.6) * (0.8 + 0.8 * hh.y) * exp(-dot(d, d) / (p_particleR * p_particleR * 0.9)) * plate * (0.3 + near);
+    col += mix(u_ink, u_a1, p_warmth * 0.6) * (0.8 + 0.8 * hh.y) * exp(-dot(d, d) / ((p_particleR*0.001) * (p_particleR*0.001) * 0.9)) * plate * (0.3 + near);
   }
   return col;
 }

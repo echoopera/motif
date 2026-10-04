@@ -15,7 +15,7 @@ const params = {
 };
 
 export default {
-  id: 'topological-tide', name: 'Topological Tide', version: '1.0.0', accent: '#D8803F', post: 'luminous', sceneScale: 1, ssaa: 1, denoise: true, cost: 8,
+  id: 'topological-tide', name: 'Topological Tide', version: '1.0.0', accent: '#D8803F', post: 'luminous', sceneScale: 1, ssaa: 1, cost: 8,
   description: 'Ivory ceramic and copper metal implicit surfaces with cobalt shadows: gyroid shells, tori, Möbius ribbons and folded plates, sphere-traced with derived Lipschitz bounds. Nine seamless infinite loops.',
   palettes: [
     { id: 'ivory-cobalt', name: 'Ivory Cobalt', bg: '#03081C', ink: '#F2EBDD', a: ['#2A55D8', '#D8803F', '#0A1A4D'] },

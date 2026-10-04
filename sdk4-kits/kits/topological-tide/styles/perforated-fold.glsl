@@ -14,7 +14,7 @@
 
 #define Q_FREQ 4.0
 #define Q_WARP 0.0
-#define Q_MORPH p_morph
+#define Q_MORPH (p_morph*0.01)
 mat3 rotXm(float a) { float c = cos(a), s = sin(a); return mat3(1, 0, 0, 0, c, s, 0, -s, c); }
 mat3 rotYm(float a) { float c = cos(a), s = sin(a); return mat3(c, 0, -s, 0, 1, 0, s, 0, c); }
 
@@ -28,7 +28,7 @@ float tideMap(vec3 p, float th, float calm, out float graw) {
   float thick = p_shell * (1.0 + Q_MORPH * 4.0 * calm * sin(th));                      // closed breathing of the shell
   float L = k * 2.4494897 * (1.0 + A * kw);
   float c = 0.0;
-  float fa = 0.20 * (0.55 + 0.45 * sin(th)) * (0.6 + p_morph * 6.0) * calm + 0.06;
+  float fa = 0.20 * (0.55 + 0.45 * sin(th)) * (0.6 + (p_morph*0.01) * 6.0) * calm + 0.06;
   float f = fa * sin(p.x * 3.2) + 0.5 * fa * sin(p.z * 2.6 + 1.0);
   float Lp = sqrt(1.0 + k_sq(fa * 3.2 + 0.5 * fa * 2.6));
   float plate = (abs(p.y - f) - thick * 0.45) / Lp;
@@ -91,7 +91,7 @@ vec4 scene_main(vec2 uv, vec2 fc, int variant) {
     }
     if (!hit) {
       float pxA = k_px() * 0.55;                                              // angular size of one pixel for this camera
-      cov = 1.0 - smoothstep(0.0, pxA * 2.2, best);                          // ~2 px smooth ramp, continuous with the hit side
+      cov = 1.0 - smoothstep(0.0, pxA * 1.5, best);                          // ~2 px smooth ramp, continuous with the hit side
       if (cov > 0.03) { hit = true; pos = ro + rd * tbest; tideMap(Minv * pos, th, calm, graw); }
     }
     if (hit) {

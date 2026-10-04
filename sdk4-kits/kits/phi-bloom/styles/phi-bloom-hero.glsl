@@ -97,7 +97,7 @@ vec4 phiLayer(vec2 p, float N, float Rf, float lenK, float widK, float soft, flo
   vec3 K = k_key();
   float reachCap = 0.9 * float(jm) * s * s / max(2.0 * r, 0.12);
   float uf = unfold * k_calm();
-  float Lmax = min(lenK * 1.55 * 1.22 * (1.0 + p_breath) * 1.0, reachCap);
+  float Lmax = min(lenK * 1.55 * 1.22 * (1.0 + (p_breath*0.01)) * 1.0, reachCap);
   float R2max = (Lmax * 1.15 + soft * 2.0) * (Lmax * 1.15 + soft * 2.0);
   for (int j = -KJ; j <= KJ; j++) {
     if (j > jm || j < -jm) continue;
@@ -115,7 +115,7 @@ vec4 phiLayer(vec2 p, float N, float Rf, float lenK, float widK, float soft, flo
     vec2 dq = p - c;
     if (dot(dq, dq) > R2max) continue;                              // cheap reject before any hashing
     float ph = nh(ne, 1.0);
-    float breathe = 1.0 + p_breath * k_calm() * sin(th + TAU * ph);
+    float breathe = 1.0 + (p_breath*0.01) * k_calm() * sin(th + TAU * ph);
     float L = min(lenK * (0.45 + 1.1 * sqrt(rel)) * (0.82 + 0.4 * nh(ne, 2.0)) * breathe * (1.0 - 0.38 * uf * wave), reachCap);
     float W = L * widK * (0.8 + 0.4 * nh(ne, 3.0));
     vec2 d = p - c;
@@ -155,7 +155,7 @@ vec4 ringLayer(vec2 p, float rk, int cnt, float rotA, float L, float W, float ta
     vec2 cs = vec2(cos(an), sin(an));
     vec2 c = rk * cs;
     float ph = h11(mod(i, nn) * 3.1 + salt);
-    float breathe = 1.0 + p_breath * k_calm() * sin(th + TAU * ph);
+    float breathe = 1.0 + (p_breath*0.01) * k_calm() * sin(th + TAU * ph);
     float Li = L * breathe * (0.85 + 0.3 * ph), Wi = W * (0.85 + 0.3 * h11(mod(i, nn) + salt + 5.0));
     vec2 d = p - c;
     vec2 ax = tangent > 0.5 ? vec2(-cs.y, cs.x) : cs; ax = vec2(ax.x * cos(tiltR) - ax.y * sin(tiltR), ax.x * sin(tiltR) + ax.y * cos(tiltR));
@@ -187,7 +187,7 @@ vec4 fernLayer(vec2 p, float rot0, float curl, float Lk, float soft, float salt,
     for (int sd = 0; sd < 2; sd++) {
       float sg = sd == 0 ? 1.0 : -1.0;
       float ph = h11(float(i) * 2.3 + salt + float(sd) * 7.0);
-      float L = Lk * (1.25 - 0.95 * t) * (0.85 + 0.3 * ph) * (1.0 + p_breath * k_calm() * sin(th + TAU * ph));
+      float L = Lk * (1.25 - 0.95 * t) * (0.85 + 0.3 * ph) * (1.0 + (p_breath*0.01) * k_calm() * sin(th + TAU * ph));
       vec2 ax = vec2(tang.x * cos(sg * 1.05) - tang.y * sin(sg * 1.05), tang.x * sin(sg * 1.05) + tang.y * cos(sg * 1.05));
       vec2 c = P + ax * L * 0.9;
       vec2 d = p - c;
@@ -238,7 +238,7 @@ vec4 scene_main(vec2 uv, vec2 fc, int variant) {
   vec3 champ = u_a0, copper = u_a1;
   vec3 col = phiGround(uv, c0 + orb * 0.5, ds);
   float Rf = 0.50;
-  float lenK = p_bladeLen, widK = 0.46;
+  float lenK = (p_bladeLen*0.01), widK = 0.46;
   float taper = P_TAPER;
   vec4 L1, L2, L3;
   vec2 pf = uv - (c0 - orb * 0.6 * ds * 2.0);                          // far stratum: moves against the camera

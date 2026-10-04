@@ -100,7 +100,7 @@ vec3 hmRidges(vec2 uv, int variant) {
     vec3 body = mix(u_bg * 1.2, u_a2 * (0.5 + 0.8 * (1.0 - zj)), 0.55 + 0.4 * (-below < 0.2 ? 1.0 : 0.0));
     body *= 0.45 + 0.8 * (1.0 - zj) + p_opacity;
     col = mix(col, body, inside * (0.7 + 0.3 * p_opacity * 2.0));
-    float rim = exp(-k_sq(below / (p_nodeWidth * (1.0 + 2.2 * (1.0 - zj)))));
+    float rim = exp(-k_sq(below / ((p_nodeWidth*0.01) * (1.0 + 2.2 * (1.0 - zj)))));
     float crest = smoothstep(0.3, 1.0, h / (p_amp * 2.2));
     vec3 rc = mix(mix(u_a0, u_ink, 0.6), u_a1 * 2.0, crest * p_warmth);
     col += rc * rim * (0.35 + 1.8 * (1.0 - zj) * (1.0 - zj));
@@ -109,7 +109,7 @@ vec3 hmRidges(vec2 uv, int variant) {
     float id = floor(uv.x / cs);
     if (h11(id * 3.7 + jj) < p_density * 0.5) {
       vec2 d = vec2(uv.x - (id + 0.5) * cs, below);
-      col += u_ink * 1.5 * exp(-dot(d, d) / (p_particleR * p_particleR * 2.0)) * (1.0 - zj * 0.7);
+      col += u_ink * 1.5 * exp(-dot(d, d) / ((p_particleR*0.001) * (p_particleR*0.001) * 2.0)) * (1.0 - zj * 0.7);
     }
   }
   return col;

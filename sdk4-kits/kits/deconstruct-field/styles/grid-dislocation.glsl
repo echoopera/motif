@@ -58,9 +58,9 @@ vec4 scene_main(vec2 uv, vec2 fc, int variant) {
   col *= 1.0 - 0.05 * smoothstep(0.2, 1.3, length(uv * vec2(1.0, 0.7)));
   float base = -0.27;
   vec2 q = rot(-base) * uv;
-  float sepAmt = p_sep;
+  float sepAmt = (p_sep*0.01);
   vec2 sdir = vec2(cos(radians(p_keyAngle)), sin(radians(p_keyAngle)));
-  float gs = max(p_grid, 0.012);
+  float gs = max((p_grid*0.01), 0.012);
 
   // large cobalt arcs: they travel with the same schedule as plane 0, partial span
   {

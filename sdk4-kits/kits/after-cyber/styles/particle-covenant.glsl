@@ -61,7 +61,7 @@ vec3 afterLattice(vec2 q, mat3 M, int variant, float th) {
   if (variant == 4) pu = vec2(0.0);
   vec2 cell = floor(pu / cs + 0.5);
   vec3 col = vec3(0.0);
-  float partR = p_particleR;
+  float partR = (p_particleR*0.001);
   int W = 4;
   vec3 hair = u_a0;
   float halfN = 0.0;

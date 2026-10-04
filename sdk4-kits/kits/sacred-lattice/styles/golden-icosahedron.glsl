@@ -10,7 +10,7 @@
 
 #define Q_CIRCLES 0
 #define Q_ORBIT p_orbit
-#define Q_BREATH p_breath
+#define Q_BREATH (p_breath*0.01)
 #define Q_DEPTHSP p_depthSp
 #define Q_QUALITY p_quality
 #define Q_FACET 0.0
@@ -147,7 +147,7 @@ vec3 circles(vec2 q, int count, float ratio, float R0, float edgeR, float th, fl
 
 vec4 scene_main(vec2 uv, vec2 fc, int variant) {
   float th = k_theta(), px = k_px();
-  vec2 c0 = vec2(0.0, 0.03);
+  vec2 c0 = vec2(0.0);
   vec2 q = uv - c0;
   vec3 col = latticeGround(uv, c0);
   float calm = k_calm();
@@ -159,7 +159,7 @@ vec4 scene_main(vec2 uv, vec2 fc, int variant) {
   float facet = Q_FACET * (0.75 + 0.25 * sin(th + 0.6));
   float lum = 1.0;
   float turns = float(p_cageTurns);
-  float edgeR = p_edgeR;
+  float edgeR = (p_edgeR*0.001);
   bool flat2d = variant == 4 || variant == 5;
   if (!flat2d) {
     for (int k = 0; k < 7; k++) {

@@ -170,7 +170,7 @@ vec3 circles(vec2 q, int count, float ratio, float R0, float edgeR, float th, fl
 
 vec4 scene_main(vec2 uv, vec2 fc, int variant) {
   float th = k_theta(), px = k_px();
-  vec2 c0 = vec2(0.0, 0.03);
+  vec2 c0 = vec2(0.0);
   vec2 q = uv - c0;
   vec3 col = latticeGround(uv, c0);
   float calm = k_calm();

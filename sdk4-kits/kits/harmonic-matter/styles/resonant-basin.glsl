@@ -74,7 +74,7 @@ vec3 particles(vec2 xz, vec3 hg, float tdist, float kindW, float sheetId) {
   vec2 cell = floor(xz / cs);
   float th = k_theta();
   float core = 0.0, halo = 0.0;
-  float rad = max(p_particleR, tdist * k_px() * 0.55);
+  float rad = max((p_particleR*0.001), tdist * k_px() * 0.55);
   for (int j = -1; j <= 1; j++) for (int i = -1; i <= 1; i++) {
     vec2 cid = cell + vec2(float(i), float(j));
     vec2 hh = h22(cid + sheetId * 19.0);
@@ -150,7 +150,7 @@ vec4 scene_main(vec2 uv, vec2 fc, int variant) {
     // nodal contour: |h| / |grad h| is the distance to the node on the surface
     float gl = max(length(hg.yz), 0.06);
     float nd = abs(hg.x) / gl;
-    float nodeW = p_nodeWidth * (variant == 1 ? 1.6 : 1.0);
+    float nodeW = (p_nodeWidth*0.01) * (variant == 1 ? 1.6 : 1.0);
     float node = nodeW > 0.0 ? exp(-k_sq(nd / max(nodeW, 1e-4))) : 0.0;
     node *= 1.0 - smoothstep(0.0, 0.5, t * k_px() * 5.0 / max(nodeW, 1e-3) * 0.02);
     vec3 em = mix(u_a0, u_ink, 0.6) * node * (s == 0 ? 0.7 : 0.18);       // contours read on the top sheet; lower sheets stay quiet

@@ -32,7 +32,7 @@ float tideMap(vec3 p, float th, float calm, out float graw) {
   float rho = length(p.xz) - R, ph = atan(p.z, p.x);
   float ca = cos(ph * 0.5), sa = sin(ph * 0.5);
   vec2 rq = vec2(ca * rho - sa * p.y, sa * rho + ca * p.y);                              // half twist: continuous because the box is 180-degree symmetric
-  vec2 bx = vec2(0.30 + 0.04 * calm * sin(th) + p_morph * 1.5 * calm * sin(th), 0.045 + 0.3 * p_shell * 0.5);   // shell = ribbon thickness, morph = width pulse
+  vec2 bx = vec2(0.30 + 0.04 * calm * sin(th) + (p_morph*0.01) * 1.5 * calm * sin(th), 0.045 + 0.3 * p_shell * 0.5);   // shell = ribbon thickness, morph = width pulse
   float d = sdBox(rq, bx);
   float Lm = sqrt(1.0 + k_sq(rmax / (2.0 * (R - rmax))));
   graw = gyroidG(w, k * 0.0 + 1.0) * 0.0 + sin(ph * 6.0 + th * 2.0) * 0.5 + 0.0;       // inlay current: integer 6 around, travelling at 2 theta
@@ -91,7 +91,7 @@ vec4 scene_main(vec2 uv, vec2 fc, int variant) {
     }
     if (!hit) {
       float pxA = k_px() * 0.55;                                              // angular size of one pixel for this camera
-      cov = 1.0 - smoothstep(0.0, pxA * 2.2, best);                          // ~2 px smooth ramp, continuous with the hit side
+      cov = 1.0 - smoothstep(0.0, pxA * 1.5, best);                          // ~2 px smooth ramp, continuous with the hit side
       if (cov > 0.03) { hit = true; pos = ro + rd * tbest; tideMap(Minv * pos, th, calm, graw); }
     }
     if (hit) {

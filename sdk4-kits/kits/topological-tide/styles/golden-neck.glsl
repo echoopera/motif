@@ -13,8 +13,8 @@
 // Loop: object rotation = integer turns of theta; thickness, warp and fold amplitude are periodic oscillators; camera orbit is closed.
 
 #define Q_FREQ p_freq
-#define Q_WARP p_warp
-#define Q_MORPH p_morph
+#define Q_WARP (p_warp*0.01)
+#define Q_MORPH (p_morph*0.01)
 mat3 rotXm(float a) { float c = cos(a), s = sin(a); return mat3(1, 0, 0, 0, c, s, 0, -s, c); }
 mat3 rotYm(float a) { float c = cos(a), s = sin(a); return mat3(c, 0, -s, 0, 1, 0, s, 0, c); }
 
@@ -87,7 +87,7 @@ vec4 scene_main(vec2 uv, vec2 fc, int variant) {
     }
     if (!hit) {
       float pxA = k_px() * 0.55;                                              // angular size of one pixel for this camera
-      cov = 1.0 - smoothstep(0.0, pxA * 2.2, best);                          // ~2 px smooth ramp, continuous with the hit side
+      cov = 1.0 - smoothstep(0.0, pxA * 1.5, best);                          // ~2 px smooth ramp, continuous with the hit side
       if (cov > 0.03) { hit = true; pos = ro + rd * tbest; tideMap(Minv * pos, th, calm, graw); }
     }
     if (hit) {

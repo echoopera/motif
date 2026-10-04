@@ -61,8 +61,8 @@ vec3 afterLattice(vec2 q, mat3 M, int variant, float th) {
   if (variant == 4) pu = vec2(0.0);
   vec2 cell = floor(pu / cs + 0.5);
   vec3 col = vec3(0.0);
-  float partR = p_particleR;
-  float edgeR = p_edgeR;
+  float partR = (p_particleR*0.001);
+  float edgeR = (p_edgeR*0.001);
   int W = 4;
   vec3 hair = u_a0;
   float halfN = float(p_res) * 0.5;
@@ -91,7 +91,7 @@ vec3 afterLattice(vec2 q, mat3 M, int variant, float th) {
         vec3 P1 = ndPos(cb, cs, variant, th, s2, w2, id2, lm2, zq2);
         float z1; vec2 B = ndProj(P1, M, z1);
         float len = length(B - A);
-        float fadeLen = 1.0 - smoothstep(p_connect * 1.15, p_connect * 2.6, len);
+        float fadeLen = 1.0 - smoothstep((p_connect*0.01) * 1.15, (p_connect*0.01) * 2.6, len);
         float we = min(w, w2) * fadeLen;
         if (we < 0.01) continue;
         float d;

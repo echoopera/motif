@@ -61,8 +61,8 @@ vec3 afterLattice(vec2 q, mat3 M, int variant, float th) {
   if (variant == 4) pu = vec2(0.0);
   vec2 cell = floor(pu / cs + 0.5);
   vec3 col = vec3(0.0);
-  float partR = p_particleR;
-  float edgeR = p_edgeR;
+  float partR = (p_particleR*0.001);
+  float edgeR = (p_edgeR*0.001);
   int W = 4;
   vec3 hair = u_a0;
   float halfN = float(p_res) * 0.5;
@@ -91,7 +91,7 @@ vec3 afterLattice(vec2 q, mat3 M, int variant, float th) {
         vec3 P1 = ndPos(cb, cs, variant, th, s2, w2, id2, lm2, zq2);
         float z1; vec2 B = ndProj(P1, M, z1);
         float len = length(B - A);
-        float fadeLen = 1.0 - smoothstep(p_connect * 1.15, p_connect * 2.6, len);
+        float fadeLen = 1.0 - smoothstep((p_connect*0.01) * 1.15, (p_connect*0.01) * 2.6, len);
         float we = min(w, w2) * fadeLen;
         if (we < 0.01) continue;
         float d;
@@ -184,14 +184,14 @@ vec4 scene_main(vec2 uv, vec2 fc, int variant) {
   vec3 lat = afterLattice(q, M, variant, th);
   if (hitT > 0.0) {
     // glass: lattice seen through a facet, offset along the facet normal (approximate refraction)
-    vec2 refr = hn.xy * p_refr * (1.0 + 0.5 * (1.0 - abs(hn.z)));
+    vec2 refr = hn.xy * (p_refr*0.01) * (1.0 + 0.5 * (1.0 - abs(hn.z)));
     vec3 inner = afterLattice(q + refr, M, variant, th);
     float fres = pow(1.0 - clamp(abs(dot(hn, normalize(vec3(uv * 0.85, -1.0)))), 0.0, 1.0), 3.0);
     vec3 K = k_key();
     float spec = pow(max(dot(reflect(normalize(vec3(uv * 0.85, -1.0)), hn), K), 0.0), 36.0);
     vec3 tint = mix(u_a2 * 0.7, u_a0 * 0.15, 0.4);
     vec3 glass = inner * (1.0 - p_glass * 0.6) + tint * p_glass * 1.5 + u_a0 * fres * (0.25 + p_glass) * 0.6 + u_ink * spec * 0.5;
-    float hair = exp(-k_sq(edgeD / (p_edgeR * 1.1 + px)));
+    float hair = exp(-k_sq(edgeD / ((p_edgeR*0.001) * 1.1 + px)));
     glass += u_a0 * hair * 1.5 + u_ink * hair * 0.25;
     col = col * (1.0 - p_glass * 0.3) + glass;
     col += lat * 0.0;

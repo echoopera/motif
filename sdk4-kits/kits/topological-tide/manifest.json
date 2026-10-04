@@ -70,9 +70,6 @@
       "cost": 8,
       "graph": {
         "buffers": {
-          "raw": {
-            "scale": 1
-          },
           "scene": {
             "scale": 1
           },
@@ -87,13 +84,6 @@
           {
             "src": "styles/topological-tide-hero.glsl",
             "reads": [],
-            "writes": "raw"
-          },
-          {
-            "src": "styles/_denoise.glsl",
-            "reads": [
-              "raw"
-            ],
             "writes": "scene"
           },
           {
@@ -156,9 +146,9 @@
           "type": "range",
           "label": "Warp amplitude",
           "min": 0,
-          "max": 0.15,
-          "def": 0.04,
-          "step": 0.0001,
+          "max": 15,
+          "def": 4,
+          "step": 0.01,
           "group": "Form",
           "hint": "Domain warp. The sphere-tracing bound is re-derived for it."
         },
@@ -196,9 +186,9 @@
           "type": "range",
           "label": "Morph amplitude",
           "min": 0,
-          "max": 0.12,
-          "def": 0.035,
-          "step": 0.0001,
+          "max": 12,
+          "def": 3.5,
+          "step": 0.01,
           "group": "Motion",
           "hint": "Periodic breathing of shell thickness."
         },
@@ -328,9 +318,6 @@
       "cost": 8,
       "graph": {
         "buffers": {
-          "raw": {
-            "scale": 1
-          },
           "scene": {
             "scale": 1
           },
@@ -345,13 +332,6 @@
           {
             "src": "styles/ivory-gyroid.glsl",
             "reads": [],
-            "writes": "raw"
-          },
-          {
-            "src": "styles/_denoise.glsl",
-            "reads": [
-              "raw"
-            ],
             "writes": "scene"
           },
           {
@@ -414,9 +394,9 @@
           "type": "range",
           "label": "Warp amplitude",
           "min": 0,
-          "max": 0.15,
-          "def": 0.04,
-          "step": 0.0001,
+          "max": 15,
+          "def": 4,
+          "step": 0.01,
           "group": "Form",
           "hint": "Domain warp. The sphere-tracing bound is re-derived for it."
         },
@@ -454,9 +434,9 @@
           "type": "range",
           "label": "Morph amplitude",
           "min": 0,
-          "max": 0.12,
-          "def": 0.035,
-          "step": 0.0001,
+          "max": 12,
+          "def": 3.5,
+          "step": 0.01,
           "group": "Motion",
           "hint": "Periodic breathing of shell thickness."
         },
@@ -586,9 +566,6 @@
       "cost": 8,
       "graph": {
         "buffers": {
-          "raw": {
-            "scale": 1
-          },
           "scene": {
             "scale": 1
           },
@@ -603,13 +580,6 @@
           {
             "src": "styles/chrome-channels.glsl",
             "reads": [],
-            "writes": "raw"
-          },
-          {
-            "src": "styles/_denoise.glsl",
-            "reads": [
-              "raw"
-            ],
             "writes": "scene"
           },
           {
@@ -672,9 +642,9 @@
           "type": "range",
           "label": "Warp amplitude",
           "min": 0,
-          "max": 0.15,
-          "def": 0.04,
-          "step": 0.0001,
+          "max": 15,
+          "def": 4,
+          "step": 0.01,
           "group": "Form",
           "hint": "Domain warp. The sphere-tracing bound is re-derived for it."
         },
@@ -712,9 +682,9 @@
           "type": "range",
           "label": "Morph amplitude",
           "min": 0,
-          "max": 0.12,
-          "def": 0.035,
-          "step": 0.0001,
+          "max": 12,
+          "def": 3.5,
+          "step": 0.01,
           "group": "Motion",
           "hint": "Periodic breathing of shell thickness."
         },
@@ -844,9 +814,6 @@
       "cost": 8,
       "graph": {
         "buffers": {
-          "raw": {
-            "scale": 1
-          },
           "scene": {
             "scale": 1
           },
@@ -861,13 +828,6 @@
           {
             "src": "styles/cobalt-torus.glsl",
             "reads": [],
-            "writes": "raw"
-          },
-          {
-            "src": "styles/_denoise.glsl",
-            "reads": [
-              "raw"
-            ],
             "writes": "scene"
           },
           {
@@ -930,9 +890,9 @@
           "type": "range",
           "label": "Warp amplitude",
           "min": 0,
-          "max": 0.15,
-          "def": 0.04,
-          "step": 0.0001,
+          "max": 15,
+          "def": 4,
+          "step": 0.01,
           "group": "Form",
           "hint": "Domain warp. The sphere-tracing bound is re-derived for it."
         },
@@ -970,9 +930,9 @@
           "type": "range",
           "label": "Morph amplitude",
           "min": 0,
-          "max": 0.12,
-          "def": 0.035,
-          "step": 0.0001,
+          "max": 12,
+          "def": 3.5,
+          "step": 0.01,
           "group": "Motion",
           "hint": "Periodic breathing of shell thickness."
         },
@@ -1102,9 +1062,6 @@
       "cost": 8,
       "graph": {
         "buffers": {
-          "raw": {
-            "scale": 1
-          },
           "scene": {
             "scale": 1
           },
@@ -1119,13 +1076,6 @@
           {
             "src": "styles/mobius-current.glsl",
             "reads": [],
-            "writes": "raw"
-          },
-          {
-            "src": "styles/_denoise.glsl",
-            "reads": [
-              "raw"
-            ],
             "writes": "scene"
           },
           {
@@ -1208,9 +1158,9 @@
           "type": "range",
           "label": "Morph amplitude",
           "min": 0,
-          "max": 0.12,
-          "def": 0.035,
-          "step": 0.0001,
+          "max": 12,
+          "def": 3.5,
+          "step": 0.01,
           "group": "Motion",
           "hint": "Periodic breathing of shell thickness."
         },
@@ -1340,9 +1290,6 @@
       "cost": 8,
       "graph": {
         "buffers": {
-          "raw": {
-            "scale": 1
-          },
           "scene": {
             "scale": 1
           },
@@ -1357,13 +1304,6 @@
           {
             "src": "styles/perforated-fold.glsl",
             "reads": [],
-            "writes": "raw"
-          },
-          {
-            "src": "styles/_denoise.glsl",
-            "reads": [
-              "raw"
-            ],
             "writes": "scene"
           },
           {
@@ -1456,9 +1396,9 @@
           "type": "range",
           "label": "Morph amplitude",
           "min": 0,
-          "max": 0.12,
-          "def": 0.08,
-          "step": 0.0001,
+          "max": 12,
+          "def": 8,
+          "step": 0.01,
           "group": "Motion",
           "hint": "Periodic breathing of shell thickness."
         },
@@ -1588,9 +1528,6 @@
       "cost": 8,
       "graph": {
         "buffers": {
-          "raw": {
-            "scale": 1
-          },
           "scene": {
             "scale": 1
           },
@@ -1605,13 +1542,6 @@
           {
             "src": "styles/ceramic-web.glsl",
             "reads": [],
-            "writes": "raw"
-          },
-          {
-            "src": "styles/_denoise.glsl",
-            "reads": [
-              "raw"
-            ],
             "writes": "scene"
           },
           {
@@ -1674,9 +1604,9 @@
           "type": "range",
           "label": "Warp amplitude",
           "min": 0,
-          "max": 0.15,
-          "def": 0.06,
-          "step": 0.0001,
+          "max": 15,
+          "def": 6,
+          "step": 0.01,
           "group": "Form",
           "hint": "Domain warp. The sphere-tracing bound is re-derived for it."
         },
@@ -1714,9 +1644,9 @@
           "type": "range",
           "label": "Morph amplitude",
           "min": 0,
-          "max": 0.12,
-          "def": 0.035,
-          "step": 0.0001,
+          "max": 12,
+          "def": 3.5,
+          "step": 0.01,
           "group": "Motion",
           "hint": "Periodic breathing of shell thickness."
         },
@@ -1846,9 +1776,6 @@
       "cost": 8,
       "graph": {
         "buffers": {
-          "raw": {
-            "scale": 1
-          },
           "scene": {
             "scale": 1
           },
@@ -1863,13 +1790,6 @@
           {
             "src": "styles/golden-neck.glsl",
             "reads": [],
-            "writes": "raw"
-          },
-          {
-            "src": "styles/_denoise.glsl",
-            "reads": [
-              "raw"
-            ],
             "writes": "scene"
           },
           {
@@ -1932,9 +1852,9 @@
           "type": "range",
           "label": "Warp amplitude",
           "min": 0,
-          "max": 0.15,
-          "def": 0.04,
-          "step": 0.0001,
+          "max": 15,
+          "def": 4,
+          "step": 0.01,
           "group": "Form",
           "hint": "Domain warp. The sphere-tracing bound is re-derived for it."
         },
@@ -1972,9 +1892,9 @@
           "type": "range",
           "label": "Morph amplitude",
           "min": 0,
-          "max": 0.12,
-          "def": 0.035,
-          "step": 0.0001,
+          "max": 12,
+          "def": 3.5,
+          "step": 0.01,
           "group": "Motion",
           "hint": "Periodic breathing of shell thickness."
         },
@@ -2104,9 +2024,6 @@
       "cost": 8,
       "graph": {
         "buffers": {
-          "raw": {
-            "scale": 1
-          },
           "scene": {
             "scale": 1
           },
@@ -2121,13 +2038,6 @@
           {
             "src": "styles/quiet-surface.glsl",
             "reads": [],
-            "writes": "raw"
-          },
-          {
-            "src": "styles/_denoise.glsl",
-            "reads": [
-              "raw"
-            ],
             "writes": "scene"
           },
           {
@@ -2190,9 +2100,9 @@
           "type": "range",
           "label": "Warp amplitude",
           "min": 0,
-          "max": 0.15,
-          "def": 0.02,
-          "step": 0.0001,
+          "max": 15,
+          "def": 2,
+          "step": 0.01,
           "group": "Form",
           "hint": "Domain warp. The sphere-tracing bound is re-derived for it."
         },
@@ -2230,9 +2140,9 @@
           "type": "range",
           "label": "Morph amplitude",
           "min": 0,
-          "max": 0.12,
-          "def": 0.01,
-          "step": 0.0001,
+          "max": 12,
+          "def": 1,
+          "step": 0.01,
           "group": "Motion",
           "hint": "Periodic breathing of shell thickness."
         },
