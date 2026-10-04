@@ -1,0 +1,54 @@
+{
+  "format": "motif-seq@1",
+  "id": "soft-reel",
+  "name": "Soft Reel",
+  "description": "A calmer twelve seconds: aura bed, satin and petal fold, oil wash and glints.",
+  "loop": 12,
+  "bpm": 70,
+  "seed": 5,
+  "maxActive": 2,
+  "cues": [
+    {
+      "id": "bed",
+      "style": "aura-wash",
+      "at": 0,
+      "len": "1",
+      "lane": 0,
+      "cycles": 1,
+      "fadeIn": 0,
+      "fadeOut": 0
+    },
+    {
+      "id": "satin",
+      "style": "satin-pour",
+      "at": "1s",
+      "len": "4s",
+      "lane": 1,
+      "cycles": 1,
+      "fadeIn": 0.25,
+      "fadeOut": 0.25,
+      "opacity": 0.9
+    },
+    {
+      "id": "petal",
+      "style": "petal-fold",
+      "at": "5s",
+      "len": "3.5s",
+      "lane": 1,
+      "cycles": 1,
+      "fadeIn": 0.25,
+      "fadeOut": 0.25
+    },
+    {
+      "id": "glint",
+      "style": "tide-glint",
+      "at": "8.5s",
+      "len": "3.5s",
+      "lane": 1,
+      "cycles": 1,
+      "fadeIn": 0.25,
+      "fadeOut": 0.25,
+      "blend": "screen"
+    }
+  ]
+}

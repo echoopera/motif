@@ -21,6 +21,6 @@ vec4 motif(vec2 uv, vec2 fc) {
   }
   vec3 col = acc / max(wsum, 1e-3);
   col = pf_poster(col, float(p_bands), p_soft, p_hue, p_mode, p_palMix, p_veins, p_veinW, c_vein());
-  col = pf_vignette(col, uv, p_vignette) * p_exposure;
+  col = pf_finish(col, uv, fc, p_vignette, p_exposure, p_grain);
   return vec4(max(col, 0.0), 1.0);
 }

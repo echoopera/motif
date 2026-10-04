@@ -51,3 +51,12 @@ vec3 pf_poster(vec3 c, float n, float soft, float hue, int mode, float pal, floa
 float pf_tw(float i, float n) { float t = i / max(n, 1.0); return 1.0 - t * t; }
 
 vec3 pf_vignette(vec3 c, vec2 uv, float amt) { return c * (1.0 - amt * smoothstep(0.2, 0.95, length(uv))); }
+
+// Cosine rainbow (thin-film iridescence), returned as approximately linear RGB.
+vec3 pf_spectrum(float t) { vec3 c = 0.5 + 0.5 * cos(TAU * (t + vec3(0.0, 0.33, 0.67))); return c * c; }
+
+// Shared finish: vignette, exposure, static film grain (loop-safe: no time).
+vec3 pf_finish(vec3 c, vec2 uv, vec2 fc, float vig, float expo, float grain) {
+  c = pf_vignette(c, uv, vig) * expo;
+  return c + (h21(fc) - 0.5) * grain * 0.05;
+}

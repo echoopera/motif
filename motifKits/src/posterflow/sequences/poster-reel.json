@@ -2,7 +2,7 @@
   "format": "motif-seq@1",
   "id": "poster-reel",
   "name": "Poster Reel",
-  "description": "Marble Flow as the bed, Streak Melt and Ink Drag crossing over it; 12 s, never more than two shaders at once.",
+  "description": "Twelve seconds: a marble bed with streaks, drags, film and engraving crossing over it. Never more than two shaders at once.",
   "loop": 12,
   "bpm": 90,
   "seed": 11,
@@ -21,22 +21,32 @@
     {
       "id": "melt",
       "style": "streak-melt",
-      "at": "3s",
-      "len": "4s",
+      "at": "2s",
+      "len": "3s",
       "lane": 1,
       "cycles": 1,
-      "fadeIn": 0.3,
-      "fadeOut": 0.3
+      "fadeIn": 0.25,
+      "fadeOut": 0.25
+    },
+    {
+      "id": "film",
+      "style": "thin-film",
+      "at": "5.5s",
+      "len": "3s",
+      "lane": 1,
+      "cycles": 1,
+      "fadeIn": 0.25,
+      "fadeOut": 0.25
     },
     {
       "id": "drag",
       "style": "ink-drag",
-      "at": "8s",
-      "len": "4s",
+      "at": "9s",
+      "len": "3s",
       "lane": 1,
       "cycles": 1,
-      "fadeIn": 0.3,
-      "fadeOut": 0.3
+      "fadeIn": 0.25,
+      "fadeOut": 0.25
     }
   ]
 }

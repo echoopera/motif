@@ -2,9 +2,9 @@
   "format": "motif-kit@4",
   "id": "posterflow",
   "name": "Posterflow",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "author": "Motif",
-  "description": "Fluid poster treatments for your own images and clips: quantized colour bands, liquid flow-warps, vein lines, streak smears and ink drags. Three styles, a layer effect and a liquid cut transition.",
+  "description": "Twelve liquid poster looks for your own images and clips: banded marbles, streak melts, ink drags, iridescent film, mosaic water, engraved gills, satin, halftone, glinting tides, oil paint, petal folds and soft auras. Plus a layer effect and a liquid cut transition.",
   "license": "MIT",
   "accent": "#4D7CFF",
   "common": "common.glsl",
@@ -78,8 +78,8 @@
         "liquid",
         "marble"
       ],
-      "cost": 1,
       "blurb": "Pours your image through a looping flow-warp and snaps it to quantized colour bands with vein lines.",
+      "cost": 1,
       "flash": false,
       "passes": [
         {
@@ -181,8 +181,8 @@
             }
           ],
           "def": "source",
-          "group": "Poster",
-          "mutate": 0
+          "mutate": 0,
+          "group": "Poster"
         },
         "palMix": {
           "type": "range",
@@ -243,6 +243,16 @@
           "step": 0.01,
           "group": "Lens",
           "mutate": 0.2
+        },
+        "grain": {
+          "type": "range",
+          "label": "Grain",
+          "min": 0,
+          "max": 1,
+          "def": 0.3,
+          "step": 0.01,
+          "group": "Lens",
+          "randMax": 0.6
         }
       }
     },
@@ -257,8 +267,8 @@
         "chromatic",
         "streak"
       ],
-      "cost": 1.6,
       "blurb": "A looping mask opens streaks that drag the image along a direction, with RGB split and optional slabs.",
+      "cost": 1.6,
       "flash": false,
       "passes": [
         {
@@ -403,8 +413,8 @@
             }
           ],
           "def": "source",
-          "group": "Poster",
-          "mutate": 0
+          "mutate": 0,
+          "group": "Poster"
         },
         "palMix": {
           "type": "range",
@@ -465,6 +475,16 @@
           "step": 0.01,
           "group": "Lens",
           "mutate": 0.2
+        },
+        "grain": {
+          "type": "range",
+          "label": "Grain",
+          "min": 0,
+          "max": 1,
+          "def": 0.3,
+          "step": 0.01,
+          "group": "Lens",
+          "randMax": 0.6
         }
       }
     },
@@ -479,8 +499,8 @@
         "ink",
         "streamline"
       ],
-      "cost": 2.4,
       "blurb": "Carries colour along looping curl streamlines, like ink drawn through water, then bands it.",
+      "cost": 2.4,
       "flash": false,
       "passes": [
         {
@@ -574,8 +594,8 @@
             }
           ],
           "def": "source",
-          "group": "Poster",
-          "mutate": 0
+          "mutate": 0,
+          "group": "Poster"
         },
         "palMix": {
           "type": "range",
@@ -636,6 +656,1194 @@
           "step": 0.01,
           "group": "Lens",
           "mutate": 0.2
+        },
+        "grain": {
+          "type": "range",
+          "label": "Grain",
+          "min": 0,
+          "max": 1,
+          "def": 0.3,
+          "step": 0.01,
+          "group": "Lens",
+          "randMax": 0.6
+        }
+      }
+    },
+    {
+      "id": "thin-film",
+      "name": "Thin Film",
+      "group": "Posterflow",
+      "palette": "mineral",
+      "tags": [
+        "media",
+        "iridescent",
+        "halo",
+        "oil"
+      ],
+      "blurb": "Iridescent halos bloom wherever brightness changes fast, over a soft liquid warp, like oil film on glass.",
+      "cost": 1.8,
+      "flash": false,
+      "passes": [
+        {
+          "src": "styles/thin-film.glsl"
+        }
+      ],
+      "params": {
+        "scale": {
+          "type": "range",
+          "label": "Flow scale",
+          "min": 0.4,
+          "max": 4,
+          "def": 1.1,
+          "step": 0.01,
+          "group": "Flow",
+          "log": true
+        },
+        "warp": {
+          "type": "range",
+          "label": "Warp",
+          "min": 0,
+          "max": 2.5,
+          "def": 0.9,
+          "step": 0.01,
+          "group": "Flow"
+        },
+        "turns": {
+          "type": "int",
+          "label": "Cycles / loop",
+          "min": 1,
+          "max": 3,
+          "def": 1,
+          "group": "Motion",
+          "hint": "Whole cycles per loop; the loop always closes."
+        },
+        "radius": {
+          "type": "range",
+          "label": "Film reach",
+          "min": 0.005,
+          "max": 0.12,
+          "def": 0.04,
+          "step": 0.01,
+          "group": "Film",
+          "log": true,
+          "hint": "How far the halo spreads from an edge."
+        },
+        "gain": {
+          "type": "range",
+          "label": "Edge gain",
+          "min": 0.5,
+          "max": 8,
+          "def": 3,
+          "step": 0.01,
+          "group": "Film",
+          "log": true
+        },
+        "thick": {
+          "type": "range",
+          "label": "Thickness",
+          "min": 0,
+          "max": 8,
+          "def": 3,
+          "step": 0.01,
+          "group": "Film",
+          "hint": "More colour bands per unit of edge."
+        },
+        "hue": {
+          "type": "range",
+          "label": "Hue shift",
+          "min": 0,
+          "max": 1,
+          "def": 0.1,
+          "step": 0.01,
+          "group": "Film"
+        },
+        "amount": {
+          "type": "range",
+          "label": "Amount",
+          "min": 0,
+          "max": 1.5,
+          "def": 1,
+          "step": 0.01,
+          "group": "Film"
+        },
+        "glow": {
+          "type": "range",
+          "label": "Bright rim",
+          "min": 0,
+          "max": 3,
+          "def": 0.8,
+          "step": 0.01,
+          "group": "Film"
+        },
+        "vignette": {
+          "type": "range",
+          "label": "Vignette",
+          "min": 0,
+          "max": 0.6,
+          "def": 0.3,
+          "step": 0.01,
+          "group": "Lens",
+          "randMax": 0.5
+        },
+        "exposure": {
+          "type": "range",
+          "label": "Exposure",
+          "min": 0.5,
+          "max": 1.6,
+          "def": 1,
+          "step": 0.01,
+          "group": "Lens",
+          "mutate": 0.2
+        },
+        "grain": {
+          "type": "range",
+          "label": "Grain",
+          "min": 0,
+          "max": 1,
+          "def": 0.45,
+          "step": 0.01,
+          "group": "Lens",
+          "randMax": 0.6
+        }
+      }
+    },
+    {
+      "id": "mosaic-tide",
+      "name": "Mosaic Tide",
+      "group": "Posterflow",
+      "palette": "tidal",
+      "tags": [
+        "media",
+        "pixel",
+        "posterize",
+        "stairs"
+      ],
+      "blurb": "Block-sampled, dithered colour stairs over a liquid warp: water and fabric turn into poster pixels.",
+      "cost": 1,
+      "flash": false,
+      "passes": [
+        {
+          "src": "styles/mosaic-tide.glsl"
+        }
+      ],
+      "params": {
+        "scale": {
+          "type": "range",
+          "label": "Flow scale",
+          "min": 0.4,
+          "max": 4,
+          "def": 1.2,
+          "step": 0.01,
+          "group": "Flow",
+          "log": true
+        },
+        "warp": {
+          "type": "range",
+          "label": "Warp",
+          "min": 0,
+          "max": 2.5,
+          "def": 0.8,
+          "step": 0.01,
+          "group": "Flow"
+        },
+        "turns": {
+          "type": "int",
+          "label": "Cycles / loop",
+          "min": 1,
+          "max": 3,
+          "def": 1,
+          "group": "Motion",
+          "hint": "Whole cycles per loop; the loop always closes."
+        },
+        "cells": {
+          "type": "int",
+          "label": "Blocks",
+          "min": 8,
+          "max": 160,
+          "def": 56,
+          "group": "Poster",
+          "hint": "Blocks across the short side.",
+          "randMax": 110
+        },
+        "bands": {
+          "type": "int",
+          "label": "Bands",
+          "min": 2,
+          "max": 12,
+          "def": 5,
+          "group": "Poster",
+          "randMax": 9
+        },
+        "soft": {
+          "type": "range",
+          "label": "Edge softness",
+          "min": 0,
+          "max": 1,
+          "def": 0.05,
+          "step": 0.01,
+          "group": "Poster"
+        },
+        "dither": {
+          "type": "range",
+          "label": "Dither",
+          "min": 0,
+          "max": 1.5,
+          "def": 0.3,
+          "step": 0.01,
+          "group": "Poster"
+        },
+        "amount": {
+          "type": "range",
+          "label": "Amount",
+          "min": 0,
+          "max": 1,
+          "def": 1,
+          "step": 0.01,
+          "group": "Poster"
+        },
+        "gap": {
+          "type": "range",
+          "label": "Block gap",
+          "min": 0,
+          "max": 0.3,
+          "def": 0,
+          "step": 0.01,
+          "group": "Poster",
+          "hint": "Dark mortar between blocks."
+        },
+        "vignette": {
+          "type": "range",
+          "label": "Vignette",
+          "min": 0,
+          "max": 0.6,
+          "def": 0.2,
+          "step": 0.01,
+          "group": "Lens",
+          "randMax": 0.5
+        },
+        "exposure": {
+          "type": "range",
+          "label": "Exposure",
+          "min": 0.5,
+          "max": 1.6,
+          "def": 1,
+          "step": 0.01,
+          "group": "Lens",
+          "mutate": 0.2
+        },
+        "grain": {
+          "type": "range",
+          "label": "Grain",
+          "min": 0,
+          "max": 1,
+          "def": 0.2,
+          "step": 0.01,
+          "group": "Lens",
+          "randMax": 0.6
+        }
+      }
+    },
+    {
+      "id": "gill-lines",
+      "name": "Gill Lines",
+      "group": "Posterflow",
+      "palette": "rosewater",
+      "tags": [
+        "media",
+        "engrave",
+        "lines",
+        "petal"
+      ],
+      "blurb": "Engraved iso-lines of the warped brightness in contour, parallel or radial patterns; shadows thicken.",
+      "cost": 1.2,
+      "flash": false,
+      "passes": [
+        {
+          "src": "styles/gill-lines.glsl"
+        }
+      ],
+      "params": {
+        "scale": {
+          "type": "range",
+          "label": "Flow scale",
+          "min": 0.4,
+          "max": 4,
+          "def": 1,
+          "step": 0.01,
+          "group": "Flow",
+          "log": true
+        },
+        "warp": {
+          "type": "range",
+          "label": "Warp",
+          "min": 0,
+          "max": 2.5,
+          "def": 0.7,
+          "step": 0.01,
+          "group": "Flow"
+        },
+        "turns": {
+          "type": "int",
+          "label": "Cycles / loop",
+          "min": 1,
+          "max": 3,
+          "def": 1,
+          "group": "Motion",
+          "hint": "Whole cycles per loop; the loop always closes."
+        },
+        "pattern": {
+          "type": "select",
+          "label": "Pattern",
+          "options": [
+            "contour",
+            "parallel",
+            "radial"
+          ],
+          "def": "radial",
+          "mutate": 0,
+          "group": "Lines"
+        },
+        "lines": {
+          "type": "range",
+          "label": "Line count",
+          "min": 6,
+          "max": 120,
+          "def": 30,
+          "step": 0.01,
+          "group": "Lines",
+          "log": true,
+          "randMax": 90
+        },
+        "angle": {
+          "type": "range",
+          "label": "Angle",
+          "min": -180,
+          "max": 180,
+          "def": 20,
+          "step": 1,
+          "group": "Lines",
+          "unit": "°",
+          "show": {
+            "param": "pattern",
+            "is": "parallel"
+          }
+        },
+        "follow": {
+          "type": "range",
+          "label": "Follow tone",
+          "min": 0,
+          "max": 3,
+          "def": 0.35,
+          "step": 0.01,
+          "group": "Lines",
+          "hint": "How strongly lines bend with the image.",
+          "show": {
+            "param": "pattern",
+            "not": "contour"
+          }
+        },
+        "weight": {
+          "type": "range",
+          "label": "Weight",
+          "min": 0.2,
+          "max": 1.6,
+          "def": 0.5,
+          "step": 0.01,
+          "group": "Lines"
+        },
+        "inkMix": {
+          "type": "range",
+          "label": "Ink vs colour",
+          "min": 0,
+          "max": 1,
+          "def": 0.15,
+          "step": 0.01,
+          "group": "Lines"
+        },
+        "ghost": {
+          "type": "range",
+          "label": "Ghost image",
+          "min": 0,
+          "max": 0.6,
+          "def": 0.22,
+          "step": 0.01,
+          "group": "Lines",
+          "hint": "Let the source show faintly between lines."
+        },
+        "vignette": {
+          "type": "range",
+          "label": "Vignette",
+          "min": 0,
+          "max": 0.6,
+          "def": 0.3,
+          "step": 0.01,
+          "group": "Lens",
+          "randMax": 0.5
+        },
+        "exposure": {
+          "type": "range",
+          "label": "Exposure",
+          "min": 0.5,
+          "max": 1.6,
+          "def": 1,
+          "step": 0.01,
+          "group": "Lens",
+          "mutate": 0.2
+        },
+        "grain": {
+          "type": "range",
+          "label": "Grain",
+          "min": 0,
+          "max": 1,
+          "def": 0.3,
+          "step": 0.01,
+          "group": "Lens",
+          "randMax": 0.6
+        }
+      }
+    },
+    {
+      "id": "satin-pour",
+      "name": "Satin Pour",
+      "group": "Posterflow",
+      "palette": "ember",
+      "tags": [
+        "media",
+        "silk",
+        "chrome",
+        "sheen"
+      ],
+      "blurb": "A soft height field refracts the image and is lit with a stretched sheen: silk, satin, liquid chrome.",
+      "cost": 2.2,
+      "flash": false,
+      "passes": [
+        {
+          "src": "styles/satin-pour.glsl"
+        }
+      ],
+      "params": {
+        "scale": {
+          "type": "range",
+          "label": "Fold scale",
+          "min": 0.3,
+          "max": 3,
+          "def": 0.9,
+          "step": 0.01,
+          "group": "Form",
+          "log": true
+        },
+        "turns": {
+          "type": "int",
+          "label": "Cycles / loop",
+          "min": 1,
+          "max": 3,
+          "def": 1,
+          "group": "Motion",
+          "hint": "Whole cycles per loop; the loop always closes."
+        },
+        "relief": {
+          "type": "range",
+          "label": "Relief",
+          "min": 0,
+          "max": 4,
+          "def": 0.7,
+          "step": 0.01,
+          "group": "Form"
+        },
+        "refract": {
+          "type": "range",
+          "label": "Refraction",
+          "min": 0,
+          "max": 3,
+          "def": 1.2,
+          "step": 0.01,
+          "group": "Form"
+        },
+        "light": {
+          "type": "range",
+          "label": "Light angle",
+          "min": -180,
+          "max": 180,
+          "def": 40,
+          "step": 1,
+          "group": "Light",
+          "unit": "°"
+        },
+        "gloss": {
+          "type": "range",
+          "label": "Gloss",
+          "min": 2,
+          "max": 120,
+          "def": 40,
+          "step": 0.01,
+          "group": "Light",
+          "log": true
+        },
+        "sheen": {
+          "type": "range",
+          "label": "Sheen",
+          "min": 0,
+          "max": 3,
+          "def": 1.4,
+          "step": 0.01,
+          "group": "Light"
+        },
+        "vignette": {
+          "type": "range",
+          "label": "Vignette",
+          "min": 0,
+          "max": 0.6,
+          "def": 0.35,
+          "step": 0.01,
+          "group": "Lens",
+          "randMax": 0.5
+        },
+        "exposure": {
+          "type": "range",
+          "label": "Exposure",
+          "min": 0.5,
+          "max": 1.6,
+          "def": 1,
+          "step": 0.01,
+          "group": "Lens",
+          "mutate": 0.2
+        },
+        "grain": {
+          "type": "range",
+          "label": "Grain",
+          "min": 0,
+          "max": 1,
+          "def": 0.25,
+          "step": 0.01,
+          "group": "Lens",
+          "randMax": 0.6
+        }
+      }
+    },
+    {
+      "id": "dot-screen",
+      "name": "Dot Screen",
+      "group": "Posterflow",
+      "palette": "mineral",
+      "tags": [
+        "media",
+        "halftone",
+        "dots",
+        "print"
+      ],
+      "blurb": "A halftone carried by liquid flow: dot size follows tone, colour follows the source.",
+      "cost": 1.2,
+      "flash": false,
+      "passes": [
+        {
+          "src": "styles/dot-screen.glsl"
+        }
+      ],
+      "params": {
+        "scale": {
+          "type": "range",
+          "label": "Flow scale",
+          "min": 0.4,
+          "max": 4,
+          "def": 1,
+          "step": 0.01,
+          "group": "Flow",
+          "log": true
+        },
+        "warp": {
+          "type": "range",
+          "label": "Warp",
+          "min": 0,
+          "max": 2.5,
+          "def": 0.8,
+          "step": 0.01,
+          "group": "Flow"
+        },
+        "turns": {
+          "type": "int",
+          "label": "Cycles / loop",
+          "min": 1,
+          "max": 3,
+          "def": 1,
+          "group": "Motion",
+          "hint": "Whole cycles per loop; the loop always closes."
+        },
+        "cells": {
+          "type": "int",
+          "label": "Dots",
+          "min": 12,
+          "max": 120,
+          "def": 48,
+          "group": "Screen",
+          "randMax": 90
+        },
+        "angle": {
+          "type": "range",
+          "label": "Screen angle",
+          "min": -90,
+          "max": 90,
+          "def": 22,
+          "step": 1,
+          "group": "Screen",
+          "unit": "°"
+        },
+        "size": {
+          "type": "range",
+          "label": "Dot size",
+          "min": 0.3,
+          "max": 1.6,
+          "def": 1.15,
+          "step": 0.01,
+          "group": "Screen"
+        },
+        "flip": {
+          "type": "toggle",
+          "label": "Light dots",
+          "def": false,
+          "group": "Screen",
+          "hint": "Dots grow with brightness instead of shadow."
+        },
+        "palMix": {
+          "type": "range",
+          "label": "Palette ink",
+          "min": 0,
+          "max": 1,
+          "def": 0.2,
+          "step": 0.01,
+          "group": "Screen"
+        },
+        "vignette": {
+          "type": "range",
+          "label": "Vignette",
+          "min": 0,
+          "max": 0.6,
+          "def": 0.25,
+          "step": 0.01,
+          "group": "Lens",
+          "randMax": 0.5
+        },
+        "exposure": {
+          "type": "range",
+          "label": "Exposure",
+          "min": 0.5,
+          "max": 1.6,
+          "def": 1,
+          "step": 0.01,
+          "group": "Lens",
+          "mutate": 0.2
+        },
+        "grain": {
+          "type": "range",
+          "label": "Grain",
+          "min": 0,
+          "max": 1,
+          "def": 0.2,
+          "step": 0.01,
+          "group": "Lens",
+          "randMax": 0.6
+        }
+      }
+    },
+    {
+      "id": "tide-glint",
+      "name": "Tide Glint",
+      "group": "Posterflow",
+      "palette": "tidal",
+      "tags": [
+        "media",
+        "water",
+        "sparkle",
+        "glint"
+      ],
+      "blurb": "Looping ripples refract the image and every highlight throws a four-way glint, like sun on water.",
+      "cost": 2.6,
+      "flash": false,
+      "passes": [
+        {
+          "src": "styles/tide-glint.glsl"
+        }
+      ],
+      "params": {
+        "scale": {
+          "type": "range",
+          "label": "Ripple scale",
+          "min": 0.5,
+          "max": 6,
+          "def": 2.2,
+          "step": 0.01,
+          "group": "Water",
+          "log": true
+        },
+        "ripple": {
+          "type": "range",
+          "label": "Ripple",
+          "min": 0,
+          "max": 3,
+          "def": 1.1,
+          "step": 0.01,
+          "group": "Water"
+        },
+        "turns": {
+          "type": "int",
+          "label": "Cycles / loop",
+          "min": 1,
+          "max": 3,
+          "def": 1,
+          "group": "Motion",
+          "hint": "Whole cycles per loop; the loop always closes."
+        },
+        "thresh": {
+          "type": "range",
+          "label": "Glint threshold",
+          "min": 0.2,
+          "max": 1.4,
+          "def": 0.55,
+          "step": 0.01,
+          "group": "Glint"
+        },
+        "glint": {
+          "type": "range",
+          "label": "Glint",
+          "min": 0,
+          "max": 3,
+          "def": 1.2,
+          "step": 0.01,
+          "group": "Glint"
+        },
+        "length": {
+          "type": "range",
+          "label": "Glint length",
+          "min": 0.02,
+          "max": 0.4,
+          "def": 0.14,
+          "step": 0.01,
+          "group": "Glint",
+          "log": true
+        },
+        "angle": {
+          "type": "range",
+          "label": "Glint angle",
+          "min": 0,
+          "max": 90,
+          "def": 20,
+          "step": 1,
+          "group": "Glint",
+          "unit": "°"
+        },
+        "tint": {
+          "type": "range",
+          "label": "Palette tint",
+          "min": 0,
+          "max": 1,
+          "def": 0.25,
+          "step": 0.01,
+          "group": "Light"
+        },
+        "vignette": {
+          "type": "range",
+          "label": "Vignette",
+          "min": 0,
+          "max": 0.6,
+          "def": 0.35,
+          "step": 0.01,
+          "group": "Lens",
+          "randMax": 0.5
+        },
+        "exposure": {
+          "type": "range",
+          "label": "Exposure",
+          "min": 0.5,
+          "max": 1.6,
+          "def": 1,
+          "step": 0.01,
+          "group": "Lens",
+          "mutate": 0.2
+        },
+        "grain": {
+          "type": "range",
+          "label": "Grain",
+          "min": 0,
+          "max": 1,
+          "def": 0.3,
+          "step": 0.01,
+          "group": "Lens",
+          "randMax": 0.6
+        }
+      }
+    },
+    {
+      "id": "oil-wash",
+      "name": "Oil Wash",
+      "group": "Posterflow",
+      "palette": "rosewater",
+      "tags": [
+        "media",
+        "paint",
+        "kuwahara",
+        "painterly"
+      ],
+      "blurb": "A Kuwahara painter: detail melts into brush-like colour fields with crisp edges between them.",
+      "cost": 3,
+      "flash": false,
+      "passes": [
+        {
+          "src": "styles/oil-wash.glsl"
+        }
+      ],
+      "params": {
+        "scale": {
+          "type": "range",
+          "label": "Flow scale",
+          "min": 0.4,
+          "max": 4,
+          "def": 1,
+          "step": 0.01,
+          "group": "Flow",
+          "log": true
+        },
+        "warp": {
+          "type": "range",
+          "label": "Warp",
+          "min": 0,
+          "max": 2.5,
+          "def": 0.6,
+          "step": 0.01,
+          "group": "Flow"
+        },
+        "turns": {
+          "type": "int",
+          "label": "Cycles / loop",
+          "min": 1,
+          "max": 3,
+          "def": 1,
+          "group": "Motion",
+          "hint": "Whole cycles per loop; the loop always closes."
+        },
+        "radius": {
+          "type": "int",
+          "label": "Brush radius",
+          "min": 1,
+          "max": 3,
+          "def": 3,
+          "group": "Brush",
+          "mutate": 0.3
+        },
+        "stroke": {
+          "type": "range",
+          "label": "Stroke size",
+          "min": 0.5,
+          "max": 5,
+          "def": 3.2,
+          "step": 0.01,
+          "group": "Brush",
+          "log": true,
+          "unit": "px"
+        },
+        "chroma": {
+          "type": "range",
+          "label": "Colour",
+          "min": 0,
+          "max": 1.6,
+          "def": 1.15,
+          "step": 0.01,
+          "group": "Brush"
+        },
+        "edge": {
+          "type": "range",
+          "label": "Edge light",
+          "min": 0,
+          "max": 2,
+          "def": 0.5,
+          "step": 0.01,
+          "group": "Brush"
+        },
+        "vignette": {
+          "type": "range",
+          "label": "Vignette",
+          "min": 0,
+          "max": 0.6,
+          "def": 0.3,
+          "step": 0.01,
+          "group": "Lens",
+          "randMax": 0.5
+        },
+        "exposure": {
+          "type": "range",
+          "label": "Exposure",
+          "min": 0.5,
+          "max": 1.6,
+          "def": 1,
+          "step": 0.01,
+          "group": "Lens",
+          "mutate": 0.2
+        },
+        "grain": {
+          "type": "range",
+          "label": "Grain",
+          "min": 0,
+          "max": 1,
+          "def": 0.2,
+          "step": 0.01,
+          "group": "Lens",
+          "randMax": 0.6
+        }
+      }
+    },
+    {
+      "id": "petal-fold",
+      "name": "Petal Fold",
+      "group": "Posterflow",
+      "palette": "ember",
+      "tags": [
+        "media",
+        "kaleidoscope",
+        "symmetry",
+        "bloom"
+      ],
+      "blurb": "The source is mirror-folded into petals, then poured through the flow: any photo becomes a symmetric bloom.",
+      "cost": 1.2,
+      "flash": false,
+      "passes": [
+        {
+          "src": "styles/petal-fold.glsl"
+        }
+      ],
+      "params": {
+        "scale": {
+          "type": "range",
+          "label": "Flow scale",
+          "min": 0.4,
+          "max": 4,
+          "def": 1,
+          "step": 0.01,
+          "group": "Flow",
+          "log": true
+        },
+        "warp": {
+          "type": "range",
+          "label": "Warp",
+          "min": 0,
+          "max": 2.5,
+          "def": 0.9,
+          "step": 0.01,
+          "group": "Flow"
+        },
+        "turns": {
+          "type": "int",
+          "label": "Cycles / loop",
+          "min": 1,
+          "max": 3,
+          "def": 1,
+          "group": "Motion",
+          "hint": "Whole cycles per loop; the loop always closes."
+        },
+        "petals": {
+          "type": "int",
+          "label": "Petals",
+          "min": 2,
+          "max": 14,
+          "def": 6,
+          "group": "Fold",
+          "randMax": 10
+        },
+        "centre": {
+          "type": "point",
+          "label": "Centre",
+          "min": -0.5,
+          "max": 0.5,
+          "def": [
+            0,
+            0
+          ],
+          "group": "Fold"
+        },
+        "pick": {
+          "type": "point",
+          "label": "Source region",
+          "min": -0.5,
+          "max": 0.5,
+          "def": [
+            0.12,
+            0.05
+          ],
+          "group": "Fold",
+          "hint": "Which part of the image feeds the petals."
+        },
+        "spin": {
+          "type": "range",
+          "label": "Spin",
+          "min": -3,
+          "max": 3,
+          "def": 0,
+          "step": 0.01,
+          "group": "Fold"
+        },
+        "zoomIn": {
+          "type": "range",
+          "label": "Bloom",
+          "min": -1,
+          "max": 1.5,
+          "def": 0.5,
+          "step": 0.01,
+          "group": "Fold"
+        },
+        "seam": {
+          "type": "range",
+          "label": "Seams",
+          "min": 0,
+          "max": 1,
+          "def": 0.15,
+          "step": 0.01,
+          "group": "Fold",
+          "hint": "Dark lines along the mirror folds."
+        },
+        "vignette": {
+          "type": "range",
+          "label": "Vignette",
+          "min": 0,
+          "max": 0.6,
+          "def": 0.3,
+          "step": 0.01,
+          "group": "Lens",
+          "randMax": 0.5
+        },
+        "exposure": {
+          "type": "range",
+          "label": "Exposure",
+          "min": 0.5,
+          "max": 1.6,
+          "def": 1,
+          "step": 0.01,
+          "group": "Lens",
+          "mutate": 0.2
+        },
+        "grain": {
+          "type": "range",
+          "label": "Grain",
+          "min": 0,
+          "max": 1,
+          "def": 0.25,
+          "step": 0.01,
+          "group": "Lens",
+          "randMax": 0.6
+        }
+      }
+    },
+    {
+      "id": "aura-wash",
+      "name": "Aura Wash",
+      "group": "Posterflow",
+      "palette": "tidal",
+      "tags": [
+        "media",
+        "blur",
+        "bloom",
+        "gradient",
+        "soft"
+      ],
+      "blurb": "An out-of-focus, drifting bloom of the source graded through the palette, with film grain.",
+      "cost": 1.6,
+      "flash": false,
+      "passes": [
+        {
+          "src": "styles/aura-wash.glsl"
+        }
+      ],
+      "params": {
+        "scale": {
+          "type": "range",
+          "label": "Flow scale",
+          "min": 0.4,
+          "max": 4,
+          "def": 0.9,
+          "step": 0.01,
+          "group": "Flow",
+          "log": true
+        },
+        "warp": {
+          "type": "range",
+          "label": "Warp",
+          "min": 0,
+          "max": 2.5,
+          "def": 1,
+          "step": 0.01,
+          "group": "Flow"
+        },
+        "turns": {
+          "type": "int",
+          "label": "Cycles / loop",
+          "min": 1,
+          "max": 3,
+          "def": 1,
+          "group": "Motion",
+          "hint": "Whole cycles per loop; the loop always closes."
+        },
+        "blur": {
+          "type": "range",
+          "label": "Blur",
+          "min": 0.01,
+          "max": 0.4,
+          "def": 0.12,
+          "step": 0.01,
+          "group": "Soft",
+          "log": true
+        },
+        "palMix": {
+          "type": "range",
+          "label": "Palette grade",
+          "min": 0,
+          "max": 1,
+          "def": 0.35,
+          "step": 0.01,
+          "group": "Soft"
+        },
+        "chroma": {
+          "type": "range",
+          "label": "Colour",
+          "min": 0,
+          "max": 1.6,
+          "def": 1.2,
+          "step": 0.01,
+          "group": "Soft"
+        },
+        "glow": {
+          "type": "range",
+          "label": "Glow",
+          "min": 0,
+          "max": 2,
+          "def": 0.7,
+          "step": 0.01,
+          "group": "Soft"
+        },
+        "vignette": {
+          "type": "range",
+          "label": "Vignette",
+          "min": 0,
+          "max": 0.6,
+          "def": 0.35,
+          "step": 0.01,
+          "group": "Lens",
+          "randMax": 0.5
+        },
+        "exposure": {
+          "type": "range",
+          "label": "Exposure",
+          "min": 0.5,
+          "max": 1.6,
+          "def": 1,
+          "step": 0.01,
+          "group": "Lens",
+          "mutate": 0.2
+        },
+        "grain": {
+          "type": "range",
+          "label": "Grain",
+          "min": 0,
+          "max": 1,
+          "def": 0.55,
+          "step": 0.01,
+          "group": "Lens",
+          "randMax": 0.6
         }
       }
     }
@@ -734,8 +1942,8 @@
             }
           ],
           "def": "source",
-          "group": "Poster",
-          "mutate": 0
+          "mutate": 0,
+          "group": "Poster"
         },
         "palMix": {
           "type": "range",
@@ -838,6 +2046,10 @@
     {
       "id": "poster-reel",
       "file": "sequences/poster-reel.json"
+    },
+    {
+      "id": "soft-reel",
+      "file": "sequences/soft-reel.json"
     }
   ],
   "exporters": [
