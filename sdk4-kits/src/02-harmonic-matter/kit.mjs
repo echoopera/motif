@@ -3,7 +3,7 @@ import { R, I, lens } from '../../tools/helpers.mjs';
 const params = {
   modes: I('Wave modes', 2, 6, 3, { group: 'Form', hint: 'Number of superposed standing modes.', mutate: 0.3 }),
   amp: R('Amplitude', 0.03, 0.35, 0.2, { group: 'Form', hint: 'Peak height of the surface in scene units.' }),
-  wavelength: R('Wavelength', 0.15, 1.5, 0.6, { group: 'Form', hint: 'Base spatial wavelength in scene units.', log: true }),
+  wavelength: R('Wavelength', 0.1, 3, 0.6, { step: 0.01, group: 'Form', hint: 'Base spatial wavelength in scene units. Short = fine ripples, long = broad swells.' }),
   tilt: R('Camera pitch', 0.15, 1.2, 0.85, { group: 'Form', hint: 'Elevation of the camera above the surface, radians.' }),
   nodeWidth: R('Node width', 0.002, 0.03, 0.006, { group: 'Material', hint: 'Width of the glowing nodal contours, measured on the surface.', log: true }),
   opacity: R('Membrane opacity', 0.05, 0.7, 0.4, { group: 'Material', hint: 'How much each thin sheet covers what lies beneath.' }),
