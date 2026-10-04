@@ -3,7 +3,7 @@ import { R, I, lens } from '../../tools/helpers.mjs';
 const params = {
   petals: I('Petal count', 48, 240, 144, { group: 'Form', hint: 'Number of petals in each golden-angle spiral. Spatial count, not a motion rate.', mutate: 0.3 }),
   pitch: R('Spiral pitch', 0.08, 0.35, 0.18, { group: 'Form', hint: 'Growth rate b of the glowing logarithmic scaffold r = r0·e^(b·a). Separate from the petal lattice.' }),
-  bladeLen: R('Blade length', 0.03, 0.16, 0.075, { group: 'Form', hint: 'Half length of a mid-field blade in scene units (short side = 1).', log: true }),
+  bladeLen: R('Blade length', 0.03, 0.16, 0.075, { step: 0.001, group: 'Form', hint: 'Half length of a mid-field blade in scene units (short side = 1).' }),
   taper: R('Blade taper', 0.15, 0.9, 0.5, { group: 'Form', hint: 'How sharply each blade narrows toward its tip.' }),
   depth: R('Depth spacing', 0.02, 0.3, 0.12, { group: 'Form', hint: 'Separation of the far, middle and foreground strata. Drives parallax and defocus.' }),
   translucency: R('Translucency', 0, 0.75, 0.3, { group: 'Material', hint: 'Light transmitted through thin edges and tips.' }),

@@ -3,7 +3,7 @@ import { R, I, lens } from '../../tools/helpers.mjs';
 const params = {
   layers: I('Membrane layers', 3, 12, 7, { group: 'Form', hint: 'Number of nested membrane shells.', mutate: 0.3 }),
   aperture: R('Aperture radius', 0.08, 0.45, 0.2, { group: 'Form', hint: 'Radius of the innermost shell and the distant aperture.' }),
-  filament: R('Filament scale', 0.02, 0.3, 0.09, { group: 'Form', hint: 'Spacing of the fine filaments on each membrane. Smaller = more filaments.', log: true }),
+  filament: R('Filament scale', 0.02, 0.3, 0.09, { step: 0.005, group: 'Form', hint: 'Spacing of the fine filaments on each membrane. Smaller = more filaments.' }),
   warp: R('Warp amplitude', 0, 0.25, 0.08, { group: 'Form', hint: 'How far each membrane folds away from a circle.' }),
   density: R('Density', 0.1, 2, 0.8, { group: 'Material', hint: 'Overall membrane density.' }),
   absorb: R('Absorption', 0.1, 3, 1.6, { group: 'Material', hint: 'How strongly membranes block what lies behind them.' }),

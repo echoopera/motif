@@ -3,7 +3,7 @@ import { R, I, lens } from '../../tools/helpers.mjs';
 const params = {
   count: I('Colony count', 8, 36, 18, { group: 'Form', hint: 'Approximate number of colonies in the frame. Sets the cell size.', mutate: 0.3 }),
   species: R('Species mix', 0, 1, 0.6, { group: 'Form', hint: 'Share of coral colonies against emerald cells.' }),
-  membrane: R('Membrane width', 0.003, 0.035, 0.012, { group: 'Material', hint: 'Width of the bright membrane and its dark channel, scene units.', log: true }),
+  membrane: R('Membrane width', 0.003, 0.035, 0.012, { step: 0.001, group: 'Material', hint: 'Width of the bright membrane and its dark channel, scene units.' }),
   translucency: R('Translucency', 0, 0.7, 0.25, { group: 'Material', hint: 'How glassy the cell bodies are.' }),
   organelles: R('Organelle density', 0.1, 1, 0.6, { group: 'Material', hint: 'Number of organelle points circling each nucleus.' }),
   filaments: I('Filament count', 8, 48, 24, { group: 'Material', hint: 'Radial filaments around each nucleus. A spatial count.', mutate: 0.3 }),

@@ -90,7 +90,7 @@
           "min": 0.1,
           "max": 0.65,
           "def": 0.35,
-          "step": 0.0028,
+          "step": 0.001,
           "group": "Form",
           "hint": "Radius of the principal cobalt arc in scene units."
         },
@@ -100,10 +100,9 @@
           "min": 0.015,
           "max": 0.12,
           "def": 0.04,
-          "step": 0.00052,
+          "step": 0.001,
           "group": "Form",
-          "hint": "Spacing of the hairline grids that ride on the planes.",
-          "log": true
+          "hint": "Spacing of the hairline grids that ride on the planes."
         },
         "lineW": {
           "type": "range",
@@ -122,7 +121,7 @@
           "min": 0,
           "max": 0.15,
           "def": 0.05,
-          "step": 0.00075,
+          "step": 0.0001,
           "group": "Light",
           "hint": "Soft shadow offset between layers. 0 prints everything flat."
         },
@@ -132,7 +131,7 @@
           "min": 0,
           "max": 0.35,
           "def": 0.12,
-          "step": 0.0017,
+          "step": 0.001,
           "group": "Motion",
           "hint": "How far planes travel on their moves."
         },
@@ -142,7 +141,7 @@
           "min": 0,
           "max": 0.5,
           "def": 0.12,
-          "step": 0.0025,
+          "step": 0.001,
           "group": "Motion",
           "hint": "How far planes rotate on their moves, radians."
         },
@@ -152,7 +151,7 @@
           "min": 0.1,
           "max": 0.6,
           "def": 0.3,
-          "step": 0.0025,
+          "step": 0.001,
           "group": "Motion",
           "hint": "Share of each half cycle spent at rest."
         },
@@ -258,7 +257,7 @@
           "min": 0.1,
           "max": 0.65,
           "def": 0.2,
-          "step": 0.0028,
+          "step": 0.001,
           "group": "Form",
           "hint": "Radius of the principal cobalt arc in scene units."
         },
@@ -268,10 +267,9 @@
           "min": 0.015,
           "max": 0.12,
           "def": 0.03,
-          "step": 0.00052,
+          "step": 0.001,
           "group": "Form",
-          "hint": "Spacing of the hairline grids that ride on the planes.",
-          "log": true
+          "hint": "Spacing of the hairline grids that ride on the planes."
         },
         "lineW": {
           "type": "range",
@@ -290,7 +288,7 @@
           "min": 0,
           "max": 0.15,
           "def": 0.05,
-          "step": 0.00075,
+          "step": 0.0001,
           "group": "Light",
           "hint": "Soft shadow offset between layers. 0 prints everything flat."
         },
@@ -300,7 +298,7 @@
           "min": 0,
           "max": 0.35,
           "def": 0.2,
-          "step": 0.0017,
+          "step": 0.001,
           "group": "Motion",
           "hint": "How far planes travel on their moves."
         },
@@ -310,7 +308,7 @@
           "min": 0,
           "max": 0.5,
           "def": 0.12,
-          "step": 0.0025,
+          "step": 0.001,
           "group": "Motion",
           "hint": "How far planes rotate on their moves, radians."
         },
@@ -320,7 +318,7 @@
           "min": 0.1,
           "max": 0.6,
           "def": 0.3,
-          "step": 0.0025,
+          "step": 0.001,
           "group": "Motion",
           "hint": "Share of each half cycle spent at rest."
         },
@@ -426,7 +424,7 @@
           "min": 0.1,
           "max": 0.65,
           "def": 0.42,
-          "step": 0.0028,
+          "step": 0.001,
           "group": "Form",
           "hint": "Radius of the principal cobalt arc in scene units."
         },
@@ -436,10 +434,9 @@
           "min": 0.015,
           "max": 0.12,
           "def": 0.05,
-          "step": 0.00052,
+          "step": 0.001,
           "group": "Form",
-          "hint": "Spacing of the hairline grids that ride on the planes.",
-          "log": true
+          "hint": "Spacing of the hairline grids that ride on the planes."
         },
         "lineW": {
           "type": "range",
@@ -458,7 +455,7 @@
           "min": 0,
           "max": 0.15,
           "def": 0.05,
-          "step": 0.00075,
+          "step": 0.0001,
           "group": "Light",
           "hint": "Soft shadow offset between layers. 0 prints everything flat."
         },
@@ -468,7 +465,7 @@
           "min": 0,
           "max": 0.35,
           "def": 0.12,
-          "step": 0.0017,
+          "step": 0.001,
           "group": "Motion",
           "hint": "How far planes travel on their moves."
         },
@@ -478,7 +475,7 @@
           "min": 0,
           "max": 0.5,
           "def": 0.08,
-          "step": 0.0025,
+          "step": 0.001,
           "group": "Motion",
           "hint": "How far planes rotate on their moves, radians."
         },
@@ -488,7 +485,7 @@
           "min": 0.1,
           "max": 0.6,
           "def": 0.3,
-          "step": 0.0025,
+          "step": 0.001,
           "group": "Motion",
           "hint": "Share of each half cycle spent at rest."
         },
@@ -594,7 +591,7 @@
           "min": 0.1,
           "max": 0.65,
           "def": 0.35,
-          "step": 0.0028,
+          "step": 0.001,
           "group": "Form",
           "hint": "Radius of the principal cobalt arc in scene units."
         },
@@ -604,10 +601,9 @@
           "min": 0.015,
           "max": 0.12,
           "def": 0.03,
-          "step": 0.00052,
+          "step": 0.001,
           "group": "Form",
-          "hint": "Spacing of the hairline grids that ride on the planes.",
-          "log": true
+          "hint": "Spacing of the hairline grids that ride on the planes."
         },
         "lineW": {
           "type": "range",
@@ -626,7 +622,7 @@
           "min": 0,
           "max": 0.15,
           "def": 0,
-          "step": 0.00075,
+          "step": 0.0001,
           "group": "Light",
           "hint": "Soft shadow offset between layers. 0 prints everything flat."
         },
@@ -636,7 +632,7 @@
           "min": 0,
           "max": 0.35,
           "def": 0.12,
-          "step": 0.0017,
+          "step": 0.001,
           "group": "Motion",
           "hint": "How far planes travel on their moves."
         },
@@ -646,7 +642,7 @@
           "min": 0,
           "max": 0.5,
           "def": 0.09,
-          "step": 0.0025,
+          "step": 0.001,
           "group": "Motion",
           "hint": "How far planes rotate on their moves, radians."
         },
@@ -656,7 +652,7 @@
           "min": 0.1,
           "max": 0.6,
           "def": 0.3,
-          "step": 0.0025,
+          "step": 0.001,
           "group": "Motion",
           "hint": "Share of each half cycle spent at rest."
         },
@@ -762,7 +758,7 @@
           "min": 0.1,
           "max": 0.65,
           "def": 0.5,
-          "step": 0.0028,
+          "step": 0.001,
           "group": "Form",
           "hint": "Radius of the principal cobalt arc in scene units."
         },
@@ -772,10 +768,9 @@
           "min": 0.015,
           "max": 0.12,
           "def": 0.06,
-          "step": 0.00052,
+          "step": 0.001,
           "group": "Form",
-          "hint": "Spacing of the hairline grids that ride on the planes.",
-          "log": true
+          "hint": "Spacing of the hairline grids that ride on the planes."
         },
         "lineW": {
           "type": "range",
@@ -794,7 +789,7 @@
           "min": 0,
           "max": 0.15,
           "def": 0.05,
-          "step": 0.00075,
+          "step": 0.0001,
           "group": "Light",
           "hint": "Soft shadow offset between layers. 0 prints everything flat."
         },
@@ -804,7 +799,7 @@
           "min": 0,
           "max": 0.35,
           "def": 0.2,
-          "step": 0.0017,
+          "step": 0.001,
           "group": "Motion",
           "hint": "How far planes travel on their moves."
         },
@@ -814,7 +809,7 @@
           "min": 0,
           "max": 0.5,
           "def": 0.15,
-          "step": 0.0025,
+          "step": 0.001,
           "group": "Motion",
           "hint": "How far planes rotate on their moves, radians."
         },
@@ -824,7 +819,7 @@
           "min": 0.1,
           "max": 0.6,
           "def": 0.35,
-          "step": 0.0025,
+          "step": 0.001,
           "group": "Motion",
           "hint": "Share of each half cycle spent at rest."
         },
@@ -930,7 +925,7 @@
           "min": 0.1,
           "max": 0.65,
           "def": 0.5,
-          "step": 0.0028,
+          "step": 0.001,
           "group": "Form",
           "hint": "Radius of the principal cobalt arc in scene units."
         },
@@ -940,10 +935,9 @@
           "min": 0.015,
           "max": 0.12,
           "def": 0.045,
-          "step": 0.00052,
+          "step": 0.001,
           "group": "Form",
-          "hint": "Spacing of the hairline grids that ride on the planes.",
-          "log": true
+          "hint": "Spacing of the hairline grids that ride on the planes."
         },
         "lineW": {
           "type": "range",
@@ -962,7 +956,7 @@
           "min": 0,
           "max": 0.15,
           "def": 0.05,
-          "step": 0.00075,
+          "step": 0.0001,
           "group": "Light",
           "hint": "Soft shadow offset between layers. 0 prints everything flat."
         },
@@ -972,7 +966,7 @@
           "min": 0,
           "max": 0.35,
           "def": 0.08,
-          "step": 0.0017,
+          "step": 0.001,
           "group": "Motion",
           "hint": "How far planes travel on their moves."
         },
@@ -982,7 +976,7 @@
           "min": 0,
           "max": 0.5,
           "def": 0.3,
-          "step": 0.0025,
+          "step": 0.001,
           "group": "Motion",
           "hint": "How far planes rotate on their moves, radians."
         },
@@ -992,7 +986,7 @@
           "min": 0.1,
           "max": 0.6,
           "def": 0.3,
-          "step": 0.0025,
+          "step": 0.001,
           "group": "Motion",
           "hint": "Share of each half cycle spent at rest."
         },
@@ -1098,7 +1092,7 @@
           "min": 0.1,
           "max": 0.65,
           "def": 0.35,
-          "step": 0.0028,
+          "step": 0.001,
           "group": "Form",
           "hint": "Radius of the principal cobalt arc in scene units."
         },
@@ -1108,10 +1102,9 @@
           "min": 0.015,
           "max": 0.12,
           "def": 0.04,
-          "step": 0.00052,
+          "step": 0.001,
           "group": "Form",
-          "hint": "Spacing of the hairline grids that ride on the planes.",
-          "log": true
+          "hint": "Spacing of the hairline grids that ride on the planes."
         },
         "lineW": {
           "type": "range",
@@ -1130,7 +1123,7 @@
           "min": 0,
           "max": 0.15,
           "def": 0.05,
-          "step": 0.00075,
+          "step": 0.0001,
           "group": "Light",
           "hint": "Soft shadow offset between layers. 0 prints everything flat."
         },
@@ -1140,7 +1133,7 @@
           "min": 0,
           "max": 0.35,
           "def": 0.14,
-          "step": 0.0017,
+          "step": 0.001,
           "group": "Motion",
           "hint": "How far planes travel on their moves."
         },
@@ -1150,7 +1143,7 @@
           "min": 0,
           "max": 0.5,
           "def": 0.12,
-          "step": 0.0025,
+          "step": 0.001,
           "group": "Motion",
           "hint": "How far planes rotate on their moves, radians."
         },
@@ -1160,7 +1153,7 @@
           "min": 0.1,
           "max": 0.6,
           "def": 0.4,
-          "step": 0.0025,
+          "step": 0.001,
           "group": "Motion",
           "hint": "Share of each half cycle spent at rest."
         },
@@ -1266,7 +1259,7 @@
           "min": 0.1,
           "max": 0.65,
           "def": 0.35,
-          "step": 0.0028,
+          "step": 0.001,
           "group": "Form",
           "hint": "Radius of the principal cobalt arc in scene units."
         },
@@ -1276,10 +1269,9 @@
           "min": 0.015,
           "max": 0.12,
           "def": 0.055,
-          "step": 0.00052,
+          "step": 0.001,
           "group": "Form",
-          "hint": "Spacing of the hairline grids that ride on the planes.",
-          "log": true
+          "hint": "Spacing of the hairline grids that ride on the planes."
         },
         "lineW": {
           "type": "range",
@@ -1298,7 +1290,7 @@
           "min": 0,
           "max": 0.15,
           "def": 0.05,
-          "step": 0.00075,
+          "step": 0.0001,
           "group": "Light",
           "hint": "Soft shadow offset between layers. 0 prints everything flat."
         },
@@ -1308,7 +1300,7 @@
           "min": 0,
           "max": 0.35,
           "def": 0.1,
-          "step": 0.0017,
+          "step": 0.001,
           "group": "Motion",
           "hint": "How far planes travel on their moves."
         },
@@ -1318,7 +1310,7 @@
           "min": 0,
           "max": 0.5,
           "def": 0.12,
-          "step": 0.0025,
+          "step": 0.001,
           "group": "Motion",
           "hint": "How far planes rotate on their moves, radians."
         },
@@ -1328,7 +1320,7 @@
           "min": 0.1,
           "max": 0.6,
           "def": 0.3,
-          "step": 0.0025,
+          "step": 0.001,
           "group": "Motion",
           "hint": "Share of each half cycle spent at rest."
         },
@@ -1434,7 +1426,7 @@
           "min": 0.1,
           "max": 0.65,
           "def": 0.3,
-          "step": 0.0028,
+          "step": 0.001,
           "group": "Form",
           "hint": "Radius of the principal cobalt arc in scene units."
         },
@@ -1444,10 +1436,9 @@
           "min": 0.015,
           "max": 0.12,
           "def": 0.07,
-          "step": 0.00052,
+          "step": 0.001,
           "group": "Form",
-          "hint": "Spacing of the hairline grids that ride on the planes.",
-          "log": true
+          "hint": "Spacing of the hairline grids that ride on the planes."
         },
         "lineW": {
           "type": "range",
@@ -1466,7 +1457,7 @@
           "min": 0,
           "max": 0.15,
           "def": 0.03,
-          "step": 0.00075,
+          "step": 0.0001,
           "group": "Light",
           "hint": "Soft shadow offset between layers. 0 prints everything flat."
         },
@@ -1476,7 +1467,7 @@
           "min": 0,
           "max": 0.35,
           "def": 0.05,
-          "step": 0.0017,
+          "step": 0.001,
           "group": "Motion",
           "hint": "How far planes travel on their moves."
         },
@@ -1486,7 +1477,7 @@
           "min": 0,
           "max": 0.5,
           "def": 0.04,
-          "step": 0.0025,
+          "step": 0.001,
           "group": "Motion",
           "hint": "How far planes rotate on their moves, radians."
         },
@@ -1496,7 +1487,7 @@
           "min": 0.1,
           "max": 0.6,
           "def": 0.5,
-          "step": 0.0025,
+          "step": 0.001,
           "group": "Motion",
           "hint": "Share of each half cycle spent at rest."
         },

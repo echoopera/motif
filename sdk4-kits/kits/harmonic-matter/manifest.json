@@ -128,7 +128,7 @@
           "min": 0.03,
           "max": 0.35,
           "def": 0.2,
-          "step": 0.0016,
+          "step": 0.001,
           "group": "Form",
           "hint": "Peak height of the surface in scene units."
         },
@@ -148,7 +148,7 @@
           "min": 0.15,
           "max": 1.2,
           "def": 0.85,
-          "step": 0.0053,
+          "step": 0.001,
           "group": "Form",
           "hint": "Elevation of the camera above the surface, radians."
         },
@@ -158,10 +158,9 @@
           "min": 0.002,
           "max": 0.03,
           "def": 0.006,
-          "step": 0.00014,
+          "step": 0.0005,
           "group": "Material",
-          "hint": "Width of the glowing nodal contours, measured on the surface.",
-          "log": true
+          "hint": "Width of the glowing nodal contours, measured on the surface."
         },
         "opacity": {
           "type": "range",
@@ -169,7 +168,7 @@
           "min": 0.05,
           "max": 0.7,
           "def": 0.4,
-          "step": 0.0032,
+          "step": 0.001,
           "group": "Material",
           "hint": "How much each thin sheet covers what lies beneath."
         },
@@ -179,7 +178,7 @@
           "min": 0,
           "max": 1,
           "def": 0.6,
-          "step": 0.005,
+          "step": 0.001,
           "group": "Material",
           "hint": "Amber light concentrated on the wave peaks."
         },
@@ -189,7 +188,7 @@
           "min": 0.1,
           "max": 1,
           "def": 0.3,
-          "step": 0.0045,
+          "step": 0.001,
           "group": "Particles",
           "hint": "Fraction of lattice cells that hold a particle."
         },
@@ -199,10 +198,9 @@
           "min": 0.001,
           "max": 0.012,
           "def": 0.003,
-          "step": 0.000055,
+          "step": 0.0005,
           "group": "Particles",
-          "hint": "Particle radius in scene units.",
-          "log": true
+          "hint": "Particle radius in scene units."
         },
         "drift": {
           "type": "range",
@@ -210,7 +208,7 @@
           "min": 0,
           "max": 0.5,
           "def": 0.25,
-          "step": 0.0025,
+          "step": 0.001,
           "group": "Particles",
           "hint": "Displacement along the field gradient. Follows the same wave."
         },
@@ -230,7 +228,7 @@
           "min": 0,
           "max": 0.3,
           "def": 0.08,
-          "step": 0.0015,
+          "step": 0.001,
           "group": "Motion",
           "hint": "Closed yaw excursion of the camera."
         },
@@ -254,7 +252,6 @@
           "def": 1,
           "step": 0.01,
           "unit": "×",
-          "log": true,
           "group": "Light",
           "hint": "Linear exposure before the single tone map.",
           "randMax": 1.4
@@ -399,7 +396,7 @@
           "min": 0.03,
           "max": 0.35,
           "def": 0.12,
-          "step": 0.0016,
+          "step": 0.001,
           "group": "Form",
           "hint": "Peak height of the surface in scene units."
         },
@@ -419,7 +416,7 @@
           "min": 0.15,
           "max": 1.2,
           "def": 0.42,
-          "step": 0.0053,
+          "step": 0.001,
           "group": "Form",
           "hint": "Elevation of the camera above the surface, radians."
         },
@@ -429,10 +426,9 @@
           "min": 0.002,
           "max": 0.03,
           "def": 0.014,
-          "step": 0.00014,
+          "step": 0.0005,
           "group": "Material",
-          "hint": "Width of the glowing nodal contours, measured on the surface.",
-          "log": true
+          "hint": "Width of the glowing nodal contours, measured on the surface."
         },
         "opacity": {
           "type": "range",
@@ -440,7 +436,7 @@
           "min": 0.05,
           "max": 0.7,
           "def": 0.4,
-          "step": 0.0032,
+          "step": 0.001,
           "group": "Material",
           "hint": "How much each thin sheet covers what lies beneath."
         },
@@ -450,7 +446,7 @@
           "min": 0,
           "max": 1,
           "def": 0.6,
-          "step": 0.005,
+          "step": 0.001,
           "group": "Material",
           "hint": "Amber light concentrated on the wave peaks."
         },
@@ -460,7 +456,7 @@
           "min": 0.1,
           "max": 1,
           "def": 0.3,
-          "step": 0.0045,
+          "step": 0.001,
           "group": "Particles",
           "hint": "Fraction of lattice cells that hold a particle."
         },
@@ -470,10 +466,9 @@
           "min": 0.001,
           "max": 0.012,
           "def": 0.003,
-          "step": 0.000055,
+          "step": 0.0005,
           "group": "Particles",
-          "hint": "Particle radius in scene units.",
-          "log": true
+          "hint": "Particle radius in scene units."
         },
         "drift": {
           "type": "range",
@@ -481,7 +476,7 @@
           "min": 0,
           "max": 0.5,
           "def": 0.25,
-          "step": 0.0025,
+          "step": 0.001,
           "group": "Particles",
           "hint": "Displacement along the field gradient. Follows the same wave."
         },
@@ -501,7 +496,7 @@
           "min": 0,
           "max": 0.3,
           "def": 0.08,
-          "step": 0.0015,
+          "step": 0.001,
           "group": "Motion",
           "hint": "Closed yaw excursion of the camera."
         },
@@ -525,7 +520,6 @@
           "def": 1,
           "step": 0.01,
           "unit": "×",
-          "log": true,
           "group": "Light",
           "hint": "Linear exposure before the single tone map.",
           "randMax": 1.4
@@ -670,7 +664,7 @@
           "min": 0.03,
           "max": 0.35,
           "def": 0.22,
-          "step": 0.0016,
+          "step": 0.001,
           "group": "Form",
           "hint": "Peak height of the surface in scene units."
         },
@@ -690,7 +684,7 @@
           "min": 0.15,
           "max": 1.2,
           "def": 0.85,
-          "step": 0.0053,
+          "step": 0.001,
           "group": "Form",
           "hint": "Elevation of the camera above the surface, radians."
         },
@@ -700,7 +694,7 @@
           "min": 0.05,
           "max": 0.7,
           "def": 0.22,
-          "step": 0.0032,
+          "step": 0.001,
           "group": "Material",
           "hint": "How much each thin sheet covers what lies beneath."
         },
@@ -710,7 +704,7 @@
           "min": 0,
           "max": 1,
           "def": 0.85,
-          "step": 0.005,
+          "step": 0.001,
           "group": "Material",
           "hint": "Amber light concentrated on the wave peaks."
         },
@@ -720,7 +714,7 @@
           "min": 0.1,
           "max": 1,
           "def": 0.7,
-          "step": 0.0045,
+          "step": 0.001,
           "group": "Particles",
           "hint": "Fraction of lattice cells that hold a particle."
         },
@@ -730,10 +724,9 @@
           "min": 0.001,
           "max": 0.012,
           "def": 0.005,
-          "step": 0.000055,
+          "step": 0.0005,
           "group": "Particles",
-          "hint": "Particle radius in scene units.",
-          "log": true
+          "hint": "Particle radius in scene units."
         },
         "drift": {
           "type": "range",
@@ -741,7 +734,7 @@
           "min": 0,
           "max": 0.5,
           "def": 0.25,
-          "step": 0.0025,
+          "step": 0.001,
           "group": "Particles",
           "hint": "Displacement along the field gradient. Follows the same wave."
         },
@@ -761,7 +754,7 @@
           "min": 0,
           "max": 0.3,
           "def": 0.08,
-          "step": 0.0015,
+          "step": 0.001,
           "group": "Motion",
           "hint": "Closed yaw excursion of the camera."
         },
@@ -785,7 +778,6 @@
           "def": 1,
           "step": 0.01,
           "unit": "×",
-          "log": true,
           "group": "Light",
           "hint": "Linear exposure before the single tone map.",
           "randMax": 1.4
@@ -930,7 +922,7 @@
           "min": 0.03,
           "max": 0.35,
           "def": 0.18,
-          "step": 0.0016,
+          "step": 0.001,
           "group": "Form",
           "hint": "Peak height of the surface in scene units."
         },
@@ -950,7 +942,7 @@
           "min": 0.15,
           "max": 1.2,
           "def": 0.85,
-          "step": 0.0053,
+          "step": 0.001,
           "group": "Form",
           "hint": "Elevation of the camera above the surface, radians."
         },
@@ -960,10 +952,9 @@
           "min": 0.002,
           "max": 0.03,
           "def": 0.006,
-          "step": 0.00014,
+          "step": 0.0005,
           "group": "Material",
-          "hint": "Width of the glowing nodal contours, measured on the surface.",
-          "log": true
+          "hint": "Width of the glowing nodal contours, measured on the surface."
         },
         "opacity": {
           "type": "range",
@@ -971,7 +962,7 @@
           "min": 0.05,
           "max": 0.7,
           "def": 0.42,
-          "step": 0.0032,
+          "step": 0.001,
           "group": "Material",
           "hint": "How much each thin sheet covers what lies beneath."
         },
@@ -981,7 +972,7 @@
           "min": 0,
           "max": 1,
           "def": 0.25,
-          "step": 0.005,
+          "step": 0.001,
           "group": "Material",
           "hint": "Amber light concentrated on the wave peaks."
         },
@@ -991,7 +982,7 @@
           "min": 0.1,
           "max": 1,
           "def": 0.35,
-          "step": 0.0045,
+          "step": 0.001,
           "group": "Particles",
           "hint": "Fraction of lattice cells that hold a particle."
         },
@@ -1001,10 +992,9 @@
           "min": 0.001,
           "max": 0.012,
           "def": 0.003,
-          "step": 0.000055,
+          "step": 0.0005,
           "group": "Particles",
-          "hint": "Particle radius in scene units.",
-          "log": true
+          "hint": "Particle radius in scene units."
         },
         "drift": {
           "type": "range",
@@ -1012,7 +1002,7 @@
           "min": 0,
           "max": 0.5,
           "def": 0.25,
-          "step": 0.0025,
+          "step": 0.001,
           "group": "Particles",
           "hint": "Displacement along the field gradient. Follows the same wave."
         },
@@ -1032,7 +1022,7 @@
           "min": 0,
           "max": 0.3,
           "def": 0.08,
-          "step": 0.0015,
+          "step": 0.001,
           "group": "Motion",
           "hint": "Closed yaw excursion of the camera."
         },
@@ -1056,7 +1046,6 @@
           "def": 1,
           "step": 0.01,
           "unit": "×",
-          "log": true,
           "group": "Light",
           "hint": "Linear exposure before the single tone map.",
           "randMax": 1.4
@@ -1201,7 +1190,7 @@
           "min": 0.03,
           "max": 0.35,
           "def": 0.2,
-          "step": 0.0016,
+          "step": 0.001,
           "group": "Form",
           "hint": "Peak height of the surface in scene units."
         },
@@ -1221,7 +1210,7 @@
           "min": 0.15,
           "max": 1.2,
           "def": 0.7,
-          "step": 0.0053,
+          "step": 0.001,
           "group": "Form",
           "hint": "Elevation of the camera above the surface, radians."
         },
@@ -1231,10 +1220,9 @@
           "min": 0.002,
           "max": 0.03,
           "def": 0.008,
-          "step": 0.00014,
+          "step": 0.0005,
           "group": "Material",
-          "hint": "Width of the glowing nodal contours, measured on the surface.",
-          "log": true
+          "hint": "Width of the glowing nodal contours, measured on the surface."
         },
         "opacity": {
           "type": "range",
@@ -1242,7 +1230,7 @@
           "min": 0.05,
           "max": 0.7,
           "def": 0.3,
-          "step": 0.0032,
+          "step": 0.001,
           "group": "Material",
           "hint": "How much each thin sheet covers what lies beneath."
         },
@@ -1252,7 +1240,7 @@
           "min": 0,
           "max": 1,
           "def": 0.6,
-          "step": 0.005,
+          "step": 0.001,
           "group": "Material",
           "hint": "Amber light concentrated on the wave peaks."
         },
@@ -1262,7 +1250,7 @@
           "min": 0.1,
           "max": 1,
           "def": 0.4,
-          "step": 0.0045,
+          "step": 0.001,
           "group": "Particles",
           "hint": "Fraction of lattice cells that hold a particle."
         },
@@ -1272,10 +1260,9 @@
           "min": 0.001,
           "max": 0.012,
           "def": 0.003,
-          "step": 0.000055,
+          "step": 0.0005,
           "group": "Particles",
-          "hint": "Particle radius in scene units.",
-          "log": true
+          "hint": "Particle radius in scene units."
         },
         "drift": {
           "type": "range",
@@ -1283,7 +1270,7 @@
           "min": 0,
           "max": 0.5,
           "def": 0.25,
-          "step": 0.0025,
+          "step": 0.001,
           "group": "Particles",
           "hint": "Displacement along the field gradient. Follows the same wave."
         },
@@ -1303,7 +1290,7 @@
           "min": 0,
           "max": 0.3,
           "def": 0.08,
-          "step": 0.0015,
+          "step": 0.001,
           "group": "Motion",
           "hint": "Closed yaw excursion of the camera."
         },
@@ -1327,7 +1314,6 @@
           "def": 1,
           "step": 0.01,
           "unit": "×",
-          "log": true,
           "group": "Light",
           "hint": "Linear exposure before the single tone map.",
           "randMax": 1.4
@@ -1472,7 +1458,7 @@
           "min": 0.03,
           "max": 0.35,
           "def": 0.14,
-          "step": 0.0016,
+          "step": 0.001,
           "group": "Form",
           "hint": "Peak height of the surface in scene units."
         },
@@ -1492,7 +1478,7 @@
           "min": 0.15,
           "max": 1.2,
           "def": 1.1,
-          "step": 0.0053,
+          "step": 0.001,
           "group": "Form",
           "hint": "Elevation of the camera above the surface, radians."
         },
@@ -1502,10 +1488,9 @@
           "min": 0.002,
           "max": 0.03,
           "def": 0.006,
-          "step": 0.00014,
+          "step": 0.0005,
           "group": "Material",
-          "hint": "Width of the glowing nodal contours, measured on the surface.",
-          "log": true
+          "hint": "Width of the glowing nodal contours, measured on the surface."
         },
         "opacity": {
           "type": "range",
@@ -1513,7 +1498,7 @@
           "min": 0.05,
           "max": 0.7,
           "def": 0.35,
-          "step": 0.0032,
+          "step": 0.001,
           "group": "Material",
           "hint": "How much each thin sheet covers what lies beneath."
         },
@@ -1523,7 +1508,7 @@
           "min": 0,
           "max": 1,
           "def": 0.2,
-          "step": 0.005,
+          "step": 0.001,
           "group": "Material",
           "hint": "Amber light concentrated on the wave peaks."
         },
@@ -1533,7 +1518,7 @@
           "min": 0.1,
           "max": 1,
           "def": 0.2,
-          "step": 0.0045,
+          "step": 0.001,
           "group": "Particles",
           "hint": "Fraction of lattice cells that hold a particle."
         },
@@ -1543,10 +1528,9 @@
           "min": 0.001,
           "max": 0.012,
           "def": 0.003,
-          "step": 0.000055,
+          "step": 0.0005,
           "group": "Particles",
-          "hint": "Particle radius in scene units.",
-          "log": true
+          "hint": "Particle radius in scene units."
         },
         "drift": {
           "type": "range",
@@ -1554,7 +1538,7 @@
           "min": 0,
           "max": 0.5,
           "def": 0.25,
-          "step": 0.0025,
+          "step": 0.001,
           "group": "Particles",
           "hint": "Displacement along the field gradient. Follows the same wave."
         },
@@ -1574,7 +1558,7 @@
           "min": 0,
           "max": 0.3,
           "def": 0.08,
-          "step": 0.0015,
+          "step": 0.001,
           "group": "Motion",
           "hint": "Closed yaw excursion of the camera."
         },
@@ -1598,7 +1582,6 @@
           "def": 1,
           "step": 0.01,
           "unit": "×",
-          "log": true,
           "group": "Light",
           "hint": "Linear exposure before the single tone map.",
           "randMax": 1.4
@@ -1743,7 +1726,7 @@
           "min": 0.03,
           "max": 0.35,
           "def": 0.1,
-          "step": 0.0016,
+          "step": 0.001,
           "group": "Form",
           "hint": "Peak height of the surface in scene units."
         },
@@ -1763,10 +1746,9 @@
           "min": 0.002,
           "max": 0.03,
           "def": 0.004,
-          "step": 0.00014,
+          "step": 0.0005,
           "group": "Material",
-          "hint": "Width of the glowing nodal contours, measured on the surface.",
-          "log": true
+          "hint": "Width of the glowing nodal contours, measured on the surface."
         },
         "opacity": {
           "type": "range",
@@ -1774,7 +1756,7 @@
           "min": 0.05,
           "max": 0.7,
           "def": 0.4,
-          "step": 0.0032,
+          "step": 0.001,
           "group": "Material",
           "hint": "How much each thin sheet covers what lies beneath."
         },
@@ -1784,7 +1766,7 @@
           "min": 0,
           "max": 1,
           "def": 0.6,
-          "step": 0.005,
+          "step": 0.001,
           "group": "Material",
           "hint": "Amber light concentrated on the wave peaks."
         },
@@ -1794,7 +1776,7 @@
           "min": 0.1,
           "max": 1,
           "def": 0.55,
-          "step": 0.0045,
+          "step": 0.001,
           "group": "Particles",
           "hint": "Fraction of lattice cells that hold a particle."
         },
@@ -1804,10 +1786,9 @@
           "min": 0.001,
           "max": 0.012,
           "def": 0.003,
-          "step": 0.000055,
+          "step": 0.0005,
           "group": "Particles",
-          "hint": "Particle radius in scene units.",
-          "log": true
+          "hint": "Particle radius in scene units."
         },
         "osc": {
           "type": "int",
@@ -1827,7 +1808,6 @@
           "def": 1,
           "step": 0.01,
           "unit": "×",
-          "log": true,
           "group": "Light",
           "hint": "Linear exposure before the single tone map.",
           "randMax": 1.4
@@ -1972,7 +1952,7 @@
           "min": 0.03,
           "max": 0.35,
           "def": 0.2,
-          "step": 0.0016,
+          "step": 0.001,
           "group": "Form",
           "hint": "Peak height of the surface in scene units."
         },
@@ -1992,10 +1972,9 @@
           "min": 0.002,
           "max": 0.03,
           "def": 0.005,
-          "step": 0.00014,
+          "step": 0.0005,
           "group": "Material",
-          "hint": "Width of the glowing nodal contours, measured on the surface.",
-          "log": true
+          "hint": "Width of the glowing nodal contours, measured on the surface."
         },
         "opacity": {
           "type": "range",
@@ -2003,7 +1982,7 @@
           "min": 0.05,
           "max": 0.7,
           "def": 0.35,
-          "step": 0.0032,
+          "step": 0.001,
           "group": "Material",
           "hint": "How much each thin sheet covers what lies beneath."
         },
@@ -2013,7 +1992,7 @@
           "min": 0,
           "max": 1,
           "def": 0.5,
-          "step": 0.005,
+          "step": 0.001,
           "group": "Material",
           "hint": "Amber light concentrated on the wave peaks."
         },
@@ -2023,7 +2002,7 @@
           "min": 0.1,
           "max": 1,
           "def": 0.4,
-          "step": 0.0045,
+          "step": 0.001,
           "group": "Particles",
           "hint": "Fraction of lattice cells that hold a particle."
         },
@@ -2033,10 +2012,9 @@
           "min": 0.001,
           "max": 0.012,
           "def": 0.003,
-          "step": 0.000055,
+          "step": 0.0005,
           "group": "Particles",
-          "hint": "Particle radius in scene units.",
-          "log": true
+          "hint": "Particle radius in scene units."
         },
         "osc": {
           "type": "int",
@@ -2056,7 +2034,6 @@
           "def": 1,
           "step": 0.01,
           "unit": "×",
-          "log": true,
           "group": "Light",
           "hint": "Linear exposure before the single tone map.",
           "randMax": 1.4
@@ -2211,10 +2188,9 @@
           "min": 0.002,
           "max": 0.03,
           "def": 0.006,
-          "step": 0.00014,
+          "step": 0.0005,
           "group": "Material",
-          "hint": "Width of the glowing nodal contours, measured on the surface.",
-          "log": true
+          "hint": "Width of the glowing nodal contours, measured on the surface."
         },
         "warmth": {
           "type": "range",
@@ -2222,7 +2198,7 @@
           "min": 0,
           "max": 1,
           "def": 0.2,
-          "step": 0.005,
+          "step": 0.001,
           "group": "Material",
           "hint": "Amber light concentrated on the wave peaks."
         },
@@ -2232,7 +2208,7 @@
           "min": 0.1,
           "max": 1,
           "def": 0.75,
-          "step": 0.0045,
+          "step": 0.001,
           "group": "Particles",
           "hint": "Fraction of lattice cells that hold a particle."
         },
@@ -2242,10 +2218,9 @@
           "min": 0.001,
           "max": 0.012,
           "def": 0.0035,
-          "step": 0.000055,
+          "step": 0.0005,
           "group": "Particles",
-          "hint": "Particle radius in scene units.",
-          "log": true
+          "hint": "Particle radius in scene units."
         },
         "osc": {
           "type": "int",
@@ -2265,7 +2240,6 @@
           "def": 0.95,
           "step": 0.01,
           "unit": "×",
-          "log": true,
           "group": "Light",
           "hint": "Linear exposure before the single tone map.",
           "randMax": 1.4

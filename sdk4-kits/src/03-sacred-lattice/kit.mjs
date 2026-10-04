@@ -5,7 +5,7 @@ const params = {
   ratio: R('Nesting ratio', 0.45, 0.85, 0.618, { group: 'Form', hint: 'Scale of each cage relative to the one outside it. 0.618 is the golden ratio.' }),
   depthSp: R('Depth spacing', 0.05, 0.6, 0.22, { group: 'Form', hint: 'Separation of the cages in depth. Drives perspective and parallax.' }),
   circleLayers: I('Circle layers', 0, 8, 4, { group: 'Form', hint: 'Concentric circles with inscribed chord polygons. 0 removes them.', mutate: 0.3 }),
-  edgeR: R('Edge radius', 0.001, 0.016, 0.004, { group: 'Material', hint: 'Radius of gold edges in scene units.', log: true }),
+  edgeR: R('Edge radius', 0.001, 0.016, 0.004, { step: 0.0005, group: 'Material', hint: 'Radius of gold edges in scene units.' }),
   facet: R('Facet opacity', 0, 0.55, 0.16, { group: 'Material', hint: 'Pale glass faces on tetra and octahedra. Approximate glass, not refraction.' }),
   core: R('Core intensity', 0.1, 3, 0.7, { group: 'Light', hint: 'Central light. Kept small so geometry stays readable at the focus.', randMax: 1.6 }),
   cageTurns: I('Cage turns per loop', 0, 3, 1, { group: 'Motion', hint: 'Whole revolutions of each cage per loop, alternating direction.', mutate: 0 }),

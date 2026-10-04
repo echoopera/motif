@@ -128,7 +128,7 @@
           "min": 0.45,
           "max": 0.85,
           "def": 0.618,
-          "step": 0.002,
+          "step": 0.001,
           "group": "Form",
           "hint": "Scale of each cage relative to the one outside it. 0.618 is the golden ratio."
         },
@@ -138,7 +138,7 @@
           "min": 0.05,
           "max": 0.6,
           "def": 0.22,
-          "step": 0.0027,
+          "step": 0.001,
           "group": "Form",
           "hint": "Separation of the cages in depth. Drives perspective and parallax."
         },
@@ -158,10 +158,9 @@
           "min": 0.001,
           "max": 0.016,
           "def": 0.004,
-          "step": 0.000075,
+          "step": 0.0005,
           "group": "Material",
-          "hint": "Radius of gold edges in scene units.",
-          "log": true
+          "hint": "Radius of gold edges in scene units."
         },
         "facet": {
           "type": "range",
@@ -169,7 +168,7 @@
           "min": 0,
           "max": 0.55,
           "def": 0.16,
-          "step": 0.0028,
+          "step": 0.001,
           "group": "Material",
           "hint": "Pale glass faces on tetra and octahedra. Approximate glass, not refraction."
         },
@@ -179,7 +178,7 @@
           "min": 0.1,
           "max": 3,
           "def": 0.7,
-          "step": 0.014,
+          "step": 0.01,
           "group": "Light",
           "hint": "Central light. Kept small so geometry stays readable at the focus.",
           "randMax": 1.6
@@ -200,7 +199,7 @@
           "min": 0,
           "max": 0.25,
           "def": 0.08,
-          "step": 0.0013,
+          "step": 0.001,
           "group": "Motion",
           "hint": "Closed camera orbit, radians."
         },
@@ -210,7 +209,7 @@
           "min": 0,
           "max": 0.1,
           "def": 0.03,
-          "step": 0.0005,
+          "step": 0.0001,
           "group": "Motion",
           "hint": "Scale and facet breathing, sin(theta + phase)."
         },
@@ -234,7 +233,6 @@
           "def": 1,
           "step": 0.01,
           "unit": "×",
-          "log": true,
           "group": "Light",
           "hint": "Linear exposure before the single tone map.",
           "randMax": 1.4
@@ -379,7 +377,7 @@
           "min": 0.45,
           "max": 0.85,
           "def": 0.7,
-          "step": 0.002,
+          "step": 0.001,
           "group": "Form",
           "hint": "Scale of each cage relative to the one outside it. 0.618 is the golden ratio."
         },
@@ -389,7 +387,7 @@
           "min": 0.05,
           "max": 0.6,
           "def": 0.42,
-          "step": 0.0027,
+          "step": 0.001,
           "group": "Form",
           "hint": "Separation of the cages in depth. Drives perspective and parallax."
         },
@@ -409,10 +407,9 @@
           "min": 0.001,
           "max": 0.016,
           "def": 0.004,
-          "step": 0.000075,
+          "step": 0.0005,
           "group": "Material",
-          "hint": "Radius of gold edges in scene units.",
-          "log": true
+          "hint": "Radius of gold edges in scene units."
         },
         "facet": {
           "type": "range",
@@ -420,7 +417,7 @@
           "min": 0,
           "max": 0.55,
           "def": 0.12,
-          "step": 0.0028,
+          "step": 0.001,
           "group": "Material",
           "hint": "Pale glass faces on tetra and octahedra. Approximate glass, not refraction."
         },
@@ -430,7 +427,7 @@
           "min": 0.1,
           "max": 3,
           "def": 0.7,
-          "step": 0.014,
+          "step": 0.01,
           "group": "Light",
           "hint": "Central light. Kept small so geometry stays readable at the focus.",
           "randMax": 1.6
@@ -451,7 +448,7 @@
           "min": 0,
           "max": 0.25,
           "def": 0.08,
-          "step": 0.0013,
+          "step": 0.001,
           "group": "Motion",
           "hint": "Closed camera orbit, radians."
         },
@@ -461,7 +458,7 @@
           "min": 0,
           "max": 0.1,
           "def": 0.03,
-          "step": 0.0005,
+          "step": 0.0001,
           "group": "Motion",
           "hint": "Scale and facet breathing, sin(theta + phase)."
         },
@@ -485,7 +482,6 @@
           "def": 0.8,
           "step": 0.01,
           "unit": "×",
-          "log": true,
           "group": "Light",
           "hint": "Linear exposure before the single tone map.",
           "randMax": 1.4
@@ -630,7 +626,7 @@
           "min": 0.45,
           "max": 0.85,
           "def": 0.618,
-          "step": 0.002,
+          "step": 0.001,
           "group": "Form",
           "hint": "Scale of each cage relative to the one outside it. 0.618 is the golden ratio."
         },
@@ -640,7 +636,7 @@
           "min": 0.05,
           "max": 0.6,
           "def": 0.22,
-          "step": 0.0027,
+          "step": 0.001,
           "group": "Form",
           "hint": "Separation of the cages in depth. Drives perspective and parallax."
         },
@@ -650,10 +646,9 @@
           "min": 0.001,
           "max": 0.016,
           "def": 0.0035,
-          "step": 0.000075,
+          "step": 0.0005,
           "group": "Material",
-          "hint": "Radius of gold edges in scene units.",
-          "log": true
+          "hint": "Radius of gold edges in scene units."
         },
         "facet": {
           "type": "range",
@@ -661,7 +656,7 @@
           "min": 0,
           "max": 0.55,
           "def": 0.12,
-          "step": 0.0028,
+          "step": 0.001,
           "group": "Material",
           "hint": "Pale glass faces on tetra and octahedra. Approximate glass, not refraction."
         },
@@ -671,7 +666,7 @@
           "min": 0.1,
           "max": 3,
           "def": 0.7,
-          "step": 0.014,
+          "step": 0.01,
           "group": "Light",
           "hint": "Central light. Kept small so geometry stays readable at the focus.",
           "randMax": 1.6
@@ -692,7 +687,7 @@
           "min": 0,
           "max": 0.25,
           "def": 0.08,
-          "step": 0.0013,
+          "step": 0.001,
           "group": "Motion",
           "hint": "Closed camera orbit, radians."
         },
@@ -702,7 +697,7 @@
           "min": 0,
           "max": 0.1,
           "def": 0.03,
-          "step": 0.0005,
+          "step": 0.0001,
           "group": "Motion",
           "hint": "Scale and facet breathing, sin(theta + phase)."
         },
@@ -726,7 +721,6 @@
           "def": 1,
           "step": 0.01,
           "unit": "×",
-          "log": true,
           "group": "Light",
           "hint": "Linear exposure before the single tone map.",
           "randMax": 1.4
@@ -871,7 +865,7 @@
           "min": 0.45,
           "max": 0.85,
           "def": 0.618,
-          "step": 0.002,
+          "step": 0.001,
           "group": "Form",
           "hint": "Scale of each cage relative to the one outside it. 0.618 is the golden ratio."
         },
@@ -881,7 +875,7 @@
           "min": 0.05,
           "max": 0.6,
           "def": 0.22,
-          "step": 0.0027,
+          "step": 0.001,
           "group": "Form",
           "hint": "Separation of the cages in depth. Drives perspective and parallax."
         },
@@ -891,10 +885,9 @@
           "min": 0.001,
           "max": 0.016,
           "def": 0.0065,
-          "step": 0.000075,
+          "step": 0.0005,
           "group": "Material",
-          "hint": "Radius of gold edges in scene units.",
-          "log": true
+          "hint": "Radius of gold edges in scene units."
         },
         "core": {
           "type": "range",
@@ -902,7 +895,7 @@
           "min": 0.1,
           "max": 3,
           "def": 1,
-          "step": 0.014,
+          "step": 0.01,
           "group": "Light",
           "hint": "Central light. Kept small so geometry stays readable at the focus.",
           "randMax": 1.6
@@ -923,7 +916,7 @@
           "min": 0,
           "max": 0.25,
           "def": 0.08,
-          "step": 0.0013,
+          "step": 0.001,
           "group": "Motion",
           "hint": "Closed camera orbit, radians."
         },
@@ -933,7 +926,7 @@
           "min": 0,
           "max": 0.1,
           "def": 0.03,
-          "step": 0.0005,
+          "step": 0.0001,
           "group": "Motion",
           "hint": "Scale and facet breathing, sin(theta + phase)."
         },
@@ -945,7 +938,6 @@
           "def": 1,
           "step": 0.01,
           "unit": "×",
-          "log": true,
           "group": "Light",
           "hint": "Linear exposure before the single tone map.",
           "randMax": 1.4
@@ -1081,7 +1073,7 @@
           "min": 0.45,
           "max": 0.85,
           "def": 0.618,
-          "step": 0.002,
+          "step": 0.001,
           "group": "Form",
           "hint": "Scale of each cage relative to the one outside it. 0.618 is the golden ratio."
         },
@@ -1101,10 +1093,9 @@
           "min": 0.001,
           "max": 0.016,
           "def": 0.0035,
-          "step": 0.000075,
+          "step": 0.0005,
           "group": "Material",
-          "hint": "Radius of gold edges in scene units.",
-          "log": true
+          "hint": "Radius of gold edges in scene units."
         },
         "core": {
           "type": "range",
@@ -1112,7 +1103,7 @@
           "min": 0.1,
           "max": 3,
           "def": 0.5,
-          "step": 0.014,
+          "step": 0.01,
           "group": "Light",
           "hint": "Central light. Kept small so geometry stays readable at the focus.",
           "randMax": 1.6
@@ -1135,7 +1126,6 @@
           "def": 1,
           "step": 0.01,
           "unit": "×",
-          "log": true,
           "group": "Light",
           "hint": "Linear exposure before the single tone map.",
           "randMax": 1.4
@@ -1280,7 +1270,7 @@
           "min": 0.45,
           "max": 0.85,
           "def": 0.8,
-          "step": 0.002,
+          "step": 0.001,
           "group": "Form",
           "hint": "Scale of each cage relative to the one outside it. 0.618 is the golden ratio."
         },
@@ -1300,10 +1290,9 @@
           "min": 0.001,
           "max": 0.016,
           "def": 0.0032,
-          "step": 0.000075,
+          "step": 0.0005,
           "group": "Material",
-          "hint": "Radius of gold edges in scene units.",
-          "log": true
+          "hint": "Radius of gold edges in scene units."
         },
         "core": {
           "type": "range",
@@ -1311,7 +1300,7 @@
           "min": 0.1,
           "max": 3,
           "def": 0.4,
-          "step": 0.014,
+          "step": 0.01,
           "group": "Light",
           "hint": "Central light. Kept small so geometry stays readable at the focus.",
           "randMax": 1.6
@@ -1334,7 +1323,6 @@
           "def": 1,
           "step": 0.01,
           "unit": "×",
-          "log": true,
           "group": "Light",
           "hint": "Linear exposure before the single tone map.",
           "randMax": 1.4
@@ -1479,7 +1467,7 @@
           "min": 0.45,
           "max": 0.85,
           "def": 0.74,
-          "step": 0.002,
+          "step": 0.001,
           "group": "Form",
           "hint": "Scale of each cage relative to the one outside it. 0.618 is the golden ratio."
         },
@@ -1489,7 +1477,7 @@
           "min": 0.05,
           "max": 0.6,
           "def": 0.22,
-          "step": 0.0027,
+          "step": 0.001,
           "group": "Form",
           "hint": "Separation of the cages in depth. Drives perspective and parallax."
         },
@@ -1499,10 +1487,9 @@
           "min": 0.001,
           "max": 0.016,
           "def": 0.0035,
-          "step": 0.000075,
+          "step": 0.0005,
           "group": "Material",
-          "hint": "Radius of gold edges in scene units.",
-          "log": true
+          "hint": "Radius of gold edges in scene units."
         },
         "core": {
           "type": "range",
@@ -1510,7 +1497,7 @@
           "min": 0.1,
           "max": 3,
           "def": 0.5,
-          "step": 0.014,
+          "step": 0.01,
           "group": "Light",
           "hint": "Central light. Kept small so geometry stays readable at the focus.",
           "randMax": 1.6
@@ -1531,7 +1518,7 @@
           "min": 0,
           "max": 0.25,
           "def": 0.14,
-          "step": 0.0013,
+          "step": 0.001,
           "group": "Motion",
           "hint": "Closed camera orbit, radians."
         },
@@ -1541,7 +1528,7 @@
           "min": 0,
           "max": 0.1,
           "def": 0.03,
-          "step": 0.0005,
+          "step": 0.0001,
           "group": "Motion",
           "hint": "Scale and facet breathing, sin(theta + phase)."
         },
@@ -1553,7 +1540,6 @@
           "def": 1,
           "step": 0.01,
           "unit": "×",
-          "log": true,
           "group": "Light",
           "hint": "Linear exposure before the single tone map.",
           "randMax": 1.4
@@ -1698,7 +1684,7 @@
           "min": 0.45,
           "max": 0.85,
           "def": 0.618,
-          "step": 0.002,
+          "step": 0.001,
           "group": "Form",
           "hint": "Scale of each cage relative to the one outside it. 0.618 is the golden ratio."
         },
@@ -1708,7 +1694,7 @@
           "min": 0.05,
           "max": 0.6,
           "def": 0.22,
-          "step": 0.0027,
+          "step": 0.001,
           "group": "Form",
           "hint": "Separation of the cages in depth. Drives perspective and parallax."
         },
@@ -1728,10 +1714,9 @@
           "min": 0.001,
           "max": 0.016,
           "def": 0.004,
-          "step": 0.000075,
+          "step": 0.0005,
           "group": "Material",
-          "hint": "Radius of gold edges in scene units.",
-          "log": true
+          "hint": "Radius of gold edges in scene units."
         },
         "facet": {
           "type": "range",
@@ -1739,7 +1724,7 @@
           "min": 0,
           "max": 0.55,
           "def": 0.22,
-          "step": 0.0028,
+          "step": 0.001,
           "group": "Material",
           "hint": "Pale glass faces on tetra and octahedra. Approximate glass, not refraction."
         },
@@ -1749,7 +1734,7 @@
           "min": 0.1,
           "max": 3,
           "def": 0.9,
-          "step": 0.014,
+          "step": 0.01,
           "group": "Light",
           "hint": "Central light. Kept small so geometry stays readable at the focus.",
           "randMax": 1.6
@@ -1770,7 +1755,7 @@
           "min": 0,
           "max": 0.25,
           "def": 0.08,
-          "step": 0.0013,
+          "step": 0.001,
           "group": "Motion",
           "hint": "Closed camera orbit, radians."
         },
@@ -1780,7 +1765,7 @@
           "min": 0,
           "max": 0.1,
           "def": 0.03,
-          "step": 0.0005,
+          "step": 0.0001,
           "group": "Motion",
           "hint": "Scale and facet breathing, sin(theta + phase)."
         },
@@ -1804,7 +1789,6 @@
           "def": 1,
           "step": 0.01,
           "unit": "×",
-          "log": true,
           "group": "Light",
           "hint": "Linear exposure before the single tone map.",
           "randMax": 1.4
@@ -1949,7 +1933,7 @@
           "min": 0.45,
           "max": 0.85,
           "def": 0.618,
-          "step": 0.002,
+          "step": 0.001,
           "group": "Form",
           "hint": "Scale of each cage relative to the one outside it. 0.618 is the golden ratio."
         },
@@ -1959,7 +1943,7 @@
           "min": 0.05,
           "max": 0.6,
           "def": 0.22,
-          "step": 0.0027,
+          "step": 0.001,
           "group": "Form",
           "hint": "Separation of the cages in depth. Drives perspective and parallax."
         },
@@ -1979,10 +1963,9 @@
           "min": 0.001,
           "max": 0.016,
           "def": 0.0025,
-          "step": 0.000075,
+          "step": 0.0005,
           "group": "Material",
-          "hint": "Radius of gold edges in scene units.",
-          "log": true
+          "hint": "Radius of gold edges in scene units."
         },
         "facet": {
           "type": "range",
@@ -1990,7 +1973,7 @@
           "min": 0,
           "max": 0.55,
           "def": 0.1,
-          "step": 0.0028,
+          "step": 0.001,
           "group": "Material",
           "hint": "Pale glass faces on tetra and octahedra. Approximate glass, not refraction."
         },
@@ -2000,7 +1983,7 @@
           "min": 0.1,
           "max": 3,
           "def": 0.35,
-          "step": 0.014,
+          "step": 0.01,
           "group": "Light",
           "hint": "Central light. Kept small so geometry stays readable at the focus.",
           "randMax": 1.6
@@ -2021,7 +2004,7 @@
           "min": 0,
           "max": 0.25,
           "def": 0.03,
-          "step": 0.0013,
+          "step": 0.001,
           "group": "Motion",
           "hint": "Closed camera orbit, radians."
         },
@@ -2031,7 +2014,7 @@
           "min": 0,
           "max": 0.1,
           "def": 0.03,
-          "step": 0.0005,
+          "step": 0.0001,
           "group": "Motion",
           "hint": "Scale and facet breathing, sin(theta + phase)."
         },
@@ -2055,7 +2038,6 @@
           "def": 0.9,
           "step": 0.01,
           "unit": "×",
-          "log": true,
           "group": "Light",
           "hint": "Linear exposure before the single tone map.",
           "randMax": 1.4

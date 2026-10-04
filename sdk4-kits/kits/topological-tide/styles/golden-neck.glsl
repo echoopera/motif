@@ -82,12 +82,12 @@ vec4 scene_main(vec2 uv, vec2 fc, int variant) {
       float ratio = d / max(t, 0.2);
       if (ratio < best) { best = ratio; tbest = t; }
       if (d < 0.0009 * (1.0 + t * 0.4)) { hit = true; break; }
-      t += d * 0.92 + 0.0004;
+      t += d * 0.85 + 0.0004;
       if (t > tmax + 0.05) break;
     }
     if (!hit) {
       float pxA = k_px() * 0.55;                                              // angular size of one pixel for this camera
-      cov = clamp(1.0 - best / (pxA * 1.6), 0.0, 1.0);
+      cov = 1.0 - smoothstep(0.0, pxA * 2.2, best);                          // ~2 px smooth ramp, continuous with the hit side
       if (cov > 0.03) { hit = true; pos = ro + rd * tbest; tideMap(Minv * pos, th, calm, graw); }
     }
     if (hit) {

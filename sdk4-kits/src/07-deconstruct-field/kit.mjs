@@ -3,7 +3,7 @@ import { R, I, crispLens } from '../../tools/helpers.mjs';
 const params = {
   planes: I('Plane count', 6, 28, 14, { group: 'Form', hint: 'Number of planes in the composition. Most are small; a few dominate.', mutate: 0.3 }),
   arcR: R('Arc radius', 0.1, 0.65, 0.35, { group: 'Form', hint: 'Radius of the principal cobalt arc in scene units.' }),
-  grid: R('Grid spacing', 0.015, 0.12, 0.04, { group: 'Form', hint: 'Spacing of the hairline grids that ride on the planes.', log: true }),
+  grid: R('Grid spacing', 0.015, 0.12, 0.04, { step: 0.001, group: 'Form', hint: 'Spacing of the hairline grids that ride on the planes.' }),
   lineW: R('Line width', 0.7, 3, 1.2, { group: 'Material', step: 0.05, unit: 'px', hint: 'Hairline width in screen pixels.' }),
   sep: R('Layer separation', 0, 0.15, 0.05, { group: 'Light', hint: 'Soft shadow offset between layers. 0 prints everything flat.' }),
   offset: R('Offset amplitude', 0, 0.35, 0.12, { group: 'Motion', hint: 'How far planes travel on their moves.' }),

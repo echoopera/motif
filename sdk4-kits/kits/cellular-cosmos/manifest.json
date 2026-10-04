@@ -128,7 +128,7 @@
           "min": 0,
           "max": 1,
           "def": 0.6,
-          "step": 0.005,
+          "step": 0.001,
           "group": "Form",
           "hint": "Share of coral colonies against emerald cells."
         },
@@ -138,10 +138,9 @@
           "min": 0.003,
           "max": 0.035,
           "def": 0.012,
-          "step": 0.00016,
+          "step": 0.001,
           "group": "Material",
-          "hint": "Width of the bright membrane and its dark channel, scene units.",
-          "log": true
+          "hint": "Width of the bright membrane and its dark channel, scene units."
         },
         "translucency": {
           "type": "range",
@@ -149,7 +148,7 @@
           "min": 0,
           "max": 0.7,
           "def": 0.25,
-          "step": 0.0035,
+          "step": 0.001,
           "group": "Material",
           "hint": "How glassy the cell bodies are."
         },
@@ -159,7 +158,7 @@
           "min": 0.1,
           "max": 1,
           "def": 0.6,
-          "step": 0.0045,
+          "step": 0.001,
           "group": "Material",
           "hint": "Number of organelle points circling each nucleus."
         },
@@ -179,7 +178,7 @@
           "min": 0,
           "max": 0.4,
           "def": 0.18,
-          "step": 0.002,
+          "step": 0.001,
           "group": "Motion",
           "hint": "How far a daughter cell separates from its parent."
         },
@@ -189,7 +188,7 @@
           "min": 0,
           "max": 0.25,
           "def": 0.1,
-          "step": 0.0013,
+          "step": 0.001,
           "group": "Motion",
           "hint": "Radius of each colony's closed migration orbit."
         },
@@ -211,7 +210,6 @@
           "def": 1,
           "step": 0.01,
           "unit": "×",
-          "log": true,
           "group": "Light",
           "hint": "Linear exposure before the single tone map.",
           "randMax": 1.4
@@ -356,10 +354,9 @@
           "min": 0.003,
           "max": 0.035,
           "def": 0.012,
-          "step": 0.00016,
+          "step": 0.001,
           "group": "Material",
-          "hint": "Width of the bright membrane and its dark channel, scene units.",
-          "log": true
+          "hint": "Width of the bright membrane and its dark channel, scene units."
         },
         "translucency": {
           "type": "range",
@@ -367,7 +364,7 @@
           "min": 0,
           "max": 0.7,
           "def": 0.45,
-          "step": 0.0035,
+          "step": 0.001,
           "group": "Material",
           "hint": "How glassy the cell bodies are."
         },
@@ -377,7 +374,7 @@
           "min": 0.1,
           "max": 1,
           "def": 0.6,
-          "step": 0.0045,
+          "step": 0.001,
           "group": "Material",
           "hint": "Number of organelle points circling each nucleus."
         },
@@ -397,7 +394,7 @@
           "min": 0,
           "max": 0.4,
           "def": 0.12,
-          "step": 0.002,
+          "step": 0.001,
           "group": "Motion",
           "hint": "How far a daughter cell separates from its parent."
         },
@@ -407,7 +404,7 @@
           "min": 0,
           "max": 0.25,
           "def": 0.1,
-          "step": 0.0013,
+          "step": 0.001,
           "group": "Motion",
           "hint": "Radius of each colony's closed migration orbit."
         },
@@ -429,7 +426,6 @@
           "def": 1,
           "step": 0.01,
           "unit": "×",
-          "log": true,
           "group": "Light",
           "hint": "Linear exposure before the single tone map.",
           "randMax": 1.4
@@ -574,10 +570,9 @@
           "min": 0.003,
           "max": 0.035,
           "def": 0.014,
-          "step": 0.00016,
+          "step": 0.001,
           "group": "Material",
-          "hint": "Width of the bright membrane and its dark channel, scene units.",
-          "log": true
+          "hint": "Width of the bright membrane and its dark channel, scene units."
         },
         "translucency": {
           "type": "range",
@@ -585,7 +580,7 @@
           "min": 0,
           "max": 0.7,
           "def": 0.25,
-          "step": 0.0035,
+          "step": 0.001,
           "group": "Material",
           "hint": "How glassy the cell bodies are."
         },
@@ -595,7 +590,7 @@
           "min": 0.1,
           "max": 1,
           "def": 0.6,
-          "step": 0.0045,
+          "step": 0.001,
           "group": "Material",
           "hint": "Number of organelle points circling each nucleus."
         },
@@ -615,7 +610,7 @@
           "min": 0,
           "max": 0.4,
           "def": 0.34,
-          "step": 0.002,
+          "step": 0.001,
           "group": "Motion",
           "hint": "How far a daughter cell separates from its parent."
         },
@@ -625,7 +620,7 @@
           "min": 0,
           "max": 0.25,
           "def": 0.06,
-          "step": 0.0013,
+          "step": 0.001,
           "group": "Motion",
           "hint": "Radius of each colony's closed migration orbit."
         },
@@ -647,7 +642,6 @@
           "def": 1,
           "step": 0.01,
           "unit": "×",
-          "log": true,
           "group": "Light",
           "hint": "Linear exposure before the single tone map.",
           "randMax": 1.4
@@ -792,7 +786,7 @@
           "min": 0,
           "max": 1,
           "def": 0.6,
-          "step": 0.005,
+          "step": 0.001,
           "group": "Form",
           "hint": "Share of coral colonies against emerald cells."
         },
@@ -802,10 +796,9 @@
           "min": 0.003,
           "max": 0.035,
           "def": 0.016,
-          "step": 0.00016,
+          "step": 0.001,
           "group": "Material",
-          "hint": "Width of the bright membrane and its dark channel, scene units.",
-          "log": true
+          "hint": "Width of the bright membrane and its dark channel, scene units."
         },
         "translucency": {
           "type": "range",
@@ -813,7 +806,7 @@
           "min": 0,
           "max": 0.7,
           "def": 0.5,
-          "step": 0.0035,
+          "step": 0.001,
           "group": "Material",
           "hint": "How glassy the cell bodies are."
         },
@@ -823,7 +816,7 @@
           "min": 0,
           "max": 0.4,
           "def": 0.1,
-          "step": 0.002,
+          "step": 0.001,
           "group": "Motion",
           "hint": "How far a daughter cell separates from its parent."
         },
@@ -833,7 +826,7 @@
           "min": 0,
           "max": 0.25,
           "def": 0.05,
-          "step": 0.0013,
+          "step": 0.001,
           "group": "Motion",
           "hint": "Radius of each colony's closed migration orbit."
         },
@@ -853,7 +846,7 @@
           "min": 0,
           "max": 0.3,
           "def": 0.16,
-          "step": 0.0015,
+          "step": 0.001,
           "group": "Motion",
           "hint": "Standing wave along the membranes (used by Membrane Choir)."
         },
@@ -865,7 +858,6 @@
           "def": 1,
           "step": 0.01,
           "unit": "×",
-          "log": true,
           "group": "Light",
           "hint": "Linear exposure before the single tone map.",
           "randMax": 1.4
@@ -1010,10 +1002,9 @@
           "min": 0.003,
           "max": 0.035,
           "def": 0.006,
-          "step": 0.00016,
+          "step": 0.001,
           "group": "Material",
-          "hint": "Width of the bright membrane and its dark channel, scene units.",
-          "log": true
+          "hint": "Width of the bright membrane and its dark channel, scene units."
         },
         "translucency": {
           "type": "range",
@@ -1021,7 +1012,7 @@
           "min": 0,
           "max": 0.7,
           "def": 0.5,
-          "step": 0.0035,
+          "step": 0.001,
           "group": "Material",
           "hint": "How glassy the cell bodies are."
         },
@@ -1031,7 +1022,7 @@
           "min": 0,
           "max": 0.4,
           "def": 0.15,
-          "step": 0.002,
+          "step": 0.001,
           "group": "Motion",
           "hint": "How far a daughter cell separates from its parent."
         },
@@ -1041,7 +1032,7 @@
           "min": 0,
           "max": 0.25,
           "def": 0.07,
-          "step": 0.0013,
+          "step": 0.001,
           "group": "Motion",
           "hint": "Radius of each colony's closed migration orbit."
         },
@@ -1063,7 +1054,6 @@
           "def": 1,
           "step": 0.01,
           "unit": "×",
-          "log": true,
           "group": "Light",
           "hint": "Linear exposure before the single tone map.",
           "randMax": 1.4
@@ -1208,7 +1198,7 @@
           "min": 0,
           "max": 1,
           "def": 0.5,
-          "step": 0.005,
+          "step": 0.001,
           "group": "Form",
           "hint": "Share of coral colonies against emerald cells."
         },
@@ -1218,10 +1208,9 @@
           "min": 0.003,
           "max": 0.035,
           "def": 0.01,
-          "step": 0.00016,
+          "step": 0.001,
           "group": "Material",
-          "hint": "Width of the bright membrane and its dark channel, scene units.",
-          "log": true
+          "hint": "Width of the bright membrane and its dark channel, scene units."
         },
         "translucency": {
           "type": "range",
@@ -1229,7 +1218,7 @@
           "min": 0,
           "max": 0.7,
           "def": 0.25,
-          "step": 0.0035,
+          "step": 0.001,
           "group": "Material",
           "hint": "How glassy the cell bodies are."
         },
@@ -1239,7 +1228,7 @@
           "min": 0,
           "max": 0.4,
           "def": 0.1,
-          "step": 0.002,
+          "step": 0.001,
           "group": "Motion",
           "hint": "How far a daughter cell separates from its parent."
         },
@@ -1249,7 +1238,7 @@
           "min": 0,
           "max": 0.25,
           "def": 0.12,
-          "step": 0.0013,
+          "step": 0.001,
           "group": "Motion",
           "hint": "Radius of each colony's closed migration orbit."
         },
@@ -1271,7 +1260,6 @@
           "def": 1,
           "step": 0.01,
           "unit": "×",
-          "log": true,
           "group": "Light",
           "hint": "Linear exposure before the single tone map.",
           "randMax": 1.4
@@ -1416,7 +1404,7 @@
           "min": 0,
           "max": 1,
           "def": 0.3,
-          "step": 0.005,
+          "step": 0.001,
           "group": "Form",
           "hint": "Share of coral colonies against emerald cells."
         },
@@ -1426,10 +1414,9 @@
           "min": 0.003,
           "max": 0.035,
           "def": 0.012,
-          "step": 0.00016,
+          "step": 0.001,
           "group": "Material",
-          "hint": "Width of the bright membrane and its dark channel, scene units.",
-          "log": true
+          "hint": "Width of the bright membrane and its dark channel, scene units."
         },
         "translucency": {
           "type": "range",
@@ -1437,7 +1424,7 @@
           "min": 0,
           "max": 0.7,
           "def": 0.25,
-          "step": 0.0035,
+          "step": 0.001,
           "group": "Material",
           "hint": "How glassy the cell bodies are."
         },
@@ -1447,7 +1434,7 @@
           "min": 0.1,
           "max": 1,
           "def": 0.95,
-          "step": 0.0045,
+          "step": 0.001,
           "group": "Material",
           "hint": "Number of organelle points circling each nucleus."
         },
@@ -1467,7 +1454,7 @@
           "min": 0,
           "max": 0.4,
           "def": 0.08,
-          "step": 0.002,
+          "step": 0.001,
           "group": "Motion",
           "hint": "How far a daughter cell separates from its parent."
         },
@@ -1477,7 +1464,7 @@
           "min": 0,
           "max": 0.25,
           "def": 0.05,
-          "step": 0.0013,
+          "step": 0.001,
           "group": "Motion",
           "hint": "Radius of each colony's closed migration orbit."
         },
@@ -1499,7 +1486,6 @@
           "def": 1,
           "step": 0.01,
           "unit": "×",
-          "log": true,
           "group": "Light",
           "hint": "Linear exposure before the single tone map.",
           "randMax": 1.4
@@ -1644,7 +1630,7 @@
           "min": 0,
           "max": 1,
           "def": 0.2,
-          "step": 0.005,
+          "step": 0.001,
           "group": "Form",
           "hint": "Share of coral colonies against emerald cells."
         },
@@ -1654,10 +1640,9 @@
           "min": 0.003,
           "max": 0.035,
           "def": 0.012,
-          "step": 0.00016,
+          "step": 0.001,
           "group": "Material",
-          "hint": "Width of the bright membrane and its dark channel, scene units.",
-          "log": true
+          "hint": "Width of the bright membrane and its dark channel, scene units."
         },
         "translucency": {
           "type": "range",
@@ -1665,7 +1650,7 @@
           "min": 0,
           "max": 0.7,
           "def": 0.25,
-          "step": 0.0035,
+          "step": 0.001,
           "group": "Material",
           "hint": "How glassy the cell bodies are."
         },
@@ -1675,7 +1660,7 @@
           "min": 0.1,
           "max": 1,
           "def": 0.35,
-          "step": 0.0045,
+          "step": 0.001,
           "group": "Material",
           "hint": "Number of organelle points circling each nucleus."
         },
@@ -1695,7 +1680,7 @@
           "min": 0,
           "max": 0.4,
           "def": 0.16,
-          "step": 0.002,
+          "step": 0.001,
           "group": "Motion",
           "hint": "How far a daughter cell separates from its parent."
         },
@@ -1705,7 +1690,7 @@
           "min": 0,
           "max": 0.25,
           "def": 0.04,
-          "step": 0.0013,
+          "step": 0.001,
           "group": "Motion",
           "hint": "Radius of each colony's closed migration orbit."
         },
@@ -1727,7 +1712,6 @@
           "def": 0.9,
           "step": 0.01,
           "unit": "×",
-          "log": true,
           "group": "Light",
           "hint": "Linear exposure before the single tone map.",
           "randMax": 1.4
@@ -1872,7 +1856,7 @@
           "min": 0,
           "max": 1,
           "def": 0.45,
-          "step": 0.005,
+          "step": 0.001,
           "group": "Form",
           "hint": "Share of coral colonies against emerald cells."
         },
@@ -1882,10 +1866,9 @@
           "min": 0.003,
           "max": 0.035,
           "def": 0.012,
-          "step": 0.00016,
+          "step": 0.001,
           "group": "Material",
-          "hint": "Width of the bright membrane and its dark channel, scene units.",
-          "log": true
+          "hint": "Width of the bright membrane and its dark channel, scene units."
         },
         "translucency": {
           "type": "range",
@@ -1893,7 +1876,7 @@
           "min": 0,
           "max": 0.7,
           "def": 0.25,
-          "step": 0.0035,
+          "step": 0.001,
           "group": "Material",
           "hint": "How glassy the cell bodies are."
         },
@@ -1903,7 +1886,7 @@
           "min": 0.1,
           "max": 1,
           "def": 0.6,
-          "step": 0.0045,
+          "step": 0.001,
           "group": "Material",
           "hint": "Number of organelle points circling each nucleus."
         },
@@ -1923,7 +1906,7 @@
           "min": 0,
           "max": 0.4,
           "def": 0.12,
-          "step": 0.002,
+          "step": 0.001,
           "group": "Motion",
           "hint": "How far a daughter cell separates from its parent."
         },
@@ -1933,7 +1916,7 @@
           "min": 0,
           "max": 0.25,
           "def": 0.2,
-          "step": 0.0013,
+          "step": 0.001,
           "group": "Motion",
           "hint": "Radius of each colony's closed migration orbit."
         },
@@ -1955,7 +1938,6 @@
           "def": 1,
           "step": 0.01,
           "unit": "×",
-          "log": true,
           "group": "Light",
           "hint": "Linear exposure before the single tone map.",
           "randMax": 1.4
