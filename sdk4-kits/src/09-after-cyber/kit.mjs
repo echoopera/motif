@@ -12,11 +12,10 @@ const params = {
   cycles: I('Reconstructions per loop', 1, 3, 1, { group: 'Motion', hint: 'Whole dissolve - transport - reassemble cycles per loop.', mutate: 0 }),
   ...lens({ keyAngle: 60, exposure: 1.0, bloom: 0.55 }),
 };
-delete params.quality;   // lime trails are always on; no quality-dependent branch remains
 const NOGLASS = ['glass', 'refr', 'keyAngle'];
 
 export default {
-  id: 'after-cyber', name: 'After Cyber', version: '1.0.0', accent: '#C6F000', post: 'luminous', sceneScale: 0.75, cost: 3,
+  id: 'after-cyber', name: 'After Cyber', version: '1.0.0', accent: '#C6F000', post: 'luminous', sceneScale: 1, ssaa: 2, cost: 3,
   description: 'Smoky glass, cyan hairlines, selective acid-lime particles in deep black: lattices that dissolve, travel and reassemble. Nine seamless infinite loops.',
   palettes: [
     { id: 'smoke-cyan-lime', name: 'Smoke Cyan Lime', bg: '#010608', ink: '#DDF8FF', a: ['#22C8E8', '#C6F000', '#0B2A30'] },

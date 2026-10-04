@@ -71,7 +71,7 @@
       "graph": {
         "buffers": {
           "scene": {
-            "scale": 0.75
+            "scale": 1
           },
           "glowA": {
             "scale": 0.25
@@ -321,7 +321,7 @@
               "l": "Export"
             }
           ],
-          "def": "balanced",
+          "def": "export",
           "mutate": 0,
           "group": "Quality",
           "hint": "Sample counts only. Composition, phase and exposure stay the same."
@@ -343,7 +343,7 @@
       "graph": {
         "buffers": {
           "scene": {
-            "scale": 0.75
+            "scale": 1
           },
           "glowA": {
             "scale": 0.25
@@ -593,7 +593,7 @@
               "l": "Export"
             }
           ],
-          "def": "balanced",
+          "def": "export",
           "mutate": 0,
           "group": "Quality",
           "hint": "Sample counts only. Composition, phase and exposure stay the same."
@@ -615,7 +615,7 @@
       "graph": {
         "buffers": {
           "scene": {
-            "scale": 0.75
+            "scale": 1
           },
           "glowA": {
             "scale": 0.25
@@ -854,7 +854,7 @@
               "l": "Export"
             }
           ],
-          "def": "balanced",
+          "def": "export",
           "mutate": 0,
           "group": "Quality",
           "hint": "Sample counts only. Composition, phase and exposure stay the same."
@@ -876,7 +876,7 @@
       "graph": {
         "buffers": {
           "scene": {
-            "scale": 0.75
+            "scale": 1
           },
           "glowA": {
             "scale": 0.25
@@ -1126,7 +1126,7 @@
               "l": "Export"
             }
           ],
-          "def": "balanced",
+          "def": "export",
           "mutate": 0,
           "group": "Quality",
           "hint": "Sample counts only. Composition, phase and exposure stay the same."
@@ -1148,7 +1148,7 @@
       "graph": {
         "buffers": {
           "scene": {
-            "scale": 0.75
+            "scale": 1
           },
           "glowA": {
             "scale": 0.25
@@ -1398,7 +1398,7 @@
               "l": "Export"
             }
           ],
-          "def": "balanced",
+          "def": "export",
           "mutate": 0,
           "group": "Quality",
           "hint": "Sample counts only. Composition, phase and exposure stay the same."
@@ -1420,7 +1420,7 @@
       "graph": {
         "buffers": {
           "scene": {
-            "scale": 0.75
+            "scale": 1
           },
           "glowA": {
             "scale": 0.25
@@ -1670,7 +1670,7 @@
               "l": "Export"
             }
           ],
-          "def": "balanced",
+          "def": "export",
           "mutate": 0,
           "group": "Quality",
           "hint": "Sample counts only. Composition, phase and exposure stay the same."
@@ -1692,7 +1692,7 @@
       "graph": {
         "buffers": {
           "scene": {
-            "scale": 0.75
+            "scale": 1
           },
           "glowA": {
             "scale": 0.25
@@ -1882,6 +1882,28 @@
           "group": "Lens",
           "hint": "Darkens the frame edge; never touches the focal area.",
           "randMax": 0.55
+        },
+        "quality": {
+          "type": "select",
+          "label": "Quality",
+          "options": [
+            {
+              "v": "live",
+              "l": "Live"
+            },
+            {
+              "v": "balanced",
+              "l": "Balanced"
+            },
+            {
+              "v": "export",
+              "l": "Export"
+            }
+          ],
+          "def": "export",
+          "mutate": 0,
+          "group": "Quality",
+          "hint": "Sample counts only. Composition, phase and exposure stay the same."
         }
       }
     },
@@ -1900,7 +1922,7 @@
       "graph": {
         "buffers": {
           "scene": {
-            "scale": 0.75
+            "scale": 1
           },
           "glowA": {
             "scale": 0.25
@@ -2090,6 +2112,28 @@
           "group": "Lens",
           "hint": "Darkens the frame edge; never touches the focal area.",
           "randMax": 0.55
+        },
+        "quality": {
+          "type": "select",
+          "label": "Quality",
+          "options": [
+            {
+              "v": "live",
+              "l": "Live"
+            },
+            {
+              "v": "balanced",
+              "l": "Balanced"
+            },
+            {
+              "v": "export",
+              "l": "Export"
+            }
+          ],
+          "def": "export",
+          "mutate": 0,
+          "group": "Quality",
+          "hint": "Sample counts only. Composition, phase and exposure stay the same."
         }
       }
     },
@@ -2108,7 +2152,7 @@
       "graph": {
         "buffers": {
           "scene": {
-            "scale": 0.75
+            "scale": 1
           },
           "glowA": {
             "scale": 0.25
@@ -2278,6 +2322,28 @@
           "group": "Lens",
           "hint": "Darkens the frame edge; never touches the focal area.",
           "randMax": 0.55
+        },
+        "quality": {
+          "type": "select",
+          "label": "Quality",
+          "options": [
+            {
+              "v": "live",
+              "l": "Live"
+            },
+            {
+              "v": "balanced",
+              "l": "Balanced"
+            },
+            {
+              "v": "export",
+              "l": "Export"
+            }
+          ],
+          "def": "export",
+          "mutate": 0,
+          "group": "Quality",
+          "hint": "Sample counts only. Composition, phase and exposure stay the same."
         }
       }
     }

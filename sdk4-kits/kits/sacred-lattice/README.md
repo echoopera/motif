@@ -2,7 +2,7 @@
 
 Gold connections, pale glass and obsidian blue: nested polyhedral cages, circles and chord networks in exact geometry. Nine seamless infinite loops.
 
-Format `motif-kit@4` - no capabilities declared - pass graph: scene (0.75) > glow A (0.25) > glow B (0.125) > output (1.0).
+Format `motif-kit@4` - no capabilities declared - pass graph: scene (1) > glow A (0.25) > glow B (0.125) > output (1.0).
 
 ## Styles
 

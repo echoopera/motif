@@ -13,10 +13,10 @@ const params = {
   stepped: { type: 'toggle', label: 'On twos', def: false, group: 'Motion', hint: 'Hold each move in six stepped poses, like animation on twos.' },
   ...crispLens({ keyAngle: -45, exposure: 1 }),
 };
-delete params.keyAngle; delete params.quality;   // not used by this style: dead controls are removed
+delete params.keyAngle;   // not used by this style: dead controls are removed
 
 export default {
-  id: 'post-punk-resonance', name: 'Post-Punk Resonance', version: '1.0.0', accent: '#E6F000', post: 'crisp', cost: 1,
+  id: 'post-punk-resonance', name: 'Post-Punk Resonance', version: '1.0.0', accent: '#E6F000', post: 'crisp', ssaa: 4, cost: 2,
   description: 'Acid yellow, red, black and warm white: stripes, ring bands and wave traces with strong negative shapes, moved on two or four clear beats with long rests. No grain, no strobe. Nine seamless infinite loops.',
   palettes: [
     { id: 'acid-warm', name: 'Acid Warm', bg: '#EEE6AE', ink: '#05050A', a: ['#F0120A', '#F2E800', '#8A8460'] },

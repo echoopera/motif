@@ -2,7 +2,7 @@
 
 Translucent emerald membranes, coral colonies, radial organs and dark channels. A deterministic periodic lifecycle of division, migration and reintegration. Nine seamless infinite loops.
 
-Format `motif-kit@4` - no capabilities declared - pass graph: scene (0.75) > glow A (0.25) > glow B (0.125) > output (1.0).
+Format `motif-kit@4` - no capabilities declared - pass graph: scene (1) > glow A (0.25) > glow B (0.125) > output (1.0).
 
 ## Styles
 

@@ -67,7 +67,7 @@
       "blurb": "Stripes, black ring bands, a red wave cut and an acid-yellow slab step to new poses on two beats.",
       "palette": "acid-warm",
       "flash": false,
-      "cost": 1,
+      "cost": 2,
       "passes": [
         {
           "src": "styles/post-punk-hero.glsl"
@@ -183,6 +183,28 @@
           "group": "Lens",
           "hint": "Darkens the frame edge. Off by default for graphic work.",
           "randMax": 0.2
+        },
+        "quality": {
+          "type": "select",
+          "label": "Quality",
+          "options": [
+            {
+              "v": "live",
+              "l": "Live"
+            },
+            {
+              "v": "balanced",
+              "l": "Balanced"
+            },
+            {
+              "v": "export",
+              "l": "Export"
+            }
+          ],
+          "def": "export",
+          "mutate": 0,
+          "group": "Quality",
+          "hint": "Sample counts only. Composition, phase and exposure stay the same."
         }
       }
     },
@@ -197,7 +219,7 @@
       "blurb": "An acid-yellow field carrying stacked black wave traces, each at its own phase.",
       "palette": "acid-warm",
       "flash": false,
-      "cost": 1,
+      "cost": 2,
       "passes": [
         {
           "src": "styles/acid-carrier.glsl"
@@ -304,6 +326,28 @@
           "group": "Lens",
           "hint": "Darkens the frame edge. Off by default for graphic work.",
           "randMax": 0.2
+        },
+        "quality": {
+          "type": "select",
+          "label": "Quality",
+          "options": [
+            {
+              "v": "live",
+              "l": "Live"
+            },
+            {
+              "v": "balanced",
+              "l": "Balanced"
+            },
+            {
+              "v": "export",
+              "l": "Export"
+            }
+          ],
+          "def": "export",
+          "mutate": 0,
+          "group": "Quality",
+          "hint": "Sample counts only. Composition, phase and exposure stay the same."
         }
       }
     },
@@ -318,7 +362,7 @@
       "blurb": "A red disc behind triangular signal traces and a black bar; the signals shift on each beat.",
       "palette": "bone-red",
       "flash": false,
-      "cost": 1,
+      "cost": 2,
       "passes": [
         {
           "src": "styles/red-signal.glsl"
@@ -414,6 +458,28 @@
           "group": "Lens",
           "hint": "Darkens the frame edge. Off by default for graphic work.",
           "randMax": 0.2
+        },
+        "quality": {
+          "type": "select",
+          "label": "Quality",
+          "options": [
+            {
+              "v": "live",
+              "l": "Live"
+            },
+            {
+              "v": "balanced",
+              "l": "Balanced"
+            },
+            {
+              "v": "export",
+              "l": "Export"
+            }
+          ],
+          "def": "export",
+          "mutate": 0,
+          "group": "Quality",
+          "hint": "Sample counts only. Composition, phase and exposure stay the same."
         }
       }
     },
@@ -428,7 +494,7 @@
       "blurb": "Concentric black rings broken into segments that turn to new positions beat by beat.",
       "palette": "bone-red",
       "flash": false,
-      "cost": 1,
+      "cost": 2,
       "passes": [
         {
           "src": "styles/broken-ring.glsl"
@@ -523,6 +589,28 @@
           "group": "Lens",
           "hint": "Darkens the frame edge. Off by default for graphic work.",
           "randMax": 0.2
+        },
+        "quality": {
+          "type": "select",
+          "label": "Quality",
+          "options": [
+            {
+              "v": "live",
+              "l": "Live"
+            },
+            {
+              "v": "balanced",
+              "l": "Balanced"
+            },
+            {
+              "v": "export",
+              "l": "Export"
+            }
+          ],
+          "def": "export",
+          "mutate": 0,
+          "group": "Quality",
+          "hint": "Sample counts only. Composition, phase and exposure stay the same."
         }
       }
     },
@@ -537,7 +625,7 @@
       "blurb": "Black ground with warm-white geometry cut out of it: circle, triangle and a sliding red bar.",
       "palette": "signal-night",
       "flash": false,
-      "cost": 1,
+      "cost": 2,
       "passes": [
         {
           "src": "styles/blackout-geometry.glsl"
@@ -612,6 +700,28 @@
           "group": "Lens",
           "hint": "Darkens the frame edge. Off by default for graphic work.",
           "randMax": 0.2
+        },
+        "quality": {
+          "type": "select",
+          "label": "Quality",
+          "options": [
+            {
+              "v": "live",
+              "l": "Live"
+            },
+            {
+              "v": "balanced",
+              "l": "Balanced"
+            },
+            {
+              "v": "export",
+              "l": "Export"
+            }
+          ],
+          "def": "export",
+          "mutate": 0,
+          "group": "Quality",
+          "hint": "Sample counts only. Composition, phase and exposure stay the same."
         }
       }
     },
@@ -626,7 +736,7 @@
       "blurb": "Two stripe fields at a slight angle, cut along a diagonal that moves; moiré is bounded by design.",
       "palette": "pink-black",
       "flash": false,
-      "cost": 1,
+      "cost": 2,
       "passes": [
         {
           "src": "styles/interference-cut.glsl"
@@ -712,6 +822,28 @@
           "group": "Lens",
           "hint": "Darkens the frame edge. Off by default for graphic work.",
           "randMax": 0.2
+        },
+        "quality": {
+          "type": "select",
+          "label": "Quality",
+          "options": [
+            {
+              "v": "live",
+              "l": "Live"
+            },
+            {
+              "v": "balanced",
+              "l": "Balanced"
+            },
+            {
+              "v": "export",
+              "l": "Export"
+            }
+          ],
+          "def": "export",
+          "mutate": 0,
+          "group": "Quality",
+          "hint": "Sample counts only. Composition, phase and exposure stay the same."
         }
       }
     },
@@ -726,7 +858,7 @@
       "blurb": "Pixel-stepped oscilloscope traces that jump pose on every beat, always animated on twos.",
       "palette": "signal-night",
       "flash": false,
-      "cost": 1,
+      "cost": 2,
       "passes": [
         {
           "src": "styles/stepped-oscillator.glsl"
@@ -822,6 +954,28 @@
           "group": "Lens",
           "hint": "Darkens the frame edge. Off by default for graphic work.",
           "randMax": 0.2
+        },
+        "quality": {
+          "type": "select",
+          "label": "Quality",
+          "options": [
+            {
+              "v": "live",
+              "l": "Live"
+            },
+            {
+              "v": "balanced",
+              "l": "Balanced"
+            },
+            {
+              "v": "export",
+              "l": "Export"
+            }
+          ],
+          "def": "export",
+          "mutate": 0,
+          "group": "Quality",
+          "hint": "Sample counts only. Composition, phase and exposure stay the same."
         }
       }
     },
@@ -836,7 +990,7 @@
       "blurb": "Nested rectangles shrink toward the centre, one full level per loop, in black, red and yellow.",
       "palette": "bone-red",
       "flash": false,
-      "cost": 1,
+      "cost": 2,
       "passes": [
         {
           "src": "styles/graphic-feedback.glsl"
@@ -901,6 +1055,28 @@
           "group": "Lens",
           "hint": "Darkens the frame edge. Off by default for graphic work.",
           "randMax": 0.2
+        },
+        "quality": {
+          "type": "select",
+          "label": "Quality",
+          "options": [
+            {
+              "v": "live",
+              "l": "Live"
+            },
+            {
+              "v": "balanced",
+              "l": "Balanced"
+            },
+            {
+              "v": "export",
+              "l": "Export"
+            }
+          ],
+          "def": "export",
+          "mutate": 0,
+          "group": "Quality",
+          "hint": "Sample counts only. Composition, phase and exposure stay the same."
         }
       }
     },
@@ -915,7 +1091,7 @@
       "blurb": "A structured halftone field that breathes slowly. Noise as pattern, never grain.",
       "palette": "bone-red",
       "flash": false,
-      "cost": 1,
+      "cost": 2,
       "passes": [
         {
           "src": "styles/quiet-noise.glsl"
@@ -990,6 +1166,28 @@
           "group": "Lens",
           "hint": "Darkens the frame edge. Off by default for graphic work.",
           "randMax": 0.2
+        },
+        "quality": {
+          "type": "select",
+          "label": "Quality",
+          "options": [
+            {
+              "v": "live",
+              "l": "Live"
+            },
+            {
+              "v": "balanced",
+              "l": "Balanced"
+            },
+            {
+              "v": "export",
+              "l": "Export"
+            }
+          ],
+          "def": "export",
+          "mutate": 0,
+          "group": "Quality",
+          "hint": "Sample counts only. Composition, phase and exposure stay the same."
         }
       }
     }

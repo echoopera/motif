@@ -10,13 +10,13 @@ export const lens = (o = {}) => ({
   bloomRadius: R('Bloom radius', 0.4, 2.2, o.bloomRadius ?? 1, { step: 0.01, group: 'Lens', hint: 'Width of the glow relative to the frame.', randMax: 1.5 }),
   lensCA: R('Edge fringe', 0, 0.5, o.lensCA ?? 0.12, { step: 0.01, group: 'Lens', hint: 'Spectral fringing toward the frame edge.', randMax: 0.25 }),
   vignette: R('Vignette', 0, 0.8, o.vignette ?? 0.38, { step: 0.01, group: 'Lens', hint: 'Darkens the frame edge; never touches the focal area.', randMax: 0.55 }),
-  quality: QUALITY(o.quality ?? 'balanced'),
+  quality: QUALITY(o.quality ?? 'export'),
 });
 export const crispLens = (o = {}) => ({
   keyAngle: R('Shadow direction', -180, 180, o.keyAngle ?? -45, { step: 1, unit: '°', group: 'Light', hint: 'Direction the soft layer shadow falls, degrees.', randMax: 180 }),
   exposure: R('Exposure', 0.7, 1.4, o.exposure ?? 1, { step: 0.01, unit: '×', group: 'Light', hint: 'Overall level of the printed colours.' }),
   vignette: R('Vignette', 0, 0.5, o.vignette ?? 0, { step: 0.01, group: 'Lens', hint: 'Darkens the frame edge. Off by default for graphic work.', randMax: 0.2 }),
-  quality: QUALITY(o.quality ?? 'balanced'),
+  quality: QUALITY(o.quality ?? 'export'),
 });
 
 export function merge(base, over) {

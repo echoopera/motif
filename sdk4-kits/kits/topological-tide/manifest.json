@@ -67,7 +67,7 @@
       "blurb": "An ivory gyroid shell with a copper inner wall and cobalt shadows in its cavities, turning once per loop.",
       "palette": "ivory-cobalt",
       "flash": false,
-      "cost": 4,
+      "cost": 8,
       "graph": {
         "buffers": {
           "scene": {
@@ -298,7 +298,7 @@
               "l": "Export"
             }
           ],
-          "def": "balanced",
+          "def": "export",
           "mutate": 0,
           "group": "Quality",
           "hint": "Sample counts only. Composition, phase and exposure stay the same."
@@ -316,7 +316,7 @@
       "blurb": "Pure matte ivory: thicker walls, no metal, soft shadows deep in the channels.",
       "palette": "ivory-cobalt",
       "flash": false,
-      "cost": 4,
+      "cost": 8,
       "graph": {
         "buffers": {
           "scene": {
@@ -547,7 +547,7 @@
               "l": "Export"
             }
           ],
-          "def": "balanced",
+          "def": "export",
           "mutate": 0,
           "group": "Quality",
           "hint": "Sample counts only. Composition, phase and exposure stay the same."
@@ -565,7 +565,7 @@
       "blurb": "Thin polished chrome channels reflecting a warm softbox and a cobalt sky.",
       "palette": "graphite-gold",
       "flash": false,
-      "cost": 4,
+      "cost": 8,
       "graph": {
         "buffers": {
           "scene": {
@@ -796,7 +796,7 @@
               "l": "Export"
             }
           ],
-          "def": "balanced",
+          "def": "export",
           "mutate": 0,
           "group": "Quality",
           "hint": "Sample counts only. Composition, phase and exposure stay the same."
@@ -814,7 +814,7 @@
       "blurb": "A cobalt-glazed torus whose wall is perforated by a gyroid cut; the ring breathes as it turns.",
       "palette": "ivory-cobalt",
       "flash": false,
-      "cost": 4,
+      "cost": 8,
       "graph": {
         "buffers": {
           "scene": {
@@ -1045,7 +1045,7 @@
               "l": "Export"
             }
           ],
-          "def": "balanced",
+          "def": "export",
           "mutate": 0,
           "group": "Quality",
           "hint": "Sample counts only. Composition, phase and exposure stay the same."
@@ -1063,7 +1063,7 @@
       "blurb": "A half-twisted ceramic ribbon with copper inlay stripes that run once around the loop.",
       "palette": "porcelain-rose",
       "flash": false,
-      "cost": 4,
+      "cost": 8,
       "graph": {
         "buffers": {
           "scene": {
@@ -1274,7 +1274,7 @@
               "l": "Export"
             }
           ],
-          "def": "balanced",
+          "def": "export",
           "mutate": 0,
           "group": "Quality",
           "hint": "Sample counts only. Composition, phase and exposure stay the same."
@@ -1292,7 +1292,7 @@
       "blurb": "A folded celadon plate perforated by a regular array of holes, folding and unfolding in place.",
       "palette": "celadon",
       "flash": false,
-      "cost": 4,
+      "cost": 8,
       "graph": {
         "buffers": {
           "scene": {
@@ -1513,7 +1513,7 @@
               "l": "Export"
             }
           ],
-          "def": "balanced",
+          "def": "export",
           "mutate": 0,
           "group": "Quality",
           "hint": "Sample counts only. Composition, phase and exposure stay the same."
@@ -1531,7 +1531,7 @@
       "blurb": "A fine, thin lattice: almost a web of porcelain with deep, dark pockets.",
       "palette": "porcelain-rose",
       "flash": false,
-      "cost": 4,
+      "cost": 8,
       "graph": {
         "buffers": {
           "scene": {
@@ -1762,7 +1762,7 @@
               "l": "Export"
             }
           ],
-          "def": "balanced",
+          "def": "export",
           "mutate": 0,
           "group": "Quality",
           "hint": "Sample counts only. Composition, phase and exposure stay the same."
@@ -1780,7 +1780,7 @@
       "blurb": "Gold-bright gyroid lobes join and pinch as the iso-level slides: topology changes through smooth necks.",
       "palette": "graphite-gold",
       "flash": false,
-      "cost": 4,
+      "cost": 8,
       "graph": {
         "buffers": {
           "scene": {
@@ -2011,7 +2011,7 @@
               "l": "Export"
             }
           ],
-          "def": "balanced",
+          "def": "export",
           "mutate": 0,
           "group": "Quality",
           "hint": "Sample counts only. Composition, phase and exposure stay the same."
@@ -2029,7 +2029,7 @@
       "blurb": "One large, soft surface in even light. The calmest of the set, for text-safe backgrounds.",
       "palette": "celadon",
       "flash": false,
-      "cost": 4,
+      "cost": 8,
       "graph": {
         "buffers": {
           "scene": {
@@ -2260,7 +2260,7 @@
               "l": "Export"
             }
           ],
-          "def": "balanced",
+          "def": "export",
           "mutate": 0,
           "group": "Quality",
           "hint": "Sample counts only. Composition, phase and exposure stay the same."

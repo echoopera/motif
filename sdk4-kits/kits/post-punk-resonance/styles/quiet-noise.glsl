@@ -178,5 +178,14 @@ vec4 scene_main(vec2 uv, vec2 fc, int variant) {
 }
 
 vec4 motif(vec2 uv, vec2 fc) {
-  return scene_main(uv, fc, 8);
+  int want = p_quality == QUALITY_LIVE ? 1 : (p_quality == QUALITY_BALANCED ? 2 : 4);
+  int n = min(want, 4);
+  float px = 1.0 / min(u_res.x, u_res.y);
+  vec3 acc = vec3(0.0);
+  for (int i = 0; i < 4; i++) {
+    if (i >= n) break;
+    vec2 o = i == 0 ? vec2(-0.125, -0.375) : (i == 1 ? vec2(0.125, 0.375) : (i == 2 ? vec2(0.375, -0.125) : vec2(-0.375, 0.125)));
+    acc += scene_main(uv + o * px, fc, 8).rgb;
+  }
+  return vec4(acc / float(n), 1.0);
 }

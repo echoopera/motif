@@ -14,7 +14,7 @@ const params = {
 };
 
 export default {
-  id: 'deconstruct-field', name: 'Deconstruct Field', version: '1.0.0', accent: '#1B3FD6', post: 'crisp', cost: 1,
+  id: 'deconstruct-field', name: 'Deconstruct Field', version: '1.0.0', accent: '#1B3FD6', post: 'crisp', ssaa: 4, cost: 2,
   description: 'Cream ground, black structure, cobalt arcs and vermilion accents: asymmetric planes and grids that slide, rotate and return on staggered in-hold-out schedules. Nine seamless infinite loops.',
   palettes: [
     { id: 'cream-cobalt', name: 'Cream Cobalt', bg: '#E8E2D0', ink: '#0B0C10', a: ['#1B3FD6', '#E4331B', '#8E8671'] },

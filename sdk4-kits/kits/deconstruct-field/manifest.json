@@ -67,7 +67,7 @@
       "blurb": "Fourteen planes, a cobalt arc and hairline grids slide out of place and return, each on its own schedule.",
       "palette": "cream-cobalt",
       "flash": false,
-      "cost": 1,
+      "cost": 2,
       "passes": [
         {
           "src": "styles/deconstruct-field-hero.glsl"
@@ -217,7 +217,7 @@
               "l": "Export"
             }
           ],
-          "def": "balanced",
+          "def": "export",
           "mutate": 0,
           "group": "Quality",
           "hint": "Sample counts only. Composition, phase and exposure stay the same."
@@ -235,7 +235,7 @@
       "blurb": "A vertical axis of narrow bars, each shearing off the line in turn and coming back.",
       "palette": "bone-ink",
       "flash": false,
-      "cost": 1,
+      "cost": 2,
       "passes": [
         {
           "src": "styles/broken-axis.glsl"
@@ -385,7 +385,7 @@
               "l": "Export"
             }
           ],
-          "def": "balanced",
+          "def": "export",
           "mutate": 0,
           "group": "Quality",
           "hint": "Sample counts only. Composition, phase and exposure stay the same."
@@ -403,7 +403,7 @@
       "blurb": "Cobalt leads: large blue planes bitten by circular cuts, with black bars for structure.",
       "palette": "cream-cobalt",
       "flash": false,
-      "cost": 1,
+      "cost": 2,
       "passes": [
         {
           "src": "styles/cobalt-cut.glsl"
@@ -553,7 +553,7 @@
               "l": "Export"
             }
           ],
-          "def": "balanced",
+          "def": "export",
           "mutate": 0,
           "group": "Quality",
           "hint": "Sample counts only. Composition, phase and exposure stay the same."
@@ -571,7 +571,7 @@
       "blurb": "Outline-only planes with a registration ghost sliding behind each, like a misprinted plan.",
       "palette": "bone-ink",
       "flash": false,
-      "cost": 1,
+      "cost": 2,
       "passes": [
         {
           "src": "styles/offset-scaffold.glsl"
@@ -721,7 +721,7 @@
               "l": "Export"
             }
           ],
-          "def": "balanced",
+          "def": "export",
           "mutate": 0,
           "group": "Quality",
           "hint": "Sample counts only. Composition, phase and exposure stay the same."
@@ -739,7 +739,7 @@
       "blurb": "A few huge planes lean against each other and slide apart, arguing across the page.",
       "palette": "cream-cobalt",
       "flash": false,
-      "cost": 1,
+      "cost": 2,
       "passes": [
         {
           "src": "styles/plane-argument.glsl"
@@ -889,7 +889,7 @@
               "l": "Export"
             }
           ],
-          "def": "balanced",
+          "def": "export",
           "mutate": 0,
           "group": "Quality",
           "hint": "Sample counts only. Composition, phase and exposure stay the same."
@@ -907,7 +907,7 @@
       "blurb": "Concentric partial circles of different weights rotate through short, eased arcs.",
       "palette": "sand-teal",
       "flash": false,
-      "cost": 1,
+      "cost": 2,
       "passes": [
         {
           "src": "styles/partial-circle.glsl"
@@ -1057,7 +1057,7 @@
               "l": "Export"
             }
           ],
-          "def": "balanced",
+          "def": "export",
           "mutate": 0,
           "group": "Quality",
           "hint": "Sample counts only. Composition, phase and exposure stay the same."
@@ -1075,7 +1075,7 @@
       "blurb": "Mostly black and bone, until a vermilion bar slides across and interrupts the composition.",
       "palette": "bone-ink",
       "flash": false,
-      "cost": 1,
+      "cost": 2,
       "passes": [
         {
           "src": "styles/red-interruption.glsl"
@@ -1225,7 +1225,7 @@
               "l": "Export"
             }
           ],
-          "def": "balanced",
+          "def": "export",
           "mutate": 0,
           "group": "Quality",
           "hint": "Sample counts only. Composition, phase and exposure stay the same."
@@ -1243,7 +1243,7 @@
       "blurb": "The grid is the subject: rows of it slip sideways against each other and settle back.",
       "palette": "night-paper",
       "flash": false,
-      "cost": 1,
+      "cost": 2,
       "passes": [
         {
           "src": "styles/grid-dislocation.glsl"
@@ -1393,7 +1393,7 @@
               "l": "Export"
             }
           ],
-          "def": "balanced",
+          "def": "export",
           "mutate": 0,
           "group": "Quality",
           "hint": "Sample counts only. Composition, phase and exposure stay the same."
@@ -1411,7 +1411,7 @@
       "blurb": "Six planes and a single arc in lots of white space; small, slow moves. Made for text-safe backgrounds.",
       "palette": "bone-ink",
       "flash": false,
-      "cost": 1,
+      "cost": 2,
       "passes": [
         {
           "src": "styles/quiet-construct.glsl"
@@ -1561,7 +1561,7 @@
               "l": "Export"
             }
           ],
-          "def": "balanced",
+          "def": "export",
           "mutate": 0,
           "group": "Quality",
           "hint": "Sample counts only. Composition, phase and exposure stay the same."

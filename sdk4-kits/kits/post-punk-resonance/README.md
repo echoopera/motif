@@ -34,6 +34,7 @@ during moves (envelope sin(pi*e)), and no form change depends on brightness: no 
 - **Motion**: Slice displacement (`slice`), Hold fraction (`hold`), Beats per loop (`beats`), On twos (`stepped`)
 - **Light**: Exposure (`exposure`)
 - **Lens**: Vignette (`vignette`)
+- **Quality**: Quality (`quality`)
 
 ## Palettes
 

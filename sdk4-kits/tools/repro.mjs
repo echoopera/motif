@@ -1,0 +1,16 @@
+import path from 'node:path'; import { createRequire } from 'node:module';
+const root='/home/user/motif/sdk4-kits';
+const { chromium } = createRequire(path.join(root,'sdk/package.json'))('playwright');
+const browser = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome', args: ['--use-angle=swiftshader','--enable-unsafe-swiftshader','--ignore-gpu-blocklist'] });
+const page = await browser.newPage({ viewport: { width: 1000, height: 1500 }, deviceScaleFactor: 2 });
+const errs=[]; page.on('console', m => { if (['error','warning'].includes(m.type())) errs.push(m.type()+': '+m.text()); }); page.on('pageerror', e => errs.push('pageerror '+e));
+await page.goto('file://'+root+'/showcase/index.html');
+await page.click('.kit[data-kit="harmonic-matter"]');
+await page.waitForFunction(() => !document.querySelector('#ov').classList.contains('on'), null, {timeout:90000});
+await page.waitForTimeout(3000);
+console.log('inspector controls:', await page.evaluate(()=>document.querySelectorAll('#inspector .ctl').length), 'details:', await page.evaluate(()=>document.querySelectorAll('#inspector details').length));
+console.log(errs.slice(0,8));
+const r = await page.evaluate(()=>{const c=document.querySelector('#cv');return [c.width,c.height]});
+console.log('canvas', r);
+await page.locator('#frame').screenshot({path: root+'/qa/repro.png'});
+await browser.close();

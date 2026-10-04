@@ -33,7 +33,26 @@ for (const id of ids) {
   const styles = kit.styles.map((s, i) => {
     const file = `styles/${s.id}.glsl`;
     const vn = s.variant ?? i;
-    fs.writeFileSync(path.join(out, file), `// ${kit.name}: ${s.name}. ${s.fingerprint}\n` + specialise(core, vn) + `\nvec4 motif(vec2 uv, vec2 fc) {\n  return ${kit.entry || 'scene_main'}(uv, fc, ${vn});\n}\n`);
+    // Anti-aliasing: every style renders through a rotated-grid supersampling wrapper driven by the Quality control
+    // (Live 1 sample, Balanced 2, Export 4, capped by the style's ssaa). The loop bound is the cap, so the SDK's static
+    // worst-case analysis sees exactly the work the style can do.
+    const ss = s.ssaa ?? kit.ssaa ?? 4;
+    const wrap = ss <= 1 ? `\nvec4 motif(vec2 uv, vec2 fc) {\n  return ${kit.entry || 'scene_main'}(uv, fc, ${vn});\n}\n` : `
+vec4 motif(vec2 uv, vec2 fc) {
+  int want = p_quality == QUALITY_LIVE ? 1 : (p_quality == QUALITY_BALANCED ? 2 : 4);
+  int n = min(want, ${ss});
+  float px = 1.0 / min(u_res.x, u_res.y);
+  vec3 acc = vec3(0.0);
+  for (int i = 0; i < ${ss}; i++) {
+    if (i >= n) break;
+    vec2 o = i == 0 ? vec2(-0.125, -0.375) : (i == 1 ? vec2(0.125, 0.375) : (i == 2 ? vec2(0.375, -0.125) : vec2(-0.375, 0.125)));
+    acc += ${kit.entry || 'scene_main'}(uv + o * px, fc, ${vn}).rgb;
+  }
+  return vec4(acc / float(n), 1.0);
+}
+`;
+    if (ss > 1 && !s.over?.quality && (s.drop || []).includes('quality')) throw new Error(s.id + ': quality dropped but ssaa > 1');
+    fs.writeFileSync(path.join(out, file), `// ${kit.name}: ${s.name}. ${s.fingerprint}\n` + specialise(core, vn) + wrap);
     const e = { id: s.id, name: s.name, group: kit.name, tags: s.tags, blurb: s.blurb, palette: s.palette, flash: !!s.flash, cost: s.cost ?? kit.cost ?? 1.5 };
     if (luminous) e.graph = { buffers: { scene: { scale: kit.sceneScale ?? 0.75 }, glowA: { scale: 0.25 }, glowB: { scale: 0.125 } }, passes: [
       { src: file, reads: [], writes: 'scene' }, { src: 'styles/_glowA.glsl', reads: ['scene'], writes: 'glowA' },

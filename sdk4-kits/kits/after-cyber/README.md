@@ -2,7 +2,7 @@
 
 Smoky glass, cyan hairlines, selective acid-lime particles in deep black: lattices that dissolve, travel and reassemble. Nine seamless infinite loops.
 
-Format `motif-kit@4` - no capabilities declared - pass graph: scene (0.75) > glow A (0.25) > glow B (0.125) > output (1.0).
+Format `motif-kit@4` - no capabilities declared - pass graph: scene (1) > glow A (0.25) > glow B (0.125) > output (1.0).
 
 ## Styles
 
@@ -38,6 +38,7 @@ Particles follow closed circles at integer harmonics with fixed seeded phases; e
 - **Motion**: Reconstructions per loop (`cycles`)
 - **Light**: Key direction (`keyAngle`), Exposure (`exposure`)
 - **Lens**: Bloom (`bloom`), Bloom radius (`bloomRadius`), Edge fringe (`lensCA`), Vignette (`vignette`)
+- **Quality**: Quality (`quality`)
 
 ## Palettes
 

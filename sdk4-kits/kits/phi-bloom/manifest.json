@@ -82,7 +82,7 @@
       "graph": {
         "buffers": {
           "scene": {
-            "scale": 0.75
+            "scale": 1
           },
           "glowA": {
             "scale": 0.25
@@ -353,7 +353,7 @@
               "l": "Export"
             }
           ],
-          "def": "balanced",
+          "def": "export",
           "mutate": 0,
           "group": "Quality",
           "hint": "Sample counts only. Composition, phase and exposure stay the same."
@@ -375,7 +375,7 @@
       "graph": {
         "buffers": {
           "scene": {
-            "scale": 0.75
+            "scale": 1
           },
           "glowA": {
             "scale": 0.25
@@ -646,7 +646,7 @@
               "l": "Export"
             }
           ],
-          "def": "balanced",
+          "def": "export",
           "mutate": 0,
           "group": "Quality",
           "hint": "Sample counts only. Composition, phase and exposure stay the same."
@@ -668,7 +668,7 @@
       "graph": {
         "buffers": {
           "scene": {
-            "scale": 0.75
+            "scale": 1
           },
           "glowA": {
             "scale": 0.25
@@ -909,7 +909,7 @@
               "l": "Export"
             }
           ],
-          "def": "balanced",
+          "def": "export",
           "mutate": 0,
           "group": "Quality",
           "hint": "Sample counts only. Composition, phase and exposure stay the same."
@@ -931,7 +931,7 @@
       "graph": {
         "buffers": {
           "scene": {
-            "scale": 0.75
+            "scale": 1
           },
           "glowA": {
             "scale": 0.25
@@ -1202,7 +1202,7 @@
               "l": "Export"
             }
           ],
-          "def": "balanced",
+          "def": "export",
           "mutate": 0,
           "group": "Quality",
           "hint": "Sample counts only. Composition, phase and exposure stay the same."
@@ -1224,7 +1224,7 @@
       "graph": {
         "buffers": {
           "scene": {
-            "scale": 0.75
+            "scale": 1
           },
           "glowA": {
             "scale": 0.25
@@ -1465,7 +1465,7 @@
               "l": "Export"
             }
           ],
-          "def": "balanced",
+          "def": "export",
           "mutate": 0,
           "group": "Quality",
           "hint": "Sample counts only. Composition, phase and exposure stay the same."
@@ -1487,7 +1487,7 @@
       "graph": {
         "buffers": {
           "scene": {
-            "scale": 0.75
+            "scale": 1
           },
           "glowA": {
             "scale": 0.25
@@ -1758,7 +1758,7 @@
               "l": "Export"
             }
           ],
-          "def": "balanced",
+          "def": "export",
           "mutate": 0,
           "group": "Quality",
           "hint": "Sample counts only. Composition, phase and exposure stay the same."
@@ -1780,7 +1780,7 @@
       "graph": {
         "buffers": {
           "scene": {
-            "scale": 0.75
+            "scale": 1
           },
           "glowA": {
             "scale": 0.25
@@ -2051,7 +2051,7 @@
               "l": "Export"
             }
           ],
-          "def": "balanced",
+          "def": "export",
           "mutate": 0,
           "group": "Quality",
           "hint": "Sample counts only. Composition, phase and exposure stay the same."
@@ -2073,7 +2073,7 @@
       "graph": {
         "buffers": {
           "scene": {
-            "scale": 0.75
+            "scale": 1
           },
           "glowA": {
             "scale": 0.25
@@ -2314,7 +2314,7 @@
               "l": "Export"
             }
           ],
-          "def": "balanced",
+          "def": "export",
           "mutate": 0,
           "group": "Quality",
           "hint": "Sample counts only. Composition, phase and exposure stay the same."
@@ -2336,7 +2336,7 @@
       "graph": {
         "buffers": {
           "scene": {
-            "scale": 0.75
+            "scale": 1
           },
           "glowA": {
             "scale": 0.25
@@ -2607,7 +2607,7 @@
               "l": "Export"
             }
           ],
-          "def": "balanced",
+          "def": "export",
           "mutate": 0,
           "group": "Quality",
           "hint": "Sample counts only. Composition, phase and exposure stay the same."
