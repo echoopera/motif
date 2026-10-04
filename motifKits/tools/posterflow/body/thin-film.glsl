@@ -1,7 +1,7 @@
 // Thin Film: a liquid warp of the source with iridescent halos where luminance changes fast, like oil film on glass.
 vec4 motif(vec2 uv, vec2 fc) {
   vec2 q = fc / u_res, asp = M_asp();
-  float k = float(p_turns);
+  float k = safeCycles(float(p_turns));
   vec2 w = pf_flow(uv * p_scale, k);
   vec2 qq = q + w * p_warp * 0.09 / asp;
   vec3 c = sx(qq);

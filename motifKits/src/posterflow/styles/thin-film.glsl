@@ -2,13 +2,13 @@
 vec3 sx(vec2 q) {
   if (u_sourceOn > 0.5) { vec4 s = m_source(q); return s.rgb + u_bg * (1.0 - s.a); }
   vec2 uv = (q - 0.5) * M_asp();
-  return ramp(0.5 + 0.5 * lfbm(uv * 1.5, 3, float(p_turns), 0.5));
+  return ramp(0.5 + 0.5 * lfbm(uv * 1.5, 3, safeCycles(float(p_turns)), 0.5));
 }
 
 // Thin Film: a liquid warp of the source with iridescent halos where luminance changes fast, like oil film on glass.
 vec4 motif(vec2 uv, vec2 fc) {
   vec2 q = fc / u_res, asp = M_asp();
-  float k = float(p_turns);
+  float k = safeCycles(float(p_turns));
   vec2 w = pf_flow(uv * p_scale, k);
   vec2 qq = q + w * p_warp * 0.09 / asp;
   vec3 c = sx(qq);

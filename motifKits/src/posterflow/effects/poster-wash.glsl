@@ -2,7 +2,7 @@
 vec4 motif(vec2 uv, vec2 fc) {
   vec2 q = fc / u_res;
   vec2 asp = M_asp();
-  float k = float(p_turns);
+  float k = safeCycles(float(p_turns));
   vec2 d = pf_flow(uv * p_scale, k) * p_warp * 0.08 / asp;
   vec4 s = g_inputAt(q + d);
   vec3 rgb = s.a > 0.001 ? s.rgb / s.a : vec3(0.0);

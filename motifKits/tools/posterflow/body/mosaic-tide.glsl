@@ -2,7 +2,7 @@
 // fabric turn into stair-stepped poster pixels.
 vec4 motif(vec2 uv, vec2 fc) {
   vec2 asp = M_asp();
-  float k = float(p_turns);
+  float k = safeCycles(float(p_turns));
   float cells = float(p_cells);
   vec2 cuv = (floor(uv * cells) + 0.5) / cells;
   vec2 w = pf_flow(cuv * p_scale, k);

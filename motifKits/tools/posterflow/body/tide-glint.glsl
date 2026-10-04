@@ -1,7 +1,7 @@
 // Tide Glint: looping ripples refract the source and every highlight throws a four-way glint, like sun on water.
 vec4 motif(vec2 uv, vec2 fc) {
   vec2 q = fc / u_res, asp = M_asp();
-  float k = float(p_turns);
+  float k = safeCycles(float(p_turns));
   vec2 p = uv * p_scale;
   vec2 rip = vec2(ln2(p * 1.6, k, 0.6), ln2(p * 1.6 + 23.1, k, 0.6)) * 0.6 + vec2(ln2(p * 3.7 + 4.0, k, 0.45), ln2(p * 3.7 + 11.0, k, 0.45)) * 0.35;
   vec2 qq = q + rip * p_ripple * 0.04 / asp;

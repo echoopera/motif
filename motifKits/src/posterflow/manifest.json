@@ -1424,7 +1424,7 @@
           "type": "range",
           "label": "Glint angle",
           "min": 0,
-          "max": 90,
+          "max": 45,
           "def": 20,
           "step": 1,
           "group": "Glint",
@@ -1860,6 +1860,7 @@
         "veins"
       ],
       "blurb": "Bands and vein-lines any layer or the whole frame, with an optional liquid warp.",
+      "inputs": [],
       "passes": [
         {
           "src": "effects/poster-wash.glsl"
@@ -2000,6 +2001,7 @@
         "wipe"
       ],
       "blurb": "An ink front sweeps from one shot to the next while both flow; exact at both ends.",
+      "inputs": [],
       "passes": [
         {
           "src": "transitions/liquid-cut.glsl"

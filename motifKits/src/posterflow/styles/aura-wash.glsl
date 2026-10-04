@@ -2,14 +2,14 @@
 vec3 sx(vec2 q) {
   if (u_sourceOn > 0.5) { vec4 s = m_source(q); return s.rgb + u_bg * (1.0 - s.a); }
   vec2 uv = (q - 0.5) * M_asp();
-  return ramp(0.5 + 0.5 * lfbm(uv * 1.5, 3, float(p_turns), 0.5));
+  return ramp(0.5 + 0.5 * lfbm(uv * 1.5, 3, safeCycles(float(p_turns)), 0.5));
 }
 
 // Aura Wash: an out-of-focus, flow-drifted bloom of the source, graded through the palette with film grain.
 // The soft colour fields that sit behind the sharper looks.
 vec4 motif(vec2 uv, vec2 fc) {
   vec2 q = fc / u_res, asp = M_asp();
-  float k = float(p_turns);
+  float k = safeCycles(float(p_turns));
   vec2 w = pf_flow(uv * p_scale, k);
   vec2 qq = q + w * p_warp * 0.1 / asp;
   vec3 acc = vec3(0.0); float ws = 0.0;
@@ -23,7 +23,7 @@ vec4 motif(vec2 uv, vec2 fc) {
   vec3 c = acc / ws;
   float L = sqrt(max(luma(c), 0.0));
   vec3 graded = mix(c, ramp(L), p_palMix);
-  graded += u_a1 * pow(max(L - 0.5, 0.0) * 2.0, 2.0) * p_glow * 0.5;
+  graded += (u_a1 + 0.25 * u_ink) * pow(max(L - 0.3, 0.0) * 1.43, 1.5) * p_glow * 0.9;
   vec3 col = mix(vec3(luma(graded)), graded, p_chroma);
   col = pf_finish(col, uv, fc, p_vignette, p_exposure, p_grain);
   return vec4(max(col, 0.0), 1.0);

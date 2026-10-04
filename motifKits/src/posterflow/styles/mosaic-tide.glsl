@@ -2,14 +2,14 @@
 vec3 sx(vec2 q) {
   if (u_sourceOn > 0.5) { vec4 s = m_source(q); return s.rgb + u_bg * (1.0 - s.a); }
   vec2 uv = (q - 0.5) * M_asp();
-  return ramp(0.5 + 0.5 * lfbm(uv * 1.5, 3, float(p_turns), 0.5));
+  return ramp(0.5 + 0.5 * lfbm(uv * 1.5, 3, safeCycles(float(p_turns)), 0.5));
 }
 
 // Mosaic Tide: the flow-warped source is sampled per block and stepped through dithered colour bands, so water and
 // fabric turn into stair-stepped poster pixels.
 vec4 motif(vec2 uv, vec2 fc) {
   vec2 asp = M_asp();
-  float k = float(p_turns);
+  float k = safeCycles(float(p_turns));
   float cells = float(p_cells);
   vec2 cuv = (floor(uv * cells) + 0.5) / cells;
   vec2 w = pf_flow(cuv * p_scale, k);

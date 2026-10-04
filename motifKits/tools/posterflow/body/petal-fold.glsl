@@ -2,7 +2,7 @@
 // becomes a symmetric bloom.
 vec4 motif(vec2 uv, vec2 fc) {
   vec2 asp = M_asp();
-  float k = float(p_turns);
+  float k = safeCycles(float(p_turns));
   vec2 p = uv - v_centre();
   float r = length(p), a = atan(p.y, p.x);
   float seg = TAU / float(p_petals);

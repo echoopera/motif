@@ -3,7 +3,7 @@
 vec4 motif(vec2 uv, vec2 fc) {
   vec2 q = fc / u_res;
   vec2 asp = M_asp();
-  float k = float(p_turns);
+  float k = safeCycles(float(p_turns));
   float ang = radians(p_angle);
   vec2 dir = vec2(cos(ang), sin(ang)), nrm = vec2(-dir.y, dir.x);
   // Coordinates along / across the drag direction.

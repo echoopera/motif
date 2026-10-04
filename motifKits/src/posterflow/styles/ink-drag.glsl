@@ -2,7 +2,7 @@
 // like ink drawn through water. Each hop recomputes the flow, so the loop closes exactly (flow is a function of u_p).
 vec4 motif(vec2 uv, vec2 fc) {
   vec2 asp = M_asp();
-  float k = float(p_turns);
+  float k = safeCycles(float(p_turns));
   vec2 p = uv;
   vec3 acc = vec3(0.0); float wsum = 0.0;
   float eps = 0.01;

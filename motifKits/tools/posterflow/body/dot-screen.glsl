@@ -2,7 +2,7 @@
 // source at each dot's centre (or the palette).
 vec4 motif(vec2 uv, vec2 fc) {
   vec2 q = fc / u_res, asp = M_asp();
-  float k = float(p_turns);
+  float k = safeCycles(float(p_turns));
   vec2 w = pf_flow(uv * p_scale, k);
   vec2 gp = rot(radians(p_angle)) * (uv + w * p_warp * 0.06);
   float cells = float(p_cells);

@@ -3,7 +3,7 @@
 vec4 motif(vec2 uv, vec2 fc) {
   vec2 q = fc / u_res;
   vec2 asp = M_asp();
-  float k = float(p_turns);
+  float k = safeCycles(float(p_turns));
   vec2 drift = p_drift * lc(k, 0.0);
   vec2 w = pf_flow(uv * p_scale + drift, k);
   // A slow vortex on top gives the pour a centre of mass (rotates by whole turns, so it loops).

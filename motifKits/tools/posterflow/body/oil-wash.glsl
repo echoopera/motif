@@ -2,7 +2,7 @@
 // melts into brush-like colour fields with crisp edges between them.
 vec4 motif(vec2 uv, vec2 fc) {
   vec2 q = fc / u_res, asp = M_asp();
-  float k = float(p_turns);
+  float k = safeCycles(float(p_turns));
   vec2 w = pf_flow(uv * p_scale, k);
   vec2 qq = q + w * p_warp * 0.06 / asp;
   vec2 px = p_stroke / u_res;

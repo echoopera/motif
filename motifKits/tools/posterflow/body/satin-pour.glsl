@@ -2,7 +2,7 @@
 float ht(vec2 p, float k) { return 0.75 * ln2(p, k, 0.5) + 0.25 * ln2(p * 2.1 + 7.0, k, 0.5); }
 vec4 motif(vec2 uv, vec2 fc) {
   vec2 q = fc / u_res, asp = M_asp();
-  float k = float(p_turns);
+  float k = safeCycles(float(p_turns));
   vec2 p = uv * p_scale + 0.3 * lc(k, 0.0);
   float e = 0.02;
   float h = ht(p, k);
