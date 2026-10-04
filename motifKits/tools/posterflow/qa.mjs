@@ -14,7 +14,8 @@ const require = createRequire(path.join(SDK, 'package.json')); const { chromium 
 const browser = await chromium.launch({ ...(process.env.MOTIF_CHROMIUM ? { executablePath: process.env.MOTIF_CHROMIUM } : {}), args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
 const page = await browser.newPage(); await page.setContent('<canvas id="c"></canvas>');
 await page.addScriptTag({ content: `window.KG = (function(){ ${src} })();` });
-const res = await page.evaluate(async ({ files, media }) => {
+const only = (flag('only') || '').split(',').filter(Boolean);
+const res = await page.evaluate(async ({ files, media, only }) => {
   const KG = window.KG, V = KG.validateKit(JSON.parse(files['manifest.json']), files); if (!V.ok) return { fatal: V.errors };
   const kit = V.kit, rt = KG.createGlRuntime(); if (!rt.ok) return { fatal: rt.reason };
   const W = 216, H = 384, tmp = document.createElement('canvas'), tx = tmp.getContext('2d', { willReadFrequently: true });
@@ -25,10 +26,11 @@ const res = await page.evaluate(async ({ files, media }) => {
     else { const g = x.createLinearGradient(0, 0, 720, 1280); g.addColorStop(0, '#0b1d4d'); g.addColorStop(.4, '#d63a78'); g.addColorStop(.7, '#f6a04a'); g.addColorStop(1, '#101a3a'); x.fillStyle = g; x.fillRect(0, 0, 720, 1280); for (let i = 0; i < 40; i++) { x.fillStyle = `hsla(${(i * 47) % 360},70%,${30 + (i * 13) % 50}%,.7)`; x.beginPath(); x.arc((i * 331) % 720, (i * 577) % 1280, 30 + (i * 29) % 120, 0, 7); x.fill(); } } }
   const bakeFor = (w, h) => { const sw = srcC.width, sh = srcC.height, ar = w / h; let cw = sw, ch = sh; if (sw / sh > ar) cw = sh * ar; else ch = sw / ar; const c = document.createElement('canvas'); c.width = Math.round(cw); c.height = Math.round(ch); c.getContext('2d').drawImage(srcC, (sw - cw) / 2, (sh - ch) / 2, cw, ch, 0, 0, c.width, c.height); return { canvas: c, rev: 1, w: sw, h: sh, time: 0 }; };
   const other = (w, h) => { const c = document.createElement('canvas'); c.width = w; c.height = h; const x = c.getContext('2d'), g = x.createLinearGradient(0, 0, w, h); g.addColorStop(0, '#0B1E3B'); g.addColorStop(1, '#F2C14E'); x.fillStyle = g; x.fillRect(0, 0, w, h); return { canvas: c, rev: 1, w, h, time: 0 }; };
+  const exact = (w, h) => { const b = bakeFor(w, h), c = document.createElement('canvas'); c.width = w; c.height = h; c.getContext('2d').drawImage(b.canvas, 0, 0, w, h); return { canvas: c, rev: 1, w, h, time: 0 }; };
   const md = (a, b) => { let s = 0; for (let i = 0; i < a.length; i += 4) s += Math.abs(a[i] - b[i]) + Math.abs(a[i + 1] - b[i + 1]) + Math.abs(a[i + 2] - b[i + 2]); return s / (a.length / 4 * 3); };
   const stats = d => { let l = 0, l2 = 0, n = d.length / 4, bad = 0, a = 0; for (let i = 0; i < d.length; i += 4) { const v = (d[i] + d[i + 1] + d[i + 2]) / 765; l += v; l2 += v * v; a += d[i + 3]; } const m = l / n; return { mean: m, sd: Math.sqrt(Math.max(0, l2 / n - m * m)), alpha: a / n / 255 }; };
   const out = [], issues = [];
-  const all = [...kit.styles, ...kit.effects, ...kit.transitions];
+  const all = [...kit.styles, ...kit.effects, ...kit.transitions].filter(e => !only.length || only.includes(e.localId));
   for (const st of all) {
     const rec = { id: st.localId, kind: st.kind || 'style', checks: {}, fails: [], warns: [] };
     const pal = kit.palettes.find(p => p.id === 'posterflow.' + st.palette) || kit.palettes[0];
@@ -37,7 +39,7 @@ const res = await page.evaluate(async ({ files, media }) => {
     const defs = P0 => Object.fromEntries(Object.entries(st.params).map(([k, s]) => [k, s.def]));
     const base = defs();
     const R = (o = {}) => { const w = o.w || W, h = o.h || H, p = o.p == null ? .37 : o.p; mk(w, h); const b = o.nomedia ? null : (st.inputs && st.inputs.length ? { source: bakeFor(w, h) } : null);
-      const ext = st.kind === 'effect' ? { input: bakeFor(w, h) } : st.kind === 'transition' ? { from: bakeFor(w, h), to: other(w, h) } : null;
+      const ext = st.kind === 'effect' ? { input: bakeFor(w, h) } : st.kind === 'transition' ? { from: exact(w, h), to: other(w, h) } : null;
       rt.draw(st.id, w, h, { p, L: o.L || 6, seed: o.seed || 417, safe: true, pal: o.pal || pal, params: o.params || base, spec: st.params, media: b, ext, progress: o.progress == null ? p : o.progress }); tx.clearRect(0, 0, w, h); rt.blit(tx, w, h); return tx.getImageData(0, 0, w, h).data; };
     const isT = st.kind === 'transition';
     // 1 seam + pops (styles and effects)
@@ -76,7 +78,7 @@ const res = await page.evaluate(async ({ files, media }) => {
       // 6 timing relative (SwiftShader)
       const t0 = performance.now(); for (let i = 0; i < 4; i++) R({ p: i / 4, w: 360, h: 640 }); rec.checks.msPerMpx = +((performance.now() - t0) / 4 / (360 * 640 / 1e6)).toFixed(0);
     } else {
-      const from = bakeFor(W, H), to = other(W, H); const ref = (b) => { const c = document.createElement('canvas'); c.width = W; c.height = H; const x = c.getContext('2d', { willReadFrequently: true }); x.drawImage(b.canvas, 0, 0, W, H); return x.getImageData(0, 0, W, H).data; };
+      const from = exact(W, H), to = other(W, H); const ref = (b) => { const c = document.createElement('canvas'); c.width = W; c.height = H; const x = c.getContext('2d', { willReadFrequently: true }); x.drawImage(b.canvas, 0, 0, W, H); return x.getImageData(0, 0, W, H).data; };
       const d0 = md(R({ progress: 0 }), ref(from)), d1 = md(R({ progress: 1 }), ref(to)); rec.checks.endpoint0 = +d0.toFixed(2); rec.checks.endpoint1 = +d1.toFixed(2);
       if (d0 > 1.5) rec.fails.push(`progress 0 differs from 'from' by Δ${d0.toFixed(2)}`); if (d1 > 1.5) rec.fails.push(`progress 1 differs from 'to' by Δ${d1.toFixed(2)}`);
       const mid = stats(R({ progress: .5 })); if (mid.sd < .004) rec.fails.push('blank at mid-transition');
@@ -85,7 +87,7 @@ const res = await page.evaluate(async ({ files, media }) => {
     out.push(rec);
   }
   return { out };
-}, { files, media });
+}, { files, media, only });
 await browser.close();
 if (res.fatal) { console.error('fatal', res.fatal); process.exit(2); }
 let nf = 0, nw = 0; const lines = ['# Posterflow QA', '', `Kit ${files['manifest.json'].match(/"version": "([^"]+)"/)[1]} · ${res.out.length} entries · ${new Date().toISOString().slice(0, 10)}`, '', '| entry | seam | pop | flash | min/max | result |', '| --- | --- | --- | --- | --- | --- |'];
