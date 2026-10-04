@@ -2,8 +2,8 @@
   "kit": "post-punk-resonance",
   "version": "1.0.0",
   "size": [
-    180,
-    320
+    90,
+    160
   ],
   "renderer": "SwiftShader (software GL, headless Chromium)",
   "note": "Metric definitions in tools/qa.mjs. Software timings and metrics are relative diagnostics, not device performance.",
@@ -13,11 +13,17 @@
       "delta0_p1": 0,
       "seamStep": 0,
       "seamStepAfter": 0,
-      "velMedian": 1.215,
-      "velMax": 2.693,
+      "velMedian": 0.85,
+      "velMax": 1.816,
       "seamRatio": 0,
-      "popRatio": 1.46,
-      "meanLuma": 0.4968,
+      "popRatio": 1.36,
+      "exposureByQuality": [
+        0.5049,
+        0.5103,
+        0.5158
+      ],
+      "exposureSpread": 0.022,
+      "meanLuma": 0.5158,
       "flashTilesOver3": 0,
       "flashPairsMaxPerSec": 0
     },
@@ -26,11 +32,17 @@
       "delta0_p1": 0,
       "seamStep": 0,
       "seamStepAfter": 0,
-      "velMedian": 0.884,
-      "velMax": 2.506,
+      "velMedian": 0.783,
+      "velMax": 2.316,
       "seamRatio": 0,
-      "popRatio": 1.18,
-      "meanLuma": 0.6521,
+      "popRatio": 1.2,
+      "exposureByQuality": [
+        0.5979,
+        0.6072,
+        0.6081
+      ],
+      "exposureSpread": 0.017,
+      "meanLuma": 0.6081,
       "flashTilesOver3": 0,
       "flashPairsMaxPerSec": 0
     },
@@ -39,11 +51,17 @@
       "delta0_p1": 0,
       "seamStep": 0,
       "seamStepAfter": 0,
-      "velMedian": 0.378,
-      "velMax": 0.924,
+      "velMedian": 0.344,
+      "velMax": 0.882,
       "seamRatio": 0,
-      "popRatio": 1.16,
-      "meanLuma": 0.6174,
+      "popRatio": 1.15,
+      "exposureByQuality": [
+        0.5803,
+        0.5843,
+        0.5843
+      ],
+      "exposureSpread": 0.007,
+      "meanLuma": 0.5843,
       "flashTilesOver3": 0,
       "flashPairsMaxPerSec": 0
     },
@@ -52,11 +70,17 @@
       "delta0_p1": 0,
       "seamStep": 0,
       "seamStepAfter": 0,
-      "velMedian": 1.257,
-      "velMax": 3.161,
+      "velMedian": 1.251,
+      "velMax": 3.043,
       "seamRatio": 0,
-      "popRatio": 1.31,
-      "meanLuma": 0.6957,
+      "popRatio": 1.37,
+      "exposureByQuality": [
+        0.7055,
+        0.7132,
+        0.714
+      ],
+      "exposureSpread": 0.012,
+      "meanLuma": 0.714,
       "flashTilesOver3": 0,
       "flashPairsMaxPerSec": 0
     },
@@ -65,11 +89,17 @@
       "delta0_p1": 0,
       "seamStep": 0,
       "seamStepAfter": 0,
-      "velMedian": 0.133,
-      "velMax": 0.439,
+      "velMedian": 0.131,
+      "velMax": 0.423,
       "seamRatio": 0,
-      "popRatio": 1.52,
-      "meanLuma": 0.7176,
+      "popRatio": 1.5,
+      "exposureByQuality": [
+        0.7202,
+        0.7213,
+        0.7215
+      ],
+      "exposureSpread": 0.002,
+      "meanLuma": 0.7215,
       "flashTilesOver3": 0,
       "flashPairsMaxPerSec": 0
     },
@@ -78,11 +108,17 @@
       "delta0_p1": 0,
       "seamStep": 0,
       "seamStepAfter": 0,
-      "velMedian": 2.538,
-      "velMax": 6.469,
+      "velMedian": 1.248,
+      "velMax": 3.672,
       "seamRatio": 0,
-      "popRatio": 1.68,
-      "meanLuma": 0.5091,
+      "popRatio": 1.46,
+      "exposureByQuality": [
+        0.5042,
+        0.5047,
+        0.5181
+      ],
+      "exposureSpread": 0.027,
+      "meanLuma": 0.5181,
       "flashTilesOver3": 0,
       "flashPairsMaxPerSec": 0
     },
@@ -95,7 +131,13 @@
       "velMax": 0,
       "seamRatio": 0,
       "popRatio": 0,
-      "meanLuma": 0.1194,
+      "exposureByQuality": [
+        0.1769,
+        0.1886,
+        0.1913
+      ],
+      "exposureSpread": 0.081,
+      "meanLuma": 0.1913,
       "flashTilesOver3": 0,
       "flashPairsMaxPerSec": 0
     },
@@ -104,11 +146,17 @@
       "delta0_p1": 0,
       "seamStep": 0,
       "seamStepAfter": 0,
-      "velMedian": 1.051,
-      "velMax": 4.462,
+      "velMedian": 1.012,
+      "velMax": 4.347,
       "seamRatio": 0,
       "popRatio": 1.68,
-      "meanLuma": 0.6713,
+      "exposureByQuality": [
+        0.6777,
+        0.6814,
+        0.6841
+      ],
+      "exposureSpread": 0.009,
+      "meanLuma": 0.6841,
       "flashTilesOver3": 0,
       "flashPairsMaxPerSec": 0
     },
@@ -121,7 +169,13 @@
       "velMax": 0.266,
       "seamRatio": 0,
       "popRatio": 1.44,
-      "meanLuma": 0.7536,
+      "exposureByQuality": [
+        0.7535,
+        0.7559,
+        0.7562
+      ],
+      "exposureSpread": 0.004,
+      "meanLuma": 0.7562,
       "flashTilesOver3": 0,
       "flashPairsMaxPerSec": 0
     }
