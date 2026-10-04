@@ -70,8 +70,11 @@
       "cost": 4,
       "graph": {
         "buffers": {
+          "raw": {
+            "scale": 0.7
+          },
           "scene": {
-            "scale": 0.6
+            "scale": 0.7
           },
           "glowA": {
             "scale": 0.25
@@ -84,6 +87,13 @@
           {
             "src": "styles/astral-threshold-hero.glsl",
             "reads": [],
+            "writes": "raw"
+          },
+          {
+            "src": "styles/_denoise.glsl",
+            "reads": [
+              "raw"
+            ],
             "writes": "scene"
           },
           {
@@ -299,8 +309,11 @@
       "cost": 4,
       "graph": {
         "buffers": {
+          "raw": {
+            "scale": 0.7
+          },
           "scene": {
-            "scale": 0.6
+            "scale": 0.7
           },
           "glowA": {
             "scale": 0.25
@@ -313,6 +326,13 @@
           {
             "src": "styles/violet-passage.glsl",
             "reads": [],
+            "writes": "raw"
+          },
+          {
+            "src": "styles/_denoise.glsl",
+            "reads": [
+              "raw"
+            ],
             "writes": "scene"
           },
           {
@@ -528,8 +548,11 @@
       "cost": 4,
       "graph": {
         "buffers": {
+          "raw": {
+            "scale": 0.7
+          },
           "scene": {
-            "scale": 0.6
+            "scale": 0.7
           },
           "glowA": {
             "scale": 0.25
@@ -542,6 +565,13 @@
           {
             "src": "styles/blue-veil.glsl",
             "reads": [],
+            "writes": "raw"
+          },
+          {
+            "src": "styles/_denoise.glsl",
+            "reads": [
+              "raw"
+            ],
             "writes": "scene"
           },
           {
@@ -757,8 +787,11 @@
       "cost": 4,
       "graph": {
         "buffers": {
+          "raw": {
+            "scale": 0.7
+          },
           "scene": {
-            "scale": 0.6
+            "scale": 0.7
           },
           "glowA": {
             "scale": 0.25
@@ -771,6 +804,13 @@
           {
             "src": "styles/folded-ether.glsl",
             "reads": [],
+            "writes": "raw"
+          },
+          {
+            "src": "styles/_denoise.glsl",
+            "reads": [
+              "raw"
+            ],
             "writes": "scene"
           },
           {
@@ -986,8 +1026,11 @@
       "cost": 4,
       "graph": {
         "buffers": {
+          "raw": {
+            "scale": 0.7
+          },
           "scene": {
-            "scale": 0.6
+            "scale": 0.7
           },
           "glowA": {
             "scale": 0.25
@@ -1000,6 +1043,13 @@
           {
             "src": "styles/filament-gate.glsl",
             "reads": [],
+            "writes": "raw"
+          },
+          {
+            "src": "styles/_denoise.glsl",
+            "reads": [
+              "raw"
+            ],
             "writes": "scene"
           },
           {
@@ -1215,8 +1265,11 @@
       "cost": 4,
       "graph": {
         "buffers": {
+          "raw": {
+            "scale": 0.7
+          },
           "scene": {
-            "scale": 0.6
+            "scale": 0.7
           },
           "glowA": {
             "scale": 0.25
@@ -1229,6 +1282,13 @@
           {
             "src": "styles/luminous-expanse.glsl",
             "reads": [],
+            "writes": "raw"
+          },
+          {
+            "src": "styles/_denoise.glsl",
+            "reads": [
+              "raw"
+            ],
             "writes": "scene"
           },
           {
@@ -1444,8 +1504,11 @@
       "cost": 4,
       "graph": {
         "buffers": {
+          "raw": {
+            "scale": 0.7
+          },
           "scene": {
-            "scale": 0.6
+            "scale": 0.7
           },
           "glowA": {
             "scale": 0.25
@@ -1458,6 +1521,13 @@
           {
             "src": "styles/membrane-drift.glsl",
             "reads": [],
+            "writes": "raw"
+          },
+          {
+            "src": "styles/_denoise.glsl",
+            "reads": [
+              "raw"
+            ],
             "writes": "scene"
           },
           {
@@ -1673,8 +1743,11 @@
       "cost": 4,
       "graph": {
         "buffers": {
+          "raw": {
+            "scale": 0.7
+          },
           "scene": {
-            "scale": 0.6
+            "scale": 0.7
           },
           "glowA": {
             "scale": 0.25
@@ -1687,6 +1760,13 @@
           {
             "src": "styles/deep-aperture.glsl",
             "reads": [],
+            "writes": "raw"
+          },
+          {
+            "src": "styles/_denoise.glsl",
+            "reads": [
+              "raw"
+            ],
             "writes": "scene"
           },
           {
@@ -1902,8 +1982,11 @@
       "cost": 4,
       "graph": {
         "buffers": {
+          "raw": {
+            "scale": 0.7
+          },
           "scene": {
-            "scale": 0.6
+            "scale": 0.7
           },
           "glowA": {
             "scale": 0.25
@@ -1916,6 +1999,13 @@
           {
             "src": "styles/quiet-transit.glsl",
             "reads": [],
+            "writes": "raw"
+          },
+          {
+            "src": "styles/_denoise.glsl",
+            "reads": [
+              "raw"
+            ],
             "writes": "scene"
           },
           {

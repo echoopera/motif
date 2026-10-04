@@ -46,13 +46,13 @@ float astralRho(vec3 p, int layers, float th, float calm, out vec3 emc, int vari
     if (dist > thick * 3.2) continue;
     float prof = exp(-(dist * dist) / (thick * thick));
     // fibres on the sheet: whole-number count around the circumference, advected by whole harmonics of theta
+    float cn = ln3(vec3(phi * 1.1, wz * 0.55 + fi * 1.7, dist * 3.0), 1.0, 0.6);
     float Rm = max(Ri, 0.2);
     float nf = min(floor(TAU * Rm / max(p_filament, 0.01)), 30.0);
-    float fib = 0.5 + 0.5 * sin(nf * phi + 6.0 * wz + float(p_advect) * th + hh * 40.0);
+    float fib = 0.5 + 0.5 * sin(nf * phi + 1.3 * wz + 3.2 * cn + float(p_advect) * th + hh * 40.0);
     float fil = pow(fib, variant == 4 ? 6.0 : 10.0);
-    float cn = ln3(vec3(phi * 1.1, wz * 0.55 + fi * 1.7, dist * 3.0), 1.0, 0.6);
     float mask = smoothstep(-0.1, 0.5, cn);                    // membranes have holes: dark gaps between the sheets
-    float local = prof * mask * (0.6 + 0.8 * fil * (variant == 4 ? 1.8 : 1.0));
+    float local = prof * mask * (0.8 + 0.45 * fil * (variant == 4 ? 1.8 : 1.0));
     float layerFade = smoothstep(0.0, 2.0, fi + 1.0) * (1.0 - smoothstep(float(layers) - 2.0, float(layers) + 0.5, fi));
     local *= 0.55 + 0.45 * layerFade;
     // colour: violet in the fibres' body, ice at the cores and toward the aperture
@@ -68,27 +68,28 @@ float astralRho(vec3 p, int layers, float th, float calm, out vec3 emc, int vari
 vec4 scene_main(vec2 uv, vec2 fc, int variant) {
   float th = k_theta(); float calm = k_calm();
   int layers = p_layers;
-  int steps = k_q() == 0 ? 12 : k_q() == 1 ? 18 : 30;
-  float zfar = 7.0;
+  int steps = k_q() == 0 ? 16 : k_q() == 1 ? 24 : 36;
+  float zfar = 6.0;
   float travel = p_travel * (variant == 1 ? 2.2 : variant == 7 ? 0.4 : 1.0) * (variant == 8 ? 1.4 : 1.0);
   float z0 = travel * 5.0 * calm * (0.5 - 0.5 * cos(th));                     // closed camera excursion
   vec3 ro = vec3(0.03 * sin(th) * calm, 0.02 * cos(th) * calm, z0 - 1.0);
   vec3 rd = normalize(vec3(uv * 0.9 + vec2(0.0, 0.0), 1.0));
   float tend = (zfar - ro.z) / rd.z;
-  float ds = tend / float(steps);
-  float jit = apIGN(fc);
+  float jit = h21(fc);                                                         // white noise: the denoise pass removes it cleanly (no structured hatch)
   vec3 C = vec3(0.0); float T = 1.0;
   float sigma = p_absorb * (variant == 3 ? 1.5 : 1.0);
   float emisK = p_emission * (variant == 8 ? 1.0 : 1.0);
-  for (int i = 0; i < 30; i++) {
+  float fn = float(steps);
+  for (int i = 0; i < 36; i++) {
     if (i >= steps) break;
-    float t = (float(i) + 0.5 + (jit - 0.5) * 0.9) * ds;
-    vec3 pos = ro + rd * t;
+    // samples are packed toward the camera (u^1.5): large near structure gets dense sampling, converging far structure stays cheap
+    float u0 = (float(i) + jit) / fn, u1 = (float(i) + 1.0 + jit) / fn;
+    float t = tend * sqrt(u0 * u0 * u0), ds = tend * (sqrt(u1 * u1 * u1) - sqrt(u0 * u0 * u0));
+    vec3 pos = ro + rd * (t + 0.5 * ds);
     vec3 emc;
     float rho = astralRho(pos, layers, th, calm, emc, variant) * p_density;
-    float ext = sigma * rho * ds * 0.35;
+    float ext = sigma * rho * ds * 0.35;                                       // step-normalised: exposure does not depend on the step count
     float a = 1.0 - exp(-ext);
-    // emission brightens toward the aperture (depth cue) and with density, scaled per unit length via a
     float depthLight = 0.6 + 0.9 * smoothstep(0.0, 1.0, pos.z / zfar);
     C += T * a * emc * emisK * depthLight * 1.1;
     T *= exp(-ext);

@@ -1,569 +1,65 @@
 [
   {
-    "kit": "after-cyber",
-    "style": "after-cyber-hero",
-    "def": 20.799999999813735,
-    "live": 20.899999999906868,
-    "bal": 21.299999999813735
-  },
-  {
-    "kit": "after-cyber",
-    "style": "cyan-scaffold",
-    "def": 18.700000000186265,
-    "live": 18.700000000186265,
-    "bal": 18.299999999813735
-  },
-  {
-    "kit": "after-cyber",
-    "style": "glass-drift",
-    "def": 23.699999999720603,
-    "live": 21.399999999906868,
-    "bal": 21.5
-  },
-  {
-    "kit": "after-cyber",
-    "style": "lime-assembly",
-    "def": 6.399999999906868,
-    "live": 6.400000000372529,
-    "bal": 6.800000000279397
-  },
-  {
-    "kit": "after-cyber",
-    "style": "particle-covenant",
-    "def": 7.699999999720603,
-    "live": 7.600000000093132,
-    "bal": 7.7000000001862645
-  },
-  {
-    "kit": "after-cyber",
-    "style": "broken-polyhedron",
-    "def": 18.700000000186265,
-    "live": 22.5,
-    "bal": 20.300000000279397
-  },
-  {
-    "kit": "after-cyber",
-    "style": "organic-circuit",
-    "def": 15.800000000279397,
-    "live": 14.199999999720603,
-    "bal": 13.799999999813735
-  },
-  {
-    "kit": "after-cyber",
-    "style": "smoky-network",
-    "def": 21,
-    "live": 18,
-    "bal": 22.799999999813735
-  },
-  {
-    "kit": "after-cyber",
-    "style": "quiet-reconstruction",
-    "def": 16.800000000279397,
-    "live": 16.700000000186265,
-    "bal": 18.100000000093132
-  },
-  {
     "kit": "astral-threshold",
     "style": "astral-threshold-hero",
-    "def": 19.600000000093132,
-    "live": 13.300000000279397,
-    "bal": 17.399999999906868
+    "def": 7.900000000372529,
+    "live": 7.399999999906868,
+    "bal": 8.899999999906868
   },
   {
     "kit": "astral-threshold",
     "style": "violet-passage",
-    "def": 21.90000000037253,
-    "live": 15.5,
-    "bal": 22
+    "def": 10.100000000093132,
+    "live": 7,
+    "bal": 10.399999999906868
   },
   {
     "kit": "astral-threshold",
     "style": "blue-veil",
-    "def": 14.699999999720603,
-    "live": 11.100000000093132,
-    "bal": 14.5
+    "def": 6.2000000001862645,
+    "live": 4.7999999998137355,
+    "bal": 6.7999999998137355
   },
   {
     "kit": "astral-threshold",
     "style": "folded-ether",
-    "def": 16.399999999906868,
-    "live": 11.899999999906868,
-    "bal": 17
+    "def": 8,
+    "live": 6.899999999906868,
+    "bal": 7.7000000001862645
   },
   {
     "kit": "astral-threshold",
     "style": "filament-gate",
-    "def": 18.399999999906868,
-    "live": 17.700000000186265,
-    "bal": 19.799999999813735
+    "def": 9.199999999720603,
+    "live": 5.899999999906868,
+    "bal": 7.899999999906868
   },
   {
     "kit": "astral-threshold",
     "style": "luminous-expanse",
-    "def": 19,
-    "live": 12.800000000279397,
-    "bal": 17.699999999720603
+    "def": 8.100000000093132,
+    "live": 6.099999999627471,
+    "bal": 7.600000000093132
   },
   {
     "kit": "astral-threshold",
     "style": "membrane-drift",
-    "def": 17.299999999813735,
-    "live": 13.100000000093132,
-    "bal": 16.700000000186265
+    "def": 7.2000000001862645,
+    "live": 5.199999999720603,
+    "bal": 7.5
   },
   {
     "kit": "astral-threshold",
     "style": "deep-aperture",
-    "def": 11.099999999627471,
-    "live": 8,
-    "bal": 11
+    "def": 4.899999999906868,
+    "live": 3.6000000000931323,
+    "bal": 4.699999999720603
   },
   {
     "kit": "astral-threshold",
     "style": "quiet-transit",
-    "def": 13,
-    "live": 10,
-    "bal": 13
-  },
-  {
-    "kit": "cellular-cosmos",
-    "style": "cellular-cosmos-hero",
-    "def": 6.300000000279397,
-    "live": 3.7999999998137355,
-    "bal": 5.899999999906868
-  },
-  {
-    "kit": "cellular-cosmos",
-    "style": "emerald-colonies",
-    "def": 6.2000000001862645,
-    "live": 3.5,
-    "bal": 5.800000000279397
-  },
-  {
-    "kit": "cellular-cosmos",
-    "style": "coral-division",
-    "def": 6.5,
-    "live": 3.6000000000931323,
-    "bal": 6.099999999627471
-  },
-  {
-    "kit": "cellular-cosmos",
-    "style": "membrane-choir",
-    "def": 5.800000000279397,
-    "live": 4.100000000093132,
-    "bal": 6.699999999720603
-  },
-  {
-    "kit": "cellular-cosmos",
-    "style": "spore-drift",
-    "def": 6.800000000279397,
-    "live": 4.2999999998137355,
-    "bal": 7
-  },
-  {
-    "kit": "cellular-cosmos",
-    "style": "symbiotic-web",
-    "def": 7.399999999906868,
-    "live": 4.2999999998137355,
-    "bal": 7.5
-  },
-  {
-    "kit": "cellular-cosmos",
-    "style": "radial-organs",
-    "def": 8.400000000372529,
-    "live": 3.6000000000931323,
-    "bal": 7.399999999906868
-  },
-  {
-    "kit": "cellular-cosmos",
-    "style": "quiet-mitosis",
-    "def": 5.899999999906868,
-    "live": 3.5,
+    "def": 6,
+    "live": 4.7999999998137355,
     "bal": 6.600000000093132
-  },
-  {
-    "kit": "cellular-cosmos",
-    "style": "tidal-habitat",
-    "def": 6.5,
-    "live": 3.599999999627471,
-    "bal": 6.100000000093132
-  },
-  {
-    "kit": "deconstruct-field",
-    "style": "deconstruct-field-hero",
-    "def": 3.8999999999068677,
-    "live": 1.8000000002793968,
-    "bal": 2.400000000372529
-  },
-  {
-    "kit": "deconstruct-field",
-    "style": "broken-axis",
-    "def": 5.5,
-    "live": 1.7999999998137355,
-    "bal": 2.599999999627471
-  },
-  {
-    "kit": "deconstruct-field",
-    "style": "cobalt-cut",
-    "def": 3.599999999627471,
-    "live": 1.6000000000931323,
-    "bal": 2.2000000001862645
-  },
-  {
-    "kit": "deconstruct-field",
-    "style": "offset-scaffold",
-    "def": 4.100000000093132,
-    "live": 1.8999999999068677,
-    "bal": 3
-  },
-  {
-    "kit": "deconstruct-field",
-    "style": "plane-argument",
-    "def": 2.7999999998137355,
-    "live": 1.6000000000931323,
-    "bal": 2
-  },
-  {
-    "kit": "deconstruct-field",
-    "style": "partial-circle",
-    "def": 3.2000000001862645,
-    "live": 1.6999999997206032,
-    "bal": 2.2000000001862645
-  },
-  {
-    "kit": "deconstruct-field",
-    "style": "red-interruption",
-    "def": 4.2000000001862645,
-    "live": 1.8000000002793968,
-    "bal": 2.5
-  },
-  {
-    "kit": "deconstruct-field",
-    "style": "grid-dislocation",
-    "def": 2.8000000002793968,
-    "live": 1.2999999998137355,
-    "bal": 2
-  },
-  {
-    "kit": "deconstruct-field",
-    "style": "quiet-construct",
-    "def": 2.2000000001862645,
-    "live": 1.2000000001862645,
-    "bal": 1.6000000000931323
-  },
-  {
-    "kit": "harmonic-matter",
-    "style": "harmonic-matter-hero",
-    "def": 12.300000000279397,
-    "live": 5.600000000093132,
-    "bal": 12.600000000093132
-  },
-  {
-    "kit": "harmonic-matter",
-    "style": "nodal-sea",
-    "def": 6.399999999906868,
-    "live": 3.3999999999068677,
-    "bal": 6.2999999998137355
-  },
-  {
-    "kit": "harmonic-matter",
-    "style": "amber-antinodes",
-    "def": 9.300000000279397,
-    "live": 4.300000000279397,
-    "bal": 9.200000000186265
-  },
-  {
-    "kit": "harmonic-matter",
-    "style": "crosswave-veil",
-    "def": 10.5,
-    "live": 5.600000000093132,
-    "bal": 11.099999999627471
-  },
-  {
-    "kit": "harmonic-matter",
-    "style": "resonant-basin",
-    "def": 8.700000000186265,
-    "live": 6.899999999906868,
-    "bal": 8.100000000093132
-  },
-  {
-    "kit": "harmonic-matter",
-    "style": "silver-interference",
-    "def": 3.8999999999068677,
-    "live": 3.6999999997206032,
-    "bal": 4.100000000093132
-  },
-  {
-    "kit": "harmonic-matter",
-    "style": "phase-ribbons",
-    "def": 6.100000000093132,
-    "live": 3.5,
-    "bal": 5.899999999906868
-  },
-  {
-    "kit": "harmonic-matter",
-    "style": "standing-crest",
-    "def": 3.1999999997206032,
-    "live": 3.3999999999068677,
-    "bal": 4.600000000093132
-  },
-  {
-    "kit": "harmonic-matter",
-    "style": "quiet-chladni",
-    "def": 2.5,
-    "live": 1.900000000372529,
-    "bal": 2.5
-  },
-  {
-    "kit": "phi-bloom",
-    "style": "phi-bloom-hero",
-    "def": 15.900000000372529,
-    "live": 19.100000000093132,
-    "bal": 34.90000000037253
-  },
-  {
-    "kit": "phi-bloom",
-    "style": "golden-seed",
-    "def": 16.699999999720603,
-    "live": 18.200000000186265,
-    "bal": 29.600000000093132
-  },
-  {
-    "kit": "phi-bloom",
-    "style": "copper-fern",
-    "def": 16.399999999906868,
-    "live": 14.800000000279397,
-    "bal": 27.300000000279397
-  },
-  {
-    "kit": "phi-bloom",
-    "style": "ivory-helix",
-    "def": 15.399999999906868,
-    "live": 15.199999999720603,
-    "bal": 28.600000000093132
-  },
-  {
-    "kit": "phi-bloom",
-    "style": "jade-crown",
-    "def": 3.1999999997206032,
-    "live": 3.2000000001862645,
-    "bal": 4.399999999906868
-  },
-  {
-    "kit": "phi-bloom",
-    "style": "spiral-canopy",
-    "def": 15.300000000279397,
-    "live": 16.200000000186265,
-    "bal": 35.10000000009313
-  },
-  {
-    "kit": "phi-bloom",
-    "style": "twin-phyllotaxis",
-    "def": 25.200000000186265,
-    "live": 22.59999999962747,
-    "bal": 45.8000000002794
-  },
-  {
-    "kit": "phi-bloom",
-    "style": "orbital-petals",
-    "def": 2.2000000001862645,
-    "live": 2.1999999997206032,
-    "bal": 3.5
-  },
-  {
-    "kit": "phi-bloom",
-    "style": "quiet-unfold",
-    "def": 17.100000000093132,
-    "live": 17.799999999813735,
-    "bal": 30.800000000279397
-  },
-  {
-    "kit": "post-punk-resonance",
-    "style": "post-punk-hero",
-    "def": 1.099999999627471,
-    "live": 0.8999999999068677,
-    "bal": 1
-  },
-  {
-    "kit": "post-punk-resonance",
-    "style": "acid-carrier",
-    "def": 1,
-    "live": 0.8999999999068677,
-    "bal": 0.900000000372529
-  },
-  {
-    "kit": "post-punk-resonance",
-    "style": "red-signal",
-    "def": 1.1000000000931323,
-    "live": 0.900000000372529,
-    "bal": 1
-  },
-  {
-    "kit": "post-punk-resonance",
-    "style": "broken-ring",
-    "def": 1.2000000001862645,
-    "live": 1,
-    "bal": 1.1000000000931323
-  },
-  {
-    "kit": "post-punk-resonance",
-    "style": "blackout-geometry",
-    "def": 1.099999999627471,
-    "live": 0.8999999999068677,
-    "bal": 0.8999999999068677
-  },
-  {
-    "kit": "post-punk-resonance",
-    "style": "interference-cut",
-    "def": 0.8999999999068677,
-    "live": 0.7999999998137355,
-    "bal": 0.8000000002793968
-  },
-  {
-    "kit": "post-punk-resonance",
-    "style": "stepped-oscillator",
-    "def": 1,
-    "live": 0.8999999999068677,
-    "bal": 1.099999999627471
-  },
-  {
-    "kit": "post-punk-resonance",
-    "style": "graphic-feedback",
-    "def": 0.8000000002793968,
-    "live": 0.6999999997206032,
-    "bal": 0.8000000002793968
-  },
-  {
-    "kit": "post-punk-resonance",
-    "style": "quiet-noise",
-    "def": 0.8999999999068677,
-    "live": 1,
-    "bal": 1
-  },
-  {
-    "kit": "sacred-lattice",
-    "style": "sacred-lattice-hero",
-    "def": 15.199999999720603,
-    "live": 11.300000000279397,
-    "bal": 12.5
-  },
-  {
-    "kit": "sacred-lattice",
-    "style": "octahedral-chapel",
-    "def": 11.100000000093132,
-    "live": 7.100000000093132,
-    "bal": 12.5
-  },
-  {
-    "kit": "sacred-lattice",
-    "style": "tetrahedral-orbit",
-    "def": 5.2999999998137355,
-    "live": 3.2999999998137355,
-    "bal": 5.100000000093132
-  },
-  {
-    "kit": "sacred-lattice",
-    "style": "golden-icosahedron",
-    "def": 10.100000000093132,
-    "live": 5.399999999906868,
-    "bal": 9.799999999813735
-  },
-  {
-    "kit": "sacred-lattice",
-    "style": "circle-cathedral",
-    "def": 2,
-    "live": 1.6999999997206032,
-    "bal": 1.6999999997206032
-  },
-  {
-    "kit": "sacred-lattice",
-    "style": "nested-compass",
-    "def": 2.2000000001862645,
-    "live": 1.6000000000931323,
-    "bal": 1.8999999999068677
-  },
-  {
-    "kit": "sacred-lattice",
-    "style": "glass-constellation",
-    "def": 18,
-    "live": 10.100000000093132,
-    "bal": 14.699999999720603
-  },
-  {
-    "kit": "sacred-lattice",
-    "style": "axial-halo",
-    "def": 12.300000000279397,
-    "live": 7.699999999720603,
-    "bal": 14
-  },
-  {
-    "kit": "sacred-lattice",
-    "style": "silent-symmetry",
-    "def": 9.399999999906868,
-    "live": 5.2000000001862645,
-    "bal": 9.5
-  },
-  {
-    "kit": "topological-tide",
-    "style": "topological-tide-hero",
-    "def": 2,
-    "live": 1.2999999998137355,
-    "bal": 1.8000000002793968
-  },
-  {
-    "kit": "topological-tide",
-    "style": "ivory-gyroid",
-    "def": 1.8000000002793968,
-    "live": 1.400000000372529,
-    "bal": 2.1000000000931323
-  },
-  {
-    "kit": "topological-tide",
-    "style": "chrome-channels",
-    "def": 2.1000000000931323,
-    "live": 1.3999999999068677,
-    "bal": 1.8999999999068677
-  },
-  {
-    "kit": "topological-tide",
-    "style": "cobalt-torus",
-    "def": 1.900000000372529,
-    "live": 1.3999999999068677,
-    "bal": 1.7000000001862645
-  },
-  {
-    "kit": "topological-tide",
-    "style": "mobius-current",
-    "def": 1.8999999999068677,
-    "live": 1.6000000000931323,
-    "bal": 2
-  },
-  {
-    "kit": "topological-tide",
-    "style": "perforated-fold",
-    "def": 2,
-    "live": 1.6000000000931323,
-    "bal": 1.7000000001862645
-  },
-  {
-    "kit": "topological-tide",
-    "style": "ceramic-web",
-    "def": 2,
-    "live": 1.6000000000931323,
-    "bal": 1.7999999998137355
-  },
-  {
-    "kit": "topological-tide",
-    "style": "golden-neck",
-    "def": 2.1999999997206032,
-    "live": 1.400000000372529,
-    "bal": 1.8999999999068677
-  },
-  {
-    "kit": "topological-tide",
-    "style": "quiet-surface",
-    "def": 2.2000000001862645,
-    "live": 1.3999999999068677,
-    "bal": 2
   }
 ]

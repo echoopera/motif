@@ -15,7 +15,7 @@ const params = {
 delete params.keyAngle;   // emissive volume: no key light
 
 export default {
-  id: 'astral-threshold', name: 'Astral Threshold', version: '1.0.0', accent: '#8A4DFF', post: 'luminous', sceneScale: 0.6, ssaa: 1, cost: 4,
+  id: 'astral-threshold', name: 'Astral Threshold', version: '1.0.0', accent: '#8A4DFF', post: 'luminous', sceneScale: 0.7, denoise: true, ssaa: 1, cost: 4,
   description: 'Violet and ice-blue volumetric membranes: foreground curtains, middle sheets and a distant aperture. Step-normalised volume rendering. Nine seamless infinite loops.',
   palettes: [
     { id: 'violet-ice', name: 'Violet Ice', bg: '#040110', ink: '#EAF3FF', a: ['#7A2CF5', '#3FA5FF', '#2A0E6E'] },

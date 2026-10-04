@@ -31,7 +31,7 @@ for (const id of ids) {
   const luminous = kit.post === 'luminous';
   const common = shared('lib.glsl');
   fs.writeFileSync(path.join(out, 'common.glsl'), common);
-  if (luminous) for (const f of ['glowA', 'glowB', 'out']) fs.writeFileSync(path.join(out, `styles/_${f}.glsl`), shared(f + '.glsl'));
+  if (luminous) for (const f of ['glowA', 'glowB', 'out', ...(kit.denoise ? ['denoise'] : [])]) fs.writeFileSync(path.join(out, `styles/_${f}.glsl`), shared(f + '.glsl'));
   const styles = kit.styles.map((s, i) => {
     const file = `styles/${s.id}.glsl`;
     const vn = s.variant ?? i;
@@ -56,7 +56,10 @@ vec4 motif(vec2 uv, vec2 fc) {
     if (ss > 1 && !s.over?.quality && (s.drop || []).includes('quality')) throw new Error(s.id + ': quality dropped but ssaa > 1');
     fs.writeFileSync(path.join(out, file), `// ${kit.name}: ${s.name}. ${s.fingerprint}\n` + specialise(core, vn) + wrap);
     const e = { id: s.id, name: s.name, group: kit.name, tags: s.tags, blurb: s.blurb, palette: s.palette, flash: !!s.flash, cost: s.cost ?? kit.cost ?? 1.5 };
-    if (luminous) e.graph = { buffers: { scene: { scale: kit.sceneScale ?? 0.75 }, glowA: { scale: 0.25 }, glowB: { scale: 0.125 } }, passes: [
+    if (luminous && kit.denoise) e.graph = { buffers: { raw: { scale: kit.sceneScale ?? 0.75 }, scene: { scale: kit.sceneScale ?? 0.75 }, glowA: { scale: 0.25 }, glowB: { scale: 0.125 } }, passes: [
+      { src: file, reads: [], writes: 'raw' }, { src: 'styles/_denoise.glsl', reads: ['raw'], writes: 'scene' }, { src: 'styles/_glowA.glsl', reads: ['scene'], writes: 'glowA' },
+      { src: 'styles/_glowB.glsl', reads: ['glowA'], writes: 'glowB' }, { src: 'styles/_out.glsl', reads: ['scene', 'glowA', 'glowB'], writes: 'output' }] };
+    else if (luminous) e.graph = { buffers: { scene: { scale: kit.sceneScale ?? 0.75 }, glowA: { scale: 0.25 }, glowB: { scale: 0.125 } }, passes: [
       { src: file, reads: [], writes: 'scene' }, { src: 'styles/_glowA.glsl', reads: ['scene'], writes: 'glowA' },
       { src: 'styles/_glowB.glsl', reads: ['glowA'], writes: 'glowB' }, { src: 'styles/_out.glsl', reads: ['scene', 'glowA', 'glowB'], writes: 'output' }] };
     else e.passes = [{ src: file }];
