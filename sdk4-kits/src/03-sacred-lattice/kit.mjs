@@ -15,7 +15,7 @@ const params = {
 };
 
 export default {
-  id: 'sacred-lattice', name: 'Sacred Lattice', version: '1.0.0', accent: '#E9B24A', post: 'luminous', sceneScale: 1, ssaa: 4, cost: 2,
+  id: 'sacred-lattice', name: 'Sacred Lattice', version: '1.0.0', accent: '#E9B24A', post: 'luminous', sceneScale: 1, ssaa: 1, cost: 2,
   description: 'Gold connections, pale glass and obsidian blue: nested polyhedral cages, circles and chord networks in exact geometry. Nine seamless infinite loops.',
   palettes: [
     { id: 'gold-obsidian', name: 'Gold Obsidian', bg: '#02040C', ink: '#E4EDFF', a: ['#E9B24A', '#7FB2FF', '#1B2A66'] },

@@ -1,65 +1,65 @@
 [
   {
-    "kit": "astral-threshold",
-    "style": "astral-threshold-hero",
-    "def": 7.900000000372529,
-    "live": 7.399999999906868,
-    "bal": 8.899999999906868
+    "kit": "sacred-lattice",
+    "style": "sacred-lattice-hero",
+    "def": 9,
+    "live": 4.600000000093132,
+    "bal": 7.2999999998137355
   },
   {
-    "kit": "astral-threshold",
-    "style": "violet-passage",
-    "def": 10.100000000093132,
-    "live": 7,
-    "bal": 10.399999999906868
-  },
-  {
-    "kit": "astral-threshold",
-    "style": "blue-veil",
-    "def": 6.2000000001862645,
-    "live": 4.7999999998137355,
-    "bal": 6.7999999998137355
-  },
-  {
-    "kit": "astral-threshold",
-    "style": "folded-ether",
-    "def": 8,
-    "live": 6.899999999906868,
-    "bal": 7.7000000001862645
-  },
-  {
-    "kit": "astral-threshold",
-    "style": "filament-gate",
-    "def": 9.199999999720603,
-    "live": 5.899999999906868,
-    "bal": 7.899999999906868
-  },
-  {
-    "kit": "astral-threshold",
-    "style": "luminous-expanse",
+    "kit": "sacred-lattice",
+    "style": "octahedral-chapel",
     "def": 8.100000000093132,
-    "live": 6.099999999627471,
-    "bal": 7.600000000093132
+    "live": 3.8999999999068677,
+    "bal": 6.5
   },
   {
-    "kit": "astral-threshold",
-    "style": "membrane-drift",
-    "def": 7.2000000001862645,
-    "live": 5.199999999720603,
+    "kit": "sacred-lattice",
+    "style": "tetrahedral-orbit",
+    "def": 3.7000000001862645,
+    "live": 2.6000000000931323,
+    "bal": 3.7000000001862645
+  },
+  {
+    "kit": "sacred-lattice",
+    "style": "golden-icosahedron",
+    "def": 10.300000000279397,
+    "live": 8.099999999627471,
+    "bal": 11.100000000093132
+  },
+  {
+    "kit": "sacred-lattice",
+    "style": "circle-cathedral",
+    "def": 1.7000000001862645,
+    "live": 1.3999999999068677,
+    "bal": 1.7000000001862645
+  },
+  {
+    "kit": "sacred-lattice",
+    "style": "nested-compass",
+    "def": 2.1999999997206032,
+    "live": 1.6000000000931323,
+    "bal": 1.8999999999068677
+  },
+  {
+    "kit": "sacred-lattice",
+    "style": "glass-constellation",
+    "def": 15,
+    "live": 8.100000000093132,
+    "bal": 14.399999999906868
+  },
+  {
+    "kit": "sacred-lattice",
+    "style": "axial-halo",
+    "def": 7,
+    "live": 4.399999999906868,
+    "bal": 6.7000000001862645
+  },
+  {
+    "kit": "sacred-lattice",
+    "style": "silent-symmetry",
+    "def": 7,
+    "live": 4,
     "bal": 7.5
-  },
-  {
-    "kit": "astral-threshold",
-    "style": "deep-aperture",
-    "def": 4.899999999906868,
-    "live": 3.6000000000931323,
-    "bal": 4.699999999720603
-  },
-  {
-    "kit": "astral-threshold",
-    "style": "quiet-transit",
-    "def": 6,
-    "live": 4.7999999998137355,
-    "bal": 6.600000000093132
   }
 ]

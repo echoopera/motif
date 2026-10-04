@@ -16,7 +16,7 @@ const params = {
 delete params.keyAngle;   // cells are lit by their own emission: no key light
 
 export default {
-  id: 'cellular-cosmos', name: 'Cellular Cosmos', version: '1.0.0', accent: '#2FD39A', post: 'luminous', sceneScale: 1, ssaa: 4, cost: 1.5,
+  id: 'cellular-cosmos', name: 'Cellular Cosmos', version: '1.0.0', accent: '#2FD39A', post: 'luminous', sceneScale: 1, ssaa: 2, cost: 1.5,
   description: 'Translucent emerald membranes, coral colonies, radial organs and dark channels. A deterministic periodic lifecycle of division, migration and reintegration. Nine seamless infinite loops.',
   palettes: [
     { id: 'emerald-coral', name: 'Emerald Coral', bg: '#010C09', ink: '#F7F0DA', a: ['#2FD39A', '#FF5C3A', '#0A4A3D'] },

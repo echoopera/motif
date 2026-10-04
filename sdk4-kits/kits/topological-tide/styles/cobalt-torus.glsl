@@ -56,7 +56,7 @@ vec3 tideEnv(vec3 d, vec3 K, float rough) {
 
 vec4 scene_main(vec2 uv, vec2 fc, int variant) {
   float th = k_theta(), calm = k_calm();
-  int steps = k_q() == 0 ? 44 : k_q() == 1 ? 70 : 100;
+  int steps = k_q() == 0 ? 28 : k_q() == 1 ? 44 : 72;
   float orb = p_orbit * calm;
   mat3 cam = rotYm(orb * sin(th)) * rotXm(-0.10 + orb * 0.6 * cos(th));
   vec3 ro = cam * vec3(0.0, 0.0, 4.5);
@@ -75,13 +75,21 @@ vec4 scene_main(vec2 uv, vec2 fc, int variant) {
   if (disc > 0.0) {
     float t = max(-bq - sqrt(disc), 0.0), tmax = -bq + sqrt(disc);
     bool hit = false; float graw = 0.0; vec3 pos = ro;
-    for (int i = 0; i < 100; i++) {
+    float best = 1e9, tbest = t, cov = 1.0;                                    // closest approach: analytic silhouette anti-aliasing (no supersampling)
+    for (int i = 0; i < 80; i++) {
       if (i >= steps) break;
       pos = ro + rd * t;
       float d = tideMap(Minv * pos, th, calm, graw);
+      float ratio = d / max(t, 0.2);
+      if (ratio < best) { best = ratio; tbest = t; }
       if (d < 0.0009 * (1.0 + t * 0.4)) { hit = true; break; }
       t += d * 0.92 + 0.0004;
       if (t > tmax + 0.05) break;
+    }
+    if (!hit) {
+      float pxA = k_px() * 0.55;                                              // angular size of one pixel for this camera
+      cov = clamp(1.0 - best / (pxA * 1.6), 0.0, 1.0);
+      if (cov > 0.03) { hit = true; pos = ro + rd * tbest; tideMap(Minv * pos, th, calm, graw); }
     }
     if (hit) {
       vec3 po = Minv * pos;
@@ -94,8 +102,8 @@ vec4 scene_main(vec2 uv, vec2 fc, int variant) {
       float ao = 1.0;
       {
         float occ = 0.0, wsum = 0.0;
-        for (int i = 1; i <= 5; i++) {
-          if (k_q() == 0 && i > 3) break;
+        for (int i = 1; i <= 4; i++) {
+          if (k_q() == 0 && i > 2) break;
           float h = 0.025 * float(i);
           float dd; float gg;
           dd = tideMap(Minv * (pos + n * h), th, calm, gg);
@@ -144,21 +152,12 @@ vec4 scene_main(vec2 uv, vec2 fc, int variant) {
       // cavity contact darkening in the cobalt shadow colour
       col = mix(col, u_a2 * 0.25, (1.0 - ao) * 0.35);
       // thin atmosphere fade at grazing silhouette keeps the focal region the brightest
-      col = mix(col, bgc, smoothstep(0.0, 0.9, 1.0 - max(dot(n, V), 0.0)) * 0.0);
+      col = mix(bgc, col, cov);                                                // partial coverage on silhouettes
     }
   }
   return vec4(col, 1.0);
 }
 
 vec4 motif(vec2 uv, vec2 fc) {
-  int want = p_quality == QUALITY_LIVE ? 1 : (p_quality == QUALITY_BALANCED ? 2 : 4);
-  int n = min(want, 4);
-  float px = 1.0 / min(u_res.x, u_res.y);
-  vec3 acc = vec3(0.0);
-  for (int i = 0; i < 4; i++) {
-    if (i >= n) break;
-    vec2 o = i == 0 ? vec2(-0.125, -0.375) : (i == 1 ? vec2(0.125, 0.375) : (i == 2 ? vec2(0.375, -0.125) : vec2(-0.375, 0.125)));
-    acc += scene_main(uv + o * px, fc, 3).rgb;
-  }
-  return vec4(acc / float(n), 1.0);
+  return scene_main(uv, fc, 3);
 }

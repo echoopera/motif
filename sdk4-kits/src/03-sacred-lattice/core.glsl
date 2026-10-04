@@ -103,14 +103,15 @@ vec3 cage(vec2 q, int type, float Rk, mat3 M, float zoff, float edgeR, float fac
   }
   if (glassOn && facet > 0.001) {
     // glass facets: additive, view-dependent. every vertex triple whose pairwise dots equal the edge dot is a face.
-    for (int i = 0; i < 6; i++) {
-      if (i >= N) break;
-      for (int j = 0; j < 6; j++) {
-        if (j >= i) break;
-        for (int k = 0; k < 6; k++) {
-          if (k >= j) break;
+    // faces are known directly: octahedron = 8 sign combinations of (+-x, +-y, +-z), tetrahedron = the 4 vertex triples
+    for (int f = 0; f < 8; f++) {
+      if (type == 0 && f >= 4) break;
+      int i, j, k;
+      if (type == 1) { i = (f & 1) == 0 ? 0 : 3; j = (f & 2) == 0 ? 1 : 4; k = (f & 4) == 0 ? 2 : 5; }
+      else { i = f == 3 ? 1 : 0; j = f == 0 ? 1 : (f == 3 ? 2 : (f == 1 ? 1 : 2)); k = f == 0 ? 2 : 3; }
+      {
+        {
           vec3 a = polyV(type, i), b = polyV(type, j), c = polyV(type, k);
-          if (abs(dot(a, b) - ed) > 0.02 || abs(dot(b, c) - ed) > 0.02 || abs(dot(a, c) - ed) > 0.02) continue;
           vec2 A = P[i].xy, B = P[j].xy, C = P[k].xy;
           vec2 v0 = B - A, v1 = C - A, v2 = q - A;
           float den = v0.x * v1.y - v1.x * v0.y;

@@ -19,7 +19,7 @@ const params = {
 };
 
 export default {
-  id: 'phi-bloom', name: 'Phi Bloom', version: '1.0.0', accent: '#E9CE97', post: 'luminous', sceneScale: 1, ssaa: 4, cost: 2.5,
+  id: 'phi-bloom', name: 'Phi Bloom', version: '1.0.0', accent: '#E9CE97', post: 'luminous', sceneScale: 1, ssaa: 1, cost: 2.5,
   description: 'Golden-angle botanical sculpture: layered translucent blades, a readable logarithmic spiral, ivory and champagne against jade-black depth. Nine seamless infinite loops.',
   palettes: [
     { id: 'ivory-jade', name: 'Ivory Jade', bg: '#02100F', ink: '#F6EBD0', a: ['#E8CC93', '#D9803F', '#0F5B50'] },
