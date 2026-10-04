@@ -1,0 +1,37 @@
+{
+  "format": "motif-kit@1",
+  "id": "param-lab",
+  "name": "Param Lab",
+  "version": "0.1.0",
+  "author": "Motif SDK",
+  "description": "Reference kit for SDK 1.2: grouped sections, colour pickers, XY pads, conditional controls, log sliders.",
+  "license": "MIT",
+  "accent": "#F0A23B",
+  "palettes": [
+    { "id": "ember", "name": "Ember", "bg": "#07080C", "ink": "#F4EFE6", "a": ["#F0A23B", "#E5484D", "#5B8CFF"] }
+  ],
+  "styles": [
+    {
+      "id": "ripple-field",
+      "name": "Ripple Field",
+      "group": "SDK 1.2",
+      "palette": "ember",
+      "tags": ["example", "params"],
+      "blurb": "Rings and a soft grid, driven by every kind of custom control.",
+      "passes": [{ "src": "styles/ripple-field.glsl" }],
+      "params": {
+        "mode":     { "type": "select", "label": "Pattern", "options": [{ "v": "rings", "l": "Rings" }, { "v": "grid", "l": "Grid" }, { "v": "both", "l": "Both" }], "def": "both", "hint": "Which layers of the pattern draw." },
+        "origin":   { "type": "point", "label": "Origin", "min": -0.5, "max": 0.5, "def": [0, 0], "group": "Geometry", "hint": "Where the ripples start. Drag the pad." },
+        "count":    { "type": "int", "label": "Ring count", "min": 2, "max": 40, "def": 12, "group": "Geometry", "show": { "param": "mode", "not": "grid" } },
+        "spread":   { "type": "range", "label": "Spread", "min": 0.02, "max": 2, "def": 0.5, "log": true, "group": "Geometry", "show": { "param": "mode", "not": "grid" }, "hint": "Log slider: fine control near zero." },
+        "cells":    { "type": "int", "label": "Grid cells", "min": 3, "max": 32, "def": 10, "group": "Geometry", "show": { "param": "mode", "not": "rings" } },
+        "warp":     { "type": "range", "label": "Warp", "min": 0, "max": 1, "def": 0.3, "group": "Motion" },
+        "speed":    { "type": "int", "label": "Waves / loop", "min": 1, "max": 6, "def": 2, "group": "Motion", "hint": "Integer, so the loop closes exactly." },
+        "tint":     { "type": "color", "label": "Tint", "def": "#F0A23B", "group": "Look", "hint": "Colour of the highlights." },
+        "tintMix":  { "type": "range", "label": "Tint amount", "min": 0, "max": 1, "def": 0.6, "group": "Look" },
+        "glowOn":   { "type": "toggle", "label": "Halo", "def": true, "group": "Look" },
+        "glow":     { "type": "range", "label": "Halo strength", "min": 0, "max": 2, "def": 0.8, "group": "Look", "show": { "param": "glowOn", "is": true } }
+      }
+    }
+  ]
+}

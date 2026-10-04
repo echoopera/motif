@@ -1,0 +1,871 @@
+{
+  "format": "motif-kit@4",
+  "id": "posterflow",
+  "name": "Posterflow",
+  "version": "1.0.0",
+  "author": "Motif",
+  "description": "Fluid poster treatments for your own images and clips: quantized colour bands, liquid flow-warps, vein lines, streak smears and ink drags. Three styles, a layer effect and a liquid cut transition.",
+  "license": "MIT",
+  "accent": "#4D7CFF",
+  "common": "common.glsl",
+  "capabilities": [
+    "media"
+  ],
+  "palettes": [
+    {
+      "id": "tidal",
+      "name": "Tidal",
+      "bg": "#04070F",
+      "ink": "#EEF3FF",
+      "a": [
+        "#3F6FFF",
+        "#A8D2FF",
+        "#0A1C55"
+      ]
+    },
+    {
+      "id": "ember",
+      "name": "Ember",
+      "bg": "#08040A",
+      "ink": "#FFF1E6",
+      "a": [
+        "#FF4A1C",
+        "#FFB38A",
+        "#4A0B1E"
+      ]
+    },
+    {
+      "id": "rosewater",
+      "name": "Rosewater",
+      "bg": "#16060B",
+      "ink": "#FFF0F2",
+      "a": [
+        "#E0457B",
+        "#F7B6C6",
+        "#5A0F2A"
+      ]
+    },
+    {
+      "id": "mineral",
+      "name": "Mineral",
+      "bg": "#07080B",
+      "ink": "#F5EFE3",
+      "a": [
+        "#6C8FD6",
+        "#E8C9A0",
+        "#232A44"
+      ]
+    }
+  ],
+  "inputs": [
+    {
+      "id": "source",
+      "type": "media",
+      "label": "Source",
+      "fit": "fill",
+      "hint": "Photo or clip to treat. Without one a palette ink marble plays."
+    }
+  ],
+  "styles": [
+    {
+      "id": "marble-flow",
+      "name": "Marble Flow",
+      "group": "Posterflow",
+      "palette": "tidal",
+      "tags": [
+        "media",
+        "posterize",
+        "liquid",
+        "marble"
+      ],
+      "cost": 1,
+      "blurb": "Pours your image through a looping flow-warp and snaps it to quantized colour bands with vein lines.",
+      "flash": false,
+      "passes": [
+        {
+          "src": "styles/marble-flow.glsl"
+        }
+      ],
+      "params": {
+        "scale": {
+          "type": "range",
+          "label": "Flow scale",
+          "min": 0.4,
+          "max": 4,
+          "def": 1.4,
+          "step": 0.01,
+          "group": "Flow",
+          "log": true
+        },
+        "warp": {
+          "type": "range",
+          "label": "Warp",
+          "min": 0,
+          "max": 2.5,
+          "def": 1.1,
+          "step": 0.01,
+          "group": "Flow"
+        },
+        "turns": {
+          "type": "int",
+          "label": "Cycles / loop",
+          "min": 1,
+          "max": 3,
+          "def": 1,
+          "group": "Motion",
+          "hint": "Whole cycles per loop; the loop always closes."
+        },
+        "swirl": {
+          "type": "range",
+          "label": "Vortex",
+          "min": 0,
+          "max": 2,
+          "def": 0.6,
+          "step": 0.01,
+          "group": "Flow"
+        },
+        "drift": {
+          "type": "range",
+          "label": "Drift",
+          "min": 0,
+          "max": 1.5,
+          "def": 0.35,
+          "step": 0.01,
+          "group": "Motion"
+        },
+        "bands": {
+          "type": "int",
+          "label": "Bands",
+          "min": 2,
+          "max": 16,
+          "def": 7,
+          "group": "Poster",
+          "randMax": 10,
+          "hint": "Number of tonal steps."
+        },
+        "soft": {
+          "type": "range",
+          "label": "Edge softness",
+          "min": 0,
+          "max": 1,
+          "def": 0.2,
+          "step": 0.01,
+          "group": "Poster",
+          "hint": "0 is a hard posterize edge."
+        },
+        "hue": {
+          "type": "range",
+          "label": "Hue steps",
+          "min": 0,
+          "max": 1,
+          "def": 0.35,
+          "step": 0.01,
+          "group": "Poster",
+          "hint": "Quantize each colour channel as well as brightness."
+        },
+        "mode": {
+          "type": "select",
+          "label": "Colour",
+          "options": [
+            {
+              "v": "source",
+              "l": "Source"
+            },
+            {
+              "v": "pal",
+              "l": "Palette ramp"
+            },
+            {
+              "v": "mix",
+              "l": "Mix"
+            }
+          ],
+          "def": "source",
+          "group": "Poster",
+          "mutate": 0
+        },
+        "palMix": {
+          "type": "range",
+          "label": "Palette mix",
+          "min": 0,
+          "max": 1,
+          "def": 0.5,
+          "step": 0.01,
+          "group": "Poster",
+          "show": {
+            "param": "mode",
+            "is": "mix"
+          }
+        },
+        "veins": {
+          "type": "range",
+          "label": "Veins",
+          "min": 0,
+          "max": 1,
+          "def": 0.4,
+          "step": 0.01,
+          "group": "Poster",
+          "hint": "Thin dark lines along band edges."
+        },
+        "veinW": {
+          "type": "range",
+          "label": "Vein width",
+          "min": 0.5,
+          "max": 4,
+          "def": 1.1,
+          "step": 0.01,
+          "group": "Poster",
+          "unit": "px",
+          "log": true
+        },
+        "vein": {
+          "type": "color",
+          "label": "Vein colour",
+          "def": "#06070C",
+          "group": "Poster"
+        },
+        "vignette": {
+          "type": "range",
+          "label": "Vignette",
+          "min": 0,
+          "max": 0.6,
+          "def": 0.25,
+          "step": 0.01,
+          "group": "Lens",
+          "randMax": 0.5
+        },
+        "exposure": {
+          "type": "range",
+          "label": "Exposure",
+          "min": 0.5,
+          "max": 1.6,
+          "def": 1,
+          "step": 0.01,
+          "group": "Lens",
+          "mutate": 0.2
+        }
+      }
+    },
+    {
+      "id": "streak-melt",
+      "name": "Streak Melt",
+      "group": "Posterflow",
+      "palette": "ember",
+      "tags": [
+        "media",
+        "smear",
+        "chromatic",
+        "streak"
+      ],
+      "cost": 1.6,
+      "blurb": "A looping mask opens streaks that drag the image along a direction, with RGB split and optional slabs.",
+      "flash": false,
+      "passes": [
+        {
+          "src": "styles/streak-melt.glsl"
+        }
+      ],
+      "params": {
+        "angle": {
+          "type": "range",
+          "label": "Angle",
+          "min": -180,
+          "max": 180,
+          "def": 8,
+          "step": 1,
+          "group": "Streak",
+          "unit": "°"
+        },
+        "length": {
+          "type": "range",
+          "label": "Length",
+          "min": 0,
+          "max": 1.2,
+          "def": 0.5,
+          "step": 0.01,
+          "group": "Streak"
+        },
+        "thresh": {
+          "type": "range",
+          "label": "Coverage",
+          "min": 0.1,
+          "max": 0.9,
+          "def": 0.45,
+          "step": 0.01,
+          "group": "Streak",
+          "hint": "Higher = fewer streaks."
+        },
+        "scale": {
+          "type": "range",
+          "label": "Streak scale",
+          "min": 0.5,
+          "max": 8,
+          "def": 2.4,
+          "step": 0.01,
+          "group": "Streak",
+          "log": true
+        },
+        "slabs": {
+          "type": "int",
+          "label": "Slabs",
+          "min": 0,
+          "max": 40,
+          "def": 14,
+          "group": "Streak",
+          "hint": "0 = smooth, else sheared strips.",
+          "randMax": 24
+        },
+        "jitter": {
+          "type": "range",
+          "label": "Slab jitter",
+          "min": 0,
+          "max": 2,
+          "def": 0.8,
+          "step": 0.01,
+          "group": "Streak",
+          "show": {
+            "param": "slabs",
+            "gt": 0
+          }
+        },
+        "taps": {
+          "type": "int",
+          "label": "Smear taps",
+          "min": 2,
+          "max": 12,
+          "def": 8,
+          "group": "Quality",
+          "mutate": 0
+        },
+        "split": {
+          "type": "range",
+          "label": "RGB split",
+          "min": 0,
+          "max": 2,
+          "def": 0.8,
+          "step": 0.01,
+          "group": "Streak"
+        },
+        "turns": {
+          "type": "int",
+          "label": "Cycles / loop",
+          "min": 1,
+          "max": 3,
+          "def": 1,
+          "group": "Motion",
+          "hint": "Whole cycles per loop; the loop always closes."
+        },
+        "bands": {
+          "type": "int",
+          "label": "Bands",
+          "min": 2,
+          "max": 16,
+          "def": 7,
+          "group": "Poster",
+          "randMax": 10,
+          "hint": "Number of tonal steps."
+        },
+        "soft": {
+          "type": "range",
+          "label": "Edge softness",
+          "min": 0,
+          "max": 1,
+          "def": 0.2,
+          "step": 0.01,
+          "group": "Poster",
+          "hint": "0 is a hard posterize edge."
+        },
+        "hue": {
+          "type": "range",
+          "label": "Hue steps",
+          "min": 0,
+          "max": 1,
+          "def": 0.35,
+          "step": 0.01,
+          "group": "Poster",
+          "hint": "Quantize each colour channel as well as brightness."
+        },
+        "mode": {
+          "type": "select",
+          "label": "Colour",
+          "options": [
+            {
+              "v": "source",
+              "l": "Source"
+            },
+            {
+              "v": "pal",
+              "l": "Palette ramp"
+            },
+            {
+              "v": "mix",
+              "l": "Mix"
+            }
+          ],
+          "def": "source",
+          "group": "Poster",
+          "mutate": 0
+        },
+        "palMix": {
+          "type": "range",
+          "label": "Palette mix",
+          "min": 0,
+          "max": 1,
+          "def": 0.5,
+          "step": 0.01,
+          "group": "Poster",
+          "show": {
+            "param": "mode",
+            "is": "mix"
+          }
+        },
+        "veins": {
+          "type": "range",
+          "label": "Veins",
+          "min": 0,
+          "max": 1,
+          "def": 0.4,
+          "step": 0.01,
+          "group": "Poster",
+          "hint": "Thin dark lines along band edges."
+        },
+        "veinW": {
+          "type": "range",
+          "label": "Vein width",
+          "min": 0.5,
+          "max": 4,
+          "def": 1.1,
+          "step": 0.01,
+          "group": "Poster",
+          "unit": "px",
+          "log": true
+        },
+        "vein": {
+          "type": "color",
+          "label": "Vein colour",
+          "def": "#06070C",
+          "group": "Poster"
+        },
+        "vignette": {
+          "type": "range",
+          "label": "Vignette",
+          "min": 0,
+          "max": 0.6,
+          "def": 0.25,
+          "step": 0.01,
+          "group": "Lens",
+          "randMax": 0.5
+        },
+        "exposure": {
+          "type": "range",
+          "label": "Exposure",
+          "min": 0.5,
+          "max": 1.6,
+          "def": 1,
+          "step": 0.01,
+          "group": "Lens",
+          "mutate": 0.2
+        }
+      }
+    },
+    {
+      "id": "ink-drag",
+      "name": "Ink Drag",
+      "group": "Posterflow",
+      "palette": "rosewater",
+      "tags": [
+        "media",
+        "curl",
+        "ink",
+        "streamline"
+      ],
+      "cost": 2.4,
+      "blurb": "Carries colour along looping curl streamlines, like ink drawn through water, then bands it.",
+      "flash": false,
+      "passes": [
+        {
+          "src": "styles/ink-drag.glsl"
+        }
+      ],
+      "params": {
+        "scale": {
+          "type": "range",
+          "label": "Flow scale",
+          "min": 0.4,
+          "max": 4,
+          "def": 1.3,
+          "step": 0.01,
+          "group": "Flow",
+          "log": true
+        },
+        "drag": {
+          "type": "range",
+          "label": "Drag",
+          "min": 0,
+          "max": 3,
+          "def": 1.4,
+          "step": 0.01,
+          "group": "Flow"
+        },
+        "steps": {
+          "type": "int",
+          "label": "Steps",
+          "min": 2,
+          "max": 14,
+          "def": 8,
+          "group": "Quality",
+          "mutate": 0,
+          "hint": "More steps = longer, smoother streams."
+        },
+        "turns": {
+          "type": "int",
+          "label": "Cycles / loop",
+          "min": 1,
+          "max": 3,
+          "def": 1,
+          "group": "Motion",
+          "hint": "Whole cycles per loop; the loop always closes."
+        },
+        "bands": {
+          "type": "int",
+          "label": "Bands",
+          "min": 2,
+          "max": 16,
+          "def": 7,
+          "group": "Poster",
+          "randMax": 10,
+          "hint": "Number of tonal steps."
+        },
+        "soft": {
+          "type": "range",
+          "label": "Edge softness",
+          "min": 0,
+          "max": 1,
+          "def": 0.2,
+          "step": 0.01,
+          "group": "Poster",
+          "hint": "0 is a hard posterize edge."
+        },
+        "hue": {
+          "type": "range",
+          "label": "Hue steps",
+          "min": 0,
+          "max": 1,
+          "def": 0.35,
+          "step": 0.01,
+          "group": "Poster",
+          "hint": "Quantize each colour channel as well as brightness."
+        },
+        "mode": {
+          "type": "select",
+          "label": "Colour",
+          "options": [
+            {
+              "v": "source",
+              "l": "Source"
+            },
+            {
+              "v": "pal",
+              "l": "Palette ramp"
+            },
+            {
+              "v": "mix",
+              "l": "Mix"
+            }
+          ],
+          "def": "source",
+          "group": "Poster",
+          "mutate": 0
+        },
+        "palMix": {
+          "type": "range",
+          "label": "Palette mix",
+          "min": 0,
+          "max": 1,
+          "def": 0.5,
+          "step": 0.01,
+          "group": "Poster",
+          "show": {
+            "param": "mode",
+            "is": "mix"
+          }
+        },
+        "veins": {
+          "type": "range",
+          "label": "Veins",
+          "min": 0,
+          "max": 1,
+          "def": 0.4,
+          "step": 0.01,
+          "group": "Poster",
+          "hint": "Thin dark lines along band edges."
+        },
+        "veinW": {
+          "type": "range",
+          "label": "Vein width",
+          "min": 0.5,
+          "max": 4,
+          "def": 1.1,
+          "step": 0.01,
+          "group": "Poster",
+          "unit": "px",
+          "log": true
+        },
+        "vein": {
+          "type": "color",
+          "label": "Vein colour",
+          "def": "#06070C",
+          "group": "Poster"
+        },
+        "vignette": {
+          "type": "range",
+          "label": "Vignette",
+          "min": 0,
+          "max": 0.6,
+          "def": 0.25,
+          "step": 0.01,
+          "group": "Lens",
+          "randMax": 0.5
+        },
+        "exposure": {
+          "type": "range",
+          "label": "Exposure",
+          "min": 0.5,
+          "max": 1.6,
+          "def": 1,
+          "step": 0.01,
+          "group": "Lens",
+          "mutate": 0.2
+        }
+      }
+    }
+  ],
+  "effects": [
+    {
+      "id": "poster-wash",
+      "name": "Poster Wash",
+      "target": "any",
+      "group": "Posterflow",
+      "cost": 0.8,
+      "tags": [
+        "posterize",
+        "veins"
+      ],
+      "blurb": "Bands and vein-lines any layer or the whole frame, with an optional liquid warp.",
+      "passes": [
+        {
+          "src": "effects/poster-wash.glsl"
+        }
+      ],
+      "params": {
+        "scale": {
+          "type": "range",
+          "label": "Flow scale",
+          "min": 0.4,
+          "max": 4,
+          "def": 1.4,
+          "step": 0.01,
+          "group": "Flow",
+          "log": true
+        },
+        "warp": {
+          "type": "range",
+          "label": "Warp",
+          "min": 0,
+          "max": 2.5,
+          "def": 0.5,
+          "step": 0.01,
+          "group": "Flow"
+        },
+        "turns": {
+          "type": "int",
+          "label": "Cycles / loop",
+          "min": 1,
+          "max": 3,
+          "def": 1,
+          "group": "Motion",
+          "hint": "Whole cycles per loop; the loop always closes."
+        },
+        "bands": {
+          "type": "int",
+          "label": "Bands",
+          "min": 2,
+          "max": 16,
+          "def": 7,
+          "group": "Poster",
+          "randMax": 10,
+          "hint": "Number of tonal steps."
+        },
+        "soft": {
+          "type": "range",
+          "label": "Edge softness",
+          "min": 0,
+          "max": 1,
+          "def": 0.2,
+          "step": 0.01,
+          "group": "Poster",
+          "hint": "0 is a hard posterize edge."
+        },
+        "hue": {
+          "type": "range",
+          "label": "Hue steps",
+          "min": 0,
+          "max": 1,
+          "def": 0.35,
+          "step": 0.01,
+          "group": "Poster",
+          "hint": "Quantize each colour channel as well as brightness."
+        },
+        "mode": {
+          "type": "select",
+          "label": "Colour",
+          "options": [
+            {
+              "v": "source",
+              "l": "Source"
+            },
+            {
+              "v": "pal",
+              "l": "Palette ramp"
+            },
+            {
+              "v": "mix",
+              "l": "Mix"
+            }
+          ],
+          "def": "source",
+          "group": "Poster",
+          "mutate": 0
+        },
+        "palMix": {
+          "type": "range",
+          "label": "Palette mix",
+          "min": 0,
+          "max": 1,
+          "def": 0.5,
+          "step": 0.01,
+          "group": "Poster",
+          "show": {
+            "param": "mode",
+            "is": "mix"
+          }
+        },
+        "veins": {
+          "type": "range",
+          "label": "Veins",
+          "min": 0,
+          "max": 1,
+          "def": 0.4,
+          "step": 0.01,
+          "group": "Poster",
+          "hint": "Thin dark lines along band edges."
+        },
+        "veinW": {
+          "type": "range",
+          "label": "Vein width",
+          "min": 0.5,
+          "max": 4,
+          "def": 1.1,
+          "step": 0.01,
+          "group": "Poster",
+          "unit": "px",
+          "log": true
+        },
+        "vein": {
+          "type": "color",
+          "label": "Vein colour",
+          "def": "#06070C",
+          "group": "Poster"
+        }
+      }
+    }
+  ],
+  "transitions": [
+    {
+      "id": "liquid-cut",
+      "name": "Liquid Cut",
+      "duration": 1.4,
+      "group": "Posterflow",
+      "cost": 0.8,
+      "tags": [
+        "ink",
+        "wipe"
+      ],
+      "blurb": "An ink front sweeps from one shot to the next while both flow; exact at both ends.",
+      "passes": [
+        {
+          "src": "transitions/liquid-cut.glsl"
+        }
+      ],
+      "params": {
+        "scale": {
+          "type": "range",
+          "label": "Scale",
+          "min": 0.5,
+          "max": 4,
+          "def": 1.6,
+          "step": 0.01,
+          "log": true
+        },
+        "warp": {
+          "type": "range",
+          "label": "Warp",
+          "min": 0,
+          "max": 2.5,
+          "def": 1.2,
+          "step": 0.01
+        },
+        "soft": {
+          "type": "range",
+          "label": "Edge softness",
+          "min": 0.02,
+          "max": 0.4,
+          "def": 0.14,
+          "step": 0.01
+        },
+        "rim": {
+          "type": "range",
+          "label": "Rim light",
+          "min": 0,
+          "max": 2,
+          "def": 0.6,
+          "step": 0.01
+        }
+      }
+    }
+  ],
+  "sequences": [
+    {
+      "id": "poster-reel",
+      "file": "sequences/poster-reel.json"
+    }
+  ],
+  "exporters": [
+    {
+      "id": "reel-vertical",
+      "name": "Reel 9:16",
+      "blurb": "Vertical 1080p MP4, three loops.",
+      "preset": {
+        "format": "mp4",
+        "aspect": "9x16",
+        "tier": 1080,
+        "fps": 30,
+        "loops": 3,
+        "quality": "high"
+      }
+    },
+    {
+      "id": "master-square",
+      "name": "Square master",
+      "blurb": "1:1 1080p WebM.",
+      "preset": {
+        "format": "webm",
+        "aspect": "1x1",
+        "tier": 1080,
+        "fps": 30,
+        "loops": 1,
+        "quality": "high"
+      }
+    }
+  ]
+}

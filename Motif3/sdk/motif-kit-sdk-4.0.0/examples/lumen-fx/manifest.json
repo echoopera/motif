@@ -1,0 +1,79 @@
+{
+  "format": "motif-kit@2",
+  "id": "lumen-fx",
+  "name": "Lumen FX",
+  "version": "1.0.0",
+  "author": "Motif SDK",
+  "description": "Reference kit for motif-kit@2: a pass-graph style with bounded feedback, a bloom effect, an iris transition and an export preset.",
+  "license": "MIT",
+  "accent": "#7CF9C0",
+  "capabilities": ["feedback"],
+  "palettes": [
+    { "id": "lagoon", "name": "Lagoon", "bg": "#04080C", "ink": "#EFFFF8", "a": ["#7CF9C0", "#3D8BFF", "#FF5FA2"] }
+  ],
+  "styles": [
+    {
+      "id": "ink-diffusion",
+      "name": "Ink Diffusion",
+      "group": "motif-kit@2",
+      "palette": "lagoon",
+      "tags": ["example", "graph", "feedback"],
+      "blurb": "Looping noise seeds a field that diffuses and grows over eight ping-pong steps per frame.",
+      "cost": 1.5,
+      "graph": {
+        "buffers": { "field": { "scale": 0.5 } },
+        "passes": [
+          { "src": "styles/ink-field.glsl", "reads": ["field"], "writes": "field", "iterate": 8 },
+          { "src": "styles/ink-color.glsl", "reads": ["field"], "writes": "output" }
+        ]
+      },
+      "params": {
+        "scale":   { "type": "range", "label": "Scale", "min": 1, "max": 8, "def": 3 },
+        "turns":   { "type": "int", "label": "Turns / loop", "min": 1, "max": 3, "def": 1 },
+        "diffuse": { "type": "range", "label": "Diffusion", "min": 0, "max": 1, "def": 0.6 },
+        "growth":  { "type": "range", "label": "Growth", "min": 0, "max": 2, "def": 1 },
+        "glow":    { "type": "range", "label": "Glow", "min": 0, "max": 1.5, "def": 0.6 }
+      }
+    }
+  ],
+  "effects": [
+    {
+      "id": "bloom",
+      "name": "Bloom",
+      "target": "any",
+      "blurb": "Bright areas bleed light: threshold, four widening blur steps, add back.",
+      "cost": 1.2,
+      "graph": {
+        "buffers": { "bright": { "scale": 0.5 }, "blur": { "scale": 0.25 } },
+        "passes": [
+          { "src": "effects/bloom-bright.glsl", "reads": ["input"], "writes": "bright" },
+          { "src": "effects/bloom-blur.glsl", "reads": ["bright", "blur"], "writes": "blur", "iterate": 4 },
+          { "src": "effects/bloom-mix.glsl", "reads": ["input", "blur"], "writes": "output" }
+        ]
+      },
+      "params": {
+        "threshold": { "type": "range", "label": "Threshold", "min": 0, "max": 1, "def": 0.55 },
+        "amount":    { "type": "range", "label": "Amount", "min": 0, "max": 2, "def": 0.9 },
+        "radius":    { "type": "range", "label": "Radius", "min": 0.5, "max": 4, "def": 1.5 },
+        "tinted":    { "type": "toggle", "label": "Tint with accent", "def": false }
+      }
+    }
+  ],
+  "transitions": [
+    {
+      "id": "iris",
+      "name": "Iris",
+      "blurb": "A soft circle opens from a point, with a glowing rim.",
+      "duration": 1.2,
+      "passes": [{ "src": "transitions/iris.glsl" }],
+      "params": {
+        "center": { "type": "point", "label": "Centre", "min": -0.5, "max": 0.5, "def": [0, 0] },
+        "soft":   { "type": "range", "label": "Softness", "min": 0, "max": 0.3, "def": 0.06 },
+        "rim":    { "type": "range", "label": "Rim glow", "min": 0, "max": 2, "def": 0.8 }
+      }
+    }
+  ],
+  "exporters": [
+    { "id": "social-loop", "name": "Social loop", "blurb": "Vertical 1080p MP4, three loops.", "preset": { "format": "mp4", "aspect": "9x16", "tier": 1080, "fps": 30, "loops": 3, "quality": "high" } }
+  ]
+}
