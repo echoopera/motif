@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Posterflow Viewer</title>
+<style>
+:root{--bg:#0b0c10;--panel:#12141a;--panel2:#171a22;--line:#242833;--ink:#eef1f7;--dim:#8d94a6;--acc:#4d7cff;--acc2:#a8d2ff;--r:12px}
+*{box-sizing:border-box}html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font:13px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,system-ui,sans-serif}
+button,select,input{font:inherit;color:inherit}
+.app{display:grid;grid-template-columns:230px minmax(0,1fr) 300px;grid-template-rows:auto 1fr;height:100%}
+header{grid-column:1/-1;display:flex;gap:14px;align-items:center;padding:10px 14px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+h1{font-size:14px;margin:0;font-weight:650;letter-spacing:.02em}h1 small{color:var(--dim);font-weight:500;margin-left:6px}
+.grp{display:flex;gap:6px;align-items:center}
+.btn{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:6px 10px;cursor:pointer;white-space:nowrap}
+.btn:hover{border-color:#3a4052}.btn.on{background:var(--acc);border-color:var(--acc);color:#fff}
+.chips{display:flex;gap:6px}.chip{width:22px;height:22px;border-radius:50%;border:2px solid var(--line);cursor:pointer;padding:0;background:conic-gradient(var(--c1),var(--c2),var(--c3),var(--c1))}
+.chip.on{border-color:#fff}
+aside{border-right:1px solid var(--line);overflow:auto;padding:8px;background:var(--panel)}
+aside.r{border-right:0;border-left:1px solid var(--line);padding:10px 12px}
+.item{display:block;width:100%;text-align:left;background:none;border:1px solid transparent;border-radius:10px;padding:8px 10px;margin-bottom:4px;cursor:pointer}
+.item:hover{background:var(--panel2)}.item.on{background:var(--panel2);border-color:var(--acc)}
+.item b{display:block;font-weight:600}.item span{color:var(--dim);font-size:11px;display:block;margin-top:2px;line-height:1.3}
+.item i{font-style:normal;font-size:10px;color:var(--acc2);float:right;opacity:.8}
+main{display:flex;flex-direction:column;min-width:0;min-height:0}
+.stage{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;padding:14px;position:relative}
+canvas#view{max-width:100%;max-height:100%;border-radius:10px;box-shadow:0 20px 60px #0009;background:#000}
+.hud{position:absolute;left:22px;bottom:22px;font-size:11px;color:#fffc;text-shadow:0 1px 3px #000;pointer-events:none}
+.msg{position:absolute;inset:0;display:none;align-items:center;justify-content:center;text-align:center;padding:30px;color:var(--dim)}
+.bar{display:flex;gap:12px;align-items:center;padding:10px 14px;border-top:1px solid var(--line);flex-wrap:wrap}
+.bar input[type=range]{flex:1;min-width:120px}
+label.f{display:flex;gap:6px;align-items:center;color:var(--dim)}
+h3{font-size:11px;text-transform:uppercase;letter-spacing:.09em;color:var(--dim);margin:16px 0 8px;font-weight:600}h3:first-child{margin-top:0}
+.row{display:grid;grid-template-columns:1fr auto;gap:2px 8px;margin-bottom:9px}
+.row label{color:var(--ink)}.row output{color:var(--dim);font-variant-numeric:tabular-nums}
+.row input[type=range]{grid-column:1/-1;width:100%}
+.row.t{display:flex;justify-content:space-between;align-items:center}
+.row select{grid-column:1/-1;background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:6px}
+input[type=range]{accent-color:var(--acc)}
+input[type=color]{width:100%;height:28px;border:1px solid var(--line);border-radius:8px;background:var(--panel2);padding:2px;grid-column:1/-1}
+.bar select{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:5px 8px}
+.tip{color:var(--dim);font-size:11px;margin:-4px 0 8px}
+@media (max-width:900px){.app{grid-template-columns:1fr;grid-template-rows:auto auto 1fr auto;height:auto}
+aside{border:0;display:flex;gap:6px;overflow-x:auto;padding:8px}aside.r{border-top:1px solid var(--line)}
+.item{min-width:150px;margin:0}.item span{display:none}.stage{height:70vh;flex:none}}
+</style>
+</head>
+<body>
+<div class="app">
+<header>
+  <h1>Posterflow<small id="ver"></small></h1>
+  <div class="grp" id="srcs"></div>
+  <div class="chips" id="pals"></div>
+  <div class="grp" id="aspects"></div>
+  <div class="grp" style="margin-left:auto"><button class="btn" id="rand">Randomize</button><button class="btn" id="reset">Reset</button><button class="btn" id="png">PNG</button><button class="btn" id="rec">Record loop</button></div>
+</header>
+<aside id="list"></aside>
+<main>
+  <div class="stage"><canvas id="view"></canvas><div class="hud" id="hud"></div><div class="msg" id="msg"></div></div>
+  <div class="bar">
+    <button class="btn" id="play">Pause</button>
+    <input type="range" id="phase" min="0" max="1" step="0.001" value="0" aria-label="Loop phase">
+    <label class="f">Loop <input type="range" id="loop" min="2" max="16" step="1" value="8" style="width:90px"><span id="loopv">8 s</span></label>
+    <label class="f">Quality <select id="qual"><option value="1">Full</option><option value="0.7">Balanced</option><option value="0.5">Fast</option></select></label>
+  </div>
+</main>
+<aside class="r" id="insp"></aside>
+</div>
+<input type="file" id="file" accept="image/*,video/*" hidden>
+<script id="kitdata" type="application/json">__KIT__</script>
+<script>
+const KG = new Function(__KG__)();
+const RAW = JSON.parse(document.getElementById('kitdata').textContent);
+const $ = s => document.querySelector(s), el = (t, c, h) => { const e = document.createElement(t); if (c) e.className = c; if (h != null) e.innerHTML = h; return e; };
+const V = KG.validateKit(RAW.manifest, RAW.files);
+const kit = V.kit, styles = kit.styles;
+$('#ver').textContent = ' ' + kit.version + ' · ' + styles.length + ' styles';
+const rt = KG.createGlRuntime();
+const view = $('#view'), vx = view.getContext('2d');
+const S = { style: null, pal: kit.palettes[0], params: {}, aspect: 9 / 16, playing: true, t0: performance.now(), phase: 0, L: 8, scale: 1, media: null, mediaKind: 'none', video: null, rec: null };
+let compiled = new Set();
+if (!rt.ok) { const m = $('#msg'); m.style.display = 'flex'; m.textContent = 'This viewer needs WebGL2: ' + (rt.reason || 'unavailable'); }
+
+// ---- samples: procedural stand-ins (no photos are bundled) -------------------------------------------------------
+function noiseField(w, h, seed) {
+  const n = 64, g = new Float32Array(n * n); let s = seed; for (let i = 0; i < g.length; i++) { s = (s * 1664525 + 1013904223) >>> 0; g[i] = s / 4294967296; }
+  const smooth = t => t * t * (3 - 2 * t);
+  const v = (x, y) => { const xi = Math.floor(x), yi = Math.floor(y), fx = smooth(x - xi), fy = smooth(y - yi); const a = g[(yi & 63) * n + (xi & 63)], b = g[(yi & 63) * n + ((xi + 1) & 63)], c = g[((yi + 1) & 63) * n + (xi & 63)], d = g[((yi + 1) & 63) * n + ((xi + 1) & 63)]; return a + (b - a) * fx + (c - a) * fy + (a - b - c + d) * fx * fy; };
+  return (x, y) => { let a = 0, f = 1, k = .5; for (let o = 0; o < 4; o++) { a += k * v(x * f, y * f); f *= 2; k *= .5; } return a / .9375; };
+}
+function ramp(stops, t) { t = Math.min(.9999, Math.max(0, t)) * (stops.length - 1); const i = Math.floor(t), f = t - i, a = stops[i], b = stops[i + 1]; return [a[0] + (b[0] - a[0]) * f, a[1] + (b[1] - a[1]) * f, a[2] + (b[2] - a[2]) * f]; }
+function sample(kind) {
+  const W = 540, H = 960, c = document.createElement('canvas'); c.width = W; c.height = H; const x = c.getContext('2d'), im = x.createImageData(W, H);
+  const n1 = noiseField(W, H, kind === 'tide' ? 7 : kind === 'bloom' ? 21 : 33), n2 = noiseField(W, H, 99);
+  const P = { tide: [[4, 10, 34], [10, 40, 110], [30, 90, 165], [150, 190, 230], [255, 226, 186]], bloom: [[20, 8, 50], [150, 40, 140], [240, 90, 140], [250, 170, 150], [255, 235, 210]], ink: [[8, 8, 14], [20, 40, 140], [200, 60, 50], [250, 150, 90], [245, 235, 220]] }[kind];
+  for (let j = 0; j < H; j++) for (let i = 0; i < W; i++) {
+    const u = i / W * 4, v = j / W * 4; const wx = n2(u + 3, v) * 1.6, wy = n2(u, v + 5) * 1.6; let f = n1(u + wx, v + wy);
+    if (kind === 'tide') { const r = n1(u * 5 + 2, v * 9) * n2(u * 6, v * 8); f = f * .5 + Math.pow(Math.max(0, r - .3), 1.3) * 3.2; }
+    if (kind === 'bloom') f = f * 1.15 - .08 + .25 * Math.sin((u + wx) * 5) * .3;
+    const col = ramp(P, f), o = (j * W + i) * 4; im.data[o] = col[0]; im.data[o + 1] = col[1]; im.data[o + 2] = col[2]; im.data[o + 3] = 255;
+  }
+  x.putImageData(im, 0, 0); return c;
+}
+const samples = {};
+function useSource(kind, obj) {
+  S.mediaKind = kind; if (S.video) { S.video.pause(); S.video = null; }
+  S.srcObj = obj || null; S.mediaRev = (S.mediaRev || 0) + 1; document.querySelectorAll('#srcs .btn').forEach(b => b.classList.toggle('on', b.dataset.k === kind));
+}
+const srcDefs = [['tide', 'Tide'], ['bloom', 'Bloom'], ['ink', 'Ink'], ['none', 'No source']];
+srcDefs.forEach(([k, l]) => { const b = el('button', 'btn', l); b.dataset.k = k; b.onclick = () => { if (k === 'none') useSource('none', null); else useSource(k, samples[k] || (samples[k] = sample(k))); }; $('#srcs').append(b); });
+{ const b = el('button', 'btn', 'Upload…'); b.dataset.k = 'file'; b.onclick = () => $('#file').click(); $('#srcs').append(b); }
+$('#file').onchange = e => { const f = e.target.files[0]; if (!f) return; const url = URL.createObjectURL(f);
+  if (f.type.startsWith('video')) { const v = document.createElement('video'); v.src = url; v.loop = true; v.muted = true; v.playsInline = true; v.onloadeddata = () => { v.play(); useSource('file', v); S.video = v; }; }
+  else { const im = new Image(); im.onload = () => useSource('file', im); im.src = url; } };
+addEventListener('dragover', e => e.preventDefault()); addEventListener('drop', e => { e.preventDefault(); const f = e.dataTransfer.files[0]; if (f) { $('#file').files = e.dataTransfer.files; $('#file').onchange({ target: { files: [f] } }); } });
+
+// cover-fit bake of the source to the frame aspect, as the host does
+const bake = { c: document.createElement('canvas'), rev: 0 };
+function mediaFor(w, h) {
+  const o = S.srcObj; if (!o) return null;
+  const sw = o.videoWidth || o.naturalWidth || o.width, sh = o.videoHeight || o.naturalHeight || o.height; if (!sw || !sh) return null;
+  const ar = w / h; let cw = sw, ch = sh; if (sw / sh > ar) cw = sh * ar; else ch = sw / ar;
+  const bw = Math.min(1024, Math.round(cw)), bh = Math.round(bw / ar); const c = bake.c; if (c.width !== bw || c.height !== bh) { c.width = bw; c.height = bh; bake.rev++; }
+  if (S.video || bake.key !== S.mediaRev + ':' + bw + 'x' + bh) { c.getContext('2d').drawImage(o, (sw - cw) / 2, (sh - ch) / 2, cw, ch, 0, 0, bw, bh); bake.rev++; bake.key = S.mediaRev + ':' + bw + 'x' + bh; }
+  return { source: { canvas: c, rev: bake.rev, w: sw, h: sh, time: S.video ? S.video.currentTime : 0 } };
+}
+
+// ---- UI --------------------------------------------------------------------------------------------------------
+kit.palettes.forEach((p, i) => { const b = el('button', 'chip'); b.title = p.name; b.style.setProperty('--c1', p.a[0]); b.style.setProperty('--c2', p.a[1]); b.style.setProperty('--c3', p.bg); b.onclick = () => { S.pal = p; mark(); }; b.dataset.i = i; $('#pals').append(b); });
+const mark = () => document.querySelectorAll('#pals .chip').forEach(b => b.classList.toggle('on', kit.palettes[+b.dataset.i] === S.pal));
+[['9:16', 9 / 16], ['1:1', 1], ['16:9', 16 / 9]].forEach(([l, a]) => { const b = el('button', 'btn' + (a === S.aspect ? ' on' : ''), l); b.onclick = () => { S.aspect = a; document.querySelectorAll('#aspects .btn').forEach(x => x.classList.toggle('on', x === b)); fit(); }; $('#aspects').append(b); });
+styles.forEach(st => { const b = el('button', 'item', `<i>${st.cost}×</i><b>${st.name}</b><span>${st.blurb}</span>`); b.dataset.id = st.id; b.onclick = () => pick(st); $('#list').append(b); });
+
+const showOk = (spec, P) => { const s = spec.show; if (!s) return true; const v = P[s.param]; const opts = (styles.find(x => x === S.style).params[s.param] || {}).options; const vv = opts && typeof v === 'number' ? (opts[v] && opts[v].v) : v;
+  if ('is' in s) return [].concat(s.is).includes(vv); if ('not' in s) return ![].concat(s.not).includes(vv); if ('gt' in s) return v > s.gt; return true; };
+function buildInspector() {
+  const st = S.style, P = S.params, root = $('#insp'); root.innerHTML = '';
+  const groups = new Map(), done = new Set();
+  for (const [k, sp] of Object.entries(st.params)) {
+    if (sp.part && sp.part.kind === 'color') { if (done.has(sp.part.of)) continue; done.add(sp.part.of); }
+    const g = sp.group || 'Style'; if (!groups.has(g)) groups.set(g, []); groups.get(g).push([k, sp]);
+  }
+  for (const [g, items] of groups) {
+    root.append(el('h3', '', g));
+    for (const [k, sp] of items) {
+      if (!showOk(sp, P)) continue;
+      const row = el('div', 'row');
+      if (sp.part && sp.part.kind === 'color') {
+        const base = sp.part.of, ks = ['R', 'G', 'B'].map(c => Object.keys(st.params).find(q => st.params[q].part && st.params[q].part.of === base && st.params[q].part.i === 'RGB'.indexOf(c)));
+        row.append(el('label', '', sp.part.label)); const ci = el('input'); ci.type = 'color';
+        const hex = () => '#' + ks.map(q => Math.round(P[q] * 255).toString(16).padStart(2, '0')).join(''); ci.value = hex();
+        ci.oninput = () => { const h = ci.value; ks.forEach((q, i) => P[q] = parseInt(h.slice(1 + i * 2, 3 + i * 2), 16) / 255); }; row.append(ci);
+      } else if (sp.type === 'toggle') {
+        row.className = 'row t'; row.append(el('label', '', sp.label)); const c = el('input'); c.type = 'checkbox'; c.checked = !!P[k]; c.onchange = () => { P[k] = c.checked; buildInspector(); }; row.append(c);
+      } else if (sp.type === 'select') {
+        row.append(el('label', '', sp.label)); const s = el('select'); sp.options.forEach(o => { const op = el('option', '', o.l); op.value = o.v; s.append(op); }); s.value = P[k]; s.onchange = () => { P[k] = s.value; buildInspector(); }; row.append(s);
+      } else {
+        const out = el('output', '', fmt(sp, P[k])); row.append(el('label', '', sp.label), out);
+        const r = el('input'); r.type = 'range'; const lg = sp.log && sp.min > 0;
+        if (lg) { r.min = 0; r.max = 1000; r.value = 1000 * Math.log(P[k] / sp.min) / Math.log(sp.max / sp.min); } else { r.min = sp.min; r.max = sp.max; r.step = sp.step || (sp.type === 'int' ? 1 : 0.01); r.value = P[k]; }
+        r.oninput = () => { let v = lg ? sp.min * Math.pow(sp.max / sp.min, r.value / 1000) : +r.value; if (sp.type === 'int') v = Math.round(v); P[k] = v; out.textContent = fmt(sp, v); if (sp.show || Object.values(st.params).some(q => q.show && q.show.param === k)) buildInspector(); };
+        row.append(r);
+      }
+      if (sp.hint) { const t = el('div', 'tip', sp.hint); root.append(row, t); } else root.append(row);
+    }
+  }
+}
+const fmt = (sp, v) => (sp.type === 'int' ? v : Math.abs(v) >= 100 ? v.toFixed(0) : Math.abs(v) >= 10 ? v.toFixed(1) : v.toFixed(2)) + (sp.unit || '');
+function defaults(st) { const P = {}; for (const [k, sp] of Object.entries(st.params)) P[k] = sp.def; return P; }
+function pick(st) {
+  S.style = st; S.params = defaults(st); document.querySelectorAll('.item').forEach(b => b.classList.toggle('on', b.dataset.id === st.id));
+  S.pal = kit.palettes.find(p => p.id === 'posterflow.' + st.palette) || kit.palettes.find(p => p.id === st.palette) || S.pal; mark();
+  if (rt.ok && !compiled.has(st.id)) { $('#hud').textContent = 'Compiling…'; const c = rt.compile(st.id, { passes: st.passes, common: kit.common, params: st.params, inputs: st.inputs || [], ...(st.runtime || {}) }); if (!c.ok) { const m = $('#msg'); m.style.display = 'flex'; m.textContent = 'Compile error: ' + c.error; return; } compiled.add(st.id); $('#msg').style.display = 'none'; }
+  buildInspector();
+}
+$('#reset').onclick = () => { S.params = defaults(S.style); buildInspector(); };
+$('#rand').onclick = () => { const st = S.style; for (const [k, sp] of Object.entries(st.params)) { if (sp.mutate === 0 || sp.type === 'toggle') continue; if (sp.type === 'select') continue; const hi = Math.min(sp.max, sp.randMax != null ? sp.randMax : sp.max); const t = Math.random(); let v = sp.log && sp.min > 0 ? sp.min * Math.pow(hi / sp.min, t) : sp.min + (hi - sp.min) * t; v = sp.def + (v - sp.def) * 0.6; if (sp.type === 'int') v = Math.max(sp.min, Math.min(sp.max, Math.round(v))); S.params[k] = v; } buildInspector(); };
+$('#play').onclick = () => { S.playing = !S.playing; $('#play').textContent = S.playing ? 'Pause' : 'Play'; if (S.playing) S.t0 = performance.now() - S.phase * S.L * 1000; };
+$('#phase').oninput = e => { S.phase = +e.target.value; if (S.playing) S.t0 = performance.now() - S.phase * S.L * 1000; };
+$('#loop').oninput = e => { S.L = +e.target.value; $('#loopv').textContent = S.L + ' s'; S.t0 = performance.now() - S.phase * S.L * 1000; };
+$('#qual').onchange = e => S.scale = +e.target.value;
+$('#png').onclick = () => view.toBlob(b => { const a = el('a'); a.href = URL.createObjectURL(b); a.download = S.style.localId + '.png'; a.click(); });
+$('#rec').onclick = () => {
+  if (S.rec) return; const stream = view.captureStream(30), mr = new MediaRecorder(stream, { mimeType: MediaRecorder.isTypeSupported('video/webm;codecs=vp9') ? 'video/webm;codecs=vp9' : 'video/webm', videoBitsPerSecond: 12e6 }), chunks = [];
+  mr.ondataavailable = e => chunks.push(e.data); mr.onstop = () => { const a = el('a'); a.href = URL.createObjectURL(new Blob(chunks, { type: 'video/webm' })); a.download = S.style.localId + '-loop.webm'; a.click(); S.rec = null; $('#rec').textContent = 'Record loop'; $('#rec').classList.remove('on'); };
+  S.playing = true; S.t0 = performance.now(); mr.start(); S.rec = mr; $('#rec').textContent = 'Recording…'; $('#rec').classList.add('on'); setTimeout(() => mr.stop(), S.L * 1000 + 60);
+};
+
+function fit() { const st = document.querySelector('.stage'), r = st.getBoundingClientRect(), pw = r.width - 28, ph = r.height - 28; let w = pw, h = pw / S.aspect; if (h > ph) { h = ph; w = ph * S.aspect; } const d = Math.min(devicePixelRatio || 1, 2), rw = Math.max(2, Math.round(Math.min(w * d, 1440))); S.cw = rw; S.ch = Math.max(2, Math.round(rw / S.aspect)); view.width = S.cw; view.height = S.ch; view.style.width = w + 'px'; view.style.height = h + 'px'; }
+addEventListener('resize', fit);
+
+let last = performance.now(), ema = 16;
+function frame(now) {
+  requestAnimationFrame(frame); if (!rt.ok || !S.style || !compiled.has(S.style.id)) return;
+  if (S.playing) { S.phase = ((now - S.t0) / (S.L * 1000)) % 1; $('#phase').value = S.phase; }
+  const st = S.style, w = S.cw, h = S.ch;
+  const r = rt.draw(st.id, w, h, { p: S.phase, L: S.L, seed: 417, safe: true, pal: S.pal, params: S.params, spec: st.params, media: mediaFor(w, h), ext: null, progress: S.phase }, { scale: S.scale });
+  vx.clearRect(0, 0, w, h); rt.blit(vx, w, h);
+  ema += (now - last - ema) * .08; last = now; $('#hud').textContent = st.name + ' · ' + (S.mediaKind === 'none' ? 'ink marble (no source)' : S.mediaKind) + ' · ' + (1000 / ema).toFixed(0) + ' fps · phase ' + S.phase.toFixed(2);
+}
+mark(); fit(); useSource('tide', samples.tide = sample('tide')); pick(styles[0]); requestAnimationFrame(frame);
+</script>
+</body>
+</html>
