@@ -1,0 +1,6 @@
+Motif-Shadcn 1.0 (Motif 9.0.1 + audiocn interface)
+
+1. Open Motif.html in Chrome or Edge. No install, no server, no network.
+2. Open the Mix tab, then Load track…: a 120 BPM loop is a good first test. Watch the band strips move; pick one and map it to a value (Bass → Burst).
+3. Open the Pads tab: hold a pad to preview a MotifGraph preset on the stage, release to leave; switch to Tap to apply.
+4. Everything from Motif 9 works as before; the classic Audio tab is still there.

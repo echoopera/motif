@@ -18,7 +18,7 @@
   --card-foreground: var(--text);
   --popover: var(--surface-2);
   --popover-foreground: var(--text);
-  --primary: var(--accent);
+  --primary: var(--ms-accent, var(--accent));
   --primary-foreground: var(--accent-ink);
   --secondary: var(--surface-3);
   --secondary-foreground: var(--text);
@@ -32,15 +32,15 @@
   --ring: var(--focus);
   --radius: 0.5rem;
   --chart-1: var(--data);
-  --chart-2: var(--accent-hover, var(--primary));
+  --chart-2: var(--ms-accent, var(--primary));
   --chart-3: var(--ok);
   --chart-4: var(--danger);
   --chart-5: var(--text-muted);
   --meter-ok: var(--ok);
-  --meter-warn: var(--primary);
+  --meter-warn: var(--ms-accent, var(--primary));
   --meter-clip: var(--danger);
   --channel-mute: var(--danger);
-  --channel-solo: var(--primary);
+  --channel-solo: var(--ms-accent, var(--primary));
   --channel-monitor: var(--data);
   --meter-ok-foreground: var(--meter-ok);
   --meter-warn-foreground: var(--meter-warn);
