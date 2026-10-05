@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <!-- Only shapes and paths are drawn; colours are ignored (everything is a mask). Holes need fill-rule="evenodd". -->
+  <path fill-rule="evenodd" d="M100 18 L172 60 V140 L100 182 L28 140 V60 Z M100 54 A46 46 0 1 0 100 146 A46 46 0 1 0 100 54 Z"/>
+  <path d="M70 128 C 80 72, 120 72, 130 128 C 116 106, 84 106, 70 128 Z"/>
+  <rect x="94" y="28" width="12" height="20" rx="6"/>
+</svg>

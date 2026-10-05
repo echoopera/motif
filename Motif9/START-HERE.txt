@@ -1,0 +1,9 @@
+Motif 9.0
+
+1. Open Motif.html in Chrome or Edge (Safari 17+ works with WebGL2 only). No install, no server, no network needed. (index.html just forwards to it.)
+2. New in 9: MotifGraph. Open the Graph tab, pick Layer or Composite, and try Presets (Radial array, Grid cascade, Type wave, Shatter, Halftone dots, Twist and taper...). Clone, bend, ripple and drive the picture in real time; every value is a normal channel you can keyframe or map to audio.
+3. Docs: docs/MOTIFGRAPH.md (guide), docs/MotifGraph-nodes.md (every node and parameter), docs/MotifGraph-PRD.md (roadmap).
+4. Kits: Kits page > Install, then pick a file from kits/ (.motifkit). Build your own kits: sdk/ (CLI, schemas, docs).
+5. Verify the files: shasum -a 256 -c SHA256SUMS
+
+Everything is local; media never leaves the browser.

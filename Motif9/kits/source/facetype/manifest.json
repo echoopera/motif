@@ -1,0 +1,2651 @@
+{
+  "format": "motif-kit@3",
+  "id": "facetype",
+  "name": "FaceType",
+  "version": "1.3.0",
+  "author": "Echo Opera",
+  "description": "Three-line rational and experimental motion typography. Type three lines in the inspector; independently animate line XY, scale, angle, opacity and ink.",
+  "license": "All rights reserved",
+  "accent": "#B9F65E",
+  "common": "common.glsl",
+  "capabilities": [
+    "text"
+  ],
+  "palettes": [
+    {
+      "id": "graphite",
+      "name": "Graphite / Signal",
+      "bg": "#0D1010",
+      "ink": "#F1F0EA",
+      "a": [
+        "#B9F65E",
+        "#7D9EA1",
+        "#E2B77D"
+      ]
+    },
+    {
+      "id": "paper",
+      "name": "Paper / Ink",
+      "bg": "#F1F0EA",
+      "ink": "#172021",
+      "a": [
+        "#CF4B30",
+        "#5E7577",
+        "#BCAD86"
+      ]
+    },
+    {
+      "id": "electric",
+      "name": "Electric / Night",
+      "bg": "#090A19",
+      "ink": "#F3F1FE",
+      "a": [
+        "#A59CFF",
+        "#FF8470",
+        "#8CE8D9"
+      ]
+    }
+  ],
+  "inputs": [
+    {
+      "id": "type",
+      "type": "text",
+      "label": "Type",
+      "aspect": 12,
+      "hint": "Three lines, each with its own font, weight, size, tracking and alignment. Motif rasterizes them; the styles move them.",
+      "lines": [
+        {
+          "id": "line1",
+          "label": "Line 1",
+          "def": "FORM FOLLOWS",
+          "maxLength": 48,
+          "font": {
+            "family": "Instrument Sans",
+            "weight": 700
+          },
+          "size": 0.78,
+          "tracking": 0.02,
+          "align": "center"
+        },
+        {
+          "id": "line2",
+          "label": "Line 2",
+          "def": "FREQUENCY",
+          "maxLength": 48,
+          "font": {
+            "family": "Instrument Sans",
+            "weight": 700
+          },
+          "size": 0.78,
+          "tracking": 0.06,
+          "align": "center"
+        },
+        {
+          "id": "line3",
+          "label": "Line 3",
+          "def": "TYPE IS SIGNAL",
+          "maxLength": 48,
+          "font": {
+            "family": "Instrument Sans",
+            "weight": 500
+          },
+          "size": 0.56,
+          "tracking": 0.12,
+          "align": "center"
+        }
+      ]
+    }
+  ],
+  "styles": [
+    {
+      "id": "rational-grid",
+      "name": "Rational Grid",
+      "group": "FaceType / Rational",
+      "tags": [
+        "typography",
+        "three-line",
+        "motion",
+        "text",
+        "rational-grid"
+      ],
+      "blurb": "Measured editorial hierarchy over a precise modular grid.",
+      "palette": "graphite",
+      "flash": false,
+      "passes": [
+        {
+          "src": "styles/rational-grid.glsl"
+        }
+      ],
+      "params": {
+        "line1Pos": {
+          "type": "point",
+          "label": "01 / Statement XY",
+          "min": -1,
+          "max": 1,
+          "def": [
+            0,
+            0.23
+          ],
+          "group": "Line 1",
+          "hint": "Position in frame-normalized XY; each axis can be keyed independently.",
+          "mutate": 0.35
+        },
+        "line1Scale": {
+          "type": "range",
+          "label": "Scale",
+          "min": 0.1,
+          "max": 2.5,
+          "def": 1,
+          "step": 0.01,
+          "group": "Line 1",
+          "mutate": 0.3
+        },
+        "line1Angle": {
+          "type": "range",
+          "label": "Angle",
+          "min": -180,
+          "max": 180,
+          "def": 0,
+          "step": 1,
+          "unit": "°",
+          "group": "Line 1",
+          "mutate": 0.15
+        },
+        "line1Opacity": {
+          "type": "range",
+          "label": "Opacity",
+          "min": 0,
+          "max": 1,
+          "def": 1,
+          "step": 0.01,
+          "group": "Line 1",
+          "mutate": 0.2
+        },
+        "line1Ink": {
+          "type": "color",
+          "label": "Ink",
+          "def": "#F1F0EA",
+          "group": "Line 1",
+          "mutate": 0.1
+        },
+        "line2Pos": {
+          "type": "point",
+          "label": "02 / Context XY",
+          "min": -1,
+          "max": 1,
+          "def": [
+            0,
+            0
+          ],
+          "group": "Line 2",
+          "hint": "Position in frame-normalized XY; each axis can be keyed independently.",
+          "mutate": 0.35
+        },
+        "line2Scale": {
+          "type": "range",
+          "label": "Scale",
+          "min": 0.1,
+          "max": 2.5,
+          "def": 1,
+          "step": 0.01,
+          "group": "Line 2",
+          "mutate": 0.3
+        },
+        "line2Angle": {
+          "type": "range",
+          "label": "Angle",
+          "min": -180,
+          "max": 180,
+          "def": 0,
+          "step": 1,
+          "unit": "°",
+          "group": "Line 2",
+          "mutate": 0.15
+        },
+        "line2Opacity": {
+          "type": "range",
+          "label": "Opacity",
+          "min": 0,
+          "max": 1,
+          "def": 1,
+          "step": 0.01,
+          "group": "Line 2",
+          "mutate": 0.2
+        },
+        "line2Ink": {
+          "type": "color",
+          "label": "Ink",
+          "def": "#B9F65E",
+          "group": "Line 2",
+          "mutate": 0.1
+        },
+        "line3Pos": {
+          "type": "point",
+          "label": "03 / Detail XY",
+          "min": -1,
+          "max": 1,
+          "def": [
+            0,
+            -0.23
+          ],
+          "group": "Line 3",
+          "hint": "Position in frame-normalized XY; each axis can be keyed independently.",
+          "mutate": 0.35
+        },
+        "line3Scale": {
+          "type": "range",
+          "label": "Scale",
+          "min": 0.1,
+          "max": 2.5,
+          "def": 1,
+          "step": 0.01,
+          "group": "Line 3",
+          "mutate": 0.3
+        },
+        "line3Angle": {
+          "type": "range",
+          "label": "Angle",
+          "min": -180,
+          "max": 180,
+          "def": 0,
+          "step": 1,
+          "unit": "°",
+          "group": "Line 3",
+          "mutate": 0.15
+        },
+        "line3Opacity": {
+          "type": "range",
+          "label": "Opacity",
+          "min": 0,
+          "max": 1,
+          "def": 1,
+          "step": 0.01,
+          "group": "Line 3",
+          "mutate": 0.2
+        },
+        "line3Ink": {
+          "type": "color",
+          "label": "Ink",
+          "def": "#F1F0EA",
+          "group": "Line 3",
+          "mutate": 0.1
+        },
+        "motion": {
+          "type": "range",
+          "label": "Motion",
+          "min": 0,
+          "max": 1,
+          "def": 0.42,
+          "step": 0.01,
+          "group": "Motion"
+        },
+        "cycles": {
+          "type": "int",
+          "label": "Cycles / loop",
+          "min": 1,
+          "max": 8,
+          "def": 1,
+          "group": "Motion"
+        },
+        "density": {
+          "type": "range",
+          "label": "Density",
+          "min": 0.1,
+          "max": 1,
+          "def": 0.54,
+          "step": 0.01,
+          "group": "Treatment"
+        },
+        "edge": {
+          "type": "range",
+          "label": "Edge / line",
+          "min": 0.001,
+          "max": 0.03,
+          "def": 0.004,
+          "step": 0.001,
+          "group": "Treatment"
+        },
+        "contrast": {
+          "type": "range",
+          "label": "Contrast",
+          "min": 0.5,
+          "max": 2,
+          "def": 1,
+          "step": 0.01,
+          "group": "Treatment"
+        },
+        "grid": {
+          "type": "toggle",
+          "label": "Construction grid",
+          "def": true,
+          "group": "Treatment"
+        },
+        "field": {
+          "type": "color",
+          "label": "Field",
+          "def": "#0D1010",
+          "group": "Treatment"
+        },
+        "accentInk": {
+          "type": "color",
+          "label": "Accent",
+          "def": "#B9F65E",
+          "group": "Treatment"
+        },
+        "backdrop": {
+          "type": "select",
+          "label": "Backdrop",
+          "options": [
+            {
+              "v": "solid",
+              "l": "Solid"
+            },
+            {
+              "v": "transparent",
+              "l": "Transparent"
+            }
+          ],
+          "def": "solid",
+          "group": "Treatment",
+          "hint": "Transparent makes the kit useful as a layer over other Motif content."
+        }
+      },
+      "cost": 1.0
+    },
+    {
+      "id": "editorial-index",
+      "name": "Editorial Index",
+      "group": "FaceType / Rational",
+      "tags": [
+        "typography",
+        "three-line",
+        "motion",
+        "text",
+        "editorial-index"
+      ],
+      "blurb": "Quiet indexes, rules and annotation ticks orient the message.",
+      "palette": "graphite",
+      "flash": false,
+      "passes": [
+        {
+          "src": "styles/editorial-index.glsl"
+        }
+      ],
+      "params": {
+        "line1Pos": {
+          "type": "point",
+          "label": "01 / Statement XY",
+          "min": -1,
+          "max": 1,
+          "def": [
+            0,
+            0.23
+          ],
+          "group": "Line 1",
+          "hint": "Position in frame-normalized XY; each axis can be keyed independently.",
+          "mutate": 0.35
+        },
+        "line1Scale": {
+          "type": "range",
+          "label": "Scale",
+          "min": 0.1,
+          "max": 2.5,
+          "def": 1,
+          "step": 0.01,
+          "group": "Line 1",
+          "mutate": 0.3
+        },
+        "line1Angle": {
+          "type": "range",
+          "label": "Angle",
+          "min": -180,
+          "max": 180,
+          "def": 0,
+          "step": 1,
+          "unit": "°",
+          "group": "Line 1",
+          "mutate": 0.15
+        },
+        "line1Opacity": {
+          "type": "range",
+          "label": "Opacity",
+          "min": 0,
+          "max": 1,
+          "def": 1,
+          "step": 0.01,
+          "group": "Line 1",
+          "mutate": 0.2
+        },
+        "line1Ink": {
+          "type": "color",
+          "label": "Ink",
+          "def": "#F1F0EA",
+          "group": "Line 1",
+          "mutate": 0.1
+        },
+        "line2Pos": {
+          "type": "point",
+          "label": "02 / Context XY",
+          "min": -1,
+          "max": 1,
+          "def": [
+            0,
+            0
+          ],
+          "group": "Line 2",
+          "hint": "Position in frame-normalized XY; each axis can be keyed independently.",
+          "mutate": 0.35
+        },
+        "line2Scale": {
+          "type": "range",
+          "label": "Scale",
+          "min": 0.1,
+          "max": 2.5,
+          "def": 1,
+          "step": 0.01,
+          "group": "Line 2",
+          "mutate": 0.3
+        },
+        "line2Angle": {
+          "type": "range",
+          "label": "Angle",
+          "min": -180,
+          "max": 180,
+          "def": 0,
+          "step": 1,
+          "unit": "°",
+          "group": "Line 2",
+          "mutate": 0.15
+        },
+        "line2Opacity": {
+          "type": "range",
+          "label": "Opacity",
+          "min": 0,
+          "max": 1,
+          "def": 1,
+          "step": 0.01,
+          "group": "Line 2",
+          "mutate": 0.2
+        },
+        "line2Ink": {
+          "type": "color",
+          "label": "Ink",
+          "def": "#B9F65E",
+          "group": "Line 2",
+          "mutate": 0.1
+        },
+        "line3Pos": {
+          "type": "point",
+          "label": "03 / Detail XY",
+          "min": -1,
+          "max": 1,
+          "def": [
+            0,
+            -0.23
+          ],
+          "group": "Line 3",
+          "hint": "Position in frame-normalized XY; each axis can be keyed independently.",
+          "mutate": 0.35
+        },
+        "line3Scale": {
+          "type": "range",
+          "label": "Scale",
+          "min": 0.1,
+          "max": 2.5,
+          "def": 1,
+          "step": 0.01,
+          "group": "Line 3",
+          "mutate": 0.3
+        },
+        "line3Angle": {
+          "type": "range",
+          "label": "Angle",
+          "min": -180,
+          "max": 180,
+          "def": 0,
+          "step": 1,
+          "unit": "°",
+          "group": "Line 3",
+          "mutate": 0.15
+        },
+        "line3Opacity": {
+          "type": "range",
+          "label": "Opacity",
+          "min": 0,
+          "max": 1,
+          "def": 1,
+          "step": 0.01,
+          "group": "Line 3",
+          "mutate": 0.2
+        },
+        "line3Ink": {
+          "type": "color",
+          "label": "Ink",
+          "def": "#F1F0EA",
+          "group": "Line 3",
+          "mutate": 0.1
+        },
+        "motion": {
+          "type": "range",
+          "label": "Motion",
+          "min": 0,
+          "max": 1,
+          "def": 0.42,
+          "step": 0.01,
+          "group": "Motion"
+        },
+        "cycles": {
+          "type": "int",
+          "label": "Cycles / loop",
+          "min": 1,
+          "max": 8,
+          "def": 1,
+          "group": "Motion"
+        },
+        "density": {
+          "type": "range",
+          "label": "Density",
+          "min": 0.1,
+          "max": 1,
+          "def": 0.54,
+          "step": 0.01,
+          "group": "Treatment"
+        },
+        "edge": {
+          "type": "range",
+          "label": "Edge / line",
+          "min": 0.001,
+          "max": 0.03,
+          "def": 0.004,
+          "step": 0.001,
+          "group": "Treatment"
+        },
+        "contrast": {
+          "type": "range",
+          "label": "Contrast",
+          "min": 0.5,
+          "max": 2,
+          "def": 1,
+          "step": 0.01,
+          "group": "Treatment"
+        },
+        "grid": {
+          "type": "toggle",
+          "label": "Construction grid",
+          "def": true,
+          "group": "Treatment"
+        },
+        "field": {
+          "type": "color",
+          "label": "Field",
+          "def": "#0D1010",
+          "group": "Treatment"
+        },
+        "accentInk": {
+          "type": "color",
+          "label": "Accent",
+          "def": "#B9F65E",
+          "group": "Treatment"
+        },
+        "backdrop": {
+          "type": "select",
+          "label": "Backdrop",
+          "options": [
+            {
+              "v": "solid",
+              "l": "Solid"
+            },
+            {
+              "v": "transparent",
+              "l": "Transparent"
+            }
+          ],
+          "def": "solid",
+          "group": "Treatment",
+          "hint": "Transparent makes the kit useful as a layer over other Motif content."
+        }
+      },
+      "cost": 1.0
+    },
+    {
+      "id": "kinetic-slices",
+      "name": "Kinetic Slices",
+      "group": "FaceType / Experimental",
+      "tags": [
+        "typography",
+        "three-line",
+        "motion",
+        "text",
+        "kinetic-slices"
+      ],
+      "blurb": "Horizontal displacement bands rhythmically fracture letterforms.",
+      "palette": "graphite",
+      "flash": false,
+      "passes": [
+        {
+          "src": "styles/kinetic-slices.glsl"
+        }
+      ],
+      "params": {
+        "line1Pos": {
+          "type": "point",
+          "label": "01 / Statement XY",
+          "min": -1,
+          "max": 1,
+          "def": [
+            0,
+            0.23
+          ],
+          "group": "Line 1",
+          "hint": "Position in frame-normalized XY; each axis can be keyed independently.",
+          "mutate": 0.35
+        },
+        "line1Scale": {
+          "type": "range",
+          "label": "Scale",
+          "min": 0.1,
+          "max": 2.5,
+          "def": 1,
+          "step": 0.01,
+          "group": "Line 1",
+          "mutate": 0.3
+        },
+        "line1Angle": {
+          "type": "range",
+          "label": "Angle",
+          "min": -180,
+          "max": 180,
+          "def": 0,
+          "step": 1,
+          "unit": "°",
+          "group": "Line 1",
+          "mutate": 0.15
+        },
+        "line1Opacity": {
+          "type": "range",
+          "label": "Opacity",
+          "min": 0,
+          "max": 1,
+          "def": 1,
+          "step": 0.01,
+          "group": "Line 1",
+          "mutate": 0.2
+        },
+        "line1Ink": {
+          "type": "color",
+          "label": "Ink",
+          "def": "#F1F0EA",
+          "group": "Line 1",
+          "mutate": 0.1
+        },
+        "line2Pos": {
+          "type": "point",
+          "label": "02 / Context XY",
+          "min": -1,
+          "max": 1,
+          "def": [
+            0,
+            0
+          ],
+          "group": "Line 2",
+          "hint": "Position in frame-normalized XY; each axis can be keyed independently.",
+          "mutate": 0.35
+        },
+        "line2Scale": {
+          "type": "range",
+          "label": "Scale",
+          "min": 0.1,
+          "max": 2.5,
+          "def": 1,
+          "step": 0.01,
+          "group": "Line 2",
+          "mutate": 0.3
+        },
+        "line2Angle": {
+          "type": "range",
+          "label": "Angle",
+          "min": -180,
+          "max": 180,
+          "def": 0,
+          "step": 1,
+          "unit": "°",
+          "group": "Line 2",
+          "mutate": 0.15
+        },
+        "line2Opacity": {
+          "type": "range",
+          "label": "Opacity",
+          "min": 0,
+          "max": 1,
+          "def": 1,
+          "step": 0.01,
+          "group": "Line 2",
+          "mutate": 0.2
+        },
+        "line2Ink": {
+          "type": "color",
+          "label": "Ink",
+          "def": "#B9F65E",
+          "group": "Line 2",
+          "mutate": 0.1
+        },
+        "line3Pos": {
+          "type": "point",
+          "label": "03 / Detail XY",
+          "min": -1,
+          "max": 1,
+          "def": [
+            0,
+            -0.23
+          ],
+          "group": "Line 3",
+          "hint": "Position in frame-normalized XY; each axis can be keyed independently.",
+          "mutate": 0.35
+        },
+        "line3Scale": {
+          "type": "range",
+          "label": "Scale",
+          "min": 0.1,
+          "max": 2.5,
+          "def": 1,
+          "step": 0.01,
+          "group": "Line 3",
+          "mutate": 0.3
+        },
+        "line3Angle": {
+          "type": "range",
+          "label": "Angle",
+          "min": -180,
+          "max": 180,
+          "def": 0,
+          "step": 1,
+          "unit": "°",
+          "group": "Line 3",
+          "mutate": 0.15
+        },
+        "line3Opacity": {
+          "type": "range",
+          "label": "Opacity",
+          "min": 0,
+          "max": 1,
+          "def": 1,
+          "step": 0.01,
+          "group": "Line 3",
+          "mutate": 0.2
+        },
+        "line3Ink": {
+          "type": "color",
+          "label": "Ink",
+          "def": "#F1F0EA",
+          "group": "Line 3",
+          "mutate": 0.1
+        },
+        "motion": {
+          "type": "range",
+          "label": "Motion",
+          "min": 0,
+          "max": 1,
+          "def": 0.42,
+          "step": 0.01,
+          "group": "Motion"
+        },
+        "cycles": {
+          "type": "int",
+          "label": "Cycles / loop",
+          "min": 1,
+          "max": 8,
+          "def": 1,
+          "group": "Motion"
+        },
+        "density": {
+          "type": "range",
+          "label": "Density",
+          "min": 0.1,
+          "max": 1,
+          "def": 0.54,
+          "step": 0.01,
+          "group": "Treatment"
+        },
+        "edge": {
+          "type": "range",
+          "label": "Edge / line",
+          "min": 0.001,
+          "max": 0.03,
+          "def": 0.004,
+          "step": 0.001,
+          "group": "Treatment"
+        },
+        "contrast": {
+          "type": "range",
+          "label": "Contrast",
+          "min": 0.5,
+          "max": 2,
+          "def": 1,
+          "step": 0.01,
+          "group": "Treatment"
+        },
+        "grid": {
+          "type": "toggle",
+          "label": "Construction grid",
+          "def": true,
+          "group": "Treatment"
+        },
+        "field": {
+          "type": "color",
+          "label": "Field",
+          "def": "#0D1010",
+          "group": "Treatment"
+        },
+        "accentInk": {
+          "type": "color",
+          "label": "Accent",
+          "def": "#B9F65E",
+          "group": "Treatment"
+        },
+        "backdrop": {
+          "type": "select",
+          "label": "Backdrop",
+          "options": [
+            {
+              "v": "solid",
+              "l": "Solid"
+            },
+            {
+              "v": "transparent",
+              "l": "Transparent"
+            }
+          ],
+          "def": "solid",
+          "group": "Treatment",
+          "hint": "Transparent makes the kit useful as a layer over other Motif content."
+        }
+      },
+      "cost": 1.0
+    },
+    {
+      "id": "variable-wave",
+      "name": "Variable Wave",
+      "group": "FaceType / Experimental",
+      "tags": [
+        "typography",
+        "three-line",
+        "motion",
+        "text",
+        "variable-wave"
+      ],
+      "blurb": "Looping typographic undulation with restrained phase offsets.",
+      "palette": "graphite",
+      "flash": false,
+      "passes": [
+        {
+          "src": "styles/variable-wave.glsl"
+        }
+      ],
+      "params": {
+        "line1Pos": {
+          "type": "point",
+          "label": "01 / Statement XY",
+          "min": -1,
+          "max": 1,
+          "def": [
+            0,
+            0.23
+          ],
+          "group": "Line 1",
+          "hint": "Position in frame-normalized XY; each axis can be keyed independently.",
+          "mutate": 0.35
+        },
+        "line1Scale": {
+          "type": "range",
+          "label": "Scale",
+          "min": 0.1,
+          "max": 2.5,
+          "def": 1,
+          "step": 0.01,
+          "group": "Line 1",
+          "mutate": 0.3
+        },
+        "line1Angle": {
+          "type": "range",
+          "label": "Angle",
+          "min": -180,
+          "max": 180,
+          "def": 0,
+          "step": 1,
+          "unit": "°",
+          "group": "Line 1",
+          "mutate": 0.15
+        },
+        "line1Opacity": {
+          "type": "range",
+          "label": "Opacity",
+          "min": 0,
+          "max": 1,
+          "def": 1,
+          "step": 0.01,
+          "group": "Line 1",
+          "mutate": 0.2
+        },
+        "line1Ink": {
+          "type": "color",
+          "label": "Ink",
+          "def": "#F1F0EA",
+          "group": "Line 1",
+          "mutate": 0.1
+        },
+        "line2Pos": {
+          "type": "point",
+          "label": "02 / Context XY",
+          "min": -1,
+          "max": 1,
+          "def": [
+            0,
+            0
+          ],
+          "group": "Line 2",
+          "hint": "Position in frame-normalized XY; each axis can be keyed independently.",
+          "mutate": 0.35
+        },
+        "line2Scale": {
+          "type": "range",
+          "label": "Scale",
+          "min": 0.1,
+          "max": 2.5,
+          "def": 1,
+          "step": 0.01,
+          "group": "Line 2",
+          "mutate": 0.3
+        },
+        "line2Angle": {
+          "type": "range",
+          "label": "Angle",
+          "min": -180,
+          "max": 180,
+          "def": 0,
+          "step": 1,
+          "unit": "°",
+          "group": "Line 2",
+          "mutate": 0.15
+        },
+        "line2Opacity": {
+          "type": "range",
+          "label": "Opacity",
+          "min": 0,
+          "max": 1,
+          "def": 1,
+          "step": 0.01,
+          "group": "Line 2",
+          "mutate": 0.2
+        },
+        "line2Ink": {
+          "type": "color",
+          "label": "Ink",
+          "def": "#B9F65E",
+          "group": "Line 2",
+          "mutate": 0.1
+        },
+        "line3Pos": {
+          "type": "point",
+          "label": "03 / Detail XY",
+          "min": -1,
+          "max": 1,
+          "def": [
+            0,
+            -0.23
+          ],
+          "group": "Line 3",
+          "hint": "Position in frame-normalized XY; each axis can be keyed independently.",
+          "mutate": 0.35
+        },
+        "line3Scale": {
+          "type": "range",
+          "label": "Scale",
+          "min": 0.1,
+          "max": 2.5,
+          "def": 1,
+          "step": 0.01,
+          "group": "Line 3",
+          "mutate": 0.3
+        },
+        "line3Angle": {
+          "type": "range",
+          "label": "Angle",
+          "min": -180,
+          "max": 180,
+          "def": 0,
+          "step": 1,
+          "unit": "°",
+          "group": "Line 3",
+          "mutate": 0.15
+        },
+        "line3Opacity": {
+          "type": "range",
+          "label": "Opacity",
+          "min": 0,
+          "max": 1,
+          "def": 1,
+          "step": 0.01,
+          "group": "Line 3",
+          "mutate": 0.2
+        },
+        "line3Ink": {
+          "type": "color",
+          "label": "Ink",
+          "def": "#F1F0EA",
+          "group": "Line 3",
+          "mutate": 0.1
+        },
+        "motion": {
+          "type": "range",
+          "label": "Motion",
+          "min": 0,
+          "max": 1,
+          "def": 0.42,
+          "step": 0.01,
+          "group": "Motion"
+        },
+        "cycles": {
+          "type": "int",
+          "label": "Cycles / loop",
+          "min": 1,
+          "max": 8,
+          "def": 1,
+          "group": "Motion"
+        },
+        "density": {
+          "type": "range",
+          "label": "Density",
+          "min": 0.1,
+          "max": 1,
+          "def": 0.54,
+          "step": 0.01,
+          "group": "Treatment"
+        },
+        "edge": {
+          "type": "range",
+          "label": "Edge / line",
+          "min": 0.001,
+          "max": 0.03,
+          "def": 0.004,
+          "step": 0.001,
+          "group": "Treatment"
+        },
+        "contrast": {
+          "type": "range",
+          "label": "Contrast",
+          "min": 0.5,
+          "max": 2,
+          "def": 1,
+          "step": 0.01,
+          "group": "Treatment"
+        },
+        "grid": {
+          "type": "toggle",
+          "label": "Construction grid",
+          "def": true,
+          "group": "Treatment"
+        },
+        "field": {
+          "type": "color",
+          "label": "Field",
+          "def": "#0D1010",
+          "group": "Treatment"
+        },
+        "accentInk": {
+          "type": "color",
+          "label": "Accent",
+          "def": "#B9F65E",
+          "group": "Treatment"
+        },
+        "backdrop": {
+          "type": "select",
+          "label": "Backdrop",
+          "options": [
+            {
+              "v": "solid",
+              "l": "Solid"
+            },
+            {
+              "v": "transparent",
+              "l": "Transparent"
+            }
+          ],
+          "def": "solid",
+          "group": "Treatment",
+          "hint": "Transparent makes the kit useful as a layer over other Motif content."
+        }
+      },
+      "cost": 1.0
+    },
+    {
+      "id": "signal-scan",
+      "name": "Signal Scan",
+      "group": "FaceType / Experimental",
+      "tags": [
+        "typography",
+        "three-line",
+        "motion",
+        "text",
+        "signal-scan"
+      ],
+      "blurb": "Scanning lines reveal the typographic signal.",
+      "palette": "graphite",
+      "flash": false,
+      "passes": [
+        {
+          "src": "styles/signal-scan.glsl"
+        }
+      ],
+      "params": {
+        "line1Pos": {
+          "type": "point",
+          "label": "01 / Statement XY",
+          "min": -1,
+          "max": 1,
+          "def": [
+            0,
+            0.23
+          ],
+          "group": "Line 1",
+          "hint": "Position in frame-normalized XY; each axis can be keyed independently.",
+          "mutate": 0.35
+        },
+        "line1Scale": {
+          "type": "range",
+          "label": "Scale",
+          "min": 0.1,
+          "max": 2.5,
+          "def": 1,
+          "step": 0.01,
+          "group": "Line 1",
+          "mutate": 0.3
+        },
+        "line1Angle": {
+          "type": "range",
+          "label": "Angle",
+          "min": -180,
+          "max": 180,
+          "def": 0,
+          "step": 1,
+          "unit": "°",
+          "group": "Line 1",
+          "mutate": 0.15
+        },
+        "line1Opacity": {
+          "type": "range",
+          "label": "Opacity",
+          "min": 0,
+          "max": 1,
+          "def": 1,
+          "step": 0.01,
+          "group": "Line 1",
+          "mutate": 0.2
+        },
+        "line1Ink": {
+          "type": "color",
+          "label": "Ink",
+          "def": "#F1F0EA",
+          "group": "Line 1",
+          "mutate": 0.1
+        },
+        "line2Pos": {
+          "type": "point",
+          "label": "02 / Context XY",
+          "min": -1,
+          "max": 1,
+          "def": [
+            0,
+            0
+          ],
+          "group": "Line 2",
+          "hint": "Position in frame-normalized XY; each axis can be keyed independently.",
+          "mutate": 0.35
+        },
+        "line2Scale": {
+          "type": "range",
+          "label": "Scale",
+          "min": 0.1,
+          "max": 2.5,
+          "def": 1,
+          "step": 0.01,
+          "group": "Line 2",
+          "mutate": 0.3
+        },
+        "line2Angle": {
+          "type": "range",
+          "label": "Angle",
+          "min": -180,
+          "max": 180,
+          "def": 0,
+          "step": 1,
+          "unit": "°",
+          "group": "Line 2",
+          "mutate": 0.15
+        },
+        "line2Opacity": {
+          "type": "range",
+          "label": "Opacity",
+          "min": 0,
+          "max": 1,
+          "def": 1,
+          "step": 0.01,
+          "group": "Line 2",
+          "mutate": 0.2
+        },
+        "line2Ink": {
+          "type": "color",
+          "label": "Ink",
+          "def": "#B9F65E",
+          "group": "Line 2",
+          "mutate": 0.1
+        },
+        "line3Pos": {
+          "type": "point",
+          "label": "03 / Detail XY",
+          "min": -1,
+          "max": 1,
+          "def": [
+            0,
+            -0.23
+          ],
+          "group": "Line 3",
+          "hint": "Position in frame-normalized XY; each axis can be keyed independently.",
+          "mutate": 0.35
+        },
+        "line3Scale": {
+          "type": "range",
+          "label": "Scale",
+          "min": 0.1,
+          "max": 2.5,
+          "def": 1,
+          "step": 0.01,
+          "group": "Line 3",
+          "mutate": 0.3
+        },
+        "line3Angle": {
+          "type": "range",
+          "label": "Angle",
+          "min": -180,
+          "max": 180,
+          "def": 0,
+          "step": 1,
+          "unit": "°",
+          "group": "Line 3",
+          "mutate": 0.15
+        },
+        "line3Opacity": {
+          "type": "range",
+          "label": "Opacity",
+          "min": 0,
+          "max": 1,
+          "def": 1,
+          "step": 0.01,
+          "group": "Line 3",
+          "mutate": 0.2
+        },
+        "line3Ink": {
+          "type": "color",
+          "label": "Ink",
+          "def": "#F1F0EA",
+          "group": "Line 3",
+          "mutate": 0.1
+        },
+        "motion": {
+          "type": "range",
+          "label": "Motion",
+          "min": 0,
+          "max": 1,
+          "def": 0.42,
+          "step": 0.01,
+          "group": "Motion"
+        },
+        "cycles": {
+          "type": "int",
+          "label": "Cycles / loop",
+          "min": 1,
+          "max": 8,
+          "def": 1,
+          "group": "Motion"
+        },
+        "density": {
+          "type": "range",
+          "label": "Density",
+          "min": 0.1,
+          "max": 1,
+          "def": 0.54,
+          "step": 0.01,
+          "group": "Treatment"
+        },
+        "edge": {
+          "type": "range",
+          "label": "Edge / line",
+          "min": 0.001,
+          "max": 0.03,
+          "def": 0.004,
+          "step": 0.001,
+          "group": "Treatment"
+        },
+        "contrast": {
+          "type": "range",
+          "label": "Contrast",
+          "min": 0.5,
+          "max": 2,
+          "def": 1,
+          "step": 0.01,
+          "group": "Treatment"
+        },
+        "grid": {
+          "type": "toggle",
+          "label": "Construction grid",
+          "def": true,
+          "group": "Treatment"
+        },
+        "field": {
+          "type": "color",
+          "label": "Field",
+          "def": "#0D1010",
+          "group": "Treatment"
+        },
+        "accentInk": {
+          "type": "color",
+          "label": "Accent",
+          "def": "#B9F65E",
+          "group": "Treatment"
+        },
+        "backdrop": {
+          "type": "select",
+          "label": "Backdrop",
+          "options": [
+            {
+              "v": "solid",
+              "l": "Solid"
+            },
+            {
+              "v": "transparent",
+              "l": "Transparent"
+            }
+          ],
+          "def": "solid",
+          "group": "Treatment",
+          "hint": "Transparent makes the kit useful as a layer over other Motif content."
+        }
+      },
+      "cost": 1.0
+    },
+    {
+      "id": "type-orbit",
+      "name": "Type Orbit",
+      "group": "FaceType / Experimental",
+      "tags": [
+        "typography",
+        "three-line",
+        "motion",
+        "text",
+        "type-orbit"
+      ],
+      "blurb": "Three lines follow small orbital paths while remaining independently placed.",
+      "palette": "graphite",
+      "flash": false,
+      "passes": [
+        {
+          "src": "styles/type-orbit.glsl"
+        }
+      ],
+      "params": {
+        "line1Pos": {
+          "type": "point",
+          "label": "01 / Statement XY",
+          "min": -1,
+          "max": 1,
+          "def": [
+            0,
+            0.23
+          ],
+          "group": "Line 1",
+          "hint": "Position in frame-normalized XY; each axis can be keyed independently.",
+          "mutate": 0.35
+        },
+        "line1Scale": {
+          "type": "range",
+          "label": "Scale",
+          "min": 0.1,
+          "max": 2.5,
+          "def": 1,
+          "step": 0.01,
+          "group": "Line 1",
+          "mutate": 0.3
+        },
+        "line1Angle": {
+          "type": "range",
+          "label": "Angle",
+          "min": -180,
+          "max": 180,
+          "def": 0,
+          "step": 1,
+          "unit": "°",
+          "group": "Line 1",
+          "mutate": 0.15
+        },
+        "line1Opacity": {
+          "type": "range",
+          "label": "Opacity",
+          "min": 0,
+          "max": 1,
+          "def": 1,
+          "step": 0.01,
+          "group": "Line 1",
+          "mutate": 0.2
+        },
+        "line1Ink": {
+          "type": "color",
+          "label": "Ink",
+          "def": "#F1F0EA",
+          "group": "Line 1",
+          "mutate": 0.1
+        },
+        "line2Pos": {
+          "type": "point",
+          "label": "02 / Context XY",
+          "min": -1,
+          "max": 1,
+          "def": [
+            0,
+            0
+          ],
+          "group": "Line 2",
+          "hint": "Position in frame-normalized XY; each axis can be keyed independently.",
+          "mutate": 0.35
+        },
+        "line2Scale": {
+          "type": "range",
+          "label": "Scale",
+          "min": 0.1,
+          "max": 2.5,
+          "def": 1,
+          "step": 0.01,
+          "group": "Line 2",
+          "mutate": 0.3
+        },
+        "line2Angle": {
+          "type": "range",
+          "label": "Angle",
+          "min": -180,
+          "max": 180,
+          "def": 0,
+          "step": 1,
+          "unit": "°",
+          "group": "Line 2",
+          "mutate": 0.15
+        },
+        "line2Opacity": {
+          "type": "range",
+          "label": "Opacity",
+          "min": 0,
+          "max": 1,
+          "def": 1,
+          "step": 0.01,
+          "group": "Line 2",
+          "mutate": 0.2
+        },
+        "line2Ink": {
+          "type": "color",
+          "label": "Ink",
+          "def": "#B9F65E",
+          "group": "Line 2",
+          "mutate": 0.1
+        },
+        "line3Pos": {
+          "type": "point",
+          "label": "03 / Detail XY",
+          "min": -1,
+          "max": 1,
+          "def": [
+            0,
+            -0.23
+          ],
+          "group": "Line 3",
+          "hint": "Position in frame-normalized XY; each axis can be keyed independently.",
+          "mutate": 0.35
+        },
+        "line3Scale": {
+          "type": "range",
+          "label": "Scale",
+          "min": 0.1,
+          "max": 2.5,
+          "def": 1,
+          "step": 0.01,
+          "group": "Line 3",
+          "mutate": 0.3
+        },
+        "line3Angle": {
+          "type": "range",
+          "label": "Angle",
+          "min": -180,
+          "max": 180,
+          "def": 0,
+          "step": 1,
+          "unit": "°",
+          "group": "Line 3",
+          "mutate": 0.15
+        },
+        "line3Opacity": {
+          "type": "range",
+          "label": "Opacity",
+          "min": 0,
+          "max": 1,
+          "def": 1,
+          "step": 0.01,
+          "group": "Line 3",
+          "mutate": 0.2
+        },
+        "line3Ink": {
+          "type": "color",
+          "label": "Ink",
+          "def": "#F1F0EA",
+          "group": "Line 3",
+          "mutate": 0.1
+        },
+        "motion": {
+          "type": "range",
+          "label": "Motion",
+          "min": 0,
+          "max": 1,
+          "def": 0.42,
+          "step": 0.01,
+          "group": "Motion"
+        },
+        "cycles": {
+          "type": "int",
+          "label": "Cycles / loop",
+          "min": 1,
+          "max": 8,
+          "def": 1,
+          "group": "Motion"
+        },
+        "density": {
+          "type": "range",
+          "label": "Density",
+          "min": 0.1,
+          "max": 1,
+          "def": 0.54,
+          "step": 0.01,
+          "group": "Treatment"
+        },
+        "edge": {
+          "type": "range",
+          "label": "Edge / line",
+          "min": 0.001,
+          "max": 0.03,
+          "def": 0.004,
+          "step": 0.001,
+          "group": "Treatment"
+        },
+        "contrast": {
+          "type": "range",
+          "label": "Contrast",
+          "min": 0.5,
+          "max": 2,
+          "def": 1,
+          "step": 0.01,
+          "group": "Treatment"
+        },
+        "grid": {
+          "type": "toggle",
+          "label": "Construction grid",
+          "def": true,
+          "group": "Treatment"
+        },
+        "field": {
+          "type": "color",
+          "label": "Field",
+          "def": "#0D1010",
+          "group": "Treatment"
+        },
+        "accentInk": {
+          "type": "color",
+          "label": "Accent",
+          "def": "#B9F65E",
+          "group": "Treatment"
+        },
+        "backdrop": {
+          "type": "select",
+          "label": "Backdrop",
+          "options": [
+            {
+              "v": "solid",
+              "l": "Solid"
+            },
+            {
+              "v": "transparent",
+              "l": "Transparent"
+            }
+          ],
+          "def": "solid",
+          "group": "Treatment",
+          "hint": "Transparent makes the kit useful as a layer over other Motif content."
+        }
+      },
+      "cost": 1.0
+    },
+    {
+      "id": "column-shift",
+      "name": "Column Shift",
+      "group": "FaceType / Experimental",
+      "tags": [
+        "typography",
+        "three-line",
+        "motion",
+        "text",
+        "column-shift"
+      ],
+      "blurb": "Staggered vertical ribbons create a structured offset.",
+      "palette": "graphite",
+      "flash": false,
+      "passes": [
+        {
+          "src": "styles/column-shift.glsl"
+        }
+      ],
+      "params": {
+        "line1Pos": {
+          "type": "point",
+          "label": "01 / Statement XY",
+          "min": -1,
+          "max": 1,
+          "def": [
+            0,
+            0.23
+          ],
+          "group": "Line 1",
+          "hint": "Position in frame-normalized XY; each axis can be keyed independently.",
+          "mutate": 0.35
+        },
+        "line1Scale": {
+          "type": "range",
+          "label": "Scale",
+          "min": 0.1,
+          "max": 2.5,
+          "def": 1,
+          "step": 0.01,
+          "group": "Line 1",
+          "mutate": 0.3
+        },
+        "line1Angle": {
+          "type": "range",
+          "label": "Angle",
+          "min": -180,
+          "max": 180,
+          "def": 0,
+          "step": 1,
+          "unit": "°",
+          "group": "Line 1",
+          "mutate": 0.15
+        },
+        "line1Opacity": {
+          "type": "range",
+          "label": "Opacity",
+          "min": 0,
+          "max": 1,
+          "def": 1,
+          "step": 0.01,
+          "group": "Line 1",
+          "mutate": 0.2
+        },
+        "line1Ink": {
+          "type": "color",
+          "label": "Ink",
+          "def": "#F1F0EA",
+          "group": "Line 1",
+          "mutate": 0.1
+        },
+        "line2Pos": {
+          "type": "point",
+          "label": "02 / Context XY",
+          "min": -1,
+          "max": 1,
+          "def": [
+            0,
+            0
+          ],
+          "group": "Line 2",
+          "hint": "Position in frame-normalized XY; each axis can be keyed independently.",
+          "mutate": 0.35
+        },
+        "line2Scale": {
+          "type": "range",
+          "label": "Scale",
+          "min": 0.1,
+          "max": 2.5,
+          "def": 1,
+          "step": 0.01,
+          "group": "Line 2",
+          "mutate": 0.3
+        },
+        "line2Angle": {
+          "type": "range",
+          "label": "Angle",
+          "min": -180,
+          "max": 180,
+          "def": 0,
+          "step": 1,
+          "unit": "°",
+          "group": "Line 2",
+          "mutate": 0.15
+        },
+        "line2Opacity": {
+          "type": "range",
+          "label": "Opacity",
+          "min": 0,
+          "max": 1,
+          "def": 1,
+          "step": 0.01,
+          "group": "Line 2",
+          "mutate": 0.2
+        },
+        "line2Ink": {
+          "type": "color",
+          "label": "Ink",
+          "def": "#B9F65E",
+          "group": "Line 2",
+          "mutate": 0.1
+        },
+        "line3Pos": {
+          "type": "point",
+          "label": "03 / Detail XY",
+          "min": -1,
+          "max": 1,
+          "def": [
+            0,
+            -0.23
+          ],
+          "group": "Line 3",
+          "hint": "Position in frame-normalized XY; each axis can be keyed independently.",
+          "mutate": 0.35
+        },
+        "line3Scale": {
+          "type": "range",
+          "label": "Scale",
+          "min": 0.1,
+          "max": 2.5,
+          "def": 1,
+          "step": 0.01,
+          "group": "Line 3",
+          "mutate": 0.3
+        },
+        "line3Angle": {
+          "type": "range",
+          "label": "Angle",
+          "min": -180,
+          "max": 180,
+          "def": 0,
+          "step": 1,
+          "unit": "°",
+          "group": "Line 3",
+          "mutate": 0.15
+        },
+        "line3Opacity": {
+          "type": "range",
+          "label": "Opacity",
+          "min": 0,
+          "max": 1,
+          "def": 1,
+          "step": 0.01,
+          "group": "Line 3",
+          "mutate": 0.2
+        },
+        "line3Ink": {
+          "type": "color",
+          "label": "Ink",
+          "def": "#F1F0EA",
+          "group": "Line 3",
+          "mutate": 0.1
+        },
+        "motion": {
+          "type": "range",
+          "label": "Motion",
+          "min": 0,
+          "max": 1,
+          "def": 0.42,
+          "step": 0.01,
+          "group": "Motion"
+        },
+        "cycles": {
+          "type": "int",
+          "label": "Cycles / loop",
+          "min": 1,
+          "max": 8,
+          "def": 1,
+          "group": "Motion"
+        },
+        "density": {
+          "type": "range",
+          "label": "Density",
+          "min": 0.1,
+          "max": 1,
+          "def": 0.54,
+          "step": 0.01,
+          "group": "Treatment"
+        },
+        "edge": {
+          "type": "range",
+          "label": "Edge / line",
+          "min": 0.001,
+          "max": 0.03,
+          "def": 0.004,
+          "step": 0.001,
+          "group": "Treatment"
+        },
+        "contrast": {
+          "type": "range",
+          "label": "Contrast",
+          "min": 0.5,
+          "max": 2,
+          "def": 1,
+          "step": 0.01,
+          "group": "Treatment"
+        },
+        "grid": {
+          "type": "toggle",
+          "label": "Construction grid",
+          "def": true,
+          "group": "Treatment"
+        },
+        "field": {
+          "type": "color",
+          "label": "Field",
+          "def": "#0D1010",
+          "group": "Treatment"
+        },
+        "accentInk": {
+          "type": "color",
+          "label": "Accent",
+          "def": "#B9F65E",
+          "group": "Treatment"
+        },
+        "backdrop": {
+          "type": "select",
+          "label": "Backdrop",
+          "options": [
+            {
+              "v": "solid",
+              "l": "Solid"
+            },
+            {
+              "v": "transparent",
+              "l": "Transparent"
+            }
+          ],
+          "def": "solid",
+          "group": "Treatment",
+          "hint": "Transparent makes the kit useful as a layer over other Motif content."
+        }
+      },
+      "cost": 1.0
+    },
+    {
+      "id": "echo-trails",
+      "name": "Echo Trails",
+      "group": "FaceType / Experimental",
+      "tags": [
+        "typography",
+        "three-line",
+        "motion",
+        "text",
+        "echo-trails"
+      ],
+      "blurb": "Low-opacity displaced copies retain an editorial afterimage.",
+      "palette": "graphite",
+      "flash": false,
+      "passes": [
+        {
+          "src": "styles/echo-trails.glsl"
+        }
+      ],
+      "params": {
+        "line1Pos": {
+          "type": "point",
+          "label": "01 / Statement XY",
+          "min": -1,
+          "max": 1,
+          "def": [
+            0,
+            0.23
+          ],
+          "group": "Line 1",
+          "hint": "Position in frame-normalized XY; each axis can be keyed independently.",
+          "mutate": 0.35
+        },
+        "line1Scale": {
+          "type": "range",
+          "label": "Scale",
+          "min": 0.1,
+          "max": 2.5,
+          "def": 1,
+          "step": 0.01,
+          "group": "Line 1",
+          "mutate": 0.3
+        },
+        "line1Angle": {
+          "type": "range",
+          "label": "Angle",
+          "min": -180,
+          "max": 180,
+          "def": 0,
+          "step": 1,
+          "unit": "°",
+          "group": "Line 1",
+          "mutate": 0.15
+        },
+        "line1Opacity": {
+          "type": "range",
+          "label": "Opacity",
+          "min": 0,
+          "max": 1,
+          "def": 1,
+          "step": 0.01,
+          "group": "Line 1",
+          "mutate": 0.2
+        },
+        "line1Ink": {
+          "type": "color",
+          "label": "Ink",
+          "def": "#F1F0EA",
+          "group": "Line 1",
+          "mutate": 0.1
+        },
+        "line2Pos": {
+          "type": "point",
+          "label": "02 / Context XY",
+          "min": -1,
+          "max": 1,
+          "def": [
+            0,
+            0
+          ],
+          "group": "Line 2",
+          "hint": "Position in frame-normalized XY; each axis can be keyed independently.",
+          "mutate": 0.35
+        },
+        "line2Scale": {
+          "type": "range",
+          "label": "Scale",
+          "min": 0.1,
+          "max": 2.5,
+          "def": 1,
+          "step": 0.01,
+          "group": "Line 2",
+          "mutate": 0.3
+        },
+        "line2Angle": {
+          "type": "range",
+          "label": "Angle",
+          "min": -180,
+          "max": 180,
+          "def": 0,
+          "step": 1,
+          "unit": "°",
+          "group": "Line 2",
+          "mutate": 0.15
+        },
+        "line2Opacity": {
+          "type": "range",
+          "label": "Opacity",
+          "min": 0,
+          "max": 1,
+          "def": 1,
+          "step": 0.01,
+          "group": "Line 2",
+          "mutate": 0.2
+        },
+        "line2Ink": {
+          "type": "color",
+          "label": "Ink",
+          "def": "#B9F65E",
+          "group": "Line 2",
+          "mutate": 0.1
+        },
+        "line3Pos": {
+          "type": "point",
+          "label": "03 / Detail XY",
+          "min": -1,
+          "max": 1,
+          "def": [
+            0,
+            -0.23
+          ],
+          "group": "Line 3",
+          "hint": "Position in frame-normalized XY; each axis can be keyed independently.",
+          "mutate": 0.35
+        },
+        "line3Scale": {
+          "type": "range",
+          "label": "Scale",
+          "min": 0.1,
+          "max": 2.5,
+          "def": 1,
+          "step": 0.01,
+          "group": "Line 3",
+          "mutate": 0.3
+        },
+        "line3Angle": {
+          "type": "range",
+          "label": "Angle",
+          "min": -180,
+          "max": 180,
+          "def": 0,
+          "step": 1,
+          "unit": "°",
+          "group": "Line 3",
+          "mutate": 0.15
+        },
+        "line3Opacity": {
+          "type": "range",
+          "label": "Opacity",
+          "min": 0,
+          "max": 1,
+          "def": 1,
+          "step": 0.01,
+          "group": "Line 3",
+          "mutate": 0.2
+        },
+        "line3Ink": {
+          "type": "color",
+          "label": "Ink",
+          "def": "#F1F0EA",
+          "group": "Line 3",
+          "mutate": 0.1
+        },
+        "motion": {
+          "type": "range",
+          "label": "Motion",
+          "min": 0,
+          "max": 1,
+          "def": 0.42,
+          "step": 0.01,
+          "group": "Motion"
+        },
+        "cycles": {
+          "type": "int",
+          "label": "Cycles / loop",
+          "min": 1,
+          "max": 8,
+          "def": 1,
+          "group": "Motion"
+        },
+        "density": {
+          "type": "range",
+          "label": "Density",
+          "min": 0.1,
+          "max": 1,
+          "def": 0.54,
+          "step": 0.01,
+          "group": "Treatment"
+        },
+        "edge": {
+          "type": "range",
+          "label": "Edge / line",
+          "min": 0.001,
+          "max": 0.03,
+          "def": 0.004,
+          "step": 0.001,
+          "group": "Treatment"
+        },
+        "contrast": {
+          "type": "range",
+          "label": "Contrast",
+          "min": 0.5,
+          "max": 2,
+          "def": 1,
+          "step": 0.01,
+          "group": "Treatment"
+        },
+        "grid": {
+          "type": "toggle",
+          "label": "Construction grid",
+          "def": true,
+          "group": "Treatment"
+        },
+        "field": {
+          "type": "color",
+          "label": "Field",
+          "def": "#0D1010",
+          "group": "Treatment"
+        },
+        "accentInk": {
+          "type": "color",
+          "label": "Accent",
+          "def": "#B9F65E",
+          "group": "Treatment"
+        },
+        "backdrop": {
+          "type": "select",
+          "label": "Backdrop",
+          "options": [
+            {
+              "v": "solid",
+              "l": "Solid"
+            },
+            {
+              "v": "transparent",
+              "l": "Transparent"
+            }
+          ],
+          "def": "solid",
+          "group": "Treatment",
+          "hint": "Transparent makes the kit useful as a layer over other Motif content."
+        }
+      },
+      "cost": 1.0
+    },
+    {
+      "id": "outline-study",
+      "name": "Outline Study",
+      "group": "FaceType / Rational",
+      "tags": [
+        "typography",
+        "three-line",
+        "motion",
+        "text",
+        "outline-study"
+      ],
+      "blurb": "Fine contour accents and offset print-register treatment.",
+      "palette": "graphite",
+      "flash": false,
+      "passes": [
+        {
+          "src": "styles/outline-study.glsl"
+        }
+      ],
+      "params": {
+        "line1Pos": {
+          "type": "point",
+          "label": "01 / Statement XY",
+          "min": -1,
+          "max": 1,
+          "def": [
+            0,
+            0.23
+          ],
+          "group": "Line 1",
+          "hint": "Position in frame-normalized XY; each axis can be keyed independently.",
+          "mutate": 0.35
+        },
+        "line1Scale": {
+          "type": "range",
+          "label": "Scale",
+          "min": 0.1,
+          "max": 2.5,
+          "def": 1,
+          "step": 0.01,
+          "group": "Line 1",
+          "mutate": 0.3
+        },
+        "line1Angle": {
+          "type": "range",
+          "label": "Angle",
+          "min": -180,
+          "max": 180,
+          "def": 0,
+          "step": 1,
+          "unit": "°",
+          "group": "Line 1",
+          "mutate": 0.15
+        },
+        "line1Opacity": {
+          "type": "range",
+          "label": "Opacity",
+          "min": 0,
+          "max": 1,
+          "def": 1,
+          "step": 0.01,
+          "group": "Line 1",
+          "mutate": 0.2
+        },
+        "line1Ink": {
+          "type": "color",
+          "label": "Ink",
+          "def": "#F1F0EA",
+          "group": "Line 1",
+          "mutate": 0.1
+        },
+        "line2Pos": {
+          "type": "point",
+          "label": "02 / Context XY",
+          "min": -1,
+          "max": 1,
+          "def": [
+            0,
+            0
+          ],
+          "group": "Line 2",
+          "hint": "Position in frame-normalized XY; each axis can be keyed independently.",
+          "mutate": 0.35
+        },
+        "line2Scale": {
+          "type": "range",
+          "label": "Scale",
+          "min": 0.1,
+          "max": 2.5,
+          "def": 1,
+          "step": 0.01,
+          "group": "Line 2",
+          "mutate": 0.3
+        },
+        "line2Angle": {
+          "type": "range",
+          "label": "Angle",
+          "min": -180,
+          "max": 180,
+          "def": 0,
+          "step": 1,
+          "unit": "°",
+          "group": "Line 2",
+          "mutate": 0.15
+        },
+        "line2Opacity": {
+          "type": "range",
+          "label": "Opacity",
+          "min": 0,
+          "max": 1,
+          "def": 1,
+          "step": 0.01,
+          "group": "Line 2",
+          "mutate": 0.2
+        },
+        "line2Ink": {
+          "type": "color",
+          "label": "Ink",
+          "def": "#B9F65E",
+          "group": "Line 2",
+          "mutate": 0.1
+        },
+        "line3Pos": {
+          "type": "point",
+          "label": "03 / Detail XY",
+          "min": -1,
+          "max": 1,
+          "def": [
+            0,
+            -0.23
+          ],
+          "group": "Line 3",
+          "hint": "Position in frame-normalized XY; each axis can be keyed independently.",
+          "mutate": 0.35
+        },
+        "line3Scale": {
+          "type": "range",
+          "label": "Scale",
+          "min": 0.1,
+          "max": 2.5,
+          "def": 1,
+          "step": 0.01,
+          "group": "Line 3",
+          "mutate": 0.3
+        },
+        "line3Angle": {
+          "type": "range",
+          "label": "Angle",
+          "min": -180,
+          "max": 180,
+          "def": 0,
+          "step": 1,
+          "unit": "°",
+          "group": "Line 3",
+          "mutate": 0.15
+        },
+        "line3Opacity": {
+          "type": "range",
+          "label": "Opacity",
+          "min": 0,
+          "max": 1,
+          "def": 1,
+          "step": 0.01,
+          "group": "Line 3",
+          "mutate": 0.2
+        },
+        "line3Ink": {
+          "type": "color",
+          "label": "Ink",
+          "def": "#F1F0EA",
+          "group": "Line 3",
+          "mutate": 0.1
+        },
+        "motion": {
+          "type": "range",
+          "label": "Motion",
+          "min": 0,
+          "max": 1,
+          "def": 0.42,
+          "step": 0.01,
+          "group": "Motion"
+        },
+        "cycles": {
+          "type": "int",
+          "label": "Cycles / loop",
+          "min": 1,
+          "max": 8,
+          "def": 1,
+          "group": "Motion"
+        },
+        "density": {
+          "type": "range",
+          "label": "Density",
+          "min": 0.1,
+          "max": 1,
+          "def": 0.54,
+          "step": 0.01,
+          "group": "Treatment"
+        },
+        "edge": {
+          "type": "range",
+          "label": "Edge / line",
+          "min": 0.001,
+          "max": 0.03,
+          "def": 0.004,
+          "step": 0.001,
+          "group": "Treatment"
+        },
+        "contrast": {
+          "type": "range",
+          "label": "Contrast",
+          "min": 0.5,
+          "max": 2,
+          "def": 1,
+          "step": 0.01,
+          "group": "Treatment"
+        },
+        "grid": {
+          "type": "toggle",
+          "label": "Construction grid",
+          "def": true,
+          "group": "Treatment"
+        },
+        "field": {
+          "type": "color",
+          "label": "Field",
+          "def": "#0D1010",
+          "group": "Treatment"
+        },
+        "accentInk": {
+          "type": "color",
+          "label": "Accent",
+          "def": "#B9F65E",
+          "group": "Treatment"
+        },
+        "backdrop": {
+          "type": "select",
+          "label": "Backdrop",
+          "options": [
+            {
+              "v": "solid",
+              "l": "Solid"
+            },
+            {
+              "v": "transparent",
+              "l": "Transparent"
+            }
+          ],
+          "def": "solid",
+          "group": "Treatment",
+          "hint": "Transparent makes the kit useful as a layer over other Motif content."
+        }
+      },
+      "cost": 1.0
+    },
+    {
+      "id": "monument",
+      "name": "Monument",
+      "group": "FaceType / Rational",
+      "tags": [
+        "typography",
+        "three-line",
+        "motion",
+        "text",
+        "monument"
+      ],
+      "blurb": "Bold framing, blocks and decisive reveal for headline scale.",
+      "palette": "graphite",
+      "flash": false,
+      "passes": [
+        {
+          "src": "styles/monument.glsl"
+        }
+      ],
+      "params": {
+        "line1Pos": {
+          "type": "point",
+          "label": "01 / Statement XY",
+          "min": -1,
+          "max": 1,
+          "def": [
+            0,
+            0.23
+          ],
+          "group": "Line 1",
+          "hint": "Position in frame-normalized XY; each axis can be keyed independently.",
+          "mutate": 0.35
+        },
+        "line1Scale": {
+          "type": "range",
+          "label": "Scale",
+          "min": 0.1,
+          "max": 2.5,
+          "def": 1,
+          "step": 0.01,
+          "group": "Line 1",
+          "mutate": 0.3
+        },
+        "line1Angle": {
+          "type": "range",
+          "label": "Angle",
+          "min": -180,
+          "max": 180,
+          "def": 0,
+          "step": 1,
+          "unit": "°",
+          "group": "Line 1",
+          "mutate": 0.15
+        },
+        "line1Opacity": {
+          "type": "range",
+          "label": "Opacity",
+          "min": 0,
+          "max": 1,
+          "def": 1,
+          "step": 0.01,
+          "group": "Line 1",
+          "mutate": 0.2
+        },
+        "line1Ink": {
+          "type": "color",
+          "label": "Ink",
+          "def": "#F1F0EA",
+          "group": "Line 1",
+          "mutate": 0.1
+        },
+        "line2Pos": {
+          "type": "point",
+          "label": "02 / Context XY",
+          "min": -1,
+          "max": 1,
+          "def": [
+            0,
+            0
+          ],
+          "group": "Line 2",
+          "hint": "Position in frame-normalized XY; each axis can be keyed independently.",
+          "mutate": 0.35
+        },
+        "line2Scale": {
+          "type": "range",
+          "label": "Scale",
+          "min": 0.1,
+          "max": 2.5,
+          "def": 1,
+          "step": 0.01,
+          "group": "Line 2",
+          "mutate": 0.3
+        },
+        "line2Angle": {
+          "type": "range",
+          "label": "Angle",
+          "min": -180,
+          "max": 180,
+          "def": 0,
+          "step": 1,
+          "unit": "°",
+          "group": "Line 2",
+          "mutate": 0.15
+        },
+        "line2Opacity": {
+          "type": "range",
+          "label": "Opacity",
+          "min": 0,
+          "max": 1,
+          "def": 1,
+          "step": 0.01,
+          "group": "Line 2",
+          "mutate": 0.2
+        },
+        "line2Ink": {
+          "type": "color",
+          "label": "Ink",
+          "def": "#B9F65E",
+          "group": "Line 2",
+          "mutate": 0.1
+        },
+        "line3Pos": {
+          "type": "point",
+          "label": "03 / Detail XY",
+          "min": -1,
+          "max": 1,
+          "def": [
+            0,
+            -0.23
+          ],
+          "group": "Line 3",
+          "hint": "Position in frame-normalized XY; each axis can be keyed independently.",
+          "mutate": 0.35
+        },
+        "line3Scale": {
+          "type": "range",
+          "label": "Scale",
+          "min": 0.1,
+          "max": 2.5,
+          "def": 1,
+          "step": 0.01,
+          "group": "Line 3",
+          "mutate": 0.3
+        },
+        "line3Angle": {
+          "type": "range",
+          "label": "Angle",
+          "min": -180,
+          "max": 180,
+          "def": 0,
+          "step": 1,
+          "unit": "°",
+          "group": "Line 3",
+          "mutate": 0.15
+        },
+        "line3Opacity": {
+          "type": "range",
+          "label": "Opacity",
+          "min": 0,
+          "max": 1,
+          "def": 1,
+          "step": 0.01,
+          "group": "Line 3",
+          "mutate": 0.2
+        },
+        "line3Ink": {
+          "type": "color",
+          "label": "Ink",
+          "def": "#F1F0EA",
+          "group": "Line 3",
+          "mutate": 0.1
+        },
+        "motion": {
+          "type": "range",
+          "label": "Motion",
+          "min": 0,
+          "max": 1,
+          "def": 0.42,
+          "step": 0.01,
+          "group": "Motion"
+        },
+        "cycles": {
+          "type": "int",
+          "label": "Cycles / loop",
+          "min": 1,
+          "max": 8,
+          "def": 1,
+          "group": "Motion"
+        },
+        "density": {
+          "type": "range",
+          "label": "Density",
+          "min": 0.1,
+          "max": 1,
+          "def": 0.54,
+          "step": 0.01,
+          "group": "Treatment"
+        },
+        "edge": {
+          "type": "range",
+          "label": "Edge / line",
+          "min": 0.001,
+          "max": 0.03,
+          "def": 0.004,
+          "step": 0.001,
+          "group": "Treatment"
+        },
+        "contrast": {
+          "type": "range",
+          "label": "Contrast",
+          "min": 0.5,
+          "max": 2,
+          "def": 1,
+          "step": 0.01,
+          "group": "Treatment"
+        },
+        "grid": {
+          "type": "toggle",
+          "label": "Construction grid",
+          "def": true,
+          "group": "Treatment"
+        },
+        "field": {
+          "type": "color",
+          "label": "Field",
+          "def": "#0D1010",
+          "group": "Treatment"
+        },
+        "accentInk": {
+          "type": "color",
+          "label": "Accent",
+          "def": "#B9F65E",
+          "group": "Treatment"
+        },
+        "backdrop": {
+          "type": "select",
+          "label": "Backdrop",
+          "options": [
+            {
+              "v": "solid",
+              "l": "Solid"
+            },
+            {
+              "v": "transparent",
+              "l": "Transparent"
+            }
+          ],
+          "def": "solid",
+          "group": "Treatment",
+          "hint": "Transparent makes the kit useful as a layer over other Motif content."
+        }
+      },
+      "cost": 1.0
+    }
+  ]
+}

@@ -1,0 +1,277 @@
+{
+  "format": "motif-kit@4",
+  "id": "vector-type",
+  "name": "Vector Type",
+  "version": "0.2.0",
+  "author": "Motif SDK",
+  "description": "Reference kit for SDK 4.0 vector graphics and typography: analytic shapes, an SVG mark and live text, all resolution-independent.",
+  "license": "MIT",
+  "accent": "#FF7A59",
+  "palettes": [
+    {
+      "id": "signal",
+      "name": "Signal",
+      "bg": "#0A0A0C",
+      "ink": "#F6F2EA",
+      "a": [
+        "#FF7A59",
+        "#FFD166",
+        "#4FD1C5"
+      ]
+    }
+  ],
+  "styles": [
+    {
+      "id": "shape-field",
+      "name": "Shape Field",
+      "group": "SDK 4.0",
+      "palette": "signal",
+      "tags": [
+        "example",
+        "vector",
+        "sdf"
+      ],
+      "blurb": "A grid of vector shapes morphing between circle, polygon, star and ring, outlined and glowing. Pure GLSL, no inputs.",
+      "passes": [
+        {
+          "src": "styles/shape-field.glsl"
+        }
+      ],
+      "params": {
+        "cols": {
+          "type": "int",
+          "label": "Columns",
+          "min": 2,
+          "max": 9,
+          "def": 5,
+          "group": "Grid"
+        },
+        "size": {
+          "type": "range",
+          "label": "Size",
+          "min": 0.2,
+          "max": 0.95,
+          "def": 0.62,
+          "group": "Grid"
+        },
+        "sides": {
+          "type": "int",
+          "label": "Polygon sides",
+          "min": 3,
+          "max": 8,
+          "def": 5,
+          "group": "Shape"
+        },
+        "points": {
+          "type": "int",
+          "label": "Star points",
+          "min": 3,
+          "max": 9,
+          "def": 5,
+          "group": "Shape"
+        },
+        "cycles": {
+          "type": "int",
+          "label": "Morphs / loop",
+          "min": 1,
+          "max": 4,
+          "def": 1,
+          "group": "Motion",
+          "hint": "Whole numbers, so the loop closes."
+        },
+        "outline": {
+          "type": "range",
+          "label": "Outline",
+          "min": 0,
+          "max": 0.05,
+          "def": 0.012,
+          "step": 0.001,
+          "group": "Look"
+        },
+        "glow": {
+          "type": "range",
+          "label": "Glow",
+          "min": 0,
+          "max": 0.2,
+          "def": 0.05,
+          "group": "Look"
+        },
+        "fill": {
+          "type": "toggle",
+          "label": "Filled",
+          "def": true,
+          "group": "Look"
+        }
+      }
+    },
+    {
+      "id": "type-poster",
+      "name": "Type Poster",
+      "group": "SDK 4.0",
+      "palette": "signal",
+      "tags": [
+        "example",
+        "typography",
+        "text",
+        "sdf"
+      ],
+      "blurb": "Live editable type as a distance field: outline, glow and echoes stay exact at any scale.",
+      "inputs": [
+        {
+          "id": "title",
+          "type": "text",
+          "label": "Title",
+          "aspect": 6,
+          "sdf": true,
+          "sdfSpread": 32,
+          "hint": "Edit the two lines under Layers > Title. Outline and glow come from a distance field, so they stay exact at any scale.",
+          "lines": [
+            {
+              "id": "line1",
+              "label": "Line 1",
+              "def": "MOTIF",
+              "font": {
+                "family": "Anybody",
+                "weight": 800
+              },
+              "size": 0.7
+            },
+            {
+              "id": "line2",
+              "label": "Line 2",
+              "def": "TYPE",
+              "font": {
+                "family": "Anybody",
+                "weight": 800
+              },
+              "size": 0.7
+            }
+          ]
+        }
+      ],
+      "passes": [
+        {
+          "src": "styles/type-poster.glsl"
+        }
+      ],
+      "params": {
+        "echoes": {
+          "type": "int",
+          "label": "Echoes",
+          "min": 0,
+          "max": 6,
+          "def": 3,
+          "group": "Look"
+        },
+        "spacing": {
+          "type": "range",
+          "label": "Echo spacing",
+          "min": 0,
+          "max": 0.12,
+          "def": 0.035,
+          "group": "Look"
+        },
+        "outline": {
+          "type": "range",
+          "label": "Outline",
+          "min": 0,
+          "max": 0.03,
+          "def": 0.005,
+          "step": 0.001,
+          "group": "Look"
+        },
+        "glow": {
+          "type": "range",
+          "label": "Glow",
+          "min": 0,
+          "max": 0.045,
+          "def": 0.03,
+          "group": "Look"
+        },
+        "bgPulse": {
+          "type": "range",
+          "label": "Backdrop",
+          "min": 0,
+          "max": 1,
+          "def": 0.5,
+          "group": "Look"
+        },
+        "scale": {
+          "type": "range",
+          "label": "Text scale",
+          "min": 0.5,
+          "max": 2.4,
+          "def": 1.5,
+          "group": "Look"
+        }
+      }
+    },
+    {
+      "id": "logo-reveal",
+      "name": "Logo Reveal",
+      "group": "SDK 4.0",
+      "palette": "signal",
+      "tags": [
+        "example",
+        "vector",
+        "svg",
+        "sdf"
+      ],
+      "blurb": "Bundled SVG mark traced, filled and haloed by a loop-safe wave. Drop your own SVG on the layer to replace it.",
+      "inputs": [
+        {
+          "id": "mark",
+          "type": "svg",
+          "label": "Mark",
+          "src": "assets/mark.svg",
+          "margin": 0.12,
+          "hint": "An SVG of paths and basic shapes."
+        }
+      ],
+      "passes": [
+        {
+          "src": "styles/logo-reveal.glsl"
+        }
+      ],
+      "params": {
+        "trace": {
+          "type": "range",
+          "label": "Trace width",
+          "min": 0.002,
+          "max": 0.03,
+          "def": 0.008,
+          "step": 0.001,
+          "group": "Look"
+        },
+        "halo": {
+          "type": "range",
+          "label": "Halo",
+          "min": 0,
+          "max": 0.2,
+          "def": 0.06,
+          "group": "Look"
+        },
+        "waves": {
+          "type": "int",
+          "label": "Reveals / loop",
+          "min": 1,
+          "max": 3,
+          "def": 1,
+          "group": "Motion"
+        },
+        "fillAmt": {
+          "type": "range",
+          "label": "Fill",
+          "min": 0,
+          "max": 1,
+          "def": 0.85,
+          "group": "Look"
+        }
+      }
+    }
+  ],
+  "capabilities": [
+    "vector",
+    "text"
+  ]
+}
