@@ -1,0 +1,26 @@
+{
+  "project": "Pocket Loop Station",
+  "engagementMode": "build",
+  "client": { "name": "Echo Opera", "designLanguage": "fieldSYS v3", "references": ["Teenage Engineering", "Linear", "Apple Voice Memos"] },
+  "problem": "Musicians sketching ideas on the move lose them because existing loopers demand two hands, menus, and a desk. Capture-to-loop must be one gesture, and the result must be usable in a real set.",
+  "users": [
+    { "persona": "Bedroom producer", "goal": "capture a 4-bar idea before it evaporates", "context": "on a train, one hand, 20 seconds", "pain": "menus and latency" },
+    { "persona": "Live performer", "goal": "layer and mute loops on stage without looking", "context": "dim stage, iPad on a stand", "pain": "tiny targets, accidental taps" }
+  ],
+  "platforms": ["ios", "ipados", "web-immersive"],
+  "domain": "music",
+  "riskLanes": ["ai", "prototype", "data-visualization", "localization", "security", "performance"],
+  "journeys": [
+    { "name": "Capture", "steps": ["Open app", "Hold to record", "Release to loop", "Adjust loop length by drag", "Save to project"] },
+    { "name": "Perform", "steps": ["Load project", "Arm tracks", "Punch in overdub", "Mute/unmute lanes", "Export mix"] }
+  ],
+  "scenarios": ["Recording with headphones in a noisy carriage", "Stage: iPad at arm's length, 40 lux"],
+  "constraints": ["Round-trip latency budget 10 ms", "Offline-first", "fieldSYS v3 tokens as base"],
+  "acceptance": [
+    { "id": "AC-1", "criterion": "A new loop can be captured in one continuous gesture" },
+    { "id": "AC-2", "criterion": "All performance controls ≥ 64pt on iPad stage layout" },
+    { "id": "AC-3", "criterion": "Every screen has designed empty, loading, error and overflow states" }
+  ],
+  "tone": "Confident, instrument-like, quiet until touched",
+  "outOfScope": ["Cloud collaboration", "Marketplace"]
+}

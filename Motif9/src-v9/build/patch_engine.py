@@ -54,11 +54,12 @@ def apply(P, mods):
   const palX = pal => ({ ink: rgb01(pal.ink), a0: rgb01(pal.a[0] || pal.ink), a1: rgb01(pal.a[1] || pal.a[0] || pal.ink), a2: rgb01(pal.a[2] || pal.a[1] || pal.a[0] || pal.ink), bg: rgb01(pal.bg) });
   function graphRenderer() { return grender || (grender = MG.createRenderer()); }
   function syncC(c) { try { (c._ctx || c.getContext('2d')).getImageData(0, 0, 1, 1); } catch (e) { /* tainted or unavailable */ } }
+  const gstat = { used: false, failed: false, error: '' }; // per frame: did a graph run, did it fault (the Graph page shows it loudly)
   function applyGraph(ctx, w, h, graph, X, space, tag) {
-    const r = graphRenderer(); if (!r.ok) return false;
+    gstat.used = true; const r = graphRenderer(); if (!r.ok) { gstat.failed = true; gstat.error = r.error || 'WebGL2 is unavailable'; return false; }
     const stg = MG.stageOf(graph), mix = stg ? stg.params.mix : 1, src = ctx.canvas;
     r.setSpace(space);
-    const out = r.render(src, graph, X, w, h); if (!out) return false;
+    const out = r.render(src, graph, X, w, h); if (!out) { gstat.failed = true; gstat.error = r.error || 'GPU error'; return false; }
     ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.filter = 'none';
     if (mix >= 0.999) { ctx.globalCompositeOperation = 'copy'; ctx.globalAlpha = 1; ctx.drawImage(out, 0, 0, w, h); }
     else { const cp = scratch('GM' + tag, w, h, space); cp._ctx.setTransform(1, 0, 0, 1, 0, 0); cp._ctx.globalCompositeOperation = 'copy'; cp._ctx.globalAlpha = 1; cp._ctx.drawImage(src, 0, 0);
@@ -83,7 +84,7 @@ def apply(P, mods):
           "    const fp = firstPal || resolvePalette('signal', false, customs);\n"
           "    if (MG && !opts.cpu && ev.graph && ev.graph.place !== 'post' && MG.active(ev.graph)) { if (engines.includes('gpu')) syncC(ctx.canvas); applyGraph(ctx, w, h, ev.graph, { A: w / h, p: ev.u, pal: palX(fp), spec: ev.spec || [0, 0, 0, 0, 0, 0, 0, 0] }, space, 'C'); }\n"
           "    ctx.restore();\n    return { pal: fp, engines };", label='composite pre hook')
-    P.rep("  return { renderLook, renderEvaluated, renderProject, scratch };", "  return { renderLook, renderEvaluated, renderProject, scratch, applyPost, graph: () => grender };", label='compositor exports')
+    P.rep("  return { renderLook, renderEvaluated, renderProject, scratch };", "  return { renderLook, renderEvaluated, renderProject, scratch, applyPost, graph: () => grender, graphReset: () => { gstat.used = false; gstat.failed = false; gstat.error = ''; }, graphState: () => ({ ...gstat }) };", label='compositor exports')
 
     # --- pipeline: composite graph after the finishing stack ---------------------------------------------------------------------
     P.rep("      cpuFinish(ctx, w, h, f, pal, t, opts.transparent);\n      return { u: ev0.u, engines, samples, post: 'cpu' };\n    }\n    const comp = compositor.scratch('comp', w, h, space);",
@@ -92,3 +93,8 @@ def apply(P, mods):
           "cpuFinish(ctx, w, h, f, pal, t, opts.transparent); compositor.applyPost(ctx, w, h, ev0, t, common); return { u: ev0.u, engines, samples, post: 'cpu' }; }\n    } else {", label='post graph (accumulate fallback)')
     P.rep("    ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalCompositeOperation = 'copy'; ctx.drawImage(glc, 0, 0, w, h); ctx.restore();\n    return { u: ev0.u, engines, samples, post: 'gpu' };",
           "    ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalCompositeOperation = 'copy'; ctx.drawImage(glc, 0, 0, w, h); ctx.restore();\n    compositor.applyPost(ctx, w, h, ev0, t, common);\n    return { u: ev0.u, engines, samples, post: 'gpu' };", label='post graph (gpu finish)')
+
+    # --- frame info: the Graph page reads stage.info.graph (works the same from the render Worker) ---------------------------------
+    P.rep("    const ev0 = evaluate(project, t, opts.env), f = ev0.finish;\n", "    compositor.graphReset();\n    const ev0 = evaluate(project, t, opts.env), f = ev0.finish;\n", label='graph status reset')
+    P.rep("samples, post: 'cpu' };", "samples, post: 'cpu', graph: compositor.graphState() };", count=2, label='graph status (cpu)')
+    P.rep("samples, post: 'gpu' };", "samples, post: 'gpu', graph: compositor.graphState() };", label='graph status (gpu)')

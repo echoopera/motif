@@ -1,0 +1,13 @@
+# Creative ambition and craft review
+- Brief, direction and artifact revision:
+- Intended character and useful differentiation:
+- Representative journey:
+- Bounded review budget:
+- Typography / optical alignment / actual content:
+- Controls, states, feedback, recovery and motion:
+- Responsive fit / input alternatives / inclusive use:
+- Product-appropriate opportunity for delight; include only within scope:
+- Defects versus preferences, severity and evidence:
+- Constructive challenge: wrong problem, habit, weak workflow or excluded user?
+- Recommendation, owner and recorded disposition:
+- Accepted strategy preserved? Any proposed change and impact:

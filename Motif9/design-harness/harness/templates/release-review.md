@@ -1,0 +1,21 @@
+# Release review
+- Product / scope / revision / date:
+- Delivered artifacts:
+- Runtime and run instructions:
+- Primary journey observed:
+- Relevant recovery paths observed:
+- Platform/device/input matrix: passed / failed / unavailable:
+- Accessibility target and actual assessment:
+- Architecture and interface evidence:
+- Performance targets and measurements:
+- Mocks / stubs / unverified integrations:
+- Blockers / major deferrals with owner and explicit decision:
+- Rollback/recovery:
+- Ready for requested mode? Evidence and limits:
+
+- Feedback dispositions and relevant client goals:
+- Craft review evidence and unresolved preferences/defects:
+- Commitments fulfilled or revised with recorded decision:
+- Editable assets, walkthrough, ownership and maintenance:
+- Aftercare scope: proposed / agreed / not requested:
+- Client validation actually performed; do not infer approval:

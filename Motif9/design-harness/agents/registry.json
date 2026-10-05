@@ -1,0 +1,188 @@
+{
+  "name": "Design Harness 3.0",
+  "version": "3.0.0",
+  "selection_rule": "Activate only roles justified by a distinct risk, artifact or decision.",
+  "agents": [
+    {
+      "id": "studio-director",
+      "category": "leadership",
+      "path": "agents/studio-director.md"
+    },
+    {
+      "id": "engagement-lead",
+      "category": "leadership",
+      "path": "agents/engagement-lead.md"
+    },
+    {
+      "id": "producer",
+      "category": "leadership",
+      "path": "agents/producer.md"
+    },
+    {
+      "id": "design-director",
+      "category": "leadership",
+      "path": "agents/design-director.md"
+    },
+    {
+      "id": "creative-director",
+      "category": "leadership",
+      "path": "agents/creative-director.md"
+    },
+    {
+      "id": "ux-researcher",
+      "category": "product",
+      "path": "agents/ux-researcher.md"
+    },
+    {
+      "id": "information-architect",
+      "category": "product",
+      "path": "agents/information-architect.md"
+    },
+    {
+      "id": "ai-experience-designer",
+      "category": "product",
+      "path": "agents/ai-experience-designer.md"
+    },
+    {
+      "id": "design-systems-engineer",
+      "category": "system",
+      "path": "agents/design-systems-engineer.md"
+    },
+    {
+      "id": "graphic-designer",
+      "category": "craft",
+      "path": "agents/graphic-designer.md"
+    },
+    {
+      "id": "motion-designer",
+      "category": "craft",
+      "path": "agents/motion-designer.md"
+    },
+    {
+      "id": "ux-writer",
+      "category": "craft",
+      "path": "agents/ux-writer.md"
+    },
+    {
+      "id": "interaction-prototyper",
+      "category": "craft",
+      "path": "agents/interaction-prototyper.md"
+    },
+    {
+      "id": "data-visualization-designer",
+      "category": "craft",
+      "path": "agents/data-visualization-designer.md"
+    },
+    {
+      "id": "localization-designer",
+      "category": "craft",
+      "path": "agents/localization-designer.md"
+    },
+    {
+      "id": "ios-designer",
+      "category": "platform",
+      "path": "agents/ios-designer.md"
+    },
+    {
+      "id": "ipados-designer",
+      "category": "platform",
+      "path": "agents/ipados-designer.md"
+    },
+    {
+      "id": "macos-designer",
+      "category": "platform",
+      "path": "agents/macos-designer.md"
+    },
+    {
+      "id": "immersive-web-designer",
+      "category": "platform",
+      "path": "agents/immersive-web-designer.md"
+    },
+    {
+      "id": "saas-product-designer",
+      "category": "platform",
+      "path": "agents/saas-product-designer.md"
+    },
+    {
+      "id": "editorial-internal-tools-designer",
+      "category": "platform",
+      "path": "agents/editorial-internal-tools-designer.md"
+    },
+    {
+      "id": "music-software-designer",
+      "category": "domain",
+      "path": "agents/music-software-designer.md"
+    },
+    {
+      "id": "creative-tools-designer",
+      "category": "domain",
+      "path": "agents/creative-tools-designer.md"
+    },
+    {
+      "id": "content-systems-designer",
+      "category": "domain",
+      "path": "agents/content-systems-designer.md"
+    },
+    {
+      "id": "marketing-designer",
+      "category": "domain",
+      "path": "agents/marketing-designer.md"
+    },
+    {
+      "id": "systems-architect",
+      "category": "engineering",
+      "path": "agents/systems-architect.md"
+    },
+    {
+      "id": "ios-engineer",
+      "category": "engineering",
+      "path": "agents/ios-engineer.md"
+    },
+    {
+      "id": "native-engineer",
+      "category": "engineering",
+      "path": "agents/native-engineer.md"
+    },
+    {
+      "id": "web-engineer",
+      "category": "engineering",
+      "path": "agents/web-engineer.md"
+    },
+    {
+      "id": "security-privacy",
+      "category": "risk",
+      "path": "agents/security-privacy.md"
+    },
+    {
+      "id": "performance-resilience",
+      "category": "risk",
+      "path": "agents/performance-resilience.md"
+    },
+    {
+      "id": "integration-engineer",
+      "category": "engineering",
+      "path": "agents/integration-engineer.md"
+    },
+    {
+      "id": "accessibility-specialist",
+      "category": "quality",
+      "path": "agents/accessibility-specialist.md"
+    },
+    {
+      "id": "aesthetic-critic",
+      "category": "quality",
+      "path": "agents/aesthetic-critic.md"
+    },
+    {
+      "id": "verifier",
+      "category": "quality",
+      "path": "agents/verifier.md"
+    },
+    {
+      "id": "log-reviewer",
+      "category": "operations",
+      "path": "agents/log-reviewer.md"
+    }
+  ]
+}
+

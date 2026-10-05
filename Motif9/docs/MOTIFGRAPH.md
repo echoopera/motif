@@ -16,6 +16,9 @@ Open the **Graph** tab. Pick **Layer** (the active layer, deformed before its ma
 
 Order within a family is the order of the list; families always run Cloner, then effectors, then deformers. A node's **Weighted by field** (or **Fall off with field**) menu picks the field that drives it.
 
+## Fast to drive
+Open **Presets** or **+ Add node** and hover (or arrow through) the list: the stage previews each item without touching your project; Esc leaves, Enter keeps it. A chip row at the top of the stack jumps to any node; folded nodes read out what they do. On a focused node: **Delete** removes, **Alt+Up/Down** reorders, **Alt+E** switches it off and on, **Alt+D** duplicates. Everything is also in the command palette (Ctrl/Cmd K, "MotifGraph").
+
 ## Everything is a channel
 
 Every parameter is an ordinary project channel: the same scrub label, key button, audio mapping and undo as the core panels. Keyframe a wave's amplitude, map a bulge to the kick, key a field's centre. Parameters that are "cycles per loop" are whole numbers, so frame 0 always equals frame L.

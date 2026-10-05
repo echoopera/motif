@@ -1,0 +1,27 @@
+{
+  "$id": "design-harness/ddm/v3",
+  "type": "object",
+  "required": ["project", "version", "decisions"],
+  "properties": {
+    "project": { "type": "string" },
+    "version": { "type": "string" },
+    "direction": { "type": "object", "properties": {
+      "chosen": { "type": "string" }, "alternatives": { "type": "array", "items": { "type": "string" } }, "rationale": { "type": "string" }
+    }},
+    "decisions": { "type": "array", "items": { "type": "object", "required": ["id", "owner", "stage", "decision", "rationale", "status"], "properties": {
+      "id": { "type": "string" },
+      "owner": { "type": "string" },
+      "stage": { "type": "integer" },
+      "decision": { "type": "string" },
+      "rationale": { "type": "string" },
+      "alternatives": { "type": "array", "items": { "type": "string" } },
+      "sacrifices": { "type": "string" },
+      "status": { "type": "string", "enum": ["proposed", "accepted", "superseded", "rejected"] },
+      "supersededBy": { "type": "string" },
+      "affects": { "type": "array", "items": { "type": "string" } }
+    }}},
+    "loopbacks": { "type": "array", "items": { "type": "object", "required": ["fromStage", "toStage", "reason"], "properties": {
+      "fromStage": { "type": "integer" }, "toStage": { "type": "integer" }, "reason": { "type": "string" }
+    }}}
+  }
+}

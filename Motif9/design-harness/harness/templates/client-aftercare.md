@@ -1,0 +1,12 @@
+# Handoff and aftercare
+- Delivered scope and revision:
+- Editable assets/source files and ownership:
+- Walkthrough: primary task, recovery, customization:
+- Run/build instructions and environment:
+- Maintenance responsibilities and known limitations:
+- Recovery/rollback:
+- Reproduction checks actually performed:
+- Client walkthrough: completed / not performed:
+- Outstanding work, owners and agreed disposition:
+- Proposed or agreed support scope and duration; distinguish clearly:
+- Next review only if authorized:

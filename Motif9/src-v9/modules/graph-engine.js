@@ -24,7 +24,7 @@ const T = (l, d, o = {}) => P.toggle(l, d, { mutate: 0, ...o });
 const DEG = { unit: '°' };
 const CURVES = [{ v: 'linear', l: 'Linear' }, { v: 'smooth', l: 'Smooth' }, { v: 'in', l: 'Ease in' }, { v: 'out', l: 'Ease out' }];
 const CURVE_IX = { linear: 0, smooth: 1, in: 2, out: 3 };
-const PAL_COLORS = [{ v: 'ink', l: 'Ink' }, { v: 'a0', l: 'Accent 1' }, { v: 'a1', l: 'Accent 2' }, { v: 'a2', l: 'Accent 3' }, { v: 'bg', l: 'Background' }, { v: 'cycle', l: 'Cycle through the palette' }, { v: 'ramp', l: 'Ramp across the array' }];
+const PAL_COLORS = [{ v: 'ink', l: 'Ink' }, { v: 'a0', l: 'Accent 1' }, { v: 'a1', l: 'Accent 2' }, { v: 'a2', l: 'Accent 3' }, { v: 'bg', l: 'Background' }, { v: 'cycle', l: 'Cycle palette' }, { v: 'ramp', l: 'Ramp' }];
 
 // ---------- node kinds: a union layout per kind fixes the uniform slot of every key; each type shows the subset it uses ----------
 const KINDS = {
@@ -37,32 +37,32 @@ const KINDS = {
     light: R('Lighting', 0, 1, 0, 0.01), lightAngle: R('Light direction', 0, 360, 315, 1, { unit: '°' }), depth: T('Sort by depth', false) } },
   cloner: { layout: {
     mode: S('Layout', [{ v: 'grid', l: 'Grid' }, { v: 'honeycomb', l: 'Honeycomb' }, { v: 'linear', l: 'Linear' }, { v: 'radial', l: 'Radial' }, { v: 'spiral', l: 'Spiral' }, { v: 'phyllo', l: 'Sunflower' }, { v: 'scatter', l: 'Scatter' }], 'grid'),
-    content: S('Each clone shows', [{ v: 'tiles', l: 'Its tile of the picture' }, { v: 'whole', l: 'The whole picture' }, { v: 'dots', l: 'A dot sampled from the picture' }], 'tiles'),
+    content: S('Each clone shows', [{ v: 'tiles', l: 'Tile of picture' }, { v: 'whole', l: 'Whole picture' }, { v: 'dots', l: 'Picture dots' }], 'tiles'),
     count: I('Count', 1, MAX_INSTANCES, 48, { log: true }), cols: I('Columns', 1, 128, 8), rows: I('Rows', 1, 128, 6),
     size: R('Clone size', 0.02, 2, 0.3, 0.01), fill: R('Tile fill', 0.1, 1.5, 1, 0.01),
     posX: R('Position x', -2, 2, 0, 0.01), posY: R('Position y', -2, 2, 0, 0.01), width: R('Width / radius', 0, 3, 1, 0.01), height: R('Height', 0, 3, 1, 0.01),
     angle: R('Angle', -360, 360, 0, 1, DEG), arc: R('Arc', 0, 360, 360, 1, DEG), turns: R('Turns', 0, 20, 3, 0.05),
-    rotate: R('Rotate each', -360, 360, 0, 1, DEG), stepRot: R('Rotate along the array', -720, 720, 0, 1, DEG), scale: R('Scale', 0.01, 4, 1, 0.01), stepScale: R('Scale along the array', -1, 4, 0, 0.01),
-    align: T('Face the centre', false), seed: I('Seed', 0, 9999, 1, { mutate: 0.5 }), detail: I('Mesh detail per clone', 1, 32, 4), reverse: T('Reverse draw order', false),
+    rotate: R('Rotate each', -360, 360, 0, 1, DEG), stepRot: R('Spin along array', -720, 720, 0, 1, DEG), scale: R('Scale', 0.01, 4, 1, 0.01), stepScale: R('Grow along array', -1, 4, 0, 0.01),
+    align: T('Face the centre', false), seed: I('Seed', 0, 9999, 1, { mutate: 0.5 }), detail: I('Clone detail', 1, 32, 4), reverse: T('Reverse draw order', false),
     shape: S('Dot shape', [{ v: 'circle', l: 'Circle' }, { v: 'square', l: 'Square' }, { v: 'diamond', l: 'Diamond' }, { v: 'ring', l: 'Ring' }], 'circle'),
     dotMin: R('Dot size, dark', 0, 1.5, 0.15, 0.01), dotMax: R('Dot size, light', 0, 1.5, 1, 0.01), dotInvert: T('Invert dot size', false) } },
   field: { layout: {
     x: R('Centre x', -2, 2, 0, 0.01), y: R('Centre y', -2, 2, 0, 0.01), sizeX: R('Size x', 0.01, 4, 0.6, 0.01), sizeY: R('Size y', 0.01, 4, 0.6, 0.01), angle: R('Angle', -360, 360, 0, 1, DEG),
     falloff: R('Falloff', 0, 1, 0.5, 0.01), curve: S('Falloff curve', CURVES, 'smooth'), invert: T('Invert', false), outMin: R('Output at 0', -2, 2, 0, 0.01), outMax: R('Output at 1', -2, 2, 1, 0.01),
     motion: S('Motion', [{ v: 'none', l: 'None' }, { v: 'sweep', l: 'Sweep' }, { v: 'orbit', l: 'Orbit' }, { v: 'pulse', l: 'Pulse' }], 'none'), travel: R('Travel', 0, 3, 1, 0.01), cycles: I('Cycles per loop', 0, 16, 1), phase: R('Phase', 0, 1, 0, 0.01),
-    combine: S('Combine with the field below', [{ v: 'add', l: 'Add' }, { v: 'mul', l: 'Multiply' }, { v: 'min', l: 'Minimum' }, { v: 'max', l: 'Maximum' }, { v: 'sub', l: 'Subtract' }, { v: 'over', l: 'Over' }], 'mul'),
+    combine: S('Combine mode', [{ v: 'add', l: 'Add' }, { v: 'mul', l: 'Multiply' }, { v: 'min', l: 'Minimum' }, { v: 'max', l: 'Maximum' }, { v: 'sub', l: 'Subtract' }, { v: 'over', l: 'Over' }], 'mul'),
     scale: R('Scale', 0.1, 24, 3, 0.1), seed: I('Seed', 0, 9999, 1, { mutate: 0.5 }) } },
   effector: { layout: {
     strength: R('Strength', -2, 2, 1, 0.01, { mutate: 0.15 }), posX: R('Move x', -2, 2, 0, 0.01), posY: R('Move y', -2, 2, 0, 0.01), posZ: R('Move z', -2, 2, 0, 0.01),
     rotX: R('Rotate x', -720, 720, 0, 1, DEG), rotY: R('Rotate y', -720, 720, 0, 1, DEG), rotZ: R('Rotate z', -720, 720, 0, 1, DEG),
     scale: R('Scale', -1, 3, 0, 0.01), scaleX: R('Scale x', -1, 3, 0, 0.01), scaleY: R('Scale y', -1, 3, 0, 0.01), opacity: R('Opacity', -1, 1, 0, 0.01),
     tint: R('Colour amount', 0, 1, 0, 0.01), tintColor: S('Colour', PAL_COLORS, 'ink'),
-    cycles: I('Cycles per loop', 0, 16, 1), phase: R('Phase', 0, 1, 0, 0.01), spread: R('Spread over the array', 0, 4, 1, 0.01), shape: S('Wave', [{ v: 'pulse', l: 'Pulse' }, { v: 'sine', l: 'Sine' }, { v: 'saw', l: 'Saw' }, { v: 'tri', l: 'Triangle' }, { v: 'spring', l: 'Spring pop' }], 'pulse'),
+    cycles: I('Cycles per loop', 0, 16, 1), phase: R('Phase', 0, 1, 0, 0.01), spread: R('Spread', 0, 4, 1, 0.01), shape: S('Wave', [{ v: 'pulse', l: 'Pulse' }, { v: 'sine', l: 'Sine' }, { v: 'saw', l: 'Saw' }, { v: 'tri', l: 'Triangle' }, { v: 'spring', l: 'Spring pop' }], 'pulse'),
     noiseScale: R('Noise scale', 0.1, 24, 2, 0.1), seed: I('Seed', 0, 9999, 1, { mutate: 0.5 }), curve: S('Curve', CURVES, 'linear'), bands: I('Bands', 1, 8, 8), bandStart: I('First band', 0, 7, 0) } },
   deformer: { layout: {
     space: S('Acts on', [{ v: 'world', l: 'Whole array' }, { v: 'object', l: 'Each clone' }], 'world'), strength: R('Amount', -6, 6, 0.5, 0.01),
     size: R('Size', 0.05, 6, 0.8, 0.01), x: R('Origin x', -2, 2, 0, 0.01), y: R('Origin y', -2, 2, 0, 0.01), angle: R('Direction', -360, 360, 0, 1, DEG),
-    dir: S('Direction of push', [{ v: 'plane', l: 'In the picture' }, { v: 'z', l: 'Toward the viewer' }, { v: 'both', l: 'Both' }], 'plane'),
+    dir: S('Direction of push', [{ v: 'plane', l: 'In the picture' }, { v: 'z', l: 'Toward viewer' }, { v: 'both', l: 'Both' }], 'plane'),
     cycles: I('Cycles per loop', 0, 16, 1), phase: R('Phase', 0, 1, 0, 0.01), scale: R('Decay', 0, 6, 1, 0.01), seed: I('Seed', 0, 9999, 1, { mutate: 0.5 }), mid: R('Midpoint', 0, 1, 0.5, 0.01) } },
 };
 const LAYOUT = {}, SLOT = {}; // LAYOUT[kind] = ordered keys; SLOT[kind][key] = uniform slot
@@ -104,7 +104,7 @@ const TYPES = {
   shear: { id: 34, name: 'Shear', short: 'SHR', hint: 'Slants the picture', ...dfm(['space', 'strength', 'x', 'y', 'angle'], { strength: { label: 'Shear', min: -2, max: 2, def: 0.4 } }, {}) },
   squash: { id: 35, name: 'Squash & stretch', short: 'SQS', hint: 'Stretches one way, squashes the other', ...dfm(['space', 'strength', 'x', 'y', 'angle'], { strength: { label: 'Stretch', min: -1.5, max: 1.5, def: 0.3 } }, {}) },
   wave: { id: 36, name: 'Wave', short: 'WAV', hint: 'A travelling wave, loop-exact', ...dfm(['space', 'strength', 'size', 'x', 'y', 'angle', 'dir', 'cycles', 'phase'], { strength: { label: 'Amplitude', min: -1, max: 1, def: 0.07 }, size: { label: 'Wavelength', def: 0.7 } }, {}) },
-  ripple: { id: 37, name: 'Ripple', short: 'RPL', hint: 'Rings expanding from a point', ...dfm(['space', 'strength', 'size', 'x', 'y', 'dir', 'cycles', 'phase', 'scale'], { strength: { label: 'Amplitude', min: -1, max: 1, def: 0.06 }, size: { label: 'Wavelength', def: 0.35 }, dir: { options: [{ v: 'plane', l: 'Outward' }, { v: 'z', l: 'Toward the viewer' }, { v: 'both', l: 'Both' }] } }, {}) },
+  ripple: { id: 37, name: 'Ripple', short: 'RPL', hint: 'Rings expanding from a point', ...dfm(['space', 'strength', 'size', 'x', 'y', 'dir', 'cycles', 'phase', 'scale'], { strength: { label: 'Amplitude', min: -1, max: 1, def: 0.06 }, size: { label: 'Wavelength', def: 0.35 }, dir: { options: [{ v: 'plane', l: 'Outward' }, { v: 'z', l: 'Toward viewer' }, { v: 'both', l: 'Both' }] } }, {}) },
   noised: { id: 38, name: 'Noise', short: 'NSD', hint: 'Organic displacement, animated in a perfect loop', ...dfm(['space', 'strength', 'size', 'dir', 'cycles', 'phase', 'seed'], { strength: { label: 'Amount', min: -1, max: 1, def: 0.09 }, size: { label: 'Feature size', def: 0.5 } }, {}) },
   bulge: { id: 39, name: 'Bulge', short: 'BLG', hint: 'Magnifies (or pinches) around a point', ...dfm(['space', 'strength', 'size', 'x', 'y'], { strength: { label: 'Bulge', min: -2, max: 2, def: 0.7 }, size: { label: 'Radius' } }, {}) },
   spherify: { id: 40, name: 'Spherify', short: 'SPF', hint: 'Wraps the picture onto a dome', ...dfm(['space', 'strength', 'size', 'x', 'y'], { strength: { label: 'Amount', min: 0, max: 1.5, def: 0.9 }, size: { label: 'Radius', def: 1 } }, {}) },

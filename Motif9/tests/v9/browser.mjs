@@ -187,6 +187,46 @@ const { page, errors } = await openApp(browser);
   t('no console errors while using the page', er.length === 0, er); await pg.close();
 }
 
+
+// ---- Motif patterns on the page: audition, loud faults, keyboard, stack map (design/motifgraph-ui) ---------------------------------------
+{
+  const { page: pg, errors: er } = await openApp(browser, { query: '?worker=0', viewport: { width: 1440, height: 900 }, wait: 3000 });
+  await pg.evaluate(() => __lab.setTab('graph')); await pg.waitForTimeout(300);
+  const h0 = await pg.evaluate(() => __lab.historySize);
+  await pg.click('#panel-graph [data-mg=menu][data-id=presets]'); await pg.hover('#panel-graph #mgMenu [data-id=radial-array]'); await pg.waitForTimeout(700);
+  const hov = await pg.evaluate(() => ({ aud: __lab.graph.auditioning, shown: !document.getElementById('aud').hidden, name: document.getElementById('audName').textContent, hasGraph: !!__lab.project.layers.find(l => l.id === __lab.project.active).graph, hist: __lab.historySize }));
+  await pg.keyboard.press('Escape'); await pg.waitForTimeout(250);
+  const esc = await pg.evaluate(() => ({ aud: __lab.graph.auditioning, shown: !document.getElementById('aud').hidden }));
+  await pg.click('#panel-graph [data-mg=menu][data-id=presets]'); await pg.waitForTimeout(150); await pg.keyboard.press('ArrowDown'); await pg.waitForTimeout(250);
+  const arrow = await pg.evaluate(() => ({ aud: __lab.graph.auditioning, name: document.getElementById('audName').textContent }));
+  await pg.keyboard.press('Enter'); await pg.waitForTimeout(500);
+  const commit = await pg.evaluate(() => ({ aud: __lab.graph.auditioning, shown: !document.getElementById('aud').hidden, hasGraph: !!__lab.project.layers.find(l => l.id === __lab.project.active).graph, hist: __lab.historySize }));
+  t('hovering a preset previews it on the stage without touching the project or undo history', hov.aud && hov.shown && /Preset/.test(hov.name) && !hov.hasGraph && hov.hist === h0, { hov, h0 });
+  t('Escape leaves the audition; arrowing to a menu item previews it at once', !esc.aud && !esc.shown && arrow.aud && /Preset/.test(arrow.name), { esc, arrow });
+  t('Enter commits the audition as one undoable step and clears the overlay', !commit.aud && !commit.shown && commit.hasGraph && commit.hist === h0 + 1, { commit, h0 });
+  // stack map and keyboard on a node
+  const map = await pg.evaluate(() => ({ chips: document.querySelectorAll('#panel-graph .mg-chip').length, nodes: __lab.graph.describe().nodes.length, folded: [...document.querySelectorAll('#panel-graph .mg-node')].filter(d => !d.open).length, reads: [...document.querySelectorAll('#panel-graph .mg-node:not([open]) .mg-read')].every(x => x.textContent.trim().length > 0) }));
+  await pg.click('#panel-graph .mg-chip[data-kind=effector]'); await pg.waitForTimeout(250);
+  const goto = await pg.evaluate(() => ({ open: document.querySelector('#panel-graph .mg-node[data-kind=effector]').open, focus: document.activeElement.parentElement && document.activeElement.parentElement.dataset.kind }));
+  await pg.keyboard.press('Alt+e'); await pg.waitForTimeout(250); const off = await pg.evaluate(() => __lab.graph.describe().nodes.find(n => n.type === 'delay').on);
+  await pg.keyboard.press('Alt+d'); await pg.waitForTimeout(250); const dup = await pg.evaluate(() => __lab.graph.describe().nodes.filter(n => n.type === 'delay').length);
+  await pg.keyboard.press('Delete'); await pg.waitForTimeout(250); const del = await pg.evaluate(() => __lab.graph.describe().nodes.filter(n => n.type === 'delay').length);
+  t('the stack map has a chip per node, folded nodes read out what they do, and a chip opens and focuses its node', map.chips === map.nodes && map.folded >= 1 && map.reads && goto.open && goto.focus === 'effector', { map, goto });
+  t('on a focused node: Alt+E toggles, Alt+D duplicates, Delete removes', off === false && dup === 2 && del === 1, { off, dup, del });
+  // bypass and unknown-node states are visible
+  await pg.evaluate(() => __lab.graph.setOn(false)); await pg.waitForTimeout(300);
+  const byp = await pg.evaluate(() => ({ mode: !!document.querySelector('#panel-graph .mg-mode'), dim: document.querySelector('#panel-graph .mg-stack').dataset.bypass }));
+  await pg.evaluate(() => __lab.graph.setOn(true)); await pg.waitForTimeout(300); const byp2 = await pg.evaluate(() => !!document.querySelector('#panel-graph .mg-mode'));
+  await pg.evaluate(() => { const p = __lab.project; p.layers.find(l => l.id === p.active).graph.nodes.push({ id: 'gq', type: 'future-node', on: true, params: {} }); __lab.setProject(__lab.api.timeline.sanitizeProject(p)); __lab.graph.render(); }); await pg.waitForTimeout(300);
+  const unk = await pg.evaluate(() => (document.querySelector('#panel-graph .mg-node[data-off="true"]:not([data-node])') || {}).textContent || '');
+  t('Bypassed shows a notice and dims the stack; turning On clears it', byp.mode && byp.dim === 'true' && !byp2, { byp, byp2 }); t('a node type from a newer Motif is listed, dimmed, as kept and not drawn', /newer Motif/.test(unk), unk);
+  // a GPU fault is loud, then clears
+  const f1 = await pg.evaluate(async () => { __lab.stage.invalidate(); await new Promise(r => setTimeout(r, 700)); const rr = __lab.pipeline.compositor.graph(); const x = rr && rr.gl && rr.gl.getExtension('WEBGL_lose_context'); if (!x) return { err: 'no renderer' }; window.__loseX = x; x.loseContext(); await new Promise(r => setTimeout(r, 200)); __lab.stage.invalidate(); await new Promise(r => setTimeout(r, 900)); return { alert: !!document.querySelector('#panel-graph .mg-alert'), text: (document.querySelector('#panel-graph .mg-alert') || {}).textContent || '', info: __lab.stage.info && __lab.stage.info.graph }; });
+  const f2 = await pg.evaluate(async () => { window.__loseX.restoreContext(); await new Promise(r => setTimeout(r, 900)); __lab.stage.invalidate(); await new Promise(r => setTimeout(r, 900)); return { alert: !!document.querySelector('#panel-graph .mg-alert'), info: __lab.stage.info && __lab.stage.info.graph }; });
+  t('a GPU fault is announced on the page (role=alert, picture passes through) and clears when the GPU returns', f1.alert && /paused/.test(f1.text) && f1.info && f1.info.failed && !f2.alert && f2.info && !f2.info.failed, { f1, f2 });
+  t('no console errors on the page', er.length === 0, er); await pg.close();
+}
+
 // ---- worker and main thread agree on a graph frame ----------------------------------------------------------------------------------
 {
   const shot = async query => {

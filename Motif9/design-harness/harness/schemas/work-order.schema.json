@@ -1,0 +1,24 @@
+{
+  "$id": "design-harness/work-order/v3",
+  "type": "object",
+  "required": ["id", "title", "owner", "stage", "status", "owns", "outputs", "acceptance"],
+  "properties": {
+    "id": { "type": "string", "pattern": "^WO-[0-9]{3}$" },
+    "title": { "type": "string" },
+    "owner": { "type": "string" },
+    "lane": { "type": "string" },
+    "stage": { "type": "integer", "minimum": 0, "maximum": 9 },
+    "status": { "type": "string", "enum": ["draft", "ready", "claimed", "in-review", "done", "blocked", "cancelled"] },
+    "owns": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+    "reads": { "type": "array", "items": { "type": "string" } },
+    "dependsOn": { "type": "array", "items": { "type": "string" } },
+    "needs": { "type": "array", "items": { "type": "object", "required": ["from", "interface"], "properties": {
+      "from": { "type": "string" }, "interface": { "type": "string" }, "stub": { "type": "string" }
+    }}},
+    "inputs": { "type": "array", "items": { "type": "string" } },
+    "outputs": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+    "acceptance": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+    "ttlMinutes": { "type": "integer", "minimum": 1 },
+    "notes": { "type": "string" }
+  }
+}

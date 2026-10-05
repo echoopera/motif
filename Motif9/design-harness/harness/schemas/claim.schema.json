@@ -1,0 +1,12 @@
+{
+  "$id": "design-harness/claim/v3",
+  "type": "object",
+  "required": ["wo", "agent", "owns", "claimedAt"],
+  "properties": {
+    "wo": { "type": "string" },
+    "agent": { "type": "string" },
+    "owns": { "type": "array", "items": { "type": "string" } },
+    "claimedAt": { "type": "string" },
+    "expiresAt": { "type": "string" }
+  }
+}

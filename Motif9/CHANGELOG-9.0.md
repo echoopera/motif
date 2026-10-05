@@ -21,6 +21,16 @@ Motif 8.0.0 plus MotifGraph. Projects, kits and presets from Motif 3 to 8 open a
 - `node tests/v9/browser.mjs` (Playwright, software GL): GPU vertex stage against the CPU reference across every node configuration, determinism, pass-through, loop closure and seam continuity of all presets in both scopes, layer/composite/mask/mix/finish-order semantics, keyframes and audio on graph channels, save/open, unknown nodes, the inspector (presets, edit, add, disable, remove, undo, scope, field refs, keyboard), render Worker versus main thread, budget cap, GPU context loss and recovery.
 - `node tests/v9/regression.mjs`: Motif 8.0.0 against 9: kit validation byte-identical, every style renders identical pixels.
 
+## 9.0.1: Graph page pass (run through Design Harness 3.0)
+Brief, plan, decisions, critique, accessibility, performance and verification records: `design-harness/design/motifgraph-ui-pass/` and `design-harness/harness/state/`.
+- **Audition, don't commit:** hover (or arrow to) a preset or node in the menus and the stage previews it through the shell's overlay; Esc leaves, Enter or click applies as one undoable step. Follows the Hover-preview toggle.
+- **Stack map and read-outs:** a sticky chip row (STG, CLN, SPH, ...) over folded nodes that say what they do ("Grid 16×9 · tile of picture", "whole array · 0.07"); one node open at a time by default.
+- **Loud states:** a GPU fault (also from the render Worker, via the frame info) shows a role=alert and clears when the GPU returns; Bypassed and no-WebGL2 have their own notices.
+- **Keyboard on a focused node:** Delete removes, Alt+Up/Down reorders, Alt+E toggles, Alt+D duplicates; focus moves sensibly after each.
+- **Shorter labels** so values no longer truncate at 400 px; **tokens only** in the page CSS (the harness token-lint rules, `design-harness/design/motifgraph-ui-pass/token-lint.mjs`).
+- **Fixed:** a node type from a newer Motif crashed the page render; a bypassed graph showed the empty-state copy.
+- Tests: 9 more browser checks (audition, keyboard, map, bypass, unknown node, fault). Build: 38 anchored patches.
+
 ## Known limits
 - No viewport gizmos or pointer field yet: the live preview runs in the render Worker, so pointer input needs a Worker protocol extension (planned with the node-graph view).
 - No dynamics (springs, collisions, particles) and no per-glyph geometry yet; the Delay effector's spring shape gives loop-exact follow-through.

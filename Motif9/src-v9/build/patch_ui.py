@@ -6,3 +6,5 @@ def apply(P, mods):
           "if (src.media) copy.media = clone(src.media); if (src.text) copy.text = clone(src.text); if (src.seq) copy.seq = clone(src.seq); if (src.graph) copy.graph = clone(src.graph);", label='dupLayer graph')
     # The page itself: an extension module like the Grade page, inserted after the shell and before media-page.
     P.before("// ---- module: media-page v1.0.0\n", mods['shell-graph'] + "\n", label='insert graph page')
+    # Audition: the Graph page previews presets and nodes on the stage through the shell's own non-history overlay (hover or arrow key).
+    P.rep("    keyState: p => keyState(p), shownValue: p => shownValue(p),", "    audition: (pr, label, hint) => setAudition(pr, label, hint), auditionOn: () => audOn,\n    keyState: p => keyState(p), shownValue: p => shownValue(p),", label='extApi audition')

@@ -9,3 +9,4 @@ Set `PLAYWRIGHT_MODULE=$(npm root -g)/playwright/index.mjs` if Playwright is not
 | `node tests/v9/regression.mjs` | Motif 8.0.0 vs 9: every style renders identical pixels; kit validation byte-identical |
 | `node tests/v9/bench.mjs` | Frame times for representative graphs (software GL: relative numbers only) |
 | `node tests/v9/gen-docs.mjs` | Regenerates `docs/MotifGraph-nodes.md` |
+| `node design-harness/design/motifgraph-ui-pass/token-lint.mjs` | Design Harness token-lint rules on the Graph page |

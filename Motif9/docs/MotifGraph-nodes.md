@@ -46,12 +46,12 @@ Copies the picture into an array: grid, honeycomb, linear, radial, spiral, sunfl
 | `arc` | Arc | 0 to 360° | 360 |
 | `turns` | Turns | 0 to 20 | 3 |
 | `rotate` | Rotate each | -360 to 360° | 0 |
-| `stepRot` | Rotate along the array | -720 to 720° | 0 |
+| `stepRot` | Spin along array | -720 to 720° | 0 |
 | `scale` | Scale | 0.01 to 4 | 1 |
-| `stepScale` | Scale along the array | -1 to 4 | 0 |
+| `stepScale` | Grow along array | -1 to 4 | 0 |
 | `align` | Face the centre | on / off | false |
 | `seed` | Seed | 0 to 9999 | 1 |
-| `detail` | Mesh detail per clone | 1 to 32 | 4 |
+| `detail` | Clone detail | 1 to 32 | 4 |
 | `reverse` | Reverse draw order | on / off | false |
 | `shape` | Dot shape | circle · square · diamond · ring | circle |
 | `dotMin` | Dot size, dark | 0 to 1.5 | 0.15 |
@@ -80,7 +80,7 @@ A soft ellipse; weights whatever references it
 | `invert` | Invert | on / off | false |
 | `outMin` | Output at 0 | -2 to 2 | 0 |
 | `outMax` | Output at 1 | -2 to 2 | 1 |
-| `combine` | Combine with the field below | add · mul · min · max · sub · over | mul |
+| `combine` | Combine mode | add · mul · min · max · sub · over | mul |
 
 ### Box field  `box` · id 21
 
@@ -102,7 +102,7 @@ A soft rectangle
 | `invert` | Invert | on / off | false |
 | `outMin` | Output at 0 | -2 to 2 | 0 |
 | `outMax` | Output at 1 | -2 to 2 | 1 |
-| `combine` | Combine with the field below | add · mul · min · max · sub · over | mul |
+| `combine` | Combine mode | add · mul · min · max · sub · over | mul |
 
 ### Linear field  `linear` · id 22
 
@@ -122,7 +122,7 @@ A gradient across the picture
 | `invert` | Invert | on / off | false |
 | `outMin` | Output at 0 | -2 to 2 | 0 |
 | `outMax` | Output at 1 | -2 to 2 | 1 |
-| `combine` | Combine with the field below | add · mul · min · max · sub · over | mul |
+| `combine` | Combine mode | add · mul · min · max · sub · over | mul |
 
 ### Radial field  `radial` · id 23
 
@@ -137,7 +137,7 @@ A gradient that sweeps around a point
 | `invert` | Invert | on / off | false |
 | `outMin` | Output at 0 | -2 to 2 | 0 |
 | `outMax` | Output at 1 | -2 to 2 | 1 |
-| `combine` | Combine with the field below | add · mul · min · max · sub · over | mul |
+| `combine` | Combine mode | add · mul · min · max · sub · over | mul |
 
 ### Noise field  `noisef` · id 24
 
@@ -155,7 +155,7 @@ Smooth noise
 | `invert` | Invert | on / off | false |
 | `outMin` | Output at 0 | -2 to 2 | 0 |
 | `outMax` | Output at 1 | -2 to 2 | 1 |
-| `combine` | Combine with the field below | add · mul · min · max · sub · over | mul |
+| `combine` | Combine mode | add · mul · min · max · sub · over | mul |
 
 ### Random field  `randomf` · id 25
 
@@ -170,7 +170,7 @@ A random weight per clone
 | `invert` | Invert | on / off | false |
 | `outMin` | Output at 0 | -2 to 2 | 0 |
 | `outMax` | Output at 1 | -2 to 2 | 1 |
-| `combine` | Combine with the field below | add · mul · min · max · sub · over | mul |
+| `combine` | Combine mode | add · mul · min · max · sub · over | mul |
 
 ### Index field  `index` · id 26
 
@@ -182,7 +182,7 @@ A ramp across the array
 | `invert` | Invert | on / off | false |
 | `outMin` | Output at 0 | -2 to 2 | 0 |
 | `outMax` | Output at 1 | -2 to 2 | 1 |
-| `combine` | Combine with the field below | add · mul · min · max · sub · over | mul |
+| `combine` | Combine mode | add · mul · min · max · sub · over | mul |
 
 ### Picture field  `luma` · id 27
 
@@ -194,7 +194,7 @@ Brightness of the picture itself drives the weight
 | `invert` | Invert | on / off | false |
 | `outMin` | Output at 0 | -2 to 2 | 0 |
 | `outMax` | Output at 1 | -2 to 2 | 1 |
-| `combine` | Combine with the field below | add · mul · min · max · sub · over | mul |
+| `combine` | Combine mode | add · mul · min · max · sub · over | mul |
 
 ### Stripes field  `stripes` · id 28
 
@@ -212,7 +212,7 @@ Travelling stripes
 | `invert` | Invert | on / off | false |
 | `outMin` | Output at 0 | -2 to 2 | 0 |
 | `outMax` | Output at 1 | -2 to 2 | 1 |
-| `combine` | Combine with the field below | add · mul · min · max · sub · over | mul |
+| `combine` | Combine mode | add · mul · min · max · sub · over | mul |
 
 ## Effectors
 
@@ -301,7 +301,7 @@ A wave that travels through the array in time: stagger, pop, cascade
 | `tintColor` | Colour | ink · a0 · a1 · a2 · bg · cycle · ramp | ink |
 | `cycles` | Cycles per loop | 0 to 16 | 1 |
 | `phase` | Phase | 0 to 1 | 0 |
-| `spread` | Spread over the array | 0 to 4 | 1 |
+| `spread` | Spread | 0 to 4 | 1 |
 | `shape` | Wave | pulse · sine · saw · tri · spring | spring |
 
 ### Noise effector  `noise` · id 14
