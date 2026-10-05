@@ -1,0 +1,30 @@
+{
+  "name": "motif-shadcn-ui",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "The React islands of Motif-Shadcn: audiocn components (shadcn registry, MIT) themed by Motif's tokens, bundled to one script + one stylesheet that the Motif build embeds.",
+  "scripts": {
+    "build": "vite build",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@base-ui/react": "^1.8.0",
+    "@phosphor-icons/react": "^2.1.10",
+    "class-variance-authority": "^0.7.1",
+    "cn": "^0.4.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.1.0",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "@vitejs/plugin-react": "^5.0.0",
+    "tailwindcss": "^4.1.0",
+    "tw-animate-css": "^1.4.0",
+    "typescript": "^5.8.0",
+    "vite": "^7.0.0"
+  }
+}
