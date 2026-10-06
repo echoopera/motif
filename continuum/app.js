@@ -10,6 +10,8 @@ const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 // ── CONTINUUM shell helpers (ui*-prefixed so the audio modules never collide) ──
 const uiPad=(n,l=2)=>String(n).padStart(l,'0');
+// Big readouts: one fixed-width cell per character, so values change in place and never shift the layout.
+function uiNum(id,str){const el=document.getElementById(id);if(!el||el.dataset.v===str)return;el.dataset.v=str;el.replaceChildren(...[...str].map(ch=>{const d=document.createElement('span');d.className='d';d.textContent=ch;return d}))}
 const uiNotes=['C','C♯','D','E♭','E','F','F♯','G','A♭','A','B♭','B'];
 const uiBuzz=ms=>{try{navigator.vibrate&&navigator.vibrate(ms)}catch{}};
 const uiMono='"IBM Plex Mono",ui-monospace,Menlo,monospace';
@@ -80,6 +82,7 @@ function uiHoldDotHit(e){if(!holdRegion||path.length<2)return false;const r=stag
 function uiReshape(cur){const o=press.orig,L=press.lens,k=press.hit.i,dx=cur.x-press.grab.x,dy=cur.y-press.grab.y,sigma=Math.max(.06,L[L.length-1]*.14);
  for(let i=0;i<o.length;i++){const w=Math.exp(-Math.pow((L[i]-L[k])/sigma,2));path[i]={x:Math.max(.02,Math.min(.98,o[i].x+dx*w)),y:Math.max(.04,Math.min(.96,o[i].y+dy*w))}}
  indexPath();uiGrab=k}
+function uiRescale(oldTotal,oldProg){indexPath();const r=oldTotal/totalLength;journeyBeats*=totalLength/oldTotal;progress=Math.min(1,oldProg*r);journeyStartProgress=progress;if(audio)journeyStartBeat=audio.beatPosition();if(holdRegion)holdRegion={a:holdRegion.a*r,b:holdRegion.b*r,c:holdRegion.c*r};point=samplePath(progress)}
 let press=null;
 stage.addEventListener('click',()=>{if(!enabled&&$('gate').hidden)enter()});
 stage.addEventListener('contextmenu',e=>e.preventDefault());
@@ -88,8 +91,10 @@ stage.addEventListener('pointerdown',e=>{if(!enabled||e.button!==0)return;
  const nodeWins=nb&&Math.hypot(e.clientX-r.left-nodes[+nb.dataset.i].x*r.width,e.clientY-r.top-nodes[+nb.dataset.i].y*r.height)<=42;
  press={id:e.pointerId,x:e.clientX,y:e.clientY,node:nodeWins?+nb.dataset.i:-1,started:false,kind:'draw',wasSilent:silenced||audio.a.state!=='running'};
  try{stage.setPointerCapture(e.pointerId)}catch{}
- const hit=!drawing&&!nodeWins?uiPathHit(e):null;
+ const hit=!drawing&&!nodeWins?uiPathHit(e):null,lastP=path[path.length-1];
+ const endHit=hit&&path.length>1&&Math.hypot(lastP.x*r.width-(e.clientX-r.left),lastP.y*r.height-(e.clientY-r.top))<=30;
  if(uiHoldDotHit(e)){press.kind='release'}
+ else if(endHit){Object.assign(press,{kind:'extend',oldTotal:totalLength,oldProg:progress})}
  else if(hit){const lens=[0];for(let i=1;i<path.length;i++)lens.push(lens[i-1]+Math.hypot(path[i].x-path[i-1].x,path[i].y-path[i-1].y));
   Object.assign(press,{kind:'path',hit,grab:pointer(e),orig:path.map(p=>({...p})),lens,held:false});
   press.timer=setTimeout(()=>{if(press&&press.kind==='path'&&!press.started){press.held=true;setHold(hit.i);uiBuzz(24)}},430)}
@@ -100,6 +105,7 @@ stage.addEventListener('pointerdown',e=>{if(!enabled||e.button!==0)return;
 stage.addEventListener('pointermove',e=>{if(!enabled)return;
  if(press&&e.pointerId===press.id){const moved=Math.hypot(e.clientX-press.x,e.clientY-press.y);
   if(press.kind==='move'){const p=pointer(e),n=nodes[press.node];n.x=Math.max(.07,Math.min(.93,p.x));n.y=Math.max(.1,Math.min(.9,p.y));const b=$('nodeLayer').querySelector('button.node[data-i="'+press.node+'"]');if(b){b.style.left=n.x*100+'%';b.style.top=n.y*100+'%';b.classList.toggle('lower',n.y>.5)}}
+  else if(press.kind==='extend'){if(press.started||moved>6){if(!press.started){press.started=true;uiGrab=path.length-1;uiBuzz(8)}const evs=e.getCoalescedEvents?e.getCoalescedEvents():[e];for(const ce of(evs.length?evs:[e]))addPoint(pointer(ce))}}
   else if(press.kind==='path'){if(!press.held&&(press.started||moved>8)){clearTimeout(press.timer);if(!press.started){press.started=true;uiBuzz(6)}uiReshape(pointer(e))}}
   else if(press.kind==='away'){if(!press.started&&moved>14){press.started=true;pointerId=e.pointerId;startDraw(pointer({clientX:press.x,clientY:press.y}));addPoint(pointer(e))}else if(press.started&&drawing)addPoint(pointer(e))}
   else if(press.kind==='draw'&&press.node>=0&&!press.started){if(moved>9){clearTimeout(press.timer);press.started=true;pointerId=e.pointerId;const n=nodes[press.node];startDraw({x:n.x,y:n.y});addPoint(pointer(e));uiBuzz(6)}}
@@ -108,6 +114,7 @@ stage.addEventListener('pointermove',e=>{if(!enabled)return;
 const uiPressEnd=e=>{if(!press||e.pointerId!==press.id)return;const p=press;press=null;clearTimeout(p.timer);uiGrab=-1;uiMove=-1;
  if(p.kind==='release'){if(e.type==='pointerup'){releaseHold();uiBuzz(12)}}
  else if(p.kind==='move'){uiBuzz(8)}
+ else if(p.kind==='extend'){if(p.started&&path.length>1){uiRescale(p.oldTotal,p.oldProg);message('Extended');uiBuzz(10)}}
  else if(p.kind==='path'){if(p.started&&!p.held){message('Reshaped');uiBuzz(8)}}
  else if(drawing){finishDraw();if(path.length>1)uiBuzz(14)}
  else if(p.node>=0&&!p.started&&e.type==='pointerup'){if(p.wasSilent)wake();else toggleSource(p.node)}};
@@ -182,7 +189,7 @@ function draw(time){
   ctx.lineJoin='round';ctx.lineCap='round';
   ctx.strokeStyle='rgba(143,227,234,.16)';ctx.lineWidth=7;ctx.beginPath();path.forEach((p,i)=>i?ctx.lineTo(p.x*w,p.y*h):ctx.moveTo(p.x*w,p.y*h));ctx.stroke();
   ctx.setLineDash([5,5]);ctx.strokeStyle='rgba(168,236,240,.78)';ctx.lineWidth=1.2;ctx.beginPath();path.forEach((p,i)=>i?ctx.lineTo(p.x*w,p.y*h):ctx.moveTo(p.x*w,p.y*h));ctx.stroke();ctx.setLineDash([]);
-  const a=path[0],z=path[path.length-1];ctx.strokeStyle=hl;ctx.fillStyle=hl;ctx.lineWidth=1.2;ctx.save();ctx.translate(a.x*w,a.y*h);ctx.rotate(Math.PI/4);ctx.strokeRect(-4,-4,8,8);ctx.restore();ctx.beginPath();ctx.arc(z.x*w,z.y*h,3,0,6.2832);ctx.fill();ctx.beginPath();ctx.arc(z.x*w,z.y*h,7,0,6.2832);ctx.stroke()}
+  const a=path[0],z=path[path.length-1];ctx.strokeStyle=hl;ctx.fillStyle=hl;ctx.lineWidth=1.2;ctx.save();ctx.translate(a.x*w,a.y*h);ctx.rotate(Math.PI/4);ctx.strokeRect(-4,-4,8,8);ctx.restore();ctx.beginPath();ctx.arc(z.x*w,z.y*h,3,0,6.2832);ctx.fill();const ep=reduced?.5:.5+.5*Math.sin(t*3.2);ctx.beginPath();ctx.arc(z.x*w,z.y*h,8+ep*2.5,0,6.2832);ctx.stroke()}
  // sources
  nodes.forEach((n,i)=>{const x=n.x*w,y=n.y*h,c=palettes[i],wt=srcOn[i]?weights[i]:0;ctx.globalAlpha=srcOn[i]?1:.38;
   const meter=audio?.routes?.[i],level=meter?.level||0;
@@ -240,9 +247,9 @@ if(time-uiTime>180){uiTime=time;const idx=weights.indexOf(Math.max(...weights));
  $('nodeLayer').querySelectorAll('button').forEach((b,i)=>b.setAttribute('aria-pressed',i===idx&&enabled?'true':'false'));
  $('identStrip').querySelectorAll('button').forEach((b,i)=>{b.setAttribute('aria-pressed',i===idx&&enabled?'true':'false');b.style.setProperty('--w',(weights[i]*100).toFixed(1)+'%');b.querySelector('i').textContent=Math.round(weights[i]*100)+'%'});
  const field=audio?.field||worlds[0];
- $('harmony').textContent=uiNotes[field.key]+' '+field.mode;$('tempo').textContent=uiPad(Math.round(audio?.bpm||72),3);
- $('srcCode').textContent=uiPad(idx+1);$('srcName').textContent=worlds[idx].name;
- const has=path.length>1;$('progress').textContent=uiPad(playing||(has&&progress>0)?Math.round(progress*100):0);
+ $('harmony').textContent=uiNotes[field.key]+' '+field.mode;uiNum('tempo',uiPad(Math.min(999,Math.round(audio?.bpm||72)),3));
+ uiNum('srcCode',uiPad(idx+1));$('srcName').textContent=worlds[idx].name;
+ const has=path.length>1;uiNum('progress',uiPad(playing||(has&&progress>0)?Math.min(99,Math.round(progress*100)):0));
  $('progressLabel').textContent=holdRegion?'HOLD · '+Math.round((holdRegion.b-holdRegion.a)*journeyBeats)+' BEATS':playing?'LOOP · BEAT '+(Math.floor(audio.beatPosition()-journeyStartBeat)+1):drawing?'DRAWING':progress>=1&&has?'ARRIVED':has?'ROUTE SET':'FREE';
  if(typeof updateEffectsClock==='function')updateEffectsClock();if(typeof updateSceneMeters==='function')updateSceneMeters();
  if(typeof transitionLabel==='function'){const tl=enabled?transitionLabel():'STANDBY';$('transitionState').textContent=tl;const t2=$('transitionState2');if(t2)t2.textContent=tl}

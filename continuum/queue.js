@@ -7,7 +7,9 @@ const DECODED_BYTES_PER_SEC=24000*2*4;           // imports decode to 24 kHz ste
 const budgetMB=()=>{const dm=navigator.deviceMemory;return dm?Math.min(640,Math.max(200,dm*70)):220}; // iOS reports nothing: stay conservative
 const fmtMB=b=>b>=1024*MB?(b/(1024*MB)).toFixed(1)+' GB':b>=100*MB?Math.round(b/MB)+' MB':(b/MB).toFixed(1)+' MB';
 const fmtT=s=>Math.floor(s/60)+':'+String(Math.floor(s%60)).padStart(2,'0');
-let db=null,items=[],est={quota:0,usage:0},busy=false;
+let db=null,items=[],est={quota:0,usage:0},busy=false,pending=null;
+// An item counts as loaded while a source still holds that exact file.
+const loadedIn=it=>[0,1,2,3].filter(i=>audioSlots[i]&&audioSlots[i].name===it.name&&audioSlots[i].file&&audioSlots[i].file.size===it.size);
 
 const open=()=>new Promise((res,rej)=>{if(!window.indexedDB){rej(Error('no idb'));return}const r=indexedDB.open(DB_NAME,1);r.onupgradeneeded=()=>r.result.createObjectStore(STORE,{keyPath:'id'});r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)});
 const tx=(mode,fn)=>new Promise((res,rej)=>{const t=db.transaction(STORE,mode),st=t.objectStore(STORE),r=fn(st);t.oncomplete=()=>res(r&&r.result);t.onerror=()=>rej(t.error);t.onabort=()=>rej(t.error||Error('aborted'))});
@@ -35,15 +37,17 @@ function render(){
   list.replaceChildren();
   if(!items.length){const e=document.createElement('p');e.className='q-empty';e.textContent='Queue is empty';list.append(e)}
   items.forEach(it=>{
-    const row=document.createElement('article');row.className='q-item';
+    const inSlots=loadedIn(it),isPending=pending&&pending.id===it.id,row=document.createElement('article');row.className='q-item'+(inSlots.length?' loaded':'')+(isPending?' loading':'');
+    if(inSlots.length)row.style.setProperty('--lc',palettes[inSlots[0]]);
     const head=document.createElement('div');head.className='q-head';
     const name=document.createElement('b');name.textContent=it.name.replace(/\.[^.]+$/,'');name.title=it.name;
     const meta=document.createElement('span');meta.className='micro';meta.textContent=(it.seconds?fmtT(it.seconds)+' · ':'')+fmtMB(it.size);
     const del=document.createElement('button');del.type='button';del.className='q-del';del.setAttribute('aria-label','Remove '+it.name);del.textContent='×';del.onclick=()=>remove(it.id);
-    head.append(name,meta,del);
+    let tagged=false;if(inSlots.length||isPending){const tag=document.createElement('span');tag.className='q-tag';tag.textContent=isPending?'LOADING':'LIVE · '+(inSlots.map(i=>String(i+1).padStart(2,'0')).join(' '));head.dataset.tag=tag.textContent;head.append(name,meta,del);head.insertBefore(tag,meta)}
+    else head.append(name,meta,del);
     const slots=document.createElement('div');slots.className='q-slots';
     const to=document.createElement('span');to.className='micro';to.textContent='LOAD';slots.append(to);
-    for(let i=0;i<4;i++){const b=document.createElement('button');b.type='button';b.className='q-slot';b.style.setProperty('--c',palettes[i]);b.textContent=String(i+1).padStart(2,'0');b.setAttribute('aria-label','Load into source '+(i+1));b.disabled=busy||importBusy;b.onclick=()=>load(it,i);slots.append(b)}
+    for(let i=0;i<4;i++){const b=document.createElement('button');b.type='button';b.className='q-slot'+(inSlots.includes(i)?' on':'');b.type='button';b.style.setProperty('--c',palettes[i]);b.textContent=String(i+1).padStart(2,'0');b.setAttribute('aria-label','Load into source '+(i+1));b.disabled=busy||importBusy;b.onclick=()=>load(it,i);slots.append(b)}
     row.append(head,slots);list.append(row);
   });
   document.getElementById('qAdd').disabled=busy||items.length>=MAX_ITEMS;
@@ -81,8 +85,8 @@ async function load(it,i){
   let rec;try{rec=await tx('readonly',s=>s.get(it.id))}catch{}
   if(!rec){message('Not found');await reload();return}
   const file=new File([rec.blob],it.name,{type:rec.blob.type||'audio/mpeg'});
-  await importFiles([file],i);
-  render();
+  pending={id:it.id,i};render();
+  try{await importFiles([file],i)}finally{pending=null;render()}
 }
 
 // Keep the meters honest whenever sources change, and re-skin the source cards with colour swatches.
