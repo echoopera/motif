@@ -364,7 +364,7 @@ select:disabled,input:disabled{opacity:.4}
   .rule{grid-row:2}
   .views{display:grid;grid-template-columns:minmax(320px,1fr) minmax(0,1.9fr) minmax(320px,1fr);grid-template-rows:minmax(0,1fr) minmax(0,.9fr);
     grid-template-areas:"mix nav fx" "src nav log";gap:14px;padding:14px var(--gut) 16px}
-  .view{position:relative;inset:auto;display:flex!important;animation:none!important;min-height:0;min-width:0;border:1px solid var(--line);background:rgba(3,12,16,.55);overflow:hidden}
+  .view{position:relative;inset:auto;display:flex!important;flex-direction:column;animation:none!important;min-height:0;min-width:0;border:1px solid var(--line);background:rgba(3,12,16,.55);overflow:hidden}
   .view.nav{grid-area:nav;padding:0 0 12px;border:0;background:none;overflow:visible}
   .view[data-view=mix]{grid-area:mix}.view[data-view=fx]{grid-area:fx}.view[data-view=src]{grid-area:src}.view[data-view=log]{grid-area:log}
   .view:not(.nav)::before{content:"";position:absolute;left:-1px;top:-1px;width:26px;height:26px;border-left:2px solid var(--ice);border-top:2px solid var(--ice);pointer-events:none;z-index:2}
