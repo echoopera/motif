@@ -41,6 +41,25 @@ let start=location.hash.slice(1);
 if(!VIEWS.includes(start)){try{start=localStorage.getItem('continuum-view-v1')||'nav'}catch{start='nav'}}
 apply(start,{push:false});
 
+// Self-fitting nav: if the stage + controls don't fit the visible height (Safari bars, small phones, big text),
+// collapse decoration in steps (t1 spectrum, t2 compact HUD/tiles, t3 captions and tiles) until the transport is on screen.
+const nav=document.querySelector('.view.nav');
+const dockEl=document.querySelector('.dock'),tabEl=document.getElementById('tabbar');
+// Short on room if the content overflows its box OR the transport actually sits under the tab bar.
+const cramped=()=>nav.scrollHeight>nav.clientHeight+1||dockEl.getBoundingClientRect().bottom>tabEl.getBoundingClientRect().top+1;
+function fit(){
+  const b=document.body;b.classList.remove('t1','t2','t3','t4');
+  if(wide.matches||matchMedia('(orientation:landscape)').matches)return;
+  for(const t of ['t1','t2','t3','t4']){
+    if(!cramped())break;
+    b.classList.add(t);
+  }
+}
+if(window.ResizeObserver)new ResizeObserver(()=>fit()).observe(document.querySelector('.views'));
+addEventListener('resize',fit);addEventListener('orientationchange',fit);
+document.fonts&&document.fonts.ready.then(fit);
+fit();
+
 // Keep the layout glued to the visual viewport (iOS toolbars collapse and expand).
 const setVH=()=>document.documentElement.style.setProperty('--vh',(window.visualViewport?.height||innerHeight)+'px');
 setVH();addEventListener('resize',setVH);window.visualViewport?.addEventListener('resize',setVH);

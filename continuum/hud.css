@@ -443,3 +443,17 @@ select:disabled,input:disabled{opacity:.4}
 .ro .d{display:inline-block;width:.62em;text-align:center;font-style:normal;letter-spacing:0}
 .ro i{text-align:center}
 .ro:first-child::before{left:6px}
+
+/* ── self-fitting nav (phones): the map gives way first, then decoration collapses; transport never leaves the screen ── */
+@media (max-width:1023px) and (orientation:portrait){
+  .stage{min-height:140px}
+  .view.nav{overflow:hidden}
+  body.t1 .spectrum{display:none}
+  body.t2 .ident em,body.t2 .ident .id-top i{display:none}
+  body.t2 .ident{min-height:42px;padding:4px 7px 5px}body.t2 .ident b{font-size:19px}
+  body.t2 .hud-top{padding-top:6px;padding-bottom:4px}body.t2 .ro b{font-size:30px;margin-top:2px}body.t2 .ro .micro{font-size:9px}
+  body.t3 .ro i{display:none}
+  body.t3 .ident-strip{display:none}
+  body.t3 .play-cell .micro{display:none}
+  body.t4 .hud-top{display:none}body.t4 .stage{min-height:90px}
+}
