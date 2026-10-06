@@ -78,9 +78,9 @@
       </div>
 
       <div class="dock">
-        <button class="dk" id="new" type="button" aria-label="New constellation">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="7" r="1.6"/><circle cx="18" cy="6" r="1.6"/><circle cx="8" cy="18" r="1.6"/><circle cx="17" cy="17" r="1.6"/><path d="M6 7l12-1M6 7l2 11M18 6l-1 11M8 18l9-1" opacity=".5"/></svg>
-          <span>New</span>
+        <button class="dk" id="loopBtn" type="button" aria-pressed="false" aria-label="Loop journey">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 3l3 3-3 3M4 11V9a3 3 0 0 1 3-3h13M7 21l-3-3 3-3M20 13v2a3 3 0 0 1-3 3H4"/></svg>
+          <span>Loop</span>
         </button>
         <button class="dk" id="clear" type="button" disabled aria-label="Clear path">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8V4h4M20 8V4h-4M4 16v4h4M20 16v4h-4M9 9l6 6M15 9l-6 6"/></svg>
@@ -118,6 +118,12 @@
         </div>
 
         <div class="panel">
+          <div class="ph"><h3>Constellation</h3><span class="micro">SOURCE LAYOUT</span></div>
+          <p class="note lead">Scatter the four sources into a new arrangement. Saved journeys keep their original places.</p>
+          <button id="new" class="btn" type="button">New constellation</button>
+        </div>
+
+        <div class="panel">
           <div class="ph"><h3>Master</h3><span class="micro">OUTPUT</span></div>
           <label class="row-range"><span class="lbl">Volume</span><input id="volume" type="range" min="0" max="100" value="65" aria-label="Master volume"></label>
         </div>
@@ -141,10 +147,10 @@
     <!-- ░░ 03 FX ░░ -->
     <section class="view fx-view" data-view="fx" aria-label="Processing">
       <div class="scroll">
-        <header class="vh"><span class="code">03</span><h2>Processing</h2><span class="sub">MASTER INSERTS · 20 PRESETS</span></header>
+        <header class="vh"><span class="code">03</span><h2>Processing</h2><span class="sub">MASTER INSERTS · 25 PRESETS</span></header>
         <div class="panel">
-          <div class="ph"><h3>Processing array</h3><span class="micro">4 SLOTS</span></div>
-          <div class="rack-chain" aria-hidden="true"><span>FIELD</span><i></i><span>GRAIN</span><i></i><span>ECHO</span><i></i><span>SPACE</span><i></i><span>FILTER</span></div>
+          <div class="ph"><h3>Processing array</h3><span class="micro">5 SLOTS</span></div>
+          <div class="rack-chain" aria-hidden="true"><span>FIELD</span><i></i><span>GRAIN</span><i></i><span>ECHO</span><i></i><span>SPACE</span><i></i><span>FILTER</span><i></i><span>MEDIA</span></div>
           <div id="effectsControls" class="effects-controls"></div>
           <p class="note">Effects process the combined sound field. Touch a preset, then shape its wet mix.</p>
         </div>

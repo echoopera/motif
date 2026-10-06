@@ -12,6 +12,8 @@ Open on an iPhone, tap **INIT** (audio needs a gesture), then Share → Add to H
 - **Nav**: live telemetry numerals, wireframe source globes with dial gauges, drag from any source to draw a route, tap a source or its tile to fly there, live signal-energy bars, wake-lock while a journey plays.
 - **Density tiers** for Safari-with-toolbars / SE heights; landscape rail layout; ≥1024px mission-control grid.
 - **PWA**: manifest, icons, network-first service worker, `#nav|#mix|#fx|#src|#log` deep links.
+- **Perform**: Loop toggle (seamless, beat-locked); drag the route while it plays to reshape it; press-and-hold on the route loops that section (whole bars) until you tap the pulsing dot or pause.
+- **Lo-Fi Media** (5th rack slot, 25 presets total): LoFi Tape, Vinyl, 8-Track, Reel to Reel, SP-1200. Native-node tape/vinyl chain plus a small bit-crusher worklet (`lofi-fx.js`).
 - **Untouched**: `audio-*.js`, `effects-rack.js`, `transition-scene.js`, `granular-fx.js`, `working-session.js` (saved sessions and journeys carry over).
 - `prd.html` restyled to match; content unchanged.
 

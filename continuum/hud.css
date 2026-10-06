@@ -387,3 +387,9 @@ select:disabled,input:disabled{opacity:.4}
 
 /* status chip sits top-centre on roomy stages so it never fights the bottom-row source labels */
 @media (min-width:521px){.stage-status{left:50%;bottom:auto;top:24px;transform:translateX(-50%);width:max-content;text-align:center}}
+
+/* loop toggle, held-section mode, tip */
+.dk[aria-pressed=true]{color:var(--cream)}.dk[aria-pressed=true] svg{filter:drop-shadow(0 0 6px rgba(236,227,164,.7))}.dk[aria-pressed=true] span{color:var(--cream)}
+.stage[data-mode=hold]{--hl:var(--warn)}
+.stage.tip .hint{opacity:.95;animation:none}
+#new{width:100%}
