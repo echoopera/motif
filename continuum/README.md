@@ -17,6 +17,9 @@ Four living soundscapes sit on one map. Draw a route and the music follows it, h
   then fade the output to silence before the audio engine sleeps (no clicks). Touch a sphere or press Play to wake it.
 - **Mix:** per-source levels, master volume, influence radii, focused blend, harmony guard, spatial depth.
 - **Processing (8 inserts, 40 presets):** Granular → Delay → Reverb → Cutoff+LFO → Lo-Fi Media → Slow Machine → 3-Band EQ → Soft Clipper.
+- **Export (Log tab):** *Export audio* bounces the journey live as a **single stereo WAV** of the final mix, or a **multitrack ZIP**: one stem per
+  source, the full mix, optional original files, `journey.json` (route, weights, tempo, effects) and a README. 1/2/4 cycles, 16/24-bit, optional ring-out tails.
+  Saved journeys have an *Audio* button too. All files start on the same sample.
 - **Sources:** import your own tracks, recolour the spheres, and keep a queue of tracks to swap in mid-journey.
   Live **memory** and **cache** meters keep large libraries from affecting playback.
 
@@ -26,6 +29,7 @@ Four living soundscapes sit on one map. Draw a route and the music follows it, h
 | `index.html` `hud.css` `app.js` `shell.js` | App shell, stage rendering, gestures, transport, tabs |
 | `transition-scene.js` `effects-rack.js` | Per-source routing, spatial field, master effects rack |
 | `audio-import.js` `queue.js` `working-session.js` | Imports, import queue, session restore |
+| `export.js` `rec-worklet.js` | Audio export: sample-accurate recorder, WAV + ZIP writers, export sheet |
 | `audio-player.js` `granular-fx.js` `lofi-fx.js` `slow-fx.js` `audio-analysis.js` | Worklets and the analysis worker |
 | `product.html` `prd.html` | Product page and requirements |
 | `sw.js` `manifest.webmanifest` `icon*` | Installable app + offline shell |

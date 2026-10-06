@@ -29,6 +29,7 @@ gzip/brotli, and a strict Content-Security-Policy.
 | --- | --- |
 | `index.html`, `app.js`, `shell.js`, `hud.css` | The instrument: shell, tabs, stage, transport |
 | `transition-scene.js`, `effects-rack.js`, `audio-import.js`, `queue.js`, `working-session.js` | Audio routing, effects, imports, queue, session restore |
+| `export.js`, `rec-worklet.js` | Audio export (single WAV or multitrack ZIP of stems), built in the browser, nothing uploaded |
 | `audio-player.js`, `granular-fx.js`, `lofi-fx.js`, `slow-fx.js`, `audio-analysis.js` | Audio worklets / analysis worker (loaded with `addModule` / `new Worker`) |
 | `product.html` (+ `.css/.js`) | One-page product site |
 | `prd.html` (+ `.css`) | Product requirements |
