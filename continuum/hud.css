@@ -393,3 +393,5 @@ select:disabled,input:disabled{opacity:.4}
 .stage[data-mode=hold]{--hl:var(--warn)}
 .stage.tip .hint{opacity:.95;animation:none}
 #new{width:100%}
+
+.fx-knob{margin-top:6px}.fx-knob input{height:38px;--tc:var(--cream)}
