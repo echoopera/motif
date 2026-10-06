@@ -15,6 +15,7 @@ Open on an iPhone, tap **INIT** (audio needs a gesture), then Share → Add to H
 - **Perform**: Loop toggle (seamless, beat-locked); drag the route while it plays to reshape it; press-and-hold on the route loops that section (whole bars) until you tap the pulsing dot or pause.
 - **Lo-Fi Media** (5th rack slot, 25 presets total): LoFi Tape, Vinyl, 8-Track, Reel to Reel, SP-1200. Native-node tape/vinyl chain plus a small bit-crusher worklet (`lofi-fx.js`).
 - **3-Band EQ** (genre presets: Ambient, Electronic, Hip-Hop, Classical, with live LOW/MID/HIGH gain sliders) and **Soft Clipper** (FL-style threshold + post gain with a glue compressor, 5 presets) close the chain: …Lo-Fi Media → EQ → Clipper.
+- **v0.7**: journeys always loop (no length/loop controls; Stop replaces Length); Mute removed; Pause fades out and suspends audio until a sphere is touched; tap a sphere (or tile) to stop/play that source; hold a sphere to move it (overlap merges sounds); FX presets fade from zero and cross-dip on change; per-source sphere colours; import queue (`queue.js`) with live cache + memory meters; quieter UI copy.
 - **Untouched**: `audio-*.js`, `effects-rack.js`, `transition-scene.js`, `granular-fx.js`, `working-session.js` (saved sessions and journeys carry over).
 - `prd.html` restyled to match; content unchanged.
 

@@ -31,9 +31,9 @@
     </a>
     <div class="top-right">
       <a class="brief" href="./prd.html">PRD</a>
-      <button id="mute" class="chip" disabled>Sound off</button>
+      <span class="live" id="liveState" data-s="OFF">OFF</span><button id="mute" hidden disabled aria-hidden="true" tabindex="-1"></button>
     </div>
-    <div class="top-sub"><span>ECHO OPERA / SPATIAL COMPOSITION SYSTEM</span><span id="sessionLabel"></span></div>
+    <div class="top-sub"><span>ECHO OPERA</span><span id="sessionLabel"></span></div>
     <div class="rule" aria-hidden="true"></div>
   </header>
 
@@ -52,18 +52,17 @@
         <i class="cb tl"></i><i class="cb tr"></i><i class="cb bl"></i><i class="cb br"></i>
         <div class="stage-corner"><span>SPATIAL NAVIGATION</span><span>SECTOR / 04</span></div>
         <div id="nodeLayer"></div>
-        <div class="hint" aria-hidden="true">Drag from a source to draw a route</div>
+        <div class="hint" aria-hidden="true">Draw a route</div>
         <div class="stage-status" id="stageStatus">Waiting for sound</div>
         <div class="mix-wrap" aria-hidden="true"><div class="mix" id="mix" aria-label="Node blend"></div></div>
 
         <div class="gate" id="gate">
           <div class="gate-sys">SYSTEM / AWAITING AUDIO</div>
-          <h2>Initialize<br>the sound field</h2>
-          <button class="init" id="enter" type="button" aria-describedby="gateCopy">
+          <h2>Initialize</h2>
+          <button class="init" id="enter" type="button">
             <svg viewBox="0 0 120 120" aria-hidden="true"><circle class="r1" cx="60" cy="60" r="56"/><circle class="r2" cx="60" cy="60" r="48"/><circle class="r3" cx="60" cy="60" r="40"/></svg>
             <span id="enterLabel">Init</span>
           </button>
-          <p id="gateCopy">Four living compositions. An endless space between them. Headphones invite a closer listen.</p>
           <ol class="boot" aria-hidden="true">
             <li>LINK / SOURCE 01 <em>OK</em></li><li>LINK / SOURCE 02 <em>OK</em></li><li>LINK / SOURCE 03 <em>OK</em></li><li>LINK / SOURCE 04 <em>OK</em></li><li>SPATIAL FIELD <em>ARMED</em></li>
           </ol>
@@ -78,49 +77,42 @@
       </div>
 
       <div class="dock">
-        <button class="dk" id="loopBtn" type="button" aria-pressed="false" aria-label="Loop journey">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 3l3 3-3 3M4 11V9a3 3 0 0 1 3-3h13M7 21l-3-3 3-3M20 13v2a3 3 0 0 1-3 3H4"/></svg>
-          <span>Loop</span>
+        <button class="dk" id="save" type="button" disabled aria-label="Save journey">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v10M8 10l4 4 4-4M5 16v4h14v-4"/></svg>
+          <span>Save</span>
         </button>
-        <button class="dk" id="clear" type="button" disabled aria-label="Clear path">
+        <button class="dk" id="clear" type="button" disabled aria-label="Clear route">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8V4h4M20 8V4h-4M4 16v4h4M20 16v4h-4M9 9l6 6M15 9l-6 6"/></svg>
           <span>Clear</span>
         </button>
         <div class="play-cell">
-          <button id="play" class="play" type="button" disabled data-state="ready" aria-label="Play journey">
+          <button id="play" class="play" type="button" disabled data-state="ready" aria-label="Play">
             <svg class="ring" viewBox="0 0 84 84" aria-hidden="true"><circle cx="42" cy="42" r="40"/><circle cx="42" cy="42" r="34" stroke-dasharray="1 4.2"/></svg>
             <svg class="i i-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-6.5z"/></svg>
             <svg class="i i-pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5h3v14H8zM13 5h3v14h-3z"/></svg>
-            <svg class="i i-replay" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12a7 7 0 1 0 2.2-5.1M5 4v4h4"/></svg>
           </button>
           <span class="micro" id="playLabel">PLAY</span>
         </div>
-        <button class="dk" id="save" type="button" disabled aria-label="Save snapshot">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v10M8 10l4 4 4-4M5 16v4h14v-4"/></svg>
-          <span>Save</span>
+        <button class="dk" id="stop" type="button" disabled aria-label="Stop">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="1"/></svg>
+          <span>Stop</span>
         </button>
-        <button class="dk" id="lenBtn" type="button" aria-label="Journey length">
-          <b id="lenVal">1M</b>
-          <span>Length</span>
+        <button class="dk" id="new" type="button" aria-label="New layout">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="7" r="1.6"/><circle cx="18" cy="6" r="1.6"/><circle cx="8" cy="18" r="1.6"/><circle cx="17" cy="17" r="1.6"/><path d="M6 7l12-1M6 7l2 11M18 6l-1 11M8 18l9-1" opacity=".5"/></svg>
+          <span>New</span>
         </button>
-        <select id="duration" hidden aria-hidden="true" tabindex="-1"><option value="30">30 seconds</option><option value="60" selected>1 minute</option><option value="120">2 minutes</option><option value="300">5 minutes</option></select>
+        <select id="duration" hidden aria-hidden="true" tabindex="-1"><option value="60" selected>1 minute</option></select>
       </div>
     </section>
 
     <!-- ░░ 02 MIX ░░ -->
     <section class="view mix-view" data-view="mix" aria-label="Mix">
       <div class="scroll">
-        <header class="vh"><span class="code">02</span><h2>Mix</h2><span class="sub">LEVELS · FIELD · HANDOFF</span></header>
+        <header class="vh"><span class="code">02</span><h2>Mix</h2><span class="sub">LEVELS · FIELD</span></header>
 
         <div class="panel">
-          <div class="ph"><h3>Source control</h3><span class="micro">04 / INDEPENDENT LEVELS</span></div>
+          <div class="ph"><h3>Source control</h3><span class="micro">LEVELS</span></div>
           <div id="trackMixer" class="track-mixer"></div>
-        </div>
-
-        <div class="panel">
-          <div class="ph"><h3>Constellation</h3><span class="micro">SOURCE LAYOUT</span></div>
-          <p class="note lead">Scatter the four sources into a new arrangement. Saved journeys keep their original places.</p>
-          <button id="new" class="btn" type="button">New constellation</button>
         </div>
 
         <div class="panel">
@@ -131,15 +123,13 @@
         <div class="panel">
           <div class="ph"><h3>Track influence</h3><span class="micro">RING RADIUS</span></div>
           <div class="projection-controls" id="projectionControls"></div>
-          <p class="note">Expand a ring to keep that track present longer. Overlapping rings blend smoothly.</p>
         </div>
 
         <div class="panel">
-          <div class="ph"><h3>Transition engine</h3><span class="micro" id="transitionState2">HANDOFF</span></div>
+          <div class="ph"><h3>Transition engine</h3><span class="micro" id="transitionState2">STANDBY</span></div>
           <label class="switch-row"><span>Focused blend<small>Two sources per transition</small></span><input id="focusBlend" type="checkbox" switch checked></label>
           <label class="switch-row"><span>Harmony guard<small>Scale-aware overlap</small></span><input id="harmonyGuard" type="checkbox" switch checked></label>
           <label class="row-range"><span class="lbl">Spatial depth <output id="spatialValue">32%</output></span><input id="spatialAmount" type="range" min="0" max="70" value="32" aria-label="Spatial depth"></label>
-          <p class="note">Headphones reveal the directional field.</p>
         </div>
       </div>
     </section>
@@ -147,12 +137,11 @@
     <!-- ░░ 03 FX ░░ -->
     <section class="view fx-view" data-view="fx" aria-label="Processing">
       <div class="scroll">
-        <header class="vh"><span class="code">03</span><h2>Processing</h2><span class="sub">MASTER INSERTS · 34 PRESETS</span></header>
+        <header class="vh"><span class="code">03</span><h2>Processing</h2><span class="sub">7 INSERTS</span></header>
         <div class="panel">
-          <div class="ph"><h3>Processing array</h3><span class="micro">7 SLOTS</span></div>
+          <div class="ph"><h3>Processing array</h3><span class="micro">CHAIN</span></div>
           <div class="rack-chain" aria-hidden="true"><span>FIELD</span><i></i><span>GRAIN</span><i></i><span>ECHO</span><i></i><span>SPACE</span><i></i><span>FILTER</span><i></i><span>MEDIA</span><i></i><span>EQ</span><i></i><span>CLIP</span></div>
           <div id="effectsControls" class="effects-controls"></div>
-          <p class="note">Effects process the combined sound field. Touch a preset, then shape its wet mix.</p>
         </div>
       </div>
     </section>
@@ -160,10 +149,10 @@
     <!-- ░░ 04 SRC ░░ -->
     <section class="view src-view" data-view="src" aria-label="Sources">
       <div class="scroll">
-        <header class="vh"><span class="code">04</span><h2>Sources</h2><span class="sub">YOUR FOUR SOUNDSCAPES</span></header>
+        <header class="vh"><span class="code">04</span><h2>Sources</h2><span class="sub">TRACKS · QUEUE</span></header>
         <div class="panel">
-          <div class="ph"><h3>Audio library</h3><span class="micro">LOCAL · PRIVATE</span></div>
-          <p class="note lead">Import up to four recordings. Each becomes a place on the map, with the same blending, drawn journeys and beat playhead. Files stay in this browser.</p>
+          <div class="ph"><h3>Audio library</h3><span class="micro">4 SLOTS</span></div>
+          <p class="note lead">Four sources. Files stay on this device.</p>
           <div class="src-actions">
             <button id="importAudio" class="btn primary" type="button">Import audio files</button>
             <label class="sel"><span class="micro">PLAYBACK</span>
@@ -171,11 +160,16 @@
             </label>
           </div>
           <input id="audioFiles" type="file" accept="audio/*,.wav,.mp3,.aif,.aiff,.m4a,.flac" multiple hidden>
-          <details class="fine"><summary>How matching works</summary>
-            <p>BPM, key and major/minor scale are estimates you can correct. Phrase-locked transitions align tempo and tonic. Harmony guard reduces clashes between incompatible scales. Transposition preserves a recording’s scale intervals — it cannot turn a major composition into a minor one.</p>
-          </details>
           <div id="audioProgress" role="status" hidden></div>
           <div class="audio-slots" id="audioSlots"></div>
+        </div>
+
+        <div class="panel" id="queuePanel">
+          <div class="ph"><h3>Queue</h3><span class="micro" id="qCount">0 / 24</span></div>
+          <div class="q-meters" id="qMeters"></div>
+          <button id="qAdd" class="btn primary" type="button">Add tracks</button>
+          <input id="qFiles" type="file" accept="audio/*,.wav,.mp3,.aif,.aiff,.m4a,.flac" multiple hidden>
+          <div class="q-list" id="qList"></div>
         </div>
       </div>
     </section>
@@ -189,15 +183,10 @@
             <span><button id="import" class="btn sm" type="button">Import</button></span>
           </div>
           <input type="file" id="importFile" accept="application/json,.json" hidden>
-          <p class="note lead" id="empty">Your paths become compositions. Save a journey to return to it.</p>
+          <p class="note lead" id="empty">No journeys saved</p>
           <div class="snapshots" id="snapshots"></div>
         </div>
-        <div class="panel about">
-          <div class="ph"><h3>About</h3><span class="micro">ECHO OPERA</span></div>
-          <p class="note lead">Drag or touch to draw · tap a place to visit · arrow keys to explore · space to draw. Snapshots stay in this browser — export a copy to keep it.</p>
-          <a class="btn" href="./prd.html">Product requirements</a>
-          <p class="note fine-print">Add to Home Screen for the full-screen instrument.</p>
-        </div>
+        <a class="btn" href="./prd.html" style="margin-top:2px">Product brief</a>
       </div>
     </section>
   </main>
@@ -218,6 +207,7 @@
 <script src="./transition-scene.js"></script>
 <script src="./effects-rack.js"></script>
 <script src="./audio-import.js"></script>
+<script src="./queue.js"></script>
 <script src="./working-session.js"></script>
 <script src="./shell.js"></script>
 </body>

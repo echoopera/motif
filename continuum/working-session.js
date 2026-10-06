@@ -20,11 +20,11 @@ function restoreWorkingSession(){
  }
  }catch{}
  sessionRestored=true;
- if(restored)message('Working session restored. Initialize audio, then Play journey to continue from your saved position.');
+ 
 }
 // Initialize immediately: neither storage reads nor restoration need audio playback.
 restoreWorkingSession();
-try{if(localStorage.getItem('continuum-audio-activated-v1')==='true'){$('gate').hidden=true;$('mute').disabled=false;$('mute').textContent='Resume sound';message('Session restored. Tap Resume sound to continue.')}}catch{}
+try{if(localStorage.getItem('continuum-audio-activated-v1')==='true'||path.length>1)$('gate').hidden=true}catch{}
 setInterval(saveWorkingSession,1500);
 document.addEventListener('visibilitychange',()=>{if(document.hidden)saveWorkingSession()});
 window.addEventListener('pagehide',saveWorkingSession);

@@ -206,7 +206,7 @@ footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px}
       <article class="card">
         <svg viewBox="0 0 34 34"><path d="M4 26c8-2 8-16 15-16s6 12 11 8"/><circle cx="4" cy="26" r="2.4"/><circle cx="30" cy="18" r="2.4"/></svg>
         <h3>Draw a route</h3>
-        <p>Drag from any source across the map and play it back over 30 seconds to 5 minutes. Turn on Loop and it repeats until you stop it.</p>
+        <p>Drag from any source across the map. Your route always loops on the beat, with the end flowing back to the start.</p>
       </article>
       <article class="card">
         <svg viewBox="0 0 34 34"><circle cx="17" cy="17" r="12"/><ellipse cx="17" cy="17" rx="5" ry="12"/><path d="M5 17h24"/></svg>
@@ -216,7 +216,7 @@ footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px}
       <article class="card">
         <svg viewBox="0 0 34 34"><path d="M7 20v-6M12 24V10M17 28V6M22 24V10M27 20v-6"/></svg>
         <h3>Bring your own audio</h3>
-        <p>Import up to four recordings of your own. CONTINUUM estimates BPM and key, and you can correct both. Files stay on your device.</p>
+        <p>Load four recordings of your own, or line up more in the queue and swap them in any time. A live meter shows your cache and memory. Files stay on your device.</p>
       </article>
       <article class="card">
         <svg viewBox="0 0 34 34"><path d="M4 17h5l3-9 5 18 4-14 3 5h6"/></svg>
@@ -245,8 +245,8 @@ footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px}
     </div>
     <div class="steps">
       <div class="step"><b>01</b><h3>Initialize</h3><p>Tap INIT to wake the sound field. Four sources appear as wireframe globes, each with a live level gauge.</p></div>
-      <div class="step"><b>02</b><h3>Draw</h3><p>Drag from a source and trace a path. Tap a source, or its tile below the map, to fly straight there.</p></div>
-      <div class="step"><b>03</b><h3>Play</h3><p>Press play. Your path becomes a composition. Loop it, reshape it, hold a section, then save the journey or export it as a file.</p></div>
+      <div class="step"><b>02</b><h3>Draw</h3><p>Drag from a source and trace a path. Tap a sphere to stop or start it.</p></div>
+      <div class="step"><b>03</b><h3>Play</h3><p>Press play. Your path becomes a composition. Bend it, hold a section, move the spheres, then save the journey or export it.</p></div>
     </div>
   </div>
 </section>
@@ -259,10 +259,12 @@ footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px}
       <p style="color:var(--ink-2);font-weight:300;font-size:17px">Once a journey is playing you can keep working on it with your fingers.</p>
     </div>
     <ul class="ticks">
-      <li><strong>Loop the journey.</strong> One tap and the route repeats on the beat, with no gap at the join.</li>
-      <li><strong>Reshape while it plays.</strong> Drag any point on the route and it bends smoothly around your finger. The music keeps going.</li>
-      <li><strong>Hold to loop a section.</strong> Press and hold on the route and the playhead circles that stretch, a whole number of bars long.</li>
-      <li><strong>Release with the pulsing dot.</strong> Tap the dot on the line to carry on, or pause to stop everything.</li>
+      <li><strong>Always looping.</strong> The route repeats on the beat, with no gap at the join.</li>
+      <li><strong>Reshape while it plays.</strong> Drag any point on the route and it bends around your finger.</li>
+      <li><strong>Hold to loop a section.</strong> Press and hold the route to circle that stretch. Tap the pulsing dot to release.</li>
+      <li><strong>Move the spheres.</strong> Hold a sphere and drag it anywhere. Overlapping spheres merge into one sound.</li>
+      <li><strong>Tap to stop or play.</strong> Tap a sphere to silence or restart that source.</li>
+      <li><strong>Pause fades out.</strong> Sound fades to silence and waits until you touch a sphere.</li>
     </ul>
   </div>
 </section>
@@ -272,7 +274,7 @@ footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px}
     <div class="sec-head">
       <div class="eyebrow">The four places</div>
       <h2>Each source has a character</h2>
-      <p>Starting sounds are generated live. Swap any of them for your own recording, then colour the whole field with a tape deck, a record or a sampler.</p>
+      <p>Starting sounds are generated live. Swap any of them for your own recording and recolour the spheres, then shape the field with a tape deck, a record or a sampler.</p>
     </div>
     <div class="sources">
       <div class="src" style="--c:#a2e1dd"><span class="micro">SRC / 01</span><b>VERDANT</b><p>Glass and open air.</p><span class="micro">C Lydian · 72 BPM</span></div>
