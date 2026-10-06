@@ -1,23 +1,42 @@
-# CONTINUUM — iPhone-first HUD rebuild
+# CONTINUUM
 
-Same audio engine, same four-source spatial composition system, rebuilt as a phone-native instrument
-in a cinematic sci-fi HUD language (ice-cyan wireframes, segmented rules, corner brackets, large light numerals).
+A spatial composition instrument for iPhone (and iPad / desktop), rebuilt as a sci-fi HUD.
+Four living soundscapes sit on one map. Draw a route and the music follows it, handing off in time and in key.
 
-## Run
-    cd continuum && python3 -m http.server 8000   # http://localhost:8000
-Open on an iPhone, tap **INIT** (audio needs a gesture), then Share → Add to Home Screen for full-screen.
+**Run it:** serve this folder over HTTPS (or `http://localhost`) and open `index.html`. See **DEPLOY.md** for hosting.
 
-## What changed
-- **Shell**: 5-tab bottom bar (Nav · Mix · FX · Src · Log), safe-area aware, no page scroll, thumb-zone transport dock, top-banner toasts.
-- **Nav**: live telemetry numerals, wireframe source globes with dial gauges, drag from any source to draw a route, tap a source or its tile to fly there, live signal-energy bars, wake-lock while a journey plays.
-- **Density tiers** for Safari-with-toolbars / SE heights; landscape rail layout; ≥1024px mission-control grid.
-- **PWA**: manifest, icons, network-first service worker, `#nav|#mix|#fx|#src|#log` deep links.
-- **Perform**: Loop toggle (seamless, beat-locked); drag the route while it plays to reshape it; press-and-hold on the route loops that section (whole bars) until you tap the pulsing dot or pause.
-- **Lo-Fi Media** (5th rack slot, 25 presets total): LoFi Tape, Vinyl, 8-Track, Reel to Reel, SP-1200. Native-node tape/vinyl chain plus a small bit-crusher worklet (`lofi-fx.js`).
-- **3-Band EQ** (genre presets: Ambient, Electronic, Hip-Hop, Classical, with live LOW/MID/HIGH gain sliders) and **Soft Clipper** (FL-style threshold + post gain with a glue compressor, 5 presets) close the chain: …Lo-Fi Media → EQ → Clipper.
-- **v0.7**: journeys always loop (no length/loop controls; Stop replaces Length); Mute removed; Pause fades out and suspends audio until a sphere is touched; tap a sphere (or tile) to stop/play that source; hold a sphere to move it (overlap merges sounds); FX presets fade from zero and cross-dip on change; per-source sphere colours; import queue (`queue.js`) with live cache + memory meters; quieter UI copy.
-- **v0.8**: extend an unfinished route by dragging from its end; queue swaps join mid-journey on the beat (no stop); Lo-Fi Media enters at 0 and never jumps to 100%; loaded queue items are highlighted (LIVE · slot); **Slow Machine** (varispeed tape worklet `slow-fx.js`: Dying Reel, Tape Stop, Warble Garden, Octave Sink, Fifth Rise, Tape Eater; AMOUNT/AGE/TIME) sits before the EQ; readouts are centred with fixed-width digit cells.
-- **Untouched**: `audio-*.js`, `effects-rack.js`, `transition-scene.js`, `granular-fx.js`, `working-session.js` (saved sessions and journeys carry over).
-- `prd.html` restyled to match; content unchanged.
+    python3 -m http.server 8000      # quick local test
 
-Files: `index.html` · `hud.css` · `app.js` (adapted from the original inline script) · `shell.js` (tabs/PWA).
+## Playing it
+- **INIT** wakes the audio engine (browsers need one tap).
+- **Draw:** drag from any source. The route always loops, with the end flowing back to the start.
+- **Edit while it plays:** drag a point to bend the route · press the route's end and keep drawing to extend it ·
+  press-and-hold on the route to loop that section (tap the pulsing dot to release).
+- **Spheres:** tap = play/stop that source · hold and drag = move it (overlapping spheres merge into one sound).
+- **Transport:** Play/Pause · Stop (rewind) · Save · Clear · New layout. Pause and Stop fade the sources, let reverb/echo/tape tails ring out,
+  then fade the output to silence before the audio engine sleeps (no clicks). Touch a sphere or press Play to wake it.
+- **Mix:** per-source levels, master volume, influence radii, focused blend, harmony guard, spatial depth.
+- **Processing (8 inserts, 40 presets):** Granular → Delay → Reverb → Cutoff+LFO → Lo-Fi Media → Slow Machine → 3-Band EQ → Soft Clipper.
+- **Sources:** import your own tracks, recolour the spheres, and keep a queue of tracks to swap in mid-journey.
+  Live **memory** and **cache** meters keep large libraries from affecting playback.
+
+## Project layout
+| Path | Purpose |
+| --- | --- |
+| `index.html` `hud.css` `app.js` `shell.js` | App shell, stage rendering, gestures, transport, tabs |
+| `transition-scene.js` `effects-rack.js` | Per-source routing, spatial field, master effects rack |
+| `audio-import.js` `queue.js` `working-session.js` | Imports, import queue, session restore |
+| `audio-player.js` `granular-fx.js` `lofi-fx.js` `slow-fx.js` `audio-analysis.js` | Worklets and the analysis worker |
+| `product.html` `prd.html` | Product page and requirements |
+| `sw.js` `manifest.webmanifest` `icon*` | Installable app + offline shell |
+| `fonts.css` `fonts/` | Self-hosted type (OFL) |
+| `deploy/` `tools/` | Server configs, optional smoke test |
+
+## Engineering notes
+- No dependencies, no build step. Plain scripts share one global scope, so load order in `index.html` matters.
+- Audio graph: sources → per-source route (level, FX slots, pan, distance) → master → rack → compressor → output.
+  Worklets are loaded lazily; if one fails, the rest of the rack keeps working.
+- The 60 fps loop never forces layout (stage size is observed), redraws at ~14 fps while silent, and persistence is debounced
+  and skips identical writes.
+- Stored data (all local): `localStorage` — working session, saved journeys, colours, source on/off, last tab;
+  `IndexedDB` — imported audio and the import queue.

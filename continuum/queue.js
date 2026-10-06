@@ -43,7 +43,7 @@ function render(){
     const name=document.createElement('b');name.textContent=it.name.replace(/\.[^.]+$/,'');name.title=it.name;
     const meta=document.createElement('span');meta.className='micro';meta.textContent=(it.seconds?fmtT(it.seconds)+' · ':'')+fmtMB(it.size);
     const del=document.createElement('button');del.type='button';del.className='q-del';del.setAttribute('aria-label','Remove '+it.name);del.textContent='×';del.onclick=()=>remove(it.id);
-    let tagged=false;if(inSlots.length||isPending){const tag=document.createElement('span');tag.className='q-tag';tag.textContent=isPending?'LOADING':'LIVE · '+(inSlots.map(i=>String(i+1).padStart(2,'0')).join(' '));head.dataset.tag=tag.textContent;head.append(name,meta,del);head.insertBefore(tag,meta)}
+    if(inSlots.length||isPending){const tag=document.createElement('span');tag.className='q-tag';tag.textContent=isPending?'LOADING':'LIVE · '+(inSlots.map(i=>String(i+1).padStart(2,'0')).join(' '));head.dataset.tag=tag.textContent;head.append(name,meta,del);head.insertBefore(tag,meta)}
     else head.append(name,meta,del);
     const slots=document.createElement('div');slots.className='q-slots';
     const to=document.createElement('span');to.className='micro';to.textContent='LOAD';slots.append(to);
@@ -98,6 +98,6 @@ renderAudioSlots=function(){baseRender();
 document.getElementById('qAdd').onclick=()=>document.getElementById('qFiles').click();
 document.getElementById('qFiles').onchange=e=>add(e.target.files);
 open().then(d=>{db=d;return reload()}).catch(()=>{render()});
-setInterval(()=>{if(document.querySelector('.view[data-view=src].active')||matchMedia('(min-width:1024px)').matches)render()},4000);
+window.addEventListener('continuum:view',e=>{if(e.detail==='src')refreshEstimate().then(render)});
 renderAudioSlots();
 })();

@@ -89,7 +89,9 @@ class ContinuumSlow extends AudioWorkletProcessor{
    o0[n]=l*this.dropEnv;if(o1)o1[n]=r*this.dropEnv;
    this.w=(this.w+1)&mask;
   }
+  const last=o0[N-1];if(!(last===last)||last>8||last<-8){this.heal()}
   return true;
  }
+ heal(){this.buf[0].fill(0);this.buf[1].fill(0);this.d[0]=this.d[1]=this.nom;this.act=0;this.next=1;this.fading=false;this.sp=1;this.dropEnv=1;this.dropTarget=1;this.slumpLeft=0}
 }
 registerProcessor('continuum-slow',ContinuumSlow);

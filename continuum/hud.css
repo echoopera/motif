@@ -51,10 +51,7 @@ input,select,textarea{-webkit-user-select:text;user-select:text}
 .wm{font:300 19px/1 var(--f-display);letter-spacing:.36em;margin-right:-.36em;color:var(--ice)}
 .top-right{display:flex;align-items:center;gap:8px}
 .brief{font:500 11px/1 var(--f-mono);letter-spacing:.14em;padding:10px 11px;color:var(--ink-2);border:1px solid var(--line);min-height:36px;display:inline-flex;align-items:center}
-.chip{white-space:nowrap;font:500 10.5px/1 var(--f-mono);letter-spacing:.14em;text-transform:uppercase;min-height:36px;padding:0 12px 0 26px;background:#071b22;border:1px solid var(--line-2);color:var(--ice);position:relative;border-radius:2px}
-.chip::before{content:"";position:absolute;left:11px;top:50%;width:6px;height:6px;margin-top:-3px;background:var(--cream);box-shadow:0 0 8px var(--cream);border-radius:50%}
-.chip:disabled{color:var(--ink-3);border-color:var(--line)}.chip:disabled::before{background:var(--ink-3);box-shadow:none}
-.chip:active{background:#0c2d36}
+
 .top-sub{grid-column:1/-1;display:flex;justify-content:space-between;gap:10px;font:400 8.5px/1 var(--f-mono);letter-spacing:.2em;color:var(--ink-3);white-space:nowrap;overflow:hidden}
 .top-sub span:first-child{overflow:hidden;text-overflow:ellipsis}
 .rule{grid-column:1/-1;position:relative;height:5px;border-top:1px solid var(--line-2);border-bottom:1px solid var(--line);margin:0 0 0}
@@ -195,8 +192,8 @@ input,select,textarea{-webkit-user-select:text;user-select:text}
 .play .ring{position:absolute;inset:-5px;width:calc(100% + 10px);height:calc(100% + 10px);fill:none;stroke:var(--cyan);stroke-width:1;opacity:.55;animation:spin 30s linear infinite}
 .play .ring circle:last-child{stroke:var(--ice);opacity:.7}
 .play .i{width:30px;height:30px;fill:var(--ice);stroke:none;display:none;filter:drop-shadow(0 0 6px rgba(191,244,244,.5))}
-.play[data-state=ready] .i-play,.play[data-state=playing] .i-pause,.play[data-state=replay] .i-replay{display:block}
-.play .i-play{margin-left:3px}.play .i-replay{fill:none;stroke:var(--ice);stroke-width:1.6;stroke-linecap:round}
+.play[data-state=ready] .i-play,.play[data-state=playing] .i-pause{display:block}
+.play .i-play{margin-left:3px}
 .play[data-state=playing]{background:radial-gradient(circle,#4a4220 0,#201c0c 72%);box-shadow:0 0 0 1px var(--cream),0 0 36px rgba(236,227,164,.22),inset 0 0 22px rgba(236,227,164,.14)}
 .play[data-state=playing] .i{fill:var(--cream)}.play[data-state=playing] .ring{stroke:var(--cream);animation-duration:9s}
 .play:disabled{opacity:.35;box-shadow:0 0 0 1px var(--line)}.play:disabled .ring{animation:none}
@@ -215,7 +212,6 @@ input,select,textarea{-webkit-user-select:text;user-select:text}
 .ph h3{font:400 13px/1.2 var(--f-mono);letter-spacing:.2em;text-transform:uppercase;color:var(--ice)}
 .note{font:400 12.5px/1.65 var(--f-mono);color:var(--ink-2);margin-top:12px}
 .note.lead{margin:0 0 14px;color:var(--ink-2)}
-.fine-print{font-size:11px;color:var(--ink-3)}
 
 /* buttons */
 .btn,.snapshot button,.audio-slot button,.slot-actions button{min-height:46px;padding:0 16px;display:inline-flex;align-items:center;justify-content:center;gap:8px;
@@ -312,7 +308,6 @@ select:disabled,input:disabled{opacity:.4}
 .snapshot h3{font:300 22px/1 var(--f-display);letter-spacing:.1em;text-transform:uppercase;color:var(--ice);margin:0 0 6px}
 .snapshot p{margin:0 0 12px}
 .snapshot .actions{display:flex;gap:8px;flex-wrap:wrap}.snapshot .actions button{flex:1;min-height:42px;font-size:10.5px;padding:0 10px}
-.about .btn{width:100%}
 
 /* ═══ PHONE FINE-TUNING ══════════════════════════════════════════════════ */
 /* density tiers: Safari toolbars and small phones shrink the viewport, so the instrument compacts instead of scrolling */

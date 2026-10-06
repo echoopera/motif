@@ -1,0 +1,14 @@
+example.com {
+	root * /var/www/continuum
+	file_server
+	encode zstd gzip
+	@code path *.html *.js *.css *.webmanifest /sw.js
+	header @code Cache-Control "no-cache"
+	@static path *.woff2 *.png *.svg
+	header @static Cache-Control "public, max-age=31536000, immutable"
+	header {
+		Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' blob:; font-src 'self'; worker-src 'self' blob:; connect-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'self'"
+		X-Content-Type-Options nosniff
+		Referrer-Policy no-referrer
+	}
+}

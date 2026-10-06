@@ -14,6 +14,7 @@ class ContinuumCrush extends AudioWorkletProcessor{
    for(let n=0;n<o.length;n++){
     this.phase[c]+=rate;
     if(this.phase[c]>=1){this.phase[c]-=1;const x=i[n];this.hold[c]=exact?x:Math.round(x*levels)/levels}
+    if(!(this.hold[c]===this.hold[c]))this.hold[c]=0;
     o[n]=this.hold[c];
    }
   }

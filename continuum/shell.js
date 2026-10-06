@@ -18,6 +18,7 @@ function apply(v,{push=true}={}){
   });
   tabs.forEach(t=>{const on=t.dataset.view===v;t.setAttribute('aria-selected',on);t.tabIndex=on?0:-1});
   document.body.dataset.view=v;
+  window.dispatchEvent(new CustomEvent('continuum:view',{detail:v}));
   if(push){try{history.replaceState(null,'','#'+v)}catch{}try{localStorage.setItem('continuum-view-v1',v)}catch{}}
 }
 
