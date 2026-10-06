@@ -19,7 +19,7 @@ Four living soundscapes sit on one map. Draw a route and the music follows it, h
 - **Processing (8 inserts, 40 presets):** Granular → Delay → Reverb → Cutoff+LFO → Lo-Fi Media → Slow Machine → 3-Band EQ → Soft Clipper.
 - **Export (Log tab):** *Export audio* bounces the journey live as a **single stereo WAV** of the final mix, or a **multitrack ZIP**: one stem per
   source, the full mix, optional original files, `journey.json` (route, weights, tempo, effects) and a README. 1/2/4 cycles, 16/24-bit, optional ring-out tails.
-  Saved journeys have an *Audio* button too. All files start on the same sample.
+  Saved journeys have an *Audio* button too. All files start on the same sample. *Stems* can be Dry, With FX (`stems-with-effects/`, each stem through its own copy of the active master effects) or Both. Time-modulated effects (Slow Machine, Lo-Fi, Cutoff LFO, Granular) move independently per stem, so those stems will not sum exactly to the mix; the master compressor is not applied.
 - **Sources:** import your own tracks, recolour the spheres, and keep a queue of tracks to swap in mid-journey.
   Live **memory** and **cache** meters keep large libraries from affecting playback.
 

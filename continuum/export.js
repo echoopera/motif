@@ -10,9 +10,11 @@ const $q=id=>document.getElementById(id);
 const fmtT=s=>{s=Math.max(0,Math.round(s));return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')};
 const fmtMB=b=>b>=1024*MB?(b/(1024*MB)).toFixed(2)+' GB':(b/MB).toFixed(b>=100*MB?0:1)+' MB';
 const safe=s=>String(s||'').replace(/[^\w\- ]+/g,'').trim().replace(/\s+/g,'-').slice(0,40)||'track';
+const MOVING=['slow','media','cutoffLfo','granular'],MOVING_NAME={slow:'Slow Machine',media:'Lo-Fi',cutoffLfo:'Cutoff LFO',granular:'Granular'};
+const activeFx=()=>Object.keys(effectState).filter(k=>fxPresets[k][effectState[k].preset]&&effectState[k].mix>.02);
 const budgetBytes=()=>{const dm=navigator.deviceMemory;return(dm?Math.min(640,Math.max(200,dm*70)):220)*MB};
 
-const S={opts:{mode:'multi',cycles:1,bits:16,tails:true,sources:true},phase:'config',snapshot:null,cancel:false,result:null,rec:null};
+const S={opts:{mode:'multi',stems:'dry',cycles:1,bits:16,tails:true,sources:true},phase:'config',snapshot:null,cancel:false,result:null,rec:null};
 let sheet=null,moduleReady=null,lastFocus=null;
 
 // ─────────── WAV + ZIP (no dependencies) ───────────
@@ -60,10 +62,10 @@ async function makeZip(entries){
 // ─────────── estimates ───────────
 function estimate(){
  const o=S.opts,sr=(typeof audio!=='undefined'&&audio)?audio.a.sampleRate:48000,dur=(+$q('duration').value||60)*o.cycles;
- const tail=o.tails?(typeof uiTailSeconds==='function'&&audio?.rack?uiTailSeconds():1)+1:0,secs=dur+tail,tracks=o.mode==='multi'?1+MAX_STEM:1,bytesPer=o.bits===16?2:4;
+ const tail=o.tails?(typeof uiTailSeconds==='function'&&audio?.rack?uiTailSeconds():1)+1:0,secs=dur+tail,tracks=o.mode==='multi'?1+(o.stems==='both'?2*MAX_STEM:MAX_STEM):1,bytesPer=o.bits===16?2:4;
  const ram=secs*sr*2*bytesPer*tracks,live=audioSlots.reduce((n,t)=>n+(t&&t.ready?t.seconds*24000*2*4:0),0),budget=budgetBytes();
  const fileBytes=secs*sr*2*(o.bits/8)*tracks;
- return{secs,dur,ram,fileBytes,over:ram+live>budget*1.5,files:o.mode==='multi'?(1+MAX_STEM)+' WAV + data':'1 WAV'};
+ return{secs,dur,ram,fileBytes,over:ram+live>budget*1.5,files:o.mode==='multi'?(1+(o.stems==='both'?2*MAX_STEM:MAX_STEM))+' WAV + data':'1 WAV'};
 }
 
 // ─────────── sheet UI ───────────
@@ -87,14 +89,16 @@ function render(){
   const e=estimate();
   b.innerHTML=
    '<div class="ex-row"><span class="micro">FORMAT</span>'+seg('mode',[['single','Single file'],['multi','Multitrack']],o.mode)+'</div>'+
+   (o.mode==='multi'?'<div class="ex-row"><span class="micro">STEMS</span>'+seg('stems',[['dry','Dry'],['fx','With FX'],['both','Both']],o.stems)+'</div>':'')+
    '<div class="ex-row"><span class="micro">LENGTH</span>'+seg('cycles',[[1,'1 cycle'],[2,'2'],[4,'4']],o.cycles)+'</div>'+
    '<div class="ex-row"><span class="micro">DEPTH</span>'+seg('bits',[[16,'16-bit'],[24,'24-bit']],o.bits)+'</div>'+
    '<label class="ex-check"><input type="checkbox" id="exTails"'+(o.tails?' checked':'')+'><span>Let tails ring out</span></label>'+
    '<label class="ex-check'+(o.mode==='multi'?'':' dim')+'"><input type="checkbox" id="exSrc"'+(o.sources?' checked':'')+(o.mode==='multi'?'':' disabled')+'><span>Include original source files</span></label>'+
    '<div class="ex-est'+(e.over?' warn':'')+'"><div><span class="micro">DURATION</span><b>≈ '+fmtT(e.secs)+'</b></div><div><span class="micro">FILES</span><b>'+e.files+'</b></div><div><span class="micro">SIZE</span><b>'+fmtMB(e.fileBytes)+'</b></div></div>'+
    (e.over?'<p class="ex-warn">Too large for this device. Use fewer cycles or 16-bit.</p>':'')+
+   (o.mode==='multi'&&o.stems!=='dry'?'<p class="ex-note">'+(activeFx().length?'Runs your effects on every stem. Best on a recent device.':'No effects are on, so stems stay dry.')+(activeFx().some(k=>MOVING.includes(k))?' '+activeFx().filter(k=>MOVING.includes(k)).map(k=>MOVING_NAME[k]).join(', ')+' modulate separately on each stem.':'')+'</p>':'')+
    '<div class="ex-actions"><button type="button" class="btn primary" id="exGo"'+(e.over?' disabled':'')+'>Start export</button><button type="button" class="btn" id="exCancel">Cancel</button></div>';
-  b.querySelectorAll('[data-k]').forEach(btn=>btn.onclick=()=>{const k=btn.dataset.k,v=btn.dataset.v;o[k]=k==='mode'?v:+v;render()});
+  b.querySelectorAll('[data-k]').forEach(btn=>btn.onclick=()=>{const k=btn.dataset.k,v=btn.dataset.v;o[k]=(k==='mode'||k==='stems')?v:+v;render()});
   $q('exTails').onchange=e=>{o.tails=e.target.checked;render()};
   const sc=$q('exSrc');if(sc)sc.onchange=e=>{o.sources=e.target.checked};
   $q('exGo').onclick=()=>run();$q('exCancel').onclick=close;
@@ -156,23 +160,40 @@ async function run(){
   // Recorders: stems tap each source after its level, FX slots, distance and pan (before the master chain);
   // the mix taps the final output.
   const sink=a.createGain();sink.gain.value=0;sink.connect(a.destination);
-  const taps=[],rec={mix:makeRecorder(o.bits),stems:[]};
+  const taps=[],rec={mix:makeRecorder(o.bits),stems:[],fx:[]};
   audio.out.connect(rec.mix.node);rec.mix.node.connect(sink);taps.push(()=>{try{audio.out.disconnect(rec.mix.node)}catch{}});
-  if(multi)for(let i=0;i<MAX_STEM;i++){
+  // Which master effects are actually on? Only those are rebuilt for each stem.
+  const fxKeys=Object.keys(effectState).filter(k=>fxPresets[k][effectState[k].preset]&&effectState[k].mix>.02);
+  let stemMode=multi?o.stems:'dry';if(stemMode!=='dry'&&!fxKeys.length)stemMode='dry';
+  if(multi&&stemMode!=='fx')for(let i=0;i<MAX_STEM;i++){
    const r=makeRecorder(o.bits),route=audio.routes[i];rec.stems.push(r);
    route.dry.connect(r.node);route.space.connect(r.node);r.node.connect(sink);
    taps.push(()=>{try{route.dry.disconnect(r.node);route.space.disconnect(r.node)}catch{}});
   }
+  // Stems with master effects: one lean mirror of the master chain per source, all running in parallel with the live mix.
+  if(multi&&stemMode!=='dry'){
+   if(typeof effectsReady!=='undefined'&&effectsReady)await effectsReady;
+   audio.stemRacks=[];
+   for(let i=0;i<MAX_STEM;i++){
+    const r=makeRecorder(o.bits),route=audio.routes[i],rack=createEffectsRack(a,r.node,fxKeys);
+    attachStemWorklets(rack);audio.stemRacks.push(rack);rec.fx.push(r);
+    route.dry.connect(rack.input);route.space.connect(rack.input);r.node.connect(sink);
+    taps.push(()=>{try{route.dry.disconnect(rack.input);route.space.disconnect(rack.input)}catch{}});
+   }
+   for(const k of fxKeys)for(const rk of audio.stemRacks)applyEffect(k,rk);
+  }
+  rec.stemMode=stemMode;rec.fxKeys=fxKeys;
   S.rec=rec;
   // Restart the journey from the top so the bounce is a clean loop.
   uiFadeSources=false;stopJourney();holdRegion=null;progress=0;if(path.length>1)point={...path[0]};playJourney(true);
   // The engine's first scheduled beat is the true start; arm every recorder on that exact moment.
   for(let k=0;k<200&&!audio.beatMarkers.length;k++)await sleep(5);
   const at=audio.beatMarkers.length?Math.max(audio.beatMarkers[0].time,a.currentTime+.04):a.currentTime+.12,cycleBeats=journeyBeats*o.cycles;
-  const latency=multi?.006+(fxPresets.slow[effectState.slow.preset]&&effectState.slow.mix>.02?.04:0):0; // compressor look-ahead + Slow Machine delay
-  const all=[rec.mix,...rec.stems];
+  const slowOn=fxKeys.includes('slow'),latency=multi?.006+(slowOn?.04:0):0,fxLat=slowOn?.04:0; // compressor look-ahead + Slow Machine delay
+  const all=[rec.mix,...rec.stems,...rec.fx];
   rec.mix.node.port.postMessage({type:'arm',at:at+latency});
   for(const r of rec.stems)r.node.port.postMessage({type:'arm',at});
+  for(const r of rec.fx)r.node.port.postMessage({type:'arm',at:at+fxLat});
   const tailSec=o.tails?Math.min(7,uiTailSeconds())+.8:0,fadeSec=o.tails?.7:0;
   const timeline=[];let stopT=null,fading=false,lastLog=0;
   const t0=performance.now();
@@ -184,7 +205,8 @@ async function run(){
    if(now-lastLog>=.1&&now>=at){lastLog=now;timeline.push({t:+(now-at).toFixed(3),progress:+progress.toFixed(4),x:+point.x.toFixed(4),y:+point.y.toFixed(4),weights:weights.map(w=>+w.toFixed(3)),bpm:+audio.bpm.toFixed(2),key:audio.field.key,mode:audio.field.mode,hold:!!holdRegion})}
    if(stopT===null&&cycleBeats-beat<1.5){const tt=timeOfBeat(cycleBeats);if(tt!==null){stopT=tt;
      rec.mix.node.port.postMessage({type:'stop',at:tt+latency+tailSec});
-     for(const r of rec.stems)r.node.port.postMessage({type:'stop',at:tt+fadeSec})}}
+     for(const r of rec.stems)r.node.port.postMessage({type:'stop',at:tt+fadeSec});
+     for(const r of rec.fx)r.node.port.postMessage({type:'stop',at:tt+fxLat+tailSec})}}
    if(stopT!==null&&!fading&&now>=stopT&&o.tails){fading=true;uiFadeSources=true}
    const total=Math.max(1,(stopT?stopT-at:cycleBeats*60/(audio.bpm||72))+tailSec);
    const el=Math.max(0,now-at);
@@ -196,6 +218,7 @@ async function run(){
   }
   await Promise.all(all.map(r=>Promise.race([r.done,sleep(4000)])));
   taps.forEach(f=>f());for(const r of all){try{r.node.disconnect()}catch{}}try{sink.disconnect()}catch{}
+  if(audio.stemRacks){audio.stemRacks.forEach(disposeRack);audio.stemRacks=null}
   uiFadeSources=false;
   if(S.cancel)throw Error('cancelled');
   $q('exStatus').textContent='BUILDING';
@@ -205,7 +228,8 @@ async function run(){
   S.phase='done';render();
  }catch(err){
   uiFadeSources=false;
-  if(S.rec){for(const r of[S.rec.mix,...S.rec.stems]){try{r.node.port.postMessage({type:'abort'});r.node.disconnect()}catch{}}}
+  if(audio.stemRacks){audio.stemRacks.forEach(disposeRack);audio.stemRacks=null}
+  if(S.rec){for(const r of[S.rec.mix,...S.rec.stems,...S.rec.fx]){try{r.node.port.postMessage({type:'abort'});r.node.disconnect()}catch{}}}
   if(err&&err.message==='cancelled'){/* cancel() already closed the sheet */}
   else{S.phase='config';message(err&&err.message||'Export failed');if(sheet){sheet.hidden=false;render()}}
  }
@@ -224,13 +248,16 @@ async function assemble(o,rec,timeline,sr,at,latency){
  const mixFrames=rec.mix.frames,mix=wavBlob(rec.mix.chunks,mixFrames,sr,o.bits);rec.mix.chunks=[];
  if(o.mode==='single')return{name:base+'-mix.wav',blob:mix,note:fmtT(mixFrames/sr)};
  const entries=[],root=base+'/';
- for(let i=0;i<rec.stems.length;i++){const r=rec.stems[i],nm=worlds[i].name;entries.push({name:root+'stems/0'+(i+1)+'-'+safe(nm)+'.wav',blob:wavBlob(r.chunks,r.frames,sr,o.bits)});r.chunks=[]}
+ const both=rec.stems.length&&rec.fx.length,fxDir=both?'stems-with-effects/':'stems/',dryDir='stems/';
+ for(let i=0;i<rec.stems.length;i++){const r=rec.stems[i],nm=worlds[i].name;entries.push({name:root+dryDir+'0'+(i+1)+'-'+safe(nm)+'.wav',blob:wavBlob(r.chunks,r.frames,sr,o.bits)});r.chunks=[]}
+ for(let i=0;i<rec.fx.length;i++){const r=rec.fx[i],nm=worlds[i].name;entries.push({name:root+fxDir+'0'+(i+1)+'-'+safe(nm)+'-FX.wav',blob:wavBlob(r.chunks,r.frames,sr,o.bits)});r.chunks=[]}
  entries.push({name:root+'mix/MIX-with-effects.wav',blob:mix});
  if(o.sources)for(let i=0;i<4;i++){const f=audioSlots[i]&&audioSlots[i].file;if(f)entries.push({name:root+'sources/0'+(i+1)+'-'+(f.name||'source').replace(/[\\/:*?"<>|]/g,'_'),blob:f})}
  const eff=typeof performanceData==='function'?performanceData():{};
  const json={
   app:'CONTINUUM',exported:new Date().toISOString(),sampleRate:sr,bitDepth:o.bits,cycles:o.cycles,tailsIncluded:o.tails,
-  frames:{stems:rec.stems.map(r=>r.frames),mix:mixFrames},mixLatencyCompensationSeconds:+latency.toFixed(4),
+  stems:rec.stemMode==='fx'?'with-effects':rec.stemMode==='both'?'dry+with-effects':'dry',masterEffectsOnStems:rec.stemMode==='dry'?[]:rec.fxKeys,
+  frames:{stems:rec.stems.map(r=>r.frames),stemsWithEffects:rec.fx.map(r=>r.frames),mix:mixFrames},mixLatencyCompensationSeconds:+latency.toFixed(4),
   sources:worlds.map((w,i)=>({index:i+1,name:w.name,color:palettes[i],on:srcOn[i],bpm:+w.bpm,key:w.key,mode:w.mode,position:{x:+nodes[i].x.toFixed(4),y:+nodes[i].y.toFixed(4)},file:audioSlots[i]&&audioSlots[i].name||null})),
   route:path.map(p=>[+p.x.toFixed(4),+p.y.toFixed(4)]),levels:eff.levels,effects:eff.effects,
   automation:timeline
@@ -239,8 +266,17 @@ async function assemble(o,rec,timeline,sr,at,latency){
  const readme=[
   'CONTINUUM multitrack export',
   '',
-  'stems/01-04  One stereo WAV per source: after its level, spatial position and distance filter.',
-  '             They do NOT include the master effects chain, so effects can be rebuilt in your DAW.',
+  ...(rec.stemMode==='dry'?[
+   'stems/01-04  One stereo WAV per source: after its level, spatial position and distance filter.',
+   '             They do NOT include the master effects chain, so effects can be rebuilt in your DAW.']:
+   rec.stemMode==='fx'?[
+   'stems/01-04  One stereo WAV per source WITH the master effects printed on each stem ('+rec.fxKeys.join(', ')+').',
+   '             Level, spatial position and distance filter are included. Effect tails ring out on each stem.']:[
+   'stems/01-04          Dry: one stereo WAV per source (level, spatial position, distance filter), no master effects.',
+   'stems-with-effects/  The same stems with the master effects printed on each ('+rec.fxKeys.join(', ')+').']),
+  ...(o.stems!=='dry'&&rec.stemMode==='dry'?['             (No master effects were active, so the stems are dry.)']:[]),
+  '             Effects are run per stem with your current settings; the master compressor is not applied to stems.',
+  ...(rec.stemMode!=='dry'&&rec.fxKeys.some(k=>MOVING.includes(k))?['             '+rec.fxKeys.filter(k=>MOVING.includes(k)).map(k=>MOVING_NAME[k]).join(', ')+' modulate independently on each stem, so those stems will not sum exactly to the mix.']:[]),
   'mix/         The full output as heard: master effects, EQ and soft clipper'+(o.tails?', with tails.':'.'),
   'sources/     The original audio files that were loaded (if included).',
   'journey.json Route, source positions, levels, effect settings and a 10 Hz automation log',
@@ -249,7 +285,7 @@ async function assemble(o,rec,timeline,sr,at,latency){
   'Stems are recorded at engine level (not normalized), so raise their gain in your DAW if needed.',
   'Import: drop every WAV in the same project at bar 1 (time 0). All files start on the same sample.',
   'Sample rate '+sr+' Hz, '+o.bits+'-bit stereo. Length: '+o.cycles+' cycle'+(o.cycles>1?'s':'')+(o.tails?' plus an ending tail.':' (loop-ready).'),
-  'The mix file is aligned to the stems (master-chain delay of '+(latency*1000).toFixed(0)+' ms removed).',
+  'Mix and effect-printed stems are time-aligned to the dry stems (processing delay removed).',
   ''
  ].join('\n');
  entries.push({name:root+'README.txt',blob:new Blob([readme],{type:'text/plain'})});
