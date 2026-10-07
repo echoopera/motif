@@ -29,7 +29,7 @@ function drawFxViz(time){
   if(!o.vis||o.w<10||o.h<10)continue;
   const W=Math.round(o.w*d),H=Math.round(o.h*d);if(o.c.width!==W||o.c.height!==H){o.c.width=W;o.c.height=H}
   const g=o.g;g.setTransform(d,0,0,d,0,0);g.clearRect(0,0,o.w,o.h);
-  const st=effectState[o.key],p=fxPresets[o.key][st.preset];o.p=p;o.mix=p?st.mix:0;o.st=st;
+  const st=effectState[o.key],p=fxPresets[o.key][st.preset];o.p=p;o.mix=p?(sendFx.includes(o.key)?1:st.mix):0;o.st=st;
   try{vzGrid(g,o.w,o.h);(p?fxDraw[o.key]:vzIdle)(o,time/1000,dt)}catch(e){console.error(e)}
  }
 }
@@ -120,7 +120,7 @@ const fxDraw={
   vzTag(g,'HP '+p.hp+' · LP '+(p.lp>=1000?(p.lp/1000).toFixed(1)+'K':p.lp)+' · '+p.bits+' BIT'+(p.sr?' · '+Math.round(p.sr/1000)+'K':''),8,4,false)
  },
  slow(o,t,dt){
-  const g=o.g,w=o.w,h=o.h,s=audio?.rack?.slots.slow,live=fxVz.live&&s&&s.sp!==undefined,sp=live?s.sp:1,drop=live?(s.drop??1):1,N=200;
+  const g=o.g,w=o.w,h=o.h,s=sendRacks.slow?.rack.slots.slow,live=fxVz.live&&s&&s.sp!==undefined,sp=live?s.sp:1,drop=live?(s.drop??1):1,N=200;
   const H=fxVz.slow;H.push({sp,drop});if(H.length>N)H.shift();
   const Y=v=>Math.max(4,Math.min(h-4,h*.5-Math.log2(v)*h*.17)),y1=Y(1),X=i=>(i+(N-H.length))/(N-1)*w;
   g.strokeStyle='rgba(154,196,204,.4)';g.setLineDash([3,4]);g.beginPath();g.moveTo(0,y1+.5);g.lineTo(w,y1+.5);g.stroke();g.setLineDash([]);

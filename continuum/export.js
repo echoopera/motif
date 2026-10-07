@@ -11,7 +11,7 @@ const fmtT=s=>{s=Math.max(0,Math.round(s));return Math.floor(s/60)+':'+String(s%
 const fmtMB=b=>b>=1024*MB?(b/(1024*MB)).toFixed(2)+' GB':(b/MB).toFixed(b>=100*MB?0:1)+' MB';
 const safe=s=>String(s||'').replace(/[^\w\- ]+/g,'').trim().replace(/\s+/g,'-').slice(0,40)||'track';
 const MOVING=['slow','media','cutoffLfo','granular'],MOVING_NAME={slow:'Slow Machine',media:'Lo-Fi',cutoffLfo:'Cutoff LFO',granular:'Granular'};
-const activeFx=()=>Object.keys(effectState).filter(k=>fxPresets[k][effectState[k].preset]&&(effectState[k].mix>.02||sendActive(k)));
+const activeFx=()=>Object.keys(effectState).filter(k=>fxPresets[k][effectState[k].preset]&&(insertFx.includes(k)?effectState[k].mix>.02:sendActive(k)));
 const budgetBytes=()=>{const dm=navigator.deviceMemory;return(dm?Math.min(640,Math.max(200,dm*70)):220)*MB};
 
 const S={opts:{mode:'multi',stems:'dry',cycles:1,bits:16,tails:true,sources:true},phase:'config',snapshot:null,cancel:false,result:null,rec:null};
@@ -162,7 +162,7 @@ async function run(){
   const taps=[],rec={mix:makeRecorder(o.bits),stems:[],fx:[]};
   audio.out.connect(rec.mix.node);rec.mix.node.connect(sink);taps.push(()=>{try{audio.out.disconnect(rec.mix.node)}catch{}});
   // Which master effects are actually on? Only those are rebuilt for each stem.
-  const fxKeys=Object.keys(effectState).filter(k=>fxPresets[k][effectState[k].preset]&&(effectState[k].mix>.02||sendActive(k)));
+  const fxKeys=Object.keys(effectState).filter(k=>fxPresets[k][effectState[k].preset]&&(insertFx.includes(k)?effectState[k].mix>.02:sendActive(k)));
   let stemMode=multi?o.stems:'dry';if(stemMode!=='dry'&&!fxKeys.length)stemMode='dry';
   if(multi&&stemMode!=='fx')for(let i=0;i<MAX_STEM;i++){
    const r=makeRecorder(o.bits),route=audio.routes[i];rec.stems.push(r);
@@ -174,17 +174,17 @@ async function run(){
    if(typeof effectsReady!=='undefined'&&effectsReady)await effectsReady;
    audio.stemRacks=[];
    for(let i=0;i<MAX_STEM;i++){
-    const r=makeRecorder(o.bits),route=audio.routes[i],rack=createEffectsRack(a,r.node,fxKeys);
+    const r=makeRecorder(o.bits),route=audio.routes[i],rack=createEffectsRack(a,r.node,fxKeys.filter(k=>insertFx.includes(k)));
     attachStemWorklets(rack);audio.stemRacks.push(rack);rec.fx.push(r);
     route.dry.connect(rack.input);route.space.connect(rack.input);r.node.connect(sink);
     taps.push(()=>{try{route.dry.disconnect(rack.input);route.space.disconnect(rack.input)}catch{}});
    }
-   for(const k of fxKeys)for(const rk of audio.stemRacks)applyEffect(k,rk);
-   // Per-track sends: this source's own send racks (100% wet) run beside its master-effect rack and land in the same stem.
+   for(const k of fxKeys.filter(k=>insertFx.includes(k)))for(const rk of audio.stemRacks)applyEffect(k,rk);
+   // Per-track sends: this source's own send racks (100% wet) return into its master-insert rack, like effect returns reach the master inserts in the live mix.
    for(let i=0;i<MAX_STEM;i++)for(let j=0;j<sendKeys.length;j++){
     const k=sendKeys[j],v=trackSends[i][j];if(v<=0||!fxPresets[k][effectState[k].preset])continue;
-    const rk=createEffectsRack(a,rec.fx[i].node,[k]),g=a.createGain(),route=audio.routes[i];
-    attachStemWorklets(rk);applyEffect(k,rk,true);g.gain.value=sendGainOf(v);route.pan.connect(g);g.connect(rk.input);audio.stemRacks.push(rk);
+    const rk=createEffectsRack(a,audio.stemRacks[i].input,[k]),g=a.createGain(),route=audio.routes[i];
+    attachStemWorklets(rk);rk.bed=sendGainOf(v);rk.out.gain.value=effectState[k].mix;applyEffect(k,rk,true);g.gain.value=sendGainOf(v);route.pan.connect(g);g.connect(rk.input);audio.stemRacks.push(rk);
     taps.push(()=>{try{route.pan.disconnect(g)}catch{}});
    }
   }

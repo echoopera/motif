@@ -19,10 +19,14 @@ Four living soundscapes sit on one map. Draw a route and the music follows it, h
   then fade the output to silence before the audio engine sleeps (no clicks). Touch a sphere or press Play to wake it.
 - **Desktop / iPad layout:** Mix, Sources, Effects and Journeys can be collapsed from their headers. Collapsing one gives its space to the module
   above/below it, expanding a collapsed one collapses its partner, and both can be collapsed. Saved per browser; phones keep the tabbed layout.
-- **Mix (3 pages, swipe or use the tabs):** page 1 per-source levels · pages 2 and 3 per-source **effect sends** as rotary dials (0 to 100) into all 8 effects.
-  Drag a dial up/down (drag far sideways for fine control), scroll, use arrow keys, or double-tap to reset. Each effect has one shared send bus, built the first
-  time a send is raised and wired once, so with every send at 0 the sound path is unchanged. A send needs a preset on that effect (a bypassed effect dims its dials).
-  Sends are saved with sessions and journeys and are included in the mix and in 'stems with effects' exports.
+- **Mix (3 pages, swipe or use the tabs):** page 1 per-source level faders · pages 2 and 3 per-source **aux sends** as rotary dials (0 to 100) into the six send effects.
+  Drag a dial up/down (drag far sideways for fine control), scroll, use arrow keys, or double-tap to reset. Sends are post-fader, like a console.
+- **Effects, console style:** *Aux sends* (Granular, Delay, Reverb, Cutoff+LFO, Lo-Fi, Slow Machine) are shared effects that run 100% wet in parallel; each has a
+  **Return** level. *Master inserts* (3-Band EQ, Soft Clipper) sit in series on the master bus with a Dry/Wet and a swappable order (▲ ▼).
+  Signal flow: track fader → pan → track bus → mix bus (+ effect returns) → EQ → Clipper → compressor → limiter → **master volume** → out.
+  Send buses are built the first time a send goes above 0 and wired once; an idle bus disconnects itself, so unused effects cost nothing.
+- **Working like an engineer:** set levels with the faders first; add a Reverb and a Delay and bring them in with the send dials (a little goes a long way);
+  use Return to balance the effect against the mix; put EQ on the master bus to shape the whole sound and the Clipper last for gentle glue; set the master volume last.
 - **Mix (other):** per-source levels, master volume, influence radii, focused blend, harmony guard, spatial depth.
 - **Effects (8 inserts, 40 presets):** Granular → Delay → Reverb → Cutoff+LFO → Lo-Fi Media → Slow Machine → 3-Band EQ → Soft Clipper.
   Each module has a preset dropdown and a live display of what it is doing (grains, echo taps, impulse response, filter sweep, tape wobble,

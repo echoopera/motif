@@ -69,14 +69,17 @@ function mixLevelPage(){
   card.append(top,line,meter);page.append(card)}
  return page}
 function mixSendPage(n){
+ const first=(n-1)*4,count=Math.min(4,sendKeys.length-first);
  const page=document.createElement('section');page.className='mp-page';page.dataset.p=n;
- const cols=document.createElement('div');cols.className='mp-cols';cols.innerHTML='<span></span>'+[0,1,2,3].map(k=>'<span>'+fxShort[sendKeys[(n-1)*4+k]]+'</span>').join('');page.append(cols);
+ const cols=document.createElement('div');cols.className='mp-cols';cols.innerHTML='<span></span>'+Array.from({length:count},(_,k)=>'<span>'+fxShort[sendKeys[first+k]]+'</span>').join('');page.append(cols);
  for(let i=0;i<4;i++){
   const row=document.createElement('div');row.className='mp-row';row.style.setProperty('--c',palettes[i]);
   row.innerHTML='<div class="who"><small>SRC '+String(i+1).padStart(2,'0')+'</small><b></b></div>';row.querySelector('b').textContent=worlds[i].name;
-  for(let k=0;k<4;k++)row.append(makeSendKnob(i,(n-1)*4+k));
+  for(let k=0;k<count;k++)row.append(makeSendKnob(i,first+k));
   page.append(row)}
- return page}
+ const note=document.createElement('p');note.className='mp-note';
+ note.textContent=n===1?'Post-fader aux sends. Level sets how much of the source reaches the master; the dial sets how much of it is processed.':'EQ and Soft Clipper are master inserts, not sends. Set them in Effects.';
+ page.append(note);return page}
 
 function renderTrackMixer(){
  const root=$('trackMixer');if(!root)return;
