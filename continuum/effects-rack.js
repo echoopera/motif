@@ -44,11 +44,15 @@ const effectState=Object.fromEntries(Object.keys(fxPresets).map(k=>[k,{preset:-1
 for(const k of Object.keys(fxKnobs))effectState[k].knobs=fxKnobs[k].map(x=>x.def);
 // Processing order (the user can reorder it). Everything that builds or wires a rack reads this list.
 const fxOrder=Object.keys(fxPresets);
+// Per-track sends: trackSends[track][effect] is 0..100, effects in the fixed order of fxPresets (not fxOrder).
+const sendKeys=Object.keys(fxPresets);
+const trackSends=Array.from({length:4},()=>Array(sendKeys.length).fill(0));
+const validSends=x=>x===undefined||(Array.isArray(x)&&x.length===4&&x.every(r=>Array.isArray(r)&&r.length===sendKeys.length&&r.every(n=>Number.isFinite(n)&&n>=0&&n<=100)));
 let effectsReady=null,selectedSource=0;
 const validFxOrder=o=>Array.isArray(o)&&o.length===fxOrder.length&&fxOrder.every(k=>o.includes(k));
-function validPerformance(s){return (s.order===undefined||validFxOrder(s.order))&&(!s.levels||(Array.isArray(s.levels)&&s.levels.length===4&&s.levels.every(v=>Number.isFinite(v)&&v>=0&&v<=1)))&&(!s.effects||(Object.keys(s.effects).every(k=>fxPresets[k]&&Number.isInteger(s.effects[k].preset)&&s.effects[k].preset>=-1&&s.effects[k].preset<fxPresets[k].length&&Number.isFinite(s.effects[k].mix)&&s.effects[k].mix>=0&&s.effects[k].mix<=1&&(s.effects[k].knobs===undefined||(fxKnobs[k]&&Array.isArray(s.effects[k].knobs)&&s.effects[k].knobs.length===fxKnobs[k].length&&s.effects[k].knobs.every((n,i)=>Number.isFinite(n)&&n>=fxKnobs[k][i].min&&n<=fxKnobs[k][i].max))))))}
-function performanceData(){return {order:[...fxOrder],levels:[...trackLevels],effects:Object.fromEntries(Object.entries(effectState).map(([k,v])=>[k,{...v,...(v.knobs?{knobs:[...v.knobs]}:{})}]))}}
-function restorePerformance(s){if(!validPerformance(s))return;if(s.order&&s.order.some((k,i)=>k!==fxOrder[i])){fxOrder.splice(0,fxOrder.length,...s.order);fxApplyOrder()}for(let i=0;i<4;i++)trackLevels[i]=s.levels?.[i]??1;for(const k of Object.keys(effectState)){Object.assign(effectState[k],s.effects?.[k]||{preset:-1,mix:0});if(fxKnobs[k]){const kn=s.effects?.[k]?.knobs;effectState[k].knobs=Array.isArray(kn)?[...kn]:fxKnobs[k].map(x=>x.def)}}renderTrackMixer();renderEffects();if(audio?.rack)for(const k of Object.keys(effectState))applyEffect(k);}
+function validPerformance(s){return (s.order===undefined||validFxOrder(s.order))&&validSends(s.sends)&&(!s.levels||(Array.isArray(s.levels)&&s.levels.length===4&&s.levels.every(v=>Number.isFinite(v)&&v>=0&&v<=1)))&&(!s.effects||(Object.keys(s.effects).every(k=>fxPresets[k]&&Number.isInteger(s.effects[k].preset)&&s.effects[k].preset>=-1&&s.effects[k].preset<fxPresets[k].length&&Number.isFinite(s.effects[k].mix)&&s.effects[k].mix>=0&&s.effects[k].mix<=1&&(s.effects[k].knobs===undefined||(fxKnobs[k]&&Array.isArray(s.effects[k].knobs)&&s.effects[k].knobs.length===fxKnobs[k].length&&s.effects[k].knobs.every((n,i)=>Number.isFinite(n)&&n>=fxKnobs[k][i].min&&n<=fxKnobs[k][i].max))))))}
+function performanceData(){return {order:[...fxOrder],sends:trackSends.map(r=>[...r]),levels:[...trackLevels],effects:Object.fromEntries(Object.entries(effectState).map(([k,v])=>[k,{...v,...(v.knobs?{knobs:[...v.knobs]}:{})}]))}}
+function restorePerformance(s){if(!validPerformance(s))return;if(s.order&&s.order.some((k,i)=>k!==fxOrder[i])){fxOrder.splice(0,fxOrder.length,...s.order);fxApplyOrder()}for(let i=0;i<4;i++){trackLevels[i]=s.levels?.[i]??1;for(let j=0;j<sendKeys.length;j++)trackSends[i][j]=s.sends?.[i]?.[j]??0}for(const k of Object.keys(effectState)){Object.assign(effectState[k],s.effects?.[k]||{preset:-1,mix:0});if(fxKnobs[k]){const kn=s.effects?.[k]?.knobs;effectState[k].knobs=Array.isArray(kn)?[...kn]:fxKnobs[k].map(x=>x.def)}}renderTrackMixer();renderEffects();if(audio?.rack){for(const k of Object.keys(effectState))applyEffect(k);applySends()}}
 function glide(param,value,time,tau=.05){if(!param)return;if(param.cancelAndHoldAtTime)param.cancelAndHoldAtTime(time);else param.cancelScheduledValues(time);param.setTargetAtTime(value,time,tau)}
 function effectSlot(a){const input=a.createGain(),output=a.createGain(),dry=a.createGain(),wet=a.createGain();dry.gain.value=1;wet.gain.value=0;input.connect(dry);dry.connect(output);wet.connect(output);return{input,output,dry,wet,processor:null}}
 // `only` limits the rack to the listed effects (used for the per-stem export racks); omit it for the full master rack.
@@ -82,7 +86,7 @@ function createEffectsRack(a,destination,only){const input=a.createGain(),slots=
 function rewireRack(rack){const keys=fxOrder.filter(k=>rack.slots[k]);try{rack.input.disconnect()}catch{}for(const k of keys)try{rack.slots[k].output.disconnect()}catch{}let prev=rack.input;for(const k of keys){prev.connect(rack.slots[k].input);prev=rack.slots[k].output}prev.connect(rack.out)}
 let fxOrderTimer=0;
 function fxApplyOrder(){const rack=audio?.rack;if(!rack)return;clearTimeout(fxOrderTimer);const o=rack.out.gain,t=audio.a.currentTime;o.cancelScheduledValues(t);o.setValueAtTime(o.value,t);o.linearRampToValueAtTime(0,t+.03);fxOrderTimer=setTimeout(()=>{rewireRack(rack);const t2=audio.a.currentTime;o.cancelScheduledValues(t2);o.setValueAtTime(0,t2);o.linearRampToValueAtTime(1,t2+.07)},45)}
-async function initializeEffects(){if(!audio?.rack)return;if(!effectsReady)effectsReady=(async()=>{try{await audio.a.audioWorklet.addModule('./granular-fx.js');const slot=audio.rack.slots.granular;slot.processor=new AudioWorkletNode(audio.a,'continuum-granular',{numberOfInputs:1,numberOfOutputs:1,outputChannelCount:[2]});slot.input.connect(slot.processor);slot.processor.connect(slot.wet);slot.processor.onprocessorerror=()=>{effectState.granular.preset=-1;applyEffect('granular');renderEffects();message('Granular stopped')};}catch{effectState.granular.preset=-1;message('Granular unavailable')}try{await audio.a.audioWorklet.addModule('./lofi-fx.js');const m=audio.rack.slots.media;m.crush=new AudioWorkletNode(audio.a,'continuum-crush',{numberOfInputs:1,numberOfOutputs:1,outputChannelCount:[2]});m.crushIn.disconnect(m.crushOut);m.crushIn.connect(m.crush);m.crush.connect(m.crushOut)}catch{}try{await audio.a.audioWorklet.addModule('./slow-fx.js');const z=audio.rack.slots.slow;z.proc=new AudioWorkletNode(audio.a,'continuum-slow',{numberOfInputs:1,numberOfOutputs:1,outputChannelCount:[2]});z.proc.port.onmessage=e=>{z.sp=e.data.s;z.drop=e.data.e};z.input.disconnect(z.pre);z.input.connect(z.proc);z.proc.connect(z.pre)}catch{}for(const k of Object.keys(effectState))applyEffect(k);renderEffects()})();await effectsReady;}
+async function initializeEffects(){if(!audio?.rack)return;if(!effectsReady)effectsReady=(async()=>{try{await audio.a.audioWorklet.addModule('./granular-fx.js');const slot=audio.rack.slots.granular;slot.processor=new AudioWorkletNode(audio.a,'continuum-granular',{numberOfInputs:1,numberOfOutputs:1,outputChannelCount:[2]});slot.input.connect(slot.processor);slot.processor.connect(slot.wet);slot.processor.onprocessorerror=()=>{effectState.granular.preset=-1;applyEffect('granular');renderEffects();message('Granular stopped')};}catch{effectState.granular.preset=-1;message('Granular unavailable')}try{await audio.a.audioWorklet.addModule('./lofi-fx.js');const m=audio.rack.slots.media;m.crush=new AudioWorkletNode(audio.a,'continuum-crush',{numberOfInputs:1,numberOfOutputs:1,outputChannelCount:[2]});m.crushIn.disconnect(m.crushOut);m.crushIn.connect(m.crush);m.crush.connect(m.crushOut)}catch{}try{await audio.a.audioWorklet.addModule('./slow-fx.js');const z=audio.rack.slots.slow;z.proc=new AudioWorkletNode(audio.a,'continuum-slow',{numberOfInputs:1,numberOfOutputs:1,outputChannelCount:[2]});z.proc.port.onmessage=e=>{z.sp=e.data.s;z.drop=e.data.e};z.input.disconnect(z.pre);z.input.connect(z.proc);z.proc.connect(z.pre)}catch{}for(const k of Object.keys(effectState))applyEffect(k);applySends();renderEffects()})();await effectsReady;}
 // Export: worklets for a per-stem rack (modules are already loaded by initializeEffects).
 function attachStemWorklets(rack){const a=audio.a,S=rack.slots;
  try{if(S.granular){const g=S.granular;g.processor=new AudioWorkletNode(a,'continuum-granular',{numberOfInputs:1,numberOfOutputs:1,outputChannelCount:[2]});g.input.connect(g.processor);g.processor.connect(g.wet)}}catch{}
@@ -90,18 +94,52 @@ function attachStemWorklets(rack){const a=audio.a,S=rack.slots;
  try{if(S.slow){const z=S.slow;z.proc=new AudioWorkletNode(a,'continuum-slow',{numberOfInputs:1,numberOfOutputs:1,outputChannelCount:[2]});z.input.disconnect(z.pre);z.input.connect(z.proc);z.proc.connect(z.pre)}}catch{}}
 function disposeRack(rack){for(const s of Object.values(rack.slots))for(const n of Object.values(s)){if(!n||typeof n!=='object')continue;try{if(n.stop)n.stop()}catch{}try{if(n.disconnect)n.disconnect()}catch{}try{if(n.port)n.port.close()}catch{}}try{rack.input.disconnect()}catch{}try{rack.out.disconnect()}catch{}}
 function makeImpulse(a,p){const sr=a.sampleRate,length=Math.ceil(sr*p.decay),b=a.createBuffer(2,length,sr);let seed=24809;const random=()=>{seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/4294967296};for(let c=0;c<2;c++){const data=b.getChannelData(c);let smooth=0;for(let i=0;i<length;i++){const t=i/length,n=random()*2-1;let env=Math.pow(1-t,p.style===2?2.8:p.style===1?2:3.5);smooth=smooth*.75+n*.25;let v=p.style===1?n:smooth;if(p.style===3)env=Math.sin(Math.PI*Math.min(1,t*1.4))*(t<.82?1:Math.max(0,(1-t)/.18));if(p.style===4){v=n*(random()<.035?3:0)+Math.sin(i/sr*2*Math.PI*(c?173:137))*.06;env=Math.pow(1-t,2.5)}data[i]=v*env*.45;}if(p.style===0){for(const seconds of [.017,.029,.043,.061]){const j=Math.floor((seconds+c*.003)*sr);if(j<length)data[j]+=.55}}}return b;}
-function applyEffect(key,rack){rack=rack||audio?.rack;if(!rack)return;const s=rack.slots[key];if(!s)return;const v=effectState[key],p=fxPresets[key][v.preset],t=audio.a.currentTime;const mix=p?v.mix:0;glide(s.dry.gain,1-mix,t);glide(s.wet.gain,mix,t);if(key==='granular'){if(s.processor)glide(s.processor.parameters.get('mode'),p?.mode||0,t,.001);return}
+// ── Per-track sends ─────────────────────────────────────────────────────────────────────────────
+// Each effect gets ONE extra shared instance (a "send bus", 100% wet) fed by four per-track send gains and summed into the
+// master bus after the series chain. Everything is built lazily the first time a send is raised above 0 and wired once:
+// afterwards only gain values move (smoothed), so no click is possible from graph edits. With every send at 0 nothing exists
+// and the signal path is identical to a build without sends.
+const sendRacks={};
+const sendGainOf=v=>Math.pow(v/100,1.6);
+const sendActive=k=>{const j=sendKeys.indexOf(k);return j>=0&&trackSends.some(r=>r[j]>0)};
+function ensureSendBus(k){
+ let o=sendRacks[k];if(o)return o;
+ const a=audio.a,sum=a.createGain(),ret=a.createGain();ret.gain.value=0;
+ const rack=createEffectsRack(a,ret,[k]);attachStemWorklets(rack);sum.connect(rack.input);
+ o=sendRacks[k]={rack,sum,ret,on:false,timer:0,gains:[null,null,null,null]};
+ applyEffect(k,rack,true);return o}
+function applySends(onlyTrack,onlyFx){
+ if(!audio?.rack||!audio.routes?.length)return;const a=audio.a,t=a.currentTime;
+ for(let j=0;j<sendKeys.length;j++){if(onlyFx!==undefined&&j!==onlyFx)continue;
+  const k=sendKeys[j],active=sendActive(k);let o=sendRacks[k];
+  if(!active&&!o)continue;
+  if(active)o=ensureSendBus(k);
+  for(let i=0;i<4;i++){if(onlyTrack!==undefined&&i!==onlyTrack)continue;
+   const v=trackSends[i][j];let g=o.gains[i];
+   if(!g){if(v<=0)continue;g=o.gains[i]=a.createGain();g.gain.value=0;audio.routes[i].pan.connect(g);g.connect(o.sum)}
+   glide(g.gain,sendGainOf(v),t,.035)}
+  // Effects with their own noise bed (Lo-Fi hiss/crackle, tape hiss) scale that bed with the loudest send, so a quiet send is quiet.
+  if(k==='media'||k==='slow'){const m=Math.max(...trackSends.map(r=>sendGainOf(r[j])));if(Math.abs(m-(o.rack.bed||0))>.002){o.rack.bed=m;applyEffect(k,o.rack,true)}}
+  if(active){clearTimeout(o.timer);o.timer=0;
+   if(!o.on){o.on=true;o.ret.connect(audio.bus)}glide(o.ret.gain,1,t,.03)}
+  else if(o.on&&!o.timer){
+   // Everything is at 0: let the effect ring out, fade it, then disconnect so an idle bus costs no CPU.
+   o.timer=setTimeout(()=>{o.timer=0;if(sendActive(k)||!o.on)return;glide(o.ret.gain,0,audio.a.currentTime,.06);o.timer=setTimeout(()=>{o.timer=0;if(!sendActive(k)&&o.on){try{o.ret.disconnect()}catch{}o.on=false}},700)},8000)}
+ }
+}
+function setSend(i,j,v){trackSends[i][j]=v;applySends(i,j)}
+function applyEffect(key,rack,send){rack=rack||audio?.rack;if(!rack)return;const s=rack.slots[key];if(!s)return;const v=effectState[key],p=fxPresets[key][v.preset],t=audio.a.currentTime;const mix=p?(send?1:v.mix):0,bs=send?(rack.bed||0):1;glide(s.dry.gain,send?0:1-mix,t);glide(s.wet.gain,mix,t);if(key==='granular'){if(s.processor)glide(s.processor.parameters.get('mode'),p?.mode||0,t,.001);return}
  if(key==='delay'){glide(s.fbL.gain,p?.feedback||0,t,.1);glide(s.fbR.gain,p?.feedback||0,t,.1);if(p){glide(s.fl.frequency,p.tone,t);glide(s.fr.frequency,p.tone,t);}rack.lastBpm=0;}
  if(key==='reverb'&&p){if(s.preset!==v.preset){const next=s.activeBank===0?1:0;(next?s.convolverB:s.convolver).buffer=makeImpulse(audio.a,p);glide(s.convA.gain,next===0?1:0,t,.08);glide(s.convB.gain,next===1?1:0,t,.08);s.activeBank=next;s.preset=v.preset;}glide(s.pre.delayTime,p.pre,t);glide(s.tone.frequency,p.style===4?3600:p.style===1?9500:6400,t);}
  if(key==='cutoffLfo'){if(p){s.filter.type=p.type;glide(s.filter.frequency,p.hz,t,.12);glide(s.filter.Q,p.q,t);if(p.wave!=='random')s.lfo.type=p.wave;glide(s.depth.gain,p.wave==='random'?0:p.depth,t,.15);}else glide(s.depth.gain,0,t);rack.lastBpm=0;}
  if(key==='media'){const g=(par,val,tau)=>glide(par,val,t,tau||.1);
-  if(p){g(s.hp.frequency,p.hp);g(s.lp.frequency,p.lp);g(s.shelf.gain,p.shelf);s.sat.curve=satCurve(p.drive);g(s.wowD.gain,p.wow[0],.15);g(s.wowO.frequency,p.wow[1],.2);g(s.flutD.gain,p.flut[0],.15);g(s.flutO.frequency,p.flut[1],.2);g(s.hissG.gain,p.hiss);g(s.crackG.gain,p.crackle);g(s.rumbleG.gain,p.rumble);
+  if(p){g(s.hp.frequency,p.hp);g(s.lp.frequency,p.lp);g(s.shelf.gain,p.shelf);s.sat.curve=satCurve(p.drive);g(s.wowD.gain,p.wow[0],.15);g(s.wowO.frequency,p.wow[1],.2);g(s.flutD.gain,p.flut[0],.15);g(s.flutO.frequency,p.flut[1],.2);g(s.hissG.gain,p.hiss*bs);g(s.crackG.gain,p.crackle*bs);g(s.rumbleG.gain,p.rumble*bs);
    const c=p.width;g(s.ll.gain,1-c);g(s.rr.gain,1-c);g(s.lr.gain,c);g(s.rl.gain,c);
    if(s.crush){g(s.crush.parameters.get('bits'),p.bits,.01);g(s.crush.parameters.get('rate'),p.sr?Math.min(1,p.sr/audio.a.sampleRate):1,.01)}}
   else{g(s.wowD.gain,0);g(s.flutD.gain,0);g(s.hissG.gain,0);g(s.crackG.gain,0);g(s.rumbleG.gain,0)}}
  if(key==='slow'){const gg=(par,val,tau)=>glide(par,val,t,tau||.08);
   if(p){const k=v.knobs,age=k[2]===undefined?0:k[1]/100;if(s.proc){const pr=s.proc.parameters;pr.get('mode').value=p.mode;pr.get('amount').value=k[0]/100;pr.get('age').value=age;pr.get('period').value=Math.max(.4,p.beats*60/(audio.bpm||72)/(k[2]/100))}
-   s.sat.curve=satCurve(.5+age*2.4);gg(s.lp.frequency,17500*Math.pow(1-age*.86,2.2)+1800,.15);gg(s.hiss.gain,age*age*.045,.2)}
+   s.sat.curve=satCurve(.5+age*2.4);gg(s.lp.frequency,17500*Math.pow(1-age*.86,2.2)+1800,.15);gg(s.hiss.gain,age*age*.045*bs,.2)}
   else{if(s.proc)s.proc.parameters.get('mode').value=0;gg(s.hiss.gain,0)}}
  if(key==='eq3'){const gg=(par,val,tau)=>glide(par,val,t,tau||.06);
   if(p){const k=v.knobs;gg(s.lo.frequency,p.lowF);gg(s.lo.gain,k[0]);gg(s.mid.frequency,p.midF);gg(s.mid.Q,p.midQ);gg(s.mid.gain,k[1]);gg(s.hi.frequency,p.highF);gg(s.hi.gain,k[2])}
@@ -109,16 +147,16 @@ function applyEffect(key,rack){rack=rack||audio?.rack;if(!rack)return;const s=ra
  if(key==='clip'){const gg=(par,val,tau)=>glide(par,val,t,tau||.06);
   if(p){const k=v.knobs,T=Math.max(.1,Math.min(1,k[0]/100)),m=p.comp;s.shaper.curve=clipCurve(T);gg(s.pre.gain,p.drive/3);gg(s.post.gain,Math.pow(10,k[1]/20));gg(s.comp.threshold,m.thr,.02);gg(s.comp.knee,m.knee,.02);gg(s.comp.ratio,m.ratio,.02);gg(s.comp.attack,m.atk,.02);gg(s.comp.release,m.rel,.02)}
   else{s.shaper.curve=null;gg(s.pre.gain,1/3);gg(s.post.gain,1)}}
+ if(!send&&rack===audio.rack&&sendRacks[key])applyEffect(key,sendRacks[key].rack,true);
  updateEffectsClock();}
 // Soft clipper transfer curve: linear below the threshold, tanh-rounded shoulder above it, ceiling at 1.
 const clipCache={};function clipCurve(T){const key=T.toFixed(2);if(clipCache[key])return clipCache[key];const n=4097,c=new Float32Array(n);for(let i=0;i<n;i++){const u=i/(n-1)*2-1,sd=Math.abs(u*3),y=sd<=T?sd:T+(1-T)*Math.tanh((sd-T)/(1-T));c[i]=Math.sign(u)*y}clipCache[key]=c;return c}
 const satCache={};function satCurve(drive){if(!drive)return null;const key=drive.toFixed(2);if(satCache[key])return satCache[key];const n=2048,c=new Float32Array(n),norm=Math.tanh(drive*1.2);for(let i=0;i<n;i++){const x=i/(n-1)*2-1;c[i]=Math.tanh(drive*1.2*x)/norm}return satCache[key]=c}
-function updateEffectsClock(){if(!audio?.rack||audio.a.state!=='running')return;for(const r of[audio.rack,...(audio.stemRacks||[])])updateRackClock(r)}
+function updateEffectsClock(){if(!audio?.rack||audio.a.state!=='running')return;for(const r of[audio.rack,...(audio.stemRacks||[])])updateRackClock(r);for(const o of Object.values(sendRacks))if(o.on)updateRackClock(o.rack)}
 function updateRackClock(rack){const t=audio.a.currentTime,bpm=audio.bpm,changed=Math.abs(bpm-rack.lastBpm)>.5;
  if(changed){rack.lastBpm=bpm;const d=fxPresets.delay[effectState.delay.preset];if(d&&rack.slots.delay){glide(rack.slots.delay.left.delayTime,Math.min(3.8,60/bpm*d.division),t,.2);glide(rack.slots.delay.right.delayTime,Math.min(3.8,60/bpm*d.division*d.spread),t,.2);}const sl=fxPresets.slow[effectState.slow.preset],sz=rack.slots.slow;if(sl&&sz&&sz.proc)glide(sz.proc.parameters.get('period'),Math.max(.4,sl.beats*60/bpm/(effectState.slow.knobs[2]/100)),t,.5);const f=fxPresets.cutoffLfo[effectState.cutoffLfo.preset];if(f&&f.wave!=='random'&&rack.slots.cutoffLfo)glide(rack.slots.cutoffLfo.lfo.frequency,bpm/60/f.beats,t,.1);}
  const p=fxPresets.cutoffLfo[effectState.cutoffLfo.preset];if(p?.wave==='random'&&rack.slots.cutoffLfo){const beat=Math.floor(audio.beatPosition()/p.beats);if(beat!==rack.lastRandomBeat){rack.lastRandomBeat=beat;const r=rng((seed^Math.imul(beat,9871))>>>0);glide(rack.slots.cutoffLfo.filter.frequency,p.hz+(r()*2-1)*p.depth,t,.06);}}
 }
-function renderTrackMixer(){const root=$('trackMixer');if(!root)return;root.replaceChildren();for(let i=0;i<4;i++){const card=document.createElement('article');card.className='track-strip';card.style.setProperty('--color',palettes[i]);const top=document.createElement('button');top.className='source-select';top.setAttribute('aria-pressed',selectedSource===i);top.innerHTML='<span class="strip-code">SOURCE / '+String(i+1).padStart(2,'0')+'</span>';const title=document.createElement('strong');title.textContent=worlds[i].name;top.append(title);top.onclick=()=>{selectedSource=i;point={x:nodes[i].x,y:nodes[i].y};stopJourney();renderTrackMixer()};const line=document.createElement('label');line.className='track-fader';line.textContent='LEVEL';const out=document.createElement('output');out.textContent=Math.round(trackLevels[i]*100)+'%';const slider=document.createElement('input');slider.type='range';slider.min=0;slider.max=100;slider.value=Math.round(trackLevels[i]*100);slider.setAttribute('aria-label',worlds[i].name+' track volume');slider.oninput=()=>{trackLevels[i]=+slider.value/100;out.textContent=slider.value+'%';if(audio?.routes[i]?.levelGain)glide(audio.routes[i].levelGain.gain,trackLevels[i],audio.a.currentTime);};line.append(out,slider);const meter=document.createElement('div');meter.className='strip-meter';meter.id='strip-meter-'+i;meter.setAttribute('aria-hidden','true');card.append(top,line,meter);root.append(card)}}
 const fxToken={},fxUI={},fxMemory={};
 // Wet/dry glides on a JS clock so the slider and the sound rise together.
 function fxRamp(k,from,to,ms,token,done){const t0=performance.now();const step=now=>{if(fxToken[k]!==token)return;const p=Math.min(1,(now-t0)/ms),ease=p<.5?2*p*p:1-Math.pow(-2*p+2,2)/2,v=from+(to-from)*ease;effectState[k].mix=v;if(k==='media'&&effectState[k].preset>=0)fxMemory.media=v;const s=audio?.rack?.slots[k];if(s){const t=audio.a.currentTime;glide(s.dry.gain,1-v,t,.025);glide(s.wet.gain,v,t,.025)}const u=fxUI[k];if(u){u.slider.value=Math.round(v*100);u.out.textContent=Math.round(v*100)+'%'}if(p<1)requestAnimationFrame(step);else if(done)done()};requestAnimationFrame(step)}
@@ -128,7 +166,7 @@ async function chooseEffect(k,index){if(!enabled)await enter();if(!enabled){rend
  if(index<0){const from=st.mix;st.preset=-1;renderEffects();fxRamp(k,from,0,280,token,()=>{st.mix=0;applyEffect(k)});if(typeof saveWorkingSession==='function')saveWorkingSession();return}
  const p=fxPresets[k][index],wasOn=prev>=0&&st.mix>.001;
  st.preset=index;if(fxKnobs[k])st.knobs=[...p.knobs];st.mix=0;renderEffects();
- const t=audio.a.currentTime;glide(s.wet.gain,0,t,.035);glide(s.dry.gain,1,t,.035);
+ const t=audio.a.currentTime;glide(s.wet.gain,0,t,.035);glide(s.dry.gain,1,t,.035);if(sendRacks[k])glide(sendRacks[k].rack.slots[k].wet.gain,0,t,.035);
  // Lo-Fi Media always enters at zero and carries the user's level (never above 60%) to the next preset.
  const target=k==='media'?Math.min(fxMemory.media||0,.6):p.mix;
  setTimeout(()=>{if(fxToken[k]!==token)return;applyEffect(k);fxRamp(k,0,target,wasOn?700:520,token)},wasOn?170:30);
@@ -155,5 +193,5 @@ function renderEffects(){const root=$('effectsControls');if(!root)return;
    const ki2=document.createElement('input');ki2.type='range';ki2.min=def.min;ki2.max=def.max;ki2.step=def.step;ki2.value=st.knobs[ki];ki2.disabled=st.preset<0;ki2.setAttribute('aria-label',fxLabels[key]+' '+def.label.toLowerCase());ki2.oninput=()=>{effectState[key].knobs[ki]=+ki2.value;ko.textContent=fmt(+ki2.value);applyEffect(key)};kl.append(ko,ki2);return kl});
   card.append(fxArrow(key,-1,n===0),head,viz,detail,...knobEls,label,fxArrow(key,1,n===fxOrder.length-1));root.append(card)});
  if(before){fxFlip=false;for(const c of root.children){const was=before.get(c.dataset.key);if(was===undefined)continue;const dy=was-c.getBoundingClientRect().top;if(Math.abs(dy)>1&&c.animate)c.animate([{transform:'translateY('+dy+'px)'},{transform:'none'}],{duration:280,easing:'cubic-bezier(.2,.8,.2,1)'})}}
- if(typeof fxVizScan==='function')fxVizScan()}
-renderTrackMixer();renderEffects();
+ if(typeof fxVizScan==='function')fxVizScan();if(typeof mixSyncSends==='function')mixSyncSends()}
+renderEffects();

@@ -19,7 +19,11 @@ Four living soundscapes sit on one map. Draw a route and the music follows it, h
   then fade the output to silence before the audio engine sleeps (no clicks). Touch a sphere or press Play to wake it.
 - **Desktop / iPad layout:** Mix, Sources, Effects and Journeys can be collapsed from their headers. Collapsing one gives its space to the module
   above/below it, expanding a collapsed one collapses its partner, and both can be collapsed. Saved per browser; phones keep the tabbed layout.
-- **Mix:** per-source levels, master volume, influence radii, focused blend, harmony guard, spatial depth.
+- **Mix (3 pages, swipe or use the tabs):** page 1 per-source levels · pages 2 and 3 per-source **effect sends** as rotary dials (0 to 100) into all 8 effects.
+  Drag a dial up/down (drag far sideways for fine control), scroll, use arrow keys, or double-tap to reset. Each effect has one shared send bus, built the first
+  time a send is raised and wired once, so with every send at 0 the sound path is unchanged. A send needs a preset on that effect (a bypassed effect dims its dials).
+  Sends are saved with sessions and journeys and are included in the mix and in 'stems with effects' exports.
+- **Mix (other):** per-source levels, master volume, influence radii, focused blend, harmony guard, spatial depth.
 - **Effects (8 inserts, 40 presets):** Granular → Delay → Reverb → Cutoff+LFO → Lo-Fi Media → Slow Machine → 3-Band EQ → Soft Clipper.
   Each module has a preset dropdown and a live display of what it is doing (grains, echo taps, impulse response, filter sweep, tape wobble,
   tape speed, EQ curve, clip transfer). The ▲ / ▼ buttons reorder the chain; the order is saved with the session and journeys and is used by export.
@@ -36,7 +40,7 @@ Four living soundscapes sit on one map. Draw a route and the music follows it, h
 | `index.html` `hud.css` `app.js` `shell.js` | App shell, stage rendering, gestures, transport, tabs |
 | `transition-scene.js` `effects-rack.js` | Per-source routing, spatial field, master effects rack |
 | `audio-import.js` `queue.js` `working-session.js` | Imports, import queue, session restore |
-| `fx-viz.js` | Live displays for each effect module |
+| `fx-viz.js` `mix-pages.js` | Live effect displays · Mix pages and send dials |
 | `export.js` `rec-worklet.js` | Audio export: sample-accurate recorder, WAV + ZIP writers, export sheet |
 | `audio-player.js` `granular-fx.js` `lofi-fx.js` `slow-fx.js` `audio-analysis.js` | Worklets and the analysis worker |
 | `product.html` `prd.html` | Product page and requirements |
