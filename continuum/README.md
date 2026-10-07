@@ -17,8 +17,10 @@ Four living soundscapes sit on one map. Draw a route and the music follows it, h
 - **Waveform + sources:** one slim row under the map: live waveform (60%) and four colour buttons (40%) that start/stop each source.
 - **Transport:** Play/Pause · Stop (rewind) · Save · Clear · New layout. Pause and Stop fade the sources, let reverb/echo/tape tails ring out,
   then fade the output to silence before the audio engine sleeps (no clicks). Touch a sphere or press Play to wake it.
+- **Desktop / iPad layout:** Mix, Sources, Effects and Journeys can be collapsed from their headers. Collapsing one gives its space to the module
+  above/below it, expanding a collapsed one collapses its partner, and both can be collapsed. Saved per browser; phones keep the tabbed layout.
 - **Mix:** per-source levels, master volume, influence radii, focused blend, harmony guard, spatial depth.
-- **Processing (8 inserts, 40 presets):** Granular → Delay → Reverb → Cutoff+LFO → Lo-Fi Media → Slow Machine → 3-Band EQ → Soft Clipper.
+- **Effects (8 inserts, 40 presets):** Granular → Delay → Reverb → Cutoff+LFO → Lo-Fi Media → Slow Machine → 3-Band EQ → Soft Clipper.
   Each module has a preset dropdown and a live display of what it is doing (grains, echo taps, impulse response, filter sweep, tape wobble,
   tape speed, EQ curve, clip transfer). The ▲ / ▼ buttons reorder the chain; the order is saved with the session and journeys and is used by export.
 - **Background play:** audio keeps running when the tab is hidden or the window loses focus (a worker clock replaces throttled timers; media keys work where the browser supports them).

@@ -41,6 +41,30 @@ let start=location.hash.slice(1);
 if(!VIEWS.includes(start)){try{start=localStorage.getItem('continuum-view-v1')||'nav'}catch{start='nav'}}
 apply(start,{push:false});
 
+// Collapsible modules (desktop / iPad layout only). Each column holds a pair; collapsing one hands its space to the other,
+// expanding a collapsed one collapses its partner, and both can be collapsed.
+const PAIR={mix:'src',src:'mix',fx:'log',log:'fx'},NAME={mix:'Mix',src:'Sources',fx:'Effects',log:'Journeys'};
+let folded={};try{folded=JSON.parse(localStorage.getItem('continuum-folded-v1')||'{}')}catch{}
+const paint=()=>{
+  for(const k of Object.keys(PAIR)){
+    const v=document.querySelector('.view[data-view='+k+']'),btn=v?.querySelector('.vh-toggle');if(!v)continue;
+    v.classList.toggle('collapsed',!!folded[k]);
+    if(btn){btn.setAttribute('aria-expanded',String(!folded[k]));btn.setAttribute('aria-label',(folded[k]?'Expand ':'Collapse ')+NAME[k])}
+  }
+};
+const fold=k=>{
+  if(folded[k]){folded[k]=false;folded[PAIR[k]]=true}else folded[k]=true;
+  try{localStorage.setItem('continuum-folded-v1',JSON.stringify(folded))}catch{}
+  paint();
+};
+for(const k of Object.keys(PAIR)){
+  const head=document.querySelector('.view[data-view='+k+'] .vh');if(!head)continue;
+  const b=document.createElement('button');b.type='button';b.className='vh-toggle';
+  b.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 15l6-6 6 6"/></svg>';
+  b.onclick=()=>fold(k);head.append(b);
+}
+paint();
+
 // Self-fitting nav: if the stage + controls don't fit the visible height (Safari bars, small phones, big text),
 // collapse decoration in steps (t1 spectrum, t2 compact HUD/tiles, t3 captions and tiles) until the transport is on screen.
 const nav=document.querySelector('.view.nav');
