@@ -1,2 +1,0 @@
-Oxanium, IBM Plex Mono and IBM Plex Sans are licensed under the SIL Open Font License 1.1 (https://openfontlicense.org).
-Latin subsets are redistributed here unmodified from Google Fonts.
