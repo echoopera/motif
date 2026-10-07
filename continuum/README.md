@@ -13,10 +13,15 @@ Four living soundscapes sit on one map. Draw a route and the music follows it, h
 - **Edit while it plays:** drag a point to bend the route · press the route's end and keep drawing to extend it ·
   press-and-hold on the route to loop that section (tap the pulsing dot to release).
 - **Spheres:** tap = play/stop that source · hold and drag = move it (overlapping spheres merge into one sound).
+  On desktop, hover a sphere's ring to light it up, then drag or scroll to change its radius (touch uses the Mix sliders).
+- **Waveform + sources:** one slim row under the map: live waveform (60%) and four colour buttons (40%) that start/stop each source.
 - **Transport:** Play/Pause · Stop (rewind) · Save · Clear · New layout. Pause and Stop fade the sources, let reverb/echo/tape tails ring out,
   then fade the output to silence before the audio engine sleeps (no clicks). Touch a sphere or press Play to wake it.
 - **Mix:** per-source levels, master volume, influence radii, focused blend, harmony guard, spatial depth.
 - **Processing (8 inserts, 40 presets):** Granular → Delay → Reverb → Cutoff+LFO → Lo-Fi Media → Slow Machine → 3-Band EQ → Soft Clipper.
+  Each module has a preset dropdown and a live display of what it is doing (grains, echo taps, impulse response, filter sweep, tape wobble,
+  tape speed, EQ curve, clip transfer). The ▲ / ▼ buttons reorder the chain; the order is saved with the session and journeys and is used by export.
+- **Background play:** audio keeps running when the tab is hidden or the window loses focus (a worker clock replaces throttled timers; media keys work where the browser supports them).
 - **Export (Log tab):** *Export audio* bounces the journey live as a **single stereo WAV** of the final mix, or a **multitrack ZIP**: one stem per
   source, the full mix, optional original files, `journey.json` (route, weights, tempo, effects) and a README. 1/2/4 cycles, 16/24-bit, optional ring-out tails.
   Saved journeys have an *Audio* button too. All files start on the same sample. *Stems* can be Dry, With FX (`stems-with-effects/`, each stem through its own copy of the active master effects) or Both. Time-modulated effects (Slow Machine, Lo-Fi, Cutoff LFO, Granular) move independently per stem, so those stems will not sum exactly to the mix; the master compressor is not applied.
@@ -29,6 +34,7 @@ Four living soundscapes sit on one map. Draw a route and the music follows it, h
 | `index.html` `hud.css` `app.js` `shell.js` | App shell, stage rendering, gestures, transport, tabs |
 | `transition-scene.js` `effects-rack.js` | Per-source routing, spatial field, master effects rack |
 | `audio-import.js` `queue.js` `working-session.js` | Imports, import queue, session restore |
+| `fx-viz.js` | Live displays for each effect module |
 | `export.js` `rec-worklet.js` | Audio export: sample-accurate recorder, WAV + ZIP writers, export sheet |
 | `audio-player.js` `granular-fx.js` `lofi-fx.js` `slow-fx.js` `audio-analysis.js` | Worklets and the analysis worker |
 | `product.html` `prd.html` | Product page and requirements |

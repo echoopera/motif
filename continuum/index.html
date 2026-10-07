@@ -67,11 +67,9 @@
         </div>
       </div>
 
-      <div class="ident-strip" id="identStrip" role="group" aria-label="Sources — tap to fly there"></div>
-
-      <div class="spectrum" aria-hidden="true">
-        <canvas id="spectrum"></canvas>
-        <div class="spec-meta"><span class="micro">SIGNAL ENERGY</span><span class="micro" id="transitionState">STANDBY</span></div>
+      <div class="meter-row">
+        <div class="spectrum" aria-hidden="true"><canvas id="spectrum"></canvas><span id="transitionState" hidden>STANDBY</span></div>
+        <div class="ident-strip" id="identStrip" role="group" aria-label="Sources: tap to start or stop"></div>
       </div>
 
       <div class="dock">
@@ -138,7 +136,7 @@
         <header class="vh"><span class="code">03</span><h2>Processing</h2><span class="sub">8 INSERTS</span></header>
         <div class="panel">
           <div class="ph"><h3>Processing array</h3><span class="micro">CHAIN</span></div>
-          <div class="rack-chain" aria-hidden="true"><span>FIELD</span><i></i><span>GRAIN</span><i></i><span>ECHO</span><i></i><span>SPACE</span><i></i><span>FILTER</span><i></i><span>MEDIA</span><i></i><span>SLOW</span><i></i><span>EQ</span><i></i><span>CLIP</span></div>
+          <div class="rack-chain" id="rackChain" aria-hidden="true"></div>
           <div id="effectsControls" class="effects-controls"></div>
         </div>
       </div>
@@ -205,6 +203,7 @@
 <script src="./app.js"></script>
 <script src="./transition-scene.js"></script>
 <script src="./effects-rack.js"></script>
+<script src="./fx-viz.js"></script>
 <script src="./audio-import.js"></script>
 <script src="./queue.js"></script>
 <script src="./export.js"></script>

@@ -78,7 +78,6 @@ function build(){
  sheet.querySelector('#exClose').onclick=()=>S.phase==='record'?cancel():close();
  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!sheet.hidden)(S.phase==='record'?cancel():close())});
  // A locked or backgrounded page stops the audio clock, which would ruin a live bounce.
- document.addEventListener('visibilitychange',()=>{if(document.hidden&&S.phase==='record')cancel('Export cancelled · screen left')});
 }
 function seg(name,items,cur){
  return'<div class="seg" role="radiogroup" aria-label="'+name+'">'+items.map(([v,l])=>'<button type="button" role="radio" aria-checked="'+(String(cur)===String(v))+'" data-k="'+name+'" data-v="'+v+'">'+l+'</button>').join('')+'</div>';
